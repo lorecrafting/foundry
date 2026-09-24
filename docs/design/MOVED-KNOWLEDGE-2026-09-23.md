@@ -1,0 +1,50 @@
+# Knowledge moved out of the deleted daemon stack — 2026-09-23
+
+**Why this exists.** Plan amendment [C1](../REPAIR-PLAN.md#clean-room-amendment) deleted the
+legacy daemon stack instead of migrating it (ticket ML-DEL-DAEMON, following the
+[clean-room sweep](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md) §1.1 and §2). The deleted tests
+encoded edge cases that the forward path (the manual lane over Core) still has to respect when
+FR-09 to FR-13 rebuild the matching capability on Core. This note lists each one, the test
+that encoded it, and where it lives now or which ticket owns it.
+
+**Reading a deleted test.** Every path below existed at `db4334c`:
+`git show db4334c:test/pramana_foundry/<file>`. "Covered" means a surviving test states the
+same property for the forward path; "owner" means nothing states it yet.
+
+## The five items the sweep named (§2 "Knowledge that moves")
+
+| Knowledge | Deleted test that encoded it | Now |
+|---|---|---|
+| Telemetry never carries a body or secret: records with any of `prompt prompt_body response response_body transcript environment env credentials secrets provider_payload corpus_text` are refused, and command argv values after `--token` or in `api_key=` form are replaced by `[REDACTED]` | `telemetry/telemetry_test.exs` "LLM metrics preserve unavailable values and reject sensitive bodies", "command telemetry redacts secrets and never invents token fields"; field list at `lib/pramana_foundry/telemetry/telemetry.ex:216` | **Owner: ML-KNOWLEDGE-NOTES.** `ManualLane.Log` (`manual_lane/log.ex`, `operator.log.jsonl`) writes argv unredacted today; the redaction and its test belong there |
+| FR-01 launch policy: subscription-only eligibility for each role; paid, manual, premium, exhausted, unknown-quota, role-disallowed and cooling-down profiles all refused; no paid fallback; every malformed nested policy gives a stable blocked reason | `autonomous_launch_test.exs:86-148` | **Covered, kept as a leaf:** moved verbatim to `test/pramana_foundry/launch_eligibility_test.exs`. The rest of that file (`:195-873`) drove Tick and AgentServer; see "Launch" below. FR-09 decides what calls `LaunchEligibility` next |
+| Process identity drift: a live process may change `command` without becoming another process, so "still running" compares pid, group and start time, never argv | `checks/status_test.exs` "a process that exec'd is still :running -- command may change, incarnation may not", "a different incarnation on the same pid is still :uncertain" | **Covered in part:** `Effects.ProcessGroup` and `effects/process_group_test.exs` are kept. **Gap, owner FR-10:** real termination and descendant cleanup were exercised only in the deleted `checks/runner_test.exs` ("cancellation terminates the check well before its natural exit", "a stale identity (already exited) is refused rather than signalled", "a replacement-owner mismatch … refuses to signal a live process") |
+| A clean release waits for the effect subtree to quiesce before the owner lock is released | `runtime_startup_boundary_test.exs` "clean release waits for the effect subtree to quiesce" (and "bridge loss quiesces the runtime and refuses automatic takeover") | **Owner: FR-10** worker monitoring ([FR10-DESIGN](../fr-10/FR10-DESIGN-2026-09-23.md)). The store-level half — two OS owners, a stale PID is not authority, fail-closed takeover evidence — is covered by `DurableStore.Owner` and the `durable_store/*` owner tests |
+| Relocation rules (verify copy before removal, digest, live handles block, collision-safe rollback) | relocation tests | Not this ticket: ML-DEL-RELOCATION (C3) |
+
+## Further knowledge found in the deleted tests
+
+| Knowledge | Deleted test | Now |
+|---|---|---|
+| A launch is checkpointed intent → start → completion; a crash after intent never re-runs the start, an uncertain launch fails explicitly, and a re-launch after completion is a pure read | `effects/launch_test.exs` (all five tests) | **Owner: FR-10** (owned effects persisted before the external call; [effects model](../../spec/fr10/effects.qnt)) |
+| Prompt delivery is at most once: a crash between intent and delivery looks for the text in the transcript instead of resending, and ambiguous evidence parks rather than guessing | `effects/prompt_delivery_test.exs` "a crash between intent and delivery never resends…", "ambiguous delivery with no transcript evidence parks rather than guessing either way" | **Owner: FR-09** (harness contract: prompt/observe) and FR-10 (reconcile) |
+| Silence is not evidence: a spinner string or wall-clock quiet never counts; a check or tool with its own deadline is exempt; the watchdog fires strictly after the bound and only on durable evidence | `effects/silence_watchdog_test.exs` | **Owner: FR-11** (timeout lifecycle) |
+| Deadline beats a late zero exit (a check finishing after its deadline is `:timeout`); no completion and no live match is `:uncertain`, never success; completion after a stop intent is diagnostics, not promotable | `checks/status_test.exs`, `checks/adoption_test.exs`, `checks/runner_test.exs` "deadline expiry outranks a late zero exit…" | **Owner: FR-13** (check receipts from the kernel's `check_*` events). The lane's check set is empty today (LANE-RUNBOOK §7) |
+| Presentation identity: a recorded native session never silently downgrades to the terminal fallback; cleanup closes only after exact agent, session, pane and terminal re-inspection; a recycled or foreign occupant survives | `herdr/identity_test.exs`, `herdr/adapter_test.exs` | **Owner: FR-09**, designed against the selected harness rather than Herdr. Argv shape rules (no shell string; prompt text one argv element; native args only after `--`) from `herdr/argv_test.exs` go with it |
+| Cleanup is a durable obligation: an owned resource needs a terminal receipt independently of the work verdict; only an exact matching receipt releases it; a pending cleanup holds capacity and blocks ordinary admission | `transition_test.exs`, `coordinator_test.exs` "unresolved launch failure and crash retain capacity without ordinary retry", `runtime_startup_boundary_test.exs` production-topology tests | **Owner: FR-10** (settlement) and **FR-12** (capacity) |
+| Correction budget: two rejected reviews prepare corrections, the third parks the ticket; a review-validation failure spends a retry budget before parking | `assignments/assignments_test.exs` "third rejection exceeds limit (2) and parks ticket", `coordinator_test.exs` "review retry budget exhaustion parks the task" | **Owner: FR-11** (correction lifecycle). |
+| Planning-attempt cap: same-reason rejections halt the planner, differing reasons reset the streak, a total ceiling halts, suspension neither extends nor breaks the count, and only a human `reset_pm_attempts` clears the halt | `pm/pm_test.exs` "planning attempt cap semantics", `pm/attempt_lifecycle_test.exs` | **Owner: FR-12**, with `Workflow.Kernel.Software.Planning` holding the forward PM events. PM proposals never act as admission (O0 C9) |
+| Parallel admission: disjoint scopes and resources may run together; differing bases, colliding checkouts, missing run IDs, overlapping scopes, shared ports or any exclusive resource class conflict; an empty scope overlaps everything | `scheduler/scheduler_test.exs` | **Owner: FR-12.** The scheduler's resource keys (`corpus database gpu …`) were Pramāṇa-shaped and are not carried |
+| No synthetic acceptance: `auto_approve` in any spelling is refused at every ingress; a stale candidate cannot stand in for checkout HEAD; review needs the independently issued reviewer identity | `fr05_containment_test.exs`, `cli_test.exs` validators | **Covered for the lane:** `git_evidence` refusal, `receipt_provenance_mismatch`, `principal_not_independent` (Core), `manual_lane/cli_test.exs`. **Gap:** `GitEvidence` has no direct test → ML-GITEVIDENCE-TEST |
+| Unavailable or corrupt is not empty and healthy: a torn or schema-invalid log enters visible recovery, preserves the bytes and admits no work | `legacy_persistence_containment_test.exs`, `stress_test.exs` | **Covered** for the SQLite store: `durable_store/sync_fault_test`, `operational_storage_test`, `quarantine_exit_probe_test`, `Observations` (FR-18A) |
+| Forecasts keep censored, blocked and outlier outcomes visible and report "unavailable" instead of false precision | `telemetry/forecast_test.exs` | **Owner: FR-18B** projections, if forecasting returns |
+| The Gateway accepted a legacy JSONL event as an idempotent `legacy_event_append` command | `durable_store/gateway_test.exs` "legacy EventLog writers can opt into the checked durable boundary" (removed with `EventLog` and `CompatibilityWriter`) | Idempotency conflicts stay covered by `gateway_test`, `atomic_bundle_test` and `protected_primitives_test`. The `legacy_event_append` command type left in pinned Core files is dead vocabulary → ML-DEAD-VOCAB |
+| JSONL import: an unterminated tail, a malformed line (with its line number) and invalid UTF-8 are refused with the source path | `schema_test.exs` "contains malformed, non-UTF8, and oversized JSON and JSONL artifacts" (the `Import.read_jsonl` half) | `schema_test` keeps the JSON half. JSONL import itself goes with ML-DEL-LEGACY-IMPORT; fresh stores leave nothing to import |
+
+## Deleted with nothing to carry
+
+Board rendering and keyboard navigation, `SystemMetrics`, the runtime revision label,
+Python-era projections, the tokenizer benchmark, `Preparation` and the retired `Parity` shim
+(`board_test`, `board/inspection_test`, `system_metrics_test`, `status/*`, `projections/*`,
+`preparation_test`, `policy_test`), and the split-layout scope checks of `HardeningPM` and
+`Improver` (`hardening_pm_test`, `improver_test`, `improver_proposal_gate_test`; FR-20
+re-derives constrained improvement on Core).
