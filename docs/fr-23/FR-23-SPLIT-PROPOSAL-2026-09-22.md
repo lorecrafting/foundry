@@ -161,8 +161,8 @@ FR-23's rules apply unchanged:
   [MIGRATION.md](../archive/MIGRATION.md) and [MIGRATION-TICKETS.md](../archive/MIGRATION-TICKETS.md).
 - The OWNED-ELSEWHERE rows, once their owners finish.
 - **Rename the namespace away from Pramāṇa** (operator request, 2026-09-23): OTP app
-  `:foundry` → `:foundry`, modules `Foundry.*` → `Foundry.*`,
-  `lib/foundry/` and `test/foundry/` → `lib/foundry/` and `test/foundry/`.
+  `:foundry`, modules `Foundry.*`, `lib/foundry/` and `test/foundry/`, each dropping its
+  Pramāṇa-era `Pramana` prefix.
   Foundry is to move to its own repository; `pramana/` already uses none of its code (only
   docs, `.gitignore` and `.github/workflows/fr19a-sync-eio.yml` name it). Measured
   2026-09-23: 2,472 occurrences in 406 tracked files under `foundry/`. It is FR-23b's, not
