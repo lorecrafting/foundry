@@ -124,7 +124,7 @@
       id: "current-coordinator",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/coordinator.ex",
+      path: "lib/foundry/coordinator.ex",
       sha256: "925c54dba022a06213f0d33eb26c6b352fbde53c713796e3587d96640e9db7e6",
       status: "legacy_blocked_route"
     },
@@ -132,7 +132,7 @@
       id: "current-tick",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/coordinator/tick.ex",
+      path: "lib/foundry/coordinator/tick.ex",
       sha256: "8df097027896c88bb55f03f50a6cb6f5592c64a8c201f41aa1bf186754143ee0",
       status: "legacy_blocked_route"
     },
@@ -140,7 +140,7 @@
       id: "current-agent-server",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/agent_server.ex",
+      path: "lib/foundry/agent_server.ex",
       # Re-pinned 2026-09-23: after the repository split the agent prompts name role files as
       # roles/… relative to the checkout root, not foundry/roles/…. Prompt text only.
       sha256: "cc62233d87f17dfa17bae9858e1f1b1d20dacfdadd924beb980a4b48e999cb1f",
@@ -150,7 +150,7 @@
       id: "current-herdr-adapter",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/herdr/adapter.ex",
+      path: "lib/foundry/herdr/adapter.ex",
       sha256: "404406087170a1e37fcaaa3a6bc0ea9528cc659a689260ac2664bf1e5e846189",
       status: "legacy_blocked_route"
     },
@@ -158,7 +158,7 @@
       id: "current-herdr-argv",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/herdr/argv.ex",
+      path: "lib/foundry/herdr/argv.ex",
       sha256: "e58e0d7c6f9701388ed1ce3c7d78e7984836677a027883f181a717bbbf303bfc",
       status: "legacy_blocked_route"
     },
@@ -166,7 +166,7 @@
       id: "current-herdr-runner",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/herdr/runner.ex",
+      path: "lib/foundry/herdr/runner.ex",
       sha256: "1df506bc0444df2326de7fd9328e72038d990e2bbc36f5c9e038abbbc0fa2650",
       status: "legacy_blocked_route"
     },
@@ -174,7 +174,7 @@
       id: "current-launch-effect",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/effects/launch.ex",
+      path: "lib/foundry/effects/launch.ex",
       sha256: "b76aa1650acdfac03b35e2e498f5260c1f23081c682007f7a80b26fa89c9da22",
       status: "legacy_blocked_route"
     },
@@ -182,7 +182,7 @@
       id: "current-prompt-effect",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/effects/prompt_delivery.ex",
+      path: "lib/foundry/effects/prompt_delivery.ex",
       sha256: "f4e4c49c24498141495e02ce0d696788f276701151e6e1a22df686ffbd6961e9",
       status: "legacy_blocked_route"
     },
@@ -190,7 +190,7 @@
       id: "current-check-runner",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/checks/runner.ex",
+      path: "lib/foundry/checks/runner.ex",
       sha256: "22610624df6102f59579808048581e7e947eab19dfcc34cbaf3661d7255af8fc",
       status: "legacy_blocked_route"
     },
@@ -198,7 +198,7 @@
       id: "current-process-group",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/effects/process_group.ex",
+      path: "lib/foundry/effects/process_group.ex",
       sha256: "0c198191bbff8e31121086075782e458db6b4c52b0ddc8eede42247fa45c65ff",
       status: "legacy_blocked_route"
     },
@@ -206,7 +206,7 @@
       id: "current-cli-rpc",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/cli/rpc.ex",
+      path: "lib/foundry/cli/rpc.ex",
       # Re-pinned 2026-09-23: Batch D W4 added routing of `lane …` argv to the manual-lane
       # CLI (ManualLane.CLI). Routing only; the transport stays inert and grants no authority.
       sha256: "5062c5e59a9e01415764edf61837b251609abd4bdd53fedf2bd25fa3a940e1a1",
@@ -216,7 +216,7 @@
       id: "current-git-evidence",
       kind: "source_route",
       version: "base-f5067d9",
-      path: "lib/pramana_foundry/git_evidence.ex",
+      path: "lib/foundry/git_evidence.ex",
       sha256: "4f044446b3559e8635da488e2d9f9f1047c1b665f56f4c84cb8fad43394fc7ce",
       status: "legacy_blocked_route"
     },
@@ -232,7 +232,7 @@
       id: "workflow-kernel",
       kind: "required_adapter",
       version: "fr06-r3-bundle-v1",
-      path: "/Library/PramanaFoundry/releases/kernel/CANDIDATE_SHA/bin/pramana-kernel",
+      path: "/Library/Foundry/releases/kernel/CANDIDATE_SHA/bin/pramana-kernel",
       sha256: "unimplemented",
       status: "blocked"
     },
@@ -344,7 +344,7 @@
       id: "protected-launcher",
       kind: "required_adapter",
       version: "fr15aa-v1",
-      path: "/Library/PramanaFoundry/bin/pf-launch",
+      path: "/Library/Foundry/bin/pf-launch",
       sha256: "unimplemented",
       status: "blocked"
     },
@@ -352,7 +352,7 @@
       id: "request-gateway",
       kind: "required_adapter",
       version: "fr15aa-v1",
-      path: "/Library/PramanaFoundry/bin/pf-auth-gateway",
+      path: "/Library/Foundry/bin/pf-auth-gateway",
       sha256: "unimplemented",
       status: "blocked"
     },
@@ -360,7 +360,7 @@
       id: "effect-bridge",
       kind: "required_adapter",
       version: "fr15aa-v1",
-      path: "/Library/PramanaFoundry/bin/pf-effect-bridge",
+      path: "/Library/Foundry/bin/pf-effect-bridge",
       sha256: "unimplemented",
       status: "blocked"
     },
@@ -368,7 +368,7 @@
       id: "fetch-service",
       kind: "required_adapter",
       version: "fr15aa-v1",
-      path: "/Library/PramanaFoundry/bin/pf-fetch",
+      path: "/Library/Foundry/bin/pf-fetch",
       sha256: "unimplemented",
       status: "blocked"
     }

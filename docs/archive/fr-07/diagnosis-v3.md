@@ -43,7 +43,7 @@ available.
 
 ## Correction A: one typed persisted-record codec
 
-Add `PramanaFoundry.DurableStore.RecordCodec`. It is the sole parser, normalizer,
+Add `Foundry.DurableStore.RecordCodec`. It is the sole parser, normalizer,
 validator, encoder, relational binder, and FR-07 projection-transition reducer for every
 JSON/BLOB record the v1 gateway can write or accept as retained authority.
 
@@ -174,7 +174,7 @@ and routing all mutations through one full reducer remain FR-08.
 
 ## Correction C: one canonical database identity before ownership or SQLite
 
-Add `PramanaFoundry.DurableStore.PathIdentity` and make its returned struct—not a caller
+Add `Foundry.DurableStore.PathIdentity` and make its returned struct—not a caller
 string—the value passed through owner acquisition, database open/initialize/migrate,
 import, and backup destination creation.
 
@@ -289,10 +289,10 @@ commit, offline import/migrate cannot enter, and unrelated files retain exact ha
 
 ## Exact minimal production changes
 
-1. **Add** `foundry/lib/pramana_foundry/durable_store/record_codec.ex` with the schema
+1. **Add** `foundry/lib/foundry/durable_store/record_codec.ex` with the schema
    registry, normalization/default rules, typed encode/decode/binding, projection-plan and
    shared reducer described above.
-2. **Add** `foundry/lib/pramana_foundry/durable_store/path_identity.ex` with strict raw-path
+2. **Add** `foundry/lib/foundry/durable_store/path_identity.ex` with strict raw-path
    validation, component walk, existing/new identity structs, equality/collision helpers,
    sidecar validation, and revalidation.
 3. **Change** `durable_store/kernel.ex`: replace private record/key/version validators and

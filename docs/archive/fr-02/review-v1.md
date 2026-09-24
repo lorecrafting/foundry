@@ -16,9 +16,9 @@ SHA-256 values checked before and after verification, relative to `foundry/`:
 | File | SHA-256 |
 |---|---|
 | `bin/pramana` | `e836621bc5d92c152f7eed2f3c00a4fb93d30b55460955abdc953704a3383e54` |
-| `lib/pramana_foundry/cli/rpc.ex` | `eec9bec3224207dec43df31fcc0620aae2f071572305c6b37f119bf9d7df4c59` |
-| `test/pramana_foundry/cli/rpc_test.exs` | `7bb444196993fa00af64393045b9f22ca3873f17815706c6a9566ba3f94520e5` |
-| `test/pramana_foundry/rpc_wrapper_test.exs` | `5b596d76f71764df51526d7418ca1de8c9c173c9e409987f5e81b3afe40ee26f` |
+| `lib/foundry/cli/rpc.ex` | `eec9bec3224207dec43df31fcc0620aae2f071572305c6b37f119bf9d7df4c59` |
+| `test/foundry/cli/rpc_test.exs` | `7bb444196993fa00af64393045b9f22ca3873f17815706c6a9566ba3f94520e5` |
+| `test/foundry/rpc_wrapper_test.exs` | `5b596d76f71764df51526d7418ca1de8c9c173c9e409987f5e81b3afe40ee26f` |
 
 Reviewed AGENTS.md, coding conventions, Rules 4/8/57/63/66, FR-02 acceptance,
 WORKFLOW-CONTRACT revision 3, audit F06, the frozen implementation log, wrapper,
@@ -121,28 +121,28 @@ No Foundry application was started by the focused test command.
 
 ```sh
 MIX_ENV=test mise exec -- mix compile --force --warnings-as-errors
-# exit 0; compiled 72 files, generated pramana_foundry app
+# exit 0; compiled 72 files, generated foundry app
 
 COORDINATOR_TICK=0 HERDR_ENV=0 MIX_ENV=test mise exec -- mix test --no-start \
-  test/pramana_foundry/cli/rpc_test.exs \
-  test/pramana_foundry/rpc_wrapper_test.exs \
-  test/pramana_foundry/cli_test.exs --seed 12092026
+  test/foundry/cli/rpc_test.exs \
+  test/foundry/rpc_wrapper_test.exs \
+  test/foundry/cli_test.exs --seed 12092026
 # exit 0; 59 passed, 4.4 seconds
 
 bash -n bin/pramana
 # exit 0
 
-git diff --check -- bin/pramana lib/pramana_foundry/cli/rpc.ex \
-  test/pramana_foundry/cli/rpc_test.exs test/pramana_foundry/rpc_wrapper_test.exs
+git diff --check -- bin/pramana lib/foundry/cli/rpc.ex \
+  test/foundry/cli/rpc_test.exs test/foundry/rpc_wrapper_test.exs
 # exit 0; note git diff does not inspect untracked file content
 
-mise exec -- mix format --check-formatted lib/pramana_foundry/cli/rpc.ex \
-  test/pramana_foundry/cli/rpc_test.exs test/pramana_foundry/rpc_wrapper_test.exs
+mise exec -- mix format --check-formatted lib/foundry/cli/rpc.ex \
+  test/foundry/cli/rpc_test.exs test/foundry/rpc_wrapper_test.exs
 # exit 0; explicitly includes the new files
 ```
 
 Independent one-off probes used `mise exec -- elixir -pa
-_build/test/lib/pramana_foundry/ebin -e '…'`, without app startup. Reproduction of
+_build/test/lib/foundry/ebin -e '…'`, without app startup. Reproduction of
 R1 and R2 (Elixir body; shell-quote as one literal argument):
 
 ```elixir
@@ -151,16 +151,16 @@ for raw <- [
   ~S({"version":1,"version":2,"argv":["ticket","list"]}),
   ~S({"version":1,"argv":["ticket","list"],"argv":["unknown"]})
 ] do
-  IO.inspect(PramanaFoundry.CLI.RPC.decode(enc.(raw)))
+  IO.inspect(Foundry.CLI.RPC.decode(enc.(raw)))
 end
 {source, 0} = System.cmd("git", ["show",
-  "7aecf31c541ab1b1f3de4045ac3c487f6ef0708f:foundry/lib/pramana_foundry/cli.ex"])
+  "7aecf31c541ab1b1f3de4045ac3c487f6ef0708f:foundry/lib/foundry/cli.ex"])
 Code.compiler_options(ignore_module_conflict: true)
 Code.compile_string(source)
 token = enc.(~S({"version":1,"argv":["ticket","unblock","TASK-1"]}))
-IO.inspect(PramanaFoundry.CLI.RPC.decode(token))
+IO.inspect(Foundry.CLI.RPC.decode(token))
 try do
-  PramanaFoundry.CLI.RPC.run(token)
+  Foundry.CLI.RPC.run(token)
 rescue
   error -> IO.inspect(Exception.message(error))
 end
@@ -169,7 +169,7 @@ end
 For the extra successful-dispatch probe, a separate ephemeral VM replaced
 `CLI.main(argv)` with `Process.put(:review_received_argv, argv)`. It called the
 actual wrapper using `System.cmd/3` with `PRAMANA_RELEASE=/bin/echo`, checked the
-entire output against the fixed `rpc PramanaFoundry.CLI.RPC.run("TOKEN")` grammar,
+entire output against the fixed `rpc Foundry.CLI.RPC.run("TOKEN")` grammar,
 evaluated that expression, and matched the recorded argv exactly against each
 input listed above. All six cases passed; the process exited 0. This tests actual
 shell transport and expression evaluation, not BEAM distribution or live mutation.

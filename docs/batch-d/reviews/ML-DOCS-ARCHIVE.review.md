@@ -9,7 +9,7 @@ Reviewer: agent:claude-fable-5-1/review-ML-DOCS-ARCHIVE. Worktree /private/tmp/r
 - `git diff -M --name-status 5fb7603 HEAD`: 136 renames (111 R100, 25 with edits), 2 adds, 21 modifies, 0 deletes.
 - Every changed line in the 25 edited renames (269 diff lines, `git diff -M base HEAD -- <old> <new>`) is a relative-link rebase; no prose changed. Same for the 12 modified unmoved docs (176 diff lines): links only.
 - `git grep -F <each of 136 old paths>` over lib test bin ci spec mix.exs .github config rel: 0 hits. Only `docs/` path any executable still cites that was in scope is `docs/fr-04/identity-drift-probe.exs` (process_group.ex comment), and it stayed in place.
-- `mix test r4_coverage_test schema_reference_test test/pramana_foundry/repair`: 75 passed, 0 failures (exit 0).
+- `mix test r4_coverage_test schema_reference_test test/foundry/repair`: 75 passed, 0 failures (exit 0).
 - `elixir bin/check_docs.exs`: 0 broken links (exit 0).
 - Forbidden paths: docs/batch-d, docs/DURABLE-STORE.md, docs/CI.md untouched. docs/fr-08: six one-line link retargets (see below).
 

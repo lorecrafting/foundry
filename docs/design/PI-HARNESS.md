@@ -1121,8 +1121,8 @@ plan and later full lifecycle acceptance.
 Do not create these paths until implementation scope is admitted, but prefer a separation
 like:
 
-    lib/pramana_foundry/harness.ex
-    lib/pramana_foundry/harness/pi/
+    lib/foundry/harness.ex
+    lib/foundry/harness/pi/
       process.ex
       rpc.ex
       protocol.ex
@@ -1138,7 +1138,7 @@ like:
       review/
       adversarial-review/
 
-    test/pramana_foundry/harness/
+    test/foundry/harness/
       contract_test.exs
       pi_protocol_test.exs
       pi_conformance_test.exs

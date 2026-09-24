@@ -209,7 +209,7 @@ epoch; `submit` and `settle` still work on them.
   outlive `/private/tmp`. `lane log` shows a body only if it still matches its digest.
 - `<runtime root>/state/manual-lane/operator.log.jsonl`: one line per lane command (argv,
   result, principal, duration). Observation only; nothing reads it back.
-- Daemon console: `$FOUNDRY_LANE_BUILD/rel/pramana_foundry/tmp/log/erlang.log.*`.
+- Daemon console: `$FOUNDRY_LANE_BUILD/rel/foundry/tmp/log/erlang.log.*`.
 
 ## 7. Out of scope
 

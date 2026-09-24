@@ -3,7 +3,7 @@
 # Run from the repository root with MIX_ENV=test elixir <this file>.
 Code.require_file("../../ci/validate_fr15aa.exs", __DIR__)
 {manifest, _} = Code.eval_file(Path.join(__DIR__, "provisioning-manifest.exs"))
-validator = &PramanaFoundry.CI.FR15aAValidator.validate/1
+validator = &Foundry.CI.FR15aAValidator.validate/1
 :ok = validator.(manifest)
 IO.puts("baseline: :ok")
 

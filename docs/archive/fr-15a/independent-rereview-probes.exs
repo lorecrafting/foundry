@@ -2,8 +2,8 @@
 # mutations below reproduce residual B2; this is not an acceptance gate.
 System.put_env("MIX_ENV", "test")
 Code.require_file("../../ci/validate_fr15aa.exs", __DIR__)
-alias PramanaFoundry.CI.FR15aAValidator, as: V
-alias PramanaFoundry.CI.FR15aAProcedure, as: P
+alias Foundry.CI.FR15aAValidator, as: V
+alias Foundry.CI.FR15aAProcedure, as: P
 {manifest, _} = Code.eval_file(Path.join(__DIR__, "provisioning-manifest.exs"))
 :ok = V.validate(manifest)
 

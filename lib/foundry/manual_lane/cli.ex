@@ -1,0 +1,605 @@
+defmodule Foundry.ManualLane.CLI do
+  @moduledoc """
+  T5, the manual-lane CLI (`docs/batch-d/THIN-LANE-DESIGN-2026-09-23.md` §4):
+  `bin/pramana lane admit|packet|submit|review|settle|status|log|integrated|recover`,
+  routed here by `CLI.RPC`.
+
+  Every command appends one line to the operator log and logs its start and finish to the
+  daemon's own log, never the RPC client's stdout (`ManualLane.Log`): observation only,
+  never read back to decide.
+
+  It runs in the daemon's BEAM against the flag-started `ManualLane.Server`, and only
+  translates arguments into `ManualLane.Backend` calls. Output is human-readable, or one
+  JSON object with `--json`. A refusal prints its atom and raises, so the release `rpc`
+  exits non-zero, as the legacy CLI does.
+  """
+
+  alias Foundry.DurableStore.Gateway
+  alias Foundry.GitEvidence
+  alias Foundry.ManualLane.{Backend, Log, Replay, Server}
+  alias Foundry.WorkPacket
+  alias Foundry.Workflow.Kernel.Execution
+
+  require Logger
+
+  # Per command: its option switches and whether the ticket id is required, optional or none.
+  @commands %{
+    "admit" =>
+      {[base_ref: :string, title: :string, scope: :string, acceptance: :keep], :required},
+    "packet" => {[role: :string, principal: :string, out: :string], :required},
+    "submit" =>
+      {[principal: :string, candidate: :string, checkout: :string, blocked: :string], :required},
+    "review" =>
+      {[principal: :string, verdict: :string, candidate: :string, notes: :string], :required},
+    "settle" =>
+      {[
+         role: :string,
+         principal: :string,
+         outcome: :string,
+         attest: :string,
+         issuer_gone: :boolean,
+         channel_quiet: :boolean
+       ], :required},
+    "status" => {[], :optional},
+    "log" => {[], :optional},
+    "integrated" => {[ref: :string], :required},
+    "recover" => {[evidence: :string], :none}
+  }
+
+  @required %{
+    "admit" => [:base_ref, :title, :scope, :acceptance],
+    "packet" => [:principal, :role],
+    "submit" => [:principal, :candidate, :checkout],
+    "review" => [:principal, :verdict, :candidate, :notes],
+    "settle" => [:principal, :role, :outcome, :attest],
+    "status" => [],
+    "log" => [],
+    "integrated" => [],
+    "recover" => [:evidence]
+  }
+
+  @roles ~w(developer reviewer)
+  @verdicts ~w(approved correction rejected)
+  @outcomes %{"non_started" => :non_started, "unknown" => :unknown}
+  @awaiting_operator ~w(issued unknown reconciliation_required)
+
+  @doc "Runs one lane command (argv after `lane`), prints its result, raises on refusal."
+  def main(argv) do
+    json? = "--json" in argv
+    command = List.first(argv)
+    store = store_path()
+    started = System.monotonic_time(:millisecond)
+    daemon_log("lane #{command} started", lane_command: command)
+    outcome = run(argv)
+    duration = System.monotonic_time(:millisecond) - started
+    observe(store, argv, outcome, duration)
+
+    case outcome do
+      {:ok, result} ->
+        IO.write(render(Map.put(result, "ok", true), json?))
+
+      {:error, reason, detail} ->
+        IO.write(
+          render(%{"ok" => false, "error" => to_string(reason), "detail" => detail}, json?)
+        )
+
+        raise "lane #{List.first(argv)} refused: #{reason}"
+    end
+  end
+
+  @doc "Parses lane argv into `{:ok, command, ticket_id | nil, opts}`; the RPC shape check."
+  def parse([command | rest]) when is_map_key(@commands, command) do
+    {switches, id_rule} = @commands[command]
+    # `:keep` so a repeated option is seen and refused rather than silently last-wins.
+    strict = for {key, type} <- switches, do: {key, if(type == :string, do: :keep, else: type)}
+
+    case OptionParser.parse(rest, strict: [{:json, :boolean} | strict]) do
+      {opts, args, []} ->
+        repeated = Keyword.keys(opts) -- Enum.uniq(Keyword.keys(opts))
+
+        cond do
+          Enum.any?(repeated, &(&1 != :acceptance)) -> {:error, :unknown_command_shape}
+          match?([_], args) and id_rule != :none -> {:ok, command, hd(args), opts}
+          args == [] and id_rule != :required -> {:ok, command, nil, opts}
+          true -> {:error, :unknown_command_shape}
+        end
+
+      _ ->
+        {:error, :unknown_command_shape}
+    end
+  end
+
+  def parse(_argv), do: {:error, :unknown_command_shape}
+
+  @doc "Runs one lane command without printing: `{:ok, map}` or `{:error, atom, detail}`."
+  def run(argv) do
+    with {:ok, command, id, opts} <- parse(argv) |> refusal(),
+         :ok <- required(command, opts),
+         {:ok, ctx} <- context(command) do
+      command(command, ctx, id, opts)
+    end
+  end
+
+  # ── Commands ──────────────────────────────────────────────────────────────────
+
+  defp command("admit", ctx, id, opts) do
+    ref = opts[:base_ref]
+
+    with {:ok, base} <- rev_parse(ctx.repo, ref) do
+      spec = %{
+        "base_revision" => base,
+        "base_ref" => ref,
+        "title" => opts[:title],
+        "scope" => String.split(opts[:scope], ",", trim: true),
+        "acceptance_criteria" => Keyword.get_values(opts, :acceptance)
+      }
+
+      with {:ok, _} <- Backend.admit(ctx, id, spec) |> refusal() do
+        ticket = ticket(ctx, id)
+
+        {:ok,
+         %{
+           "ticket_id" => id,
+           "base_revision" => ticket["spec"]["base_revision"],
+           "spec_revision_id" => ticket["spec_revision_id"]
+         }}
+      end
+    end
+  end
+
+  defp command("packet", ctx, id, opts) do
+    with :ok <- one_of(opts[:role], @roles, :unsupported_role),
+         {:ok, result} <- Backend.launch(ctx, id, opts[:role], opts[:principal]) |> refusal() do
+      case result do
+        %{"packet_id" => _} = packet ->
+          write_packet(packet, opts[:out])
+
+        %{"ticket" => t} ->
+          {:ok, %{"packet" => nil, "phase" => t["phase"], "reason" => t["reason"]}}
+      end
+    end
+  end
+
+  defp command("submit", ctx, id, opts) do
+    principal = opts[:principal]
+    candidate = opts[:candidate]
+
+    with %{} = ticket <- ticket(ctx, id) || {:error, :ticket_not_found, nil},
+         :ok <- git_evidence(opts[:checkout], candidate, ticket["spec"]["base_revision"]),
+         receipt =
+           attestation(principal, "delivered candidate #{candidate}")
+           |> Map.put("candidate_id", candidate)
+           |> Map.merge(if opts[:blocked], do: %{"blocked" => opts[:blocked]}, else: %{}),
+         {:ok, %{"receipt" => %{"payload" => attested}}} <-
+           Backend.deliver(ctx, id, "developer", principal, receipt) |> refusal(),
+         # The freeze records what the receipt attests, never this run's argv.
+         {:ok, _} <-
+           freeze(ctx, id, principal, attested["candidate_id"], attested["blocked"]) do
+      t = ticket(ctx, id)
+      {:ok, %{"phase" => t["phase"], "candidate_id" => candidate}}
+    end
+  end
+
+  defp command("review", ctx, id, opts) do
+    principal = opts[:principal]
+    verdict = opts[:verdict]
+    candidate = opts[:candidate]
+
+    with :ok <- one_of(verdict, @verdicts, :invalid_verdict),
+         {:ok, notes} <- read_notes(opts[:notes]),
+         # F5: archived before any write, so a recorded digest always has its body.
+         {:ok, digest} <- archive_notes(ctx.store_path, notes),
+         receipt =
+           attestation(principal, "review verdict #{verdict} on candidate #{candidate}")
+           |> Map.merge(%{"verdict" => verdict, "notes_sha256" => digest}),
+         {:ok, %{"ticket" => t}} <-
+           Backend.review(ctx, id, principal, verdict, candidate, receipt) |> refusal() do
+      {:ok, %{"phase" => t["phase"], "verdict" => verdict, "candidate_id" => candidate}}
+    end
+  end
+
+  defp command("settle", ctx, id, opts) do
+    principal = opts[:principal]
+
+    with :ok <- one_of(opts[:role], @roles, :unsupported_role),
+         :ok <- one_of(opts[:outcome], Map.keys(@outcomes), :invalid_outcome),
+         attestation =
+           attestation(principal, opts[:attest])
+           |> Map.merge(
+             Map.new(Keyword.take(opts, [:issuer_gone, :channel_quiet]), fn {k, v} ->
+               {to_string(k), v}
+             end)
+           ),
+         {:ok, result} <-
+           Backend.settle(ctx, id, opts[:role], principal, @outcomes[opts[:outcome]], attestation)
+           |> refusal() do
+      {:ok,
+       %{
+         "phase" => ticket(ctx, id)["phase"],
+         "outcome" => opts[:outcome],
+         "selected_discriminator" => result["selected_discriminator"]
+       }}
+    end
+  end
+
+  # Read-only, so it also runs in recovery while the store can be read (`Log.trail/2`).
+  defp command("log", ctx, id, _opts) do
+    case Log.trail(ctx.path, id) do
+      {:ok, %{^id => %{"events" => []}}} ->
+        {:error, :ticket_not_found, nil}
+
+      {:ok, trail} ->
+        {:ok, %{"mode" => to_string(ctx.mode), "trail" => trail}}
+
+      {:error, _reason} when ctx.mode == :recovery ->
+        {:error, :gateway_recovery, recovery_detail(ctx.recovery_reason)}
+
+      {:error, reason} ->
+        {:error, :store_unreadable, inspect(reason)}
+    end
+  end
+
+  # F6/F10: read-only. Every commit of base..candidate must be in the ref by ancestry or,
+  # after a cherry-pick, by patch-equivalence: `git cherry REF CANDIDATE BASE` lists each
+  # commit of that range the ref lacks by ancestry, `-` when an equivalent patch is there.
+  defp command("integrated", ctx, id, opts) do
+    ref = opts[:ref] || "main"
+
+    with %{} = ticket <- ticket(ctx, id) || {:error, :ticket_not_found, nil},
+         {:ok, candidate} <- latest_candidate(ticket),
+         base = ticket["spec"]["base_revision"],
+         {:ok, ref_sha} <- rev_parse(ctx.repo, ref),
+         {:ok, cherry} <- git(ctx.repo, ["cherry", "-v", ref_sha, candidate, base]),
+         {:ok, range} <- git(ctx.repo, ["rev-list", "--count", "#{base}..#{candidate}"]) do
+      missing = for "+ " <> commit <- String.split(cherry, "\n", trim: true), do: commit
+
+      {:ok,
+       %{
+         "ticket_id" => id,
+         "ref" => ref,
+         "ref_sha" => ref_sha,
+         "base_revision" => base,
+         "candidate_id" => candidate,
+         "commits" => String.to_integer(range),
+         "integrated" => missing == [],
+         "missing" => missing
+       }}
+    end
+  end
+
+  # The one command that runs while the Gateway is in recovery; see `Server.recover/1`.
+  defp command("recover", nil, nil, opts) do
+    with {:ok, %{mode: mode, reason: reason}} <- Server.recover(opts[:evidence]) |> refusal() do
+      if mode == :ready,
+        do: {:ok, %{"mode" => "ready"}},
+        else: {:error, :gateway_recovery, recovery_detail(reason)}
+    end
+  end
+
+  defp command("status", ctx, id, _opts) do
+    tickets = Backend.state(ctx)["tickets"]
+
+    # Only lane tickets exist in the lane's store: admission refuses any other id.
+    selected = if id, do: Map.take(tickets, [id]), else: tickets
+
+    if id && selected == %{} do
+      {:error, :ticket_not_found, nil}
+    else
+      {:ok,
+       %{
+         "mode" => to_string(Gateway.status(ctx.gateway).mode),
+         "tickets" => Map.new(selected, fn {tid, t} -> {tid, ticket_status(ctx, t)} end)
+       }}
+    end
+  end
+
+  defp ticket_status(ctx, ticket) do
+    attempts =
+      Map.new(ticket["attempts"] || %{}, fn {attempt_id, attempt} ->
+        executions =
+          for {execution_id, %Execution{} = e} <- attempt["executions"] || %{} do
+            effect_id = String.replace_suffix(execution_id, "/execution", "/effect")
+
+            effect =
+              case Replay.query(ctx, %{"type" => "effect", "effect_id" => effect_id}) do
+                {:ok, effect} -> effect
+                _ -> %{}
+              end
+
+            %{
+              "execution_id" => execution_id,
+              "role" => e.role,
+              "lifecycle" => e.lifecycle,
+              "effect_status" => effect["status"],
+              "issuer" => effect["issuer"],
+              "awaits_operator" => effect["status"] in @awaiting_operator
+            }
+          end
+
+        {attempt_id,
+         %{
+           "phase" => attempt["phase"],
+           "candidate_id" => attempt["candidate_id"],
+           "verdict" => get_in(attempt, ["review", "verdict"]),
+           "executions" => Enum.sort_by(executions, & &1["execution_id"])
+         }}
+      end)
+
+    %{
+      "phase" => ticket["phase"],
+      "reason" => ticket["reason"],
+      "active_attempt_id" => ticket["active_attempt_id"],
+      "attempts" => attempts
+    }
+  end
+
+  # ── Steps ─────────────────────────────────────────────────────────────────────
+
+  # The developer's result as ingress (Q1, Q4: a second commit after the receipt). Its id
+  # names the execution, so a rerun after a split replays as idempotent.
+  defp freeze(ctx, id, principal, candidate, blocked) do
+    ticket = ticket(ctx, id)
+    attempt_id = ticket["active_attempt_id"]
+    attempt = get_in(ticket, ["attempts", attempt_id]) || %{}
+
+    open =
+      for {eid, %Execution{role: "developer", lifecycle: l}} <- attempt["executions"] || %{},
+          l != "closed",
+          do: eid
+
+    case open do
+      [execution_id] ->
+        base = %{"ticket_id" => id, "attempt_id" => attempt_id}
+        exec = Map.put(base, "execution_id", execution_id)
+        observation = %{"observation_id" => execution_id <> "/freeze"}
+
+        result =
+          if blocked,
+            do: [
+              {"artifact_blocked",
+               Map.merge(base, observation)
+               |> Map.merge(%{"result" => "blocked", "reason" => blocked})}
+            ],
+            else: [
+              {"artifact_frozen",
+               Map.merge(base, observation)
+               |> Map.merge(%{"candidate_id" => candidate, "sealed_generation" => candidate})}
+            ]
+
+        closing = [
+          {"stream_sealed", Map.put(exec, "last_accepted_sequence", 0)},
+          {"developer_closed", exec}
+        ]
+
+        with {:ok, checks} <- checks_started(ctx, base, blocked) do
+          Backend.ingress(
+            ctx,
+            "#{id}/freeze/#{execution_id}",
+            id,
+            result ++ closing ++ checks,
+            principal
+          )
+          |> refusal()
+        end
+
+      # Already frozen and closed: a rerun of a completed submit.
+      [] when is_binary(attempt_id) ->
+        if attempt["candidate_id"] == candidate or blocked,
+          do: {:ok, %{"idempotent" => true}},
+          else: {:error, :candidate_mismatch, attempt["candidate_id"]}
+
+      _ ->
+        {:error, :no_issued_claim, nil}
+    end
+  end
+
+  # A5: `policy_empty` is the policy's check set at submit, not a literal. The lane runs no
+  # checks, so a non-empty set is refused here as `WorkPacket` refuses it at launch.
+  defp checks_started(_ctx, _base, blocked) when is_binary(blocked), do: {:ok, []}
+
+  defp checks_started(ctx, base, nil) do
+    case Replay.query(ctx, %{"type" => "policy", "policy_id" => Backend.ids().policy_id}) do
+      {:ok, %{"value" => %{"check_set" => []}}} ->
+        {:ok, [{"checks_started", Map.put(base, "policy_empty", true)}]}
+
+      _ ->
+        {:error, :check_set_not_empty, nil}
+    end
+  end
+
+  defp write_packet(packet, nil), do: {:ok, %{"packet" => packet}}
+
+  defp write_packet(packet, path) do
+    case File.write(path, WorkPacket.encode(packet)) do
+      :ok -> {:ok, %{"packet" => packet, "out" => path}}
+      {:error, reason} -> {:error, :packet_write_failed, to_string(reason)}
+    end
+  end
+
+  # ── Guards ────────────────────────────────────────────────────────────────────
+
+  # The principal never defaults (§4). Checked before any Gateway call.
+  defp required(command, opts) do
+    case Enum.reject(@required[command], &(opts[&1] not in [nil, ""])) do
+      [] -> :ok
+      [:principal | _] -> {:error, :principal_required, nil}
+      missing -> {:error, :option_required, Enum.map(missing, &option_name/1)}
+    end
+  end
+
+  defp context(command) do
+    cond do
+      !Process.whereis(Server) ->
+        {:error, :lane_disabled, nil}
+
+      command == "recover" ->
+        {:ok, nil}
+
+      true ->
+        ctx = Server.context()
+
+        case {command, Gateway.status(ctx.gateway)} do
+          {_, %{mode: :ready}} ->
+            {:ok, Map.merge(ctx, %{path: ctx.store_path, mode: :ready})}
+
+          {"log", %{reason: reason}} ->
+            {:ok,
+             Map.merge(ctx, %{path: ctx.store_path, mode: :recovery, recovery_reason: reason})}
+
+          {_, %{reason: reason}} ->
+            {:error, :gateway_recovery, recovery_detail(reason)}
+        end
+    end
+  end
+
+  # Only an unclean previous owner is something `recover` can clear.
+  defp recovery_detail({:store_owner_unavailable, {:ambiguous_previous_owner, _, _}} = reason) do
+    %{
+      "reason" => inspect(reason),
+      "next" =>
+        "confirm no other lane process owns the store, then: bin/pramana lane recover " <>
+          "--evidence \"<what you checked>\""
+    }
+  end
+
+  defp recovery_detail(reason), do: %{"reason" => inspect(reason), "next" => "store repair"}
+
+  defp rev_parse(repo, ref) do
+    case System.cmd("git", ["-C", repo, "rev-parse", "--verify", "--quiet", ref <> "^{commit}"],
+           stderr_to_stdout: true
+         ) do
+      {sha, 0} -> {:ok, String.trim(sha)}
+      _ -> {:error, :git_ref_unresolved, ref}
+    end
+  end
+
+  # The active attempt's candidate, else the latest prior attempt's.
+  defp latest_candidate(ticket) do
+    [ticket["active_attempt_id"] | Enum.reverse(ticket["prior_attempt_ids"] || [])]
+    |> Enum.find_value({:error, :no_candidate, nil}, fn attempt_id ->
+      case get_in(ticket, ["attempts", attempt_id, "candidate_id"]) do
+        nil -> nil
+        candidate -> {:ok, candidate}
+      end
+    end)
+  end
+
+  defp git(repo, args) do
+    case System.cmd("git", ["-C", repo | args], stderr_to_stdout: true) do
+      {out, 0} -> {:ok, String.trim(out)}
+      {out, _} -> {:error, :git_failed, String.trim(out)}
+    end
+  end
+
+  defp git_evidence(checkout, candidate, base) do
+    case GitEvidence.validate_checkout(checkout, candidate, base) do
+      :ok -> :ok
+      {:error, message} -> {:error, :git_evidence, message}
+    end
+  end
+
+  defp read_notes(path) do
+    case File.read(path) do
+      {:ok, notes} -> {:ok, notes}
+      {:error, reason} -> {:error, :notes_unreadable, to_string(reason)}
+    end
+  end
+
+  defp archive_notes(store_path, notes) do
+    case Log.archive_notes(store_path, notes) do
+      {:ok, digest} -> {:ok, digest}
+      {:error, reason} -> {:error, :notes_archive_failed, inspect(reason)}
+    end
+  end
+
+  defp one_of(value, allowed, reason),
+    do: if(value in allowed, do: :ok, else: {:error, reason, value})
+
+  # ── Observation ───────────────────────────────────────────────────────────────
+
+  # The store the operator log sits beside; nil when no lane runs (nothing to sit beside).
+  defp store_path do
+    if Process.whereis(Server), do: Server.context().store_path
+  catch
+    :exit, _ -> nil
+  end
+
+  # Lane argv carries no secret-bearing option: attestations and paths are recorded as given.
+  defp observe(store, argv, outcome, duration) do
+    {result, summary} =
+      case outcome do
+        {:ok, r} -> {"ok", r}
+        {:error, reason, _detail} -> {to_string(reason), %{}}
+      end
+
+    {id, principal} =
+      case parse(argv) do
+        {:ok, _command, id, opts} -> {id, opts[:principal]}
+        _ -> {nil, nil}
+      end
+
+    daemon_log("lane #{List.first(argv)} finished: #{result} in #{duration}ms",
+      lane_command: List.first(argv),
+      lane_result: result,
+      duration_ms: duration
+    )
+
+    Log.operator(store, %{
+      "ts" => DateTime.to_iso8601(DateTime.utc_now()),
+      "argv" => argv,
+      "principal" => principal,
+      "result" => result,
+      "ticket_id" => id,
+      "phase" => summary["phase"],
+      "duration_ms" => duration
+    })
+  end
+
+  # F1: a Logger event carries its process's group leader, and OTP forwards an event whose
+  # group leader is on another node to that node. Under the release `rpc` that is the client,
+  # so these lines printed around the result on its stdout. Pinned to this node's `user`,
+  # they stay in the daemon's own log.
+  defp daemon_log(message, metadata),
+    do: Logger.info(message, [gl: Process.whereis(:user) || Process.group_leader()] ++ metadata)
+
+  # ── Helpers ───────────────────────────────────────────────────────────────────
+
+  defp ticket(ctx, id), do: Backend.state(ctx)["tickets"][id]
+
+  # A1: every receipt the human asserts says so, by whom, and what.
+  defp attestation(principal, statement) do
+    %{
+      "evidence_kind" => "operator_attestation",
+      "attested_by" => principal,
+      "statement" => statement
+    }
+  end
+
+  defp option_name(key), do: "--" <> String.replace(to_string(key), "_", "-")
+
+  defp refusal({:reject, reason}), do: {:error, reason, nil}
+  defp refusal({:error, reason}) when is_atom(reason), do: {:error, reason, nil}
+  defp refusal({:error, reason}), do: {:error, :refused, inspect(reason)}
+  defp refusal(ok), do: ok
+
+  # ── Output ────────────────────────────────────────────────────────────────────
+
+  defp render(result, true), do: JSON.encode!(result) <> "\n"
+  defp render(%{"ok" => true, "trail" => _} = result, false), do: Log.text(result)
+
+  defp render(result, false) do
+    result
+    |> Map.delete("ok")
+    |> Enum.sort()
+    |> Enum.map_join(fn {key, value} -> "#{key}: #{human(value)}\n" end)
+    |> then(&if(result["ok"], do: &1, else: "refused\n" <> &1))
+  end
+
+  defp human(value) when is_binary(value), do: value
+  defp human(nil), do: "-"
+
+  defp human(value) when is_map(value) or is_list(value),
+    do: :json.format(value) |> IO.iodata_to_binary()
+
+  defp human(value), do: to_string(value)
+end

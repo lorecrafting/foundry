@@ -5,7 +5,7 @@
 /ci-artifacts/
 /local/
 /handoffs/
-/pramana_foundry
+/foundry
 erl_crash.dump
 *.ez
 /.claude/

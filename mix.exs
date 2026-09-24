@@ -1,14 +1,14 @@
-defmodule PramanaFoundry.MixProject do
+defmodule Foundry.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :pramana_foundry,
+      app: :foundry,
       version: "0.1.0",
       elixir: "~> 1.20",
       start_permanent: Mix.env() == :prod,
-      escript: [main_module: PramanaFoundry.ManualLane.CLI],
-      releases: [pramana_foundry: [include_executables_for: [:unix], vm_args: "rel/vm.args"]],
+      escript: [main_module: Foundry.ManualLane.CLI],
+      releases: [foundry: [include_executables_for: [:unix], vm_args: "rel/vm.args"]],
       deps: [
         {:exqlite, "== 0.40.0"},
         {:owl, "~> 0.12"}
@@ -17,6 +17,6 @@ defmodule PramanaFoundry.MixProject do
   end
 
   def application do
-    [extra_applications: [:logger, :crypto, :public_key], mod: {PramanaFoundry.Application, []}]
+    [extra_applications: [:logger, :crypto, :public_key], mod: {Foundry.Application, []}]
   end
 end

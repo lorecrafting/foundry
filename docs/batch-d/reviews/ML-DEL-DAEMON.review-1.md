@@ -12,13 +12,13 @@ deleted stack remains; the knowledge record is thorough; scope is respected.
 ## Findings
 
 ### F1 — medium, correction: `Effects.ProcessGroup.signal/4`'s refusal branch is untested
-- lib/pramana_foundry/effects/process_group.ex:83-92 (`{:error, :stale_identity}` on a mismatched
+- lib/foundry/effects/process_group.ex:83-92 (`{:error, :stale_identity}` on a mismatched
   or absent identity) — the guard that stops a recycled pid or a replacement owner from being killed.
 - `grep -rn stale_identity test` → no hits. Before the deletion it was covered only by
-  test/pramana_foundry/checks/runner_test.exs "a stale identity (already exited) is refused rather
+  test/foundry/checks/runner_test.exs "a stale identity (already exited) is refused rather
   than signalled" and "a replacement-owner mismatch (same pid, wrong recorded start time) refuses to
   signal a live process" (`git show db4334c:…runner_test.exs` :104-139).
-- The kept test/pramana_foundry/effects/process_group_test.exs covers presence (`gone?`, defunct,
+- The kept test/foundry/effects/process_group_test.exs covers presence (`gone?`, defunct,
   zombie, recycled) and a failed `kill` (:127), but never the refusal.
 - The MOVED-KNOWLEDGE note ("Gap, owner FR-10") is not enough here: this is a kept module's safety
   property, not future-owner knowledge, and it is pure logic. Two tests with the file's existing
@@ -30,18 +30,18 @@ deleted stack remains; the knowledge record is thorough; scope is respected.
   is the hazard the file's own header names.
 
 ### F2 — low: a release started without `FOUNDRY_MANUAL_LANE=1` is a silent idle daemon
-- lib/pramana_foundry/application.ex:31,39 and bin/foundry-lane:20 agree: the script exports the flag,
+- lib/foundry/application.ex:31,39 and bin/foundry-lane:20 agree: the script exports the flag,
   `startup_mode/0` reads it. Verified on the built release: `daemon` without the flag →
   `Supervisor.which_children == []`, node stays up under `+heart` until `stop`, prints nothing;
   with the flag → `[ManualLane.Server]`.
 - Acceptable for this ticket (the runbook routes operators through bin/foundry-lane), but a foot-gun
-  for `bin/pramana_foundry daemon|start` run by hand. rel/overlays/env.sh already branches on
+  for `bin/foundry daemon|start` run by hand. rel/overlays/env.sh already branches on
   `RELEASE_COMMAND` (the release script exports it), so either defaulting the flag there for
   `daemon*|start*` or a one-line `IO.puts` in `runtime_children(:client)` when RELEASE_COMMAND is a
   boot command closes it. Base printed a "client mode" line; the candidate prints nothing.
 
 ### F3 — low: non_launch allowlist admits any `System.cmd("git", …)`, not only reads
-- test/pramana_foundry/manual_lane/non_launch_test.exs:96 `allowed_spawn?(_mod, {System, :cmd, "git"})`.
+- test/foundry/manual_lane/non_launch_test.exs:96 `allowed_spawn?(_mod, {System, :cmd, "git"})`.
   The moduledoc says "a literal `git` read", but argv is not inspected: `git worktree add`,
   `git -c core.sshCommand=…`, or an alias with `!` would pass. Real closure hits are read-only today
   (manual_lane/cli.ex:435 rev-parse; git_evidence.ex:89 merge-base, :100 generic helper for
@@ -49,7 +49,7 @@ deleted stack remains; the knowledge record is thorough; scope is respected.
   needs git_evidence's `git/2` helper to take a literal subcommand.
 - Red controls: the four fixture controls pass, and a live control bites: inserting
   `System.cmd("omp", ["run"])` into ManualLane.CLI.main/1 fails the closure test with
-  `[{PramanaFoundry.ManualLane.CLI, {System, :cmd, "omp"}}]`; restored by exact string, 5/5 green.
+  `[{Foundry.ManualLane.CLI, {System, :cmd, "omp"}}]`; restored by exact string, 5/5 green.
 
 ### F4 — low: edge cases in deleted tests not named in docs/design/MOVED-KNOWLEDGE-2026-09-23.md
 Spot-checked 16 deleted files by test name and 4 by body. Unrecorded (add a phrase to the owner row):
@@ -63,7 +63,7 @@ Spot-checked 16 deleted files by test name and 4 by body. Unrecorded (add a phra
 - coordinator/engine_test "queued tick and handoff complete in either mailbox order without losing the
   handoff" (FR-10 row).
 - coordinator/recovery_test "dirty task checkout is refused on handoff" — the code survives at
-  lib/pramana_foundry/git_evidence.ex:66-73 but `grep -rn 'uncommitted or untracked' test` → none;
+  lib/foundry/git_evidence.ex:66-73 but `grep -rn 'uncommitted or untracked' test` → none;
   name it in the ML-GITEVIDENCE-TEST gap row.
 Covered without being listed (fine): runtime_startup_boundary_test "actual client startup is
 effect-free" → manual_lane/startup_test "without it the node is a child-less client".
@@ -90,7 +90,7 @@ effect-free" → manual_lane/startup_test "without it the node is a child-less c
 
 ### F7 — info: dangling references
 `git grep -nE 'Coordinator|AgentServer|Herdr|Improver|HardeningPM|Scheduler|COORDINATOR_TICK|PRAMANA_STARTUP_MODE' -- lib test bin ci config mix.exs rel`
-→ 14 hits: lib/pramana_foundry/ci.ex:78 and 7 tests clear `COORDINATOR_TICK`/`HERDR_ENV` in subprocess
+→ 14 hits: lib/foundry/ci.ex:78 and 7 tests clear `COORDINATOR_TICK`/`HERDR_ENV` in subprocess
 env (hygiene, could go later); startup_test.exs:14,42 asserts the retired switch is inert; three
 comments. No live module reference.
 

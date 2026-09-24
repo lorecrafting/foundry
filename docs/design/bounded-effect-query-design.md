@@ -218,22 +218,22 @@ Unavailable, corrupt and unknown states never collapse into an empty canonical r
 
 ## Implementation change points after ownership release
 
-- `foundry/lib/pramana_foundry/durable_store/protected_primitives.ex`
+- `foundry/lib/foundry/durable_store/protected_primitives.ex`
   - extend `query/2` with the new type;
   - add private `effect_observation_page/2`, strict request/cursor validation, source
     frontier capture, four bounded section readers, bounded row decoding and the size
     accumulator and exact singleton infrastructure-settlement reader;
   - leave `execute/**`, all mutation helpers and the legacy `"effect"` query unchanged.
-- `foundry/lib/pramana_foundry/observations.ex`
+- `foundry/lib/foundry/observations.ex`
   - make `read_target/3` use the bounded protected query;
   - update `validate_query/1`, `canonical_effect/2` and `build_page/6` for continuation,
     truncation and explicit unknown/unavailable mappings;
   - correlate before recursively redacting the final envelope.
-- `foundry/lib/pramana_foundry/observations/query.ex` and
-  `foundry/lib/pramana_foundry/observations/page.ex`
+- `foundry/lib/foundry/observations/query.ex` and
+  `foundry/lib/foundry/observations/page.ex`
   - replace the bare public offset with a tagged cursor that can represent both target
     position and an in-effect continuation.
-- `foundry/lib/pramana_foundry/observations/gateway_source.ex`
+- `foundry/lib/foundry/observations/gateway_source.ex`
   - map stale cursors and oversized supported facts to unavailable while retaining the
     existing corruption classifications.
 

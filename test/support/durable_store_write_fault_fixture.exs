@@ -1,4 +1,4 @@
-alias PramanaFoundry.DurableStore.Gateway
+alias Foundry.DurableStore.Gateway
 
 [path] = System.argv()
 {:ok, gateway} = Gateway.start_link(path: path)

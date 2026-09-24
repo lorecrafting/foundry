@@ -25,7 +25,7 @@ if [ "${1:-}" = "lane" ]; then
 fi
 
 # 1. Try relative to script (main repo case)
-RELEASE_BIN="$FOUNDRY_DIR/_build/prod/rel/pramana_foundry/bin/pramana_foundry"
+RELEASE_BIN="$FOUNDRY_DIR/_build/prod/rel/foundry/bin/foundry"
 
 # 2. Try env var override. An explicit but invalid override is an error; silently
 # falling back could send a command to a different daemon than the caller chose.
@@ -47,7 +47,7 @@ if [ ! -x "$RELEASE_BIN" ]; then
       gitdir:*)
         MAIN_DIR="${GITDIR_LINE#gitdir: }"
         MAIN_DIR="${MAIN_DIR%/.git*}"
-        RELEASE_BIN="$MAIN_DIR/_build/prod/rel/pramana_foundry/bin/pramana_foundry"
+        RELEASE_BIN="$MAIN_DIR/_build/prod/rel/foundry/bin/foundry"
         ;;
     esac
   fi
@@ -56,8 +56,8 @@ fi
 # 4. Last resort: common user paths
 if [ ! -x "$RELEASE_BIN" ]; then
   for candidate in \
-    "$HOME/dev/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" \
-    "$HOME/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry"; do
+    "$HOME/dev/foundry/_build/prod/rel/foundry/bin/foundry" \
+    "$HOME/foundry/_build/prod/rel/foundry/bin/foundry"; do
     if [ -x "$candidate" ]; then
       RELEASE_BIN="$candidate"
       break
@@ -66,14 +66,14 @@ if [ ! -x "$RELEASE_BIN" ]; then
 fi
 
 if [ ! -x "$RELEASE_BIN" ]; then
-  echo "Error: cannot find pramana_foundry release binary" >&2
+  echo "Error: cannot find foundry release binary" >&2
   echo "" >&2
-  echo "The release binary is at _build/prod/rel/pramana_foundry/bin/pramana_foundry" >&2
+  echo "The release binary is at _build/prod/rel/foundry/bin/foundry" >&2
   echo "Build it from the root of the main checkout:" >&2
   echo "  MIX_ENV=prod mix release" >&2
   echo "" >&2
   echo "Or set PRAMANA_RELEASE env var:" >&2
-  echo "  export PRAMANA_RELEASE=/path/to/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" >&2
+  echo "  export PRAMANA_RELEASE=/path/to/foundry/_build/prod/rel/foundry/bin/foundry" >&2
   exit 1
 fi
 
@@ -106,7 +106,7 @@ end
 }
 
 if PAYLOAD=$(encode_for_rpc "$@"); then
-  RPC_CODE="PramanaFoundry.CLI.RPC.run(\"${PAYLOAD}\")"
+  RPC_CODE="Foundry.CLI.RPC.run(\"${PAYLOAD}\")"
 else
   ENCODE_STATUS=$?
   exit "$ENCODE_STATUS"

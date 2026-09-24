@@ -18,10 +18,10 @@ Direct Git inspection reproduced both identities. The exact parent-to-correction
 contains only:
 
 ```text
-M foundry/lib/pramana_foundry/observations.ex
-M foundry/lib/pramana_foundry/observations/gateway_source.ex
-M foundry/lib/pramana_foundry/observations/observation.ex
-M foundry/test/pramana_foundry/observations_test.exs
+M foundry/lib/foundry/observations.ex
+M foundry/lib/foundry/observations/gateway_source.ex
+M foundry/lib/foundry/observations/observation.ex
+M foundry/test/foundry/observations_test.exs
 ```
 
 No protected-store, Gateway, provider, daemon, activation or deployment path changed.
@@ -147,10 +147,10 @@ MIX_ENV=test \
 MIX_BUILD_PATH=/private/tmp/fr18a-rereview-build \
 MIX_DEPS_PATH=/Users/raymondluong/dev/pramana/foundry/deps \
 COORDINATOR_TICK=0 \
-mix test test/pramana_foundry/observations_test.exs \
-  test/pramana_foundry/durable_store/protected_primitives_test.exs \
-  test/pramana_foundry/durable_store/fr08a_critical_corrections_test.exs \
-  test/pramana_foundry/durable_store/fr08a_fr19a_integration_test.exs \
+mix test test/foundry/observations_test.exs \
+  test/foundry/durable_store/protected_primitives_test.exs \
+  test/foundry/durable_store/fr08a_critical_corrections_test.exs \
+  test/foundry/durable_store/fr08a_fr19a_integration_test.exs \
   --seed 18241
 ```
 

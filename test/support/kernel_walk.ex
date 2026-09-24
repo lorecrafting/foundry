@@ -1,7 +1,7 @@
 Code.require_file("r4_rows.ex", __DIR__)
 
-defmodule PramanaFoundry.Test.KernelWalk do
-  alias PramanaFoundry.Workflow.Kernel.State
+defmodule Foundry.Test.KernelWalk do
+  alias Foundry.Workflow.Kernel.State
 
   @moduledoc """
   A reachability-driven generator for the FR-08B domain kernel.
@@ -24,8 +24,8 @@ defmodule PramanaFoundry.Test.KernelWalk do
   seed-pinned evidence model.
   """
 
-  alias PramanaFoundry.Test.{Harness, R4Rows}
-  alias PramanaFoundry.Workflow.Kernel.Event
+  alias Foundry.Test.{Harness, R4Rows}
+  alias Foundry.Workflow.Kernel.Event
 
   @default_tickets ~w(T1 T2 T3)
   @objective "O1"

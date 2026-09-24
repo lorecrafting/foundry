@@ -83,7 +83,7 @@ Pinned Elixir 1.20.3 / OTP 29.0.5; fresh canonical root
 removed. Commands ran from candidate `foundry/` via `mise exec --`.
 
 - `mix compile --force --warnings-as-errors`: exit 0; 90 project files.
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 9221`:
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 9221`:
   exit 0; **92 passed**.
 - Independent `carrier_probes.exs`: exit 0; **2 passed**, including the nine-case matrix.
 - Independent unchanged `closure_probes.exs`: exit 0; **4 passed**.

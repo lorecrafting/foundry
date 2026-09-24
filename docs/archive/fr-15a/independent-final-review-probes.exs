@@ -1,7 +1,7 @@
 # Residual B2 acceptance probes for candidate 9ed32575. No host/provider calls.
 System.put_env("MIX_ENV", "test")
 Code.require_file("../../ci/validate_fr15aa.exs", __DIR__)
-alias PramanaFoundry.CI.FR15aAValidator, as: V
+alias Foundry.CI.FR15aAValidator, as: V
 {manifest, _} = Code.eval_file(Path.join(__DIR__, "provisioning-manifest.exs"))
 :ok = V.validate(manifest)
 

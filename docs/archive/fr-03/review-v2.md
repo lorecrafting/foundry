@@ -145,8 +145,8 @@ under `/Users/raymondluong/.local/share/mise/installs`, followed by
 operator/active roots and `PRAMANA_RUNTIME_ROOT_FRESH=1`. Tests were invoked with:
 
 ```elixir
-Application.load(:pramana_foundry)
-Application.put_env(:pramana_foundry, :herdr_command, "/nonexistent/fr03-v2-herdr")
+Application.load(:foundry)
+Application.put_env(:foundry, :herdr_command, "/nonexistent/fr03-v2-herdr")
 Mix.Task.run("test", ["--seed", "424210", "--max-cases", "1"])
 ```
 
@@ -190,26 +190,26 @@ new review is excluded from its own input inventory. Hashes below are SHA-256.
 | File | Hash |
 |---|---|
 | config/config.exs | `d38fca63c3463b4bbbb5c56afcd66a900d4f6e4d5c5434bf3ec0157f372a7b16` |
-| lib/pramana_foundry/application.ex | `35654ad4d19228fea06fdbb47bb714636b3dfbae3a09fef49bba5e3794737c9c` |
-| lib/pramana_foundry/board.ex | `57b097d4cb7ad4ca1e2a10dbb0ab1862ccbae1b1ae25c7c34dca3757e32ae2c6` |
-| lib/pramana_foundry/board/findings_panel.ex | `aaa8190073b2dd81a41ddd9c6bf00bd81849195159a1a48bed57480334da9977` |
-| lib/pramana_foundry/consolidated_log.ex | `ff7eebb85bd34f39b0bf345432de3ca1ed4e7f1b6b62cc1bfa4f1b991352137c` |
-| lib/pramana_foundry/coordinator.ex | `8798a52a679d65a5c416156878ba6c030c81134b685f66740d5cbc48cbcb74a7` |
-| lib/pramana_foundry/coordinator/tick.ex | `00af5820712d7d3d018dd110440f6173e7cf81c567b9d113f336580d2a8ce03e` |
-| lib/pramana_foundry/event_log.ex | `99f2389985bcb094428636774aeb4d13f8188874bdbec200664a007c76ce167d` |
-| lib/pramana_foundry/fence.ex | `59ab62c203d29b2f0bf56133743f9bc3f4e4e4ce91113573844a59a880b4efb7` |
-| lib/pramana_foundry/import.ex | `3cd3f7dee6bc279d3f27f76fb057d98a21b76112dc66e778d13883e6eeb0c9f3` |
-| lib/pramana_foundry/improver.ex | `eeb5c8a353bac57409527ef4d90b7c898725d11c5d7a18d578b5530f14df186d` |
-| lib/pramana_foundry/runtime_owner.ex | `48dea9fb7e64b279e64ca280eea16833faf259099f11df078f9bd73f88a0bbbc` |
-| lib/pramana_foundry/runtime_root.ex | `1bf3fe5bd5de23ce3dbac85ffff887b6f913afd64662ea4008826116267683d2` |
-| lib/pramana_foundry/status/report.ex | `f6da2b96af21b92087ad119ade3ad7db7efb0991784f72815a1e5e51f48efef2` |
-| lib/pramana_foundry/transition.ex | `387baa673e5084c86c9d9d7eefcd1b6e03a13fad9ca3fbfdbb60a0fbb62ce92b` |
-| test/pramana_foundry/coordinator_test.exs | `3ab10ccfae88aa7647b650ed05e636fc8c214151e96c62c048abab1ae2735e31` |
-| test/pramana_foundry/legacy_persistence_containment_test.exs | `d71837a516b38bc8abb888b34a8eb5b0d9f6bfc6a5ba70cbeb430d0e3fc8340a` |
-| test/pramana_foundry/runtime_root_test.exs | `676bcae97d52c9a832cb6474680e3ca48a9d355b2c15e67b2d498c2f71b50e3b` |
-| test/pramana_foundry/runtime_startup_boundary_test.exs | `7d4406e850c420ccafe3ecc019549e4e4ca9bfa6f8c47da8d80e3ca171cdd743` |
-| test/pramana_foundry/stress_test.exs | `506768777068737c471ec5cea36d0f677c674edd3a89a9d74feaf3e7e3a2c6ec` |
-| test/pramana_foundry/transition_test.exs | `847ab60d3d0d53ccc7f37c7458c9a83aa7d01e7e055218a65ba2796e537688aa` |
+| lib/foundry/application.ex | `35654ad4d19228fea06fdbb47bb714636b3dfbae3a09fef49bba5e3794737c9c` |
+| lib/foundry/board.ex | `57b097d4cb7ad4ca1e2a10dbb0ab1862ccbae1b1ae25c7c34dca3757e32ae2c6` |
+| lib/foundry/board/findings_panel.ex | `aaa8190073b2dd81a41ddd9c6bf00bd81849195159a1a48bed57480334da9977` |
+| lib/foundry/consolidated_log.ex | `ff7eebb85bd34f39b0bf345432de3ca1ed4e7f1b6b62cc1bfa4f1b991352137c` |
+| lib/foundry/coordinator.ex | `8798a52a679d65a5c416156878ba6c030c81134b685f66740d5cbc48cbcb74a7` |
+| lib/foundry/coordinator/tick.ex | `00af5820712d7d3d018dd110440f6173e7cf81c567b9d113f336580d2a8ce03e` |
+| lib/foundry/event_log.ex | `99f2389985bcb094428636774aeb4d13f8188874bdbec200664a007c76ce167d` |
+| lib/foundry/fence.ex | `59ab62c203d29b2f0bf56133743f9bc3f4e4e4ce91113573844a59a880b4efb7` |
+| lib/foundry/import.ex | `3cd3f7dee6bc279d3f27f76fb057d98a21b76112dc66e778d13883e6eeb0c9f3` |
+| lib/foundry/improver.ex | `eeb5c8a353bac57409527ef4d90b7c898725d11c5d7a18d578b5530f14df186d` |
+| lib/foundry/runtime_owner.ex | `48dea9fb7e64b279e64ca280eea16833faf259099f11df078f9bd73f88a0bbbc` |
+| lib/foundry/runtime_root.ex | `1bf3fe5bd5de23ce3dbac85ffff887b6f913afd64662ea4008826116267683d2` |
+| lib/foundry/status/report.ex | `f6da2b96af21b92087ad119ade3ad7db7efb0991784f72815a1e5e51f48efef2` |
+| lib/foundry/transition.ex | `387baa673e5084c86c9d9d7eefcd1b6e03a13fad9ca3fbfdbb60a0fbb62ce92b` |
+| test/foundry/coordinator_test.exs | `3ab10ccfae88aa7647b650ed05e636fc8c214151e96c62c048abab1ae2735e31` |
+| test/foundry/legacy_persistence_containment_test.exs | `d71837a516b38bc8abb888b34a8eb5b0d9f6bfc6a5ba70cbeb430d0e3fc8340a` |
+| test/foundry/runtime_root_test.exs | `676bcae97d52c9a832cb6474680e3ca48a9d355b2c15e67b2d498c2f71b50e3b` |
+| test/foundry/runtime_startup_boundary_test.exs | `7d4406e850c420ccafe3ecc019549e4e4ca9bfa6f8c47da8d80e3ca171cdd743` |
+| test/foundry/stress_test.exs | `506768777068737c471ec5cea36d0f677c674edd3a89a9d74feaf3e7e3a2c6ec` |
+| test/foundry/transition_test.exs | `847ab60d3d0d53ccc7f37c7458c9a83aa7d01e7e055218a65ba2796e537688aa` |
 
 Input review-document hashes appear at the beginning. Context included project
 AGENTS/orientation, applicable RULES and CODE_CONVENTIONS, Foundry README, audit F02/F14,

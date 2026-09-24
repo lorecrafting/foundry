@@ -1,4 +1,4 @@
-defmodule PramanaFoundry.Test.R4Rows do
+defmodule Foundry.Test.R4Rows do
   @moduledoc """
   The R4 and R4a transition rows, as data, parsed from the contract itself.
 
@@ -12,7 +12,7 @@ defmodule PramanaFoundry.Test.R4Rows do
   rather than copied here, so the inventory cannot silently drift from the contract. Edit a
   row in the contract and the lookup fails, naming the row.
 
-  `PramanaFoundry.Workflow.R4CoverageTest` pairs each row with a scenario that drives it
+  `Foundry.Workflow.R4CoverageTest` pairs each row with a scenario that drives it
   through the kernel and asserts its outcome. A row with no scenario is a failure, not a
   gap for a reviewer to find later.
   """

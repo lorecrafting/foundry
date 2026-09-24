@@ -113,7 +113,7 @@ The user decides whether either is credited to FR-23a.
 
 The argument is from the files each ticket's scope rewrites. The mapping comes from the
 plan's scope text plus the O0 inventory's crossing table, which says where the relevant
-code lives. Paths are under `foundry/lib/pramana_foundry/`.
+code lives. Paths are under `foundry/lib/foundry/`.
 
 | Ticket | Scope (plan) | Files it rewrites |
 |---|---|---|
@@ -161,8 +161,8 @@ FR-23's rules apply unchanged:
   [MIGRATION.md](../archive/MIGRATION.md) and [MIGRATION-TICKETS.md](../archive/MIGRATION-TICKETS.md).
 - The OWNED-ELSEWHERE rows, once their owners finish.
 - **Rename the namespace away from Pramāṇa** (operator request, 2026-09-23): OTP app
-  `:pramana_foundry` → `:foundry`, modules `PramanaFoundry.*` → `Foundry.*`,
-  `lib/pramana_foundry/` and `test/pramana_foundry/` → `lib/foundry/` and `test/foundry/`.
+  `:foundry` → `:foundry`, modules `Foundry.*` → `Foundry.*`,
+  `lib/foundry/` and `test/foundry/` → `lib/foundry/` and `test/foundry/`.
   Foundry is to move to its own repository; `pramana/` already uses none of its code (only
   docs, `.gitignore` and `.github/workflows/fr19a-sync-eio.yml` name it). Measured
   2026-09-23: 2,472 occurrences in 406 tracked files under `foundry/`. It is FR-23b's, not
@@ -224,7 +224,7 @@ Excludes clause says to extend its job in each subsequent ticket rather than wai
 whole repair.
 
 **Where the change actually lands.** `foundry/ci/run.exs` is two lines. It requires
-`lib/pramana_foundry/ci.ex` and calls `PramanaFoundry.CI.main/1`. The stages live in
+`lib/foundry/ci.ex` and calls `Foundry.CI.main/1`. The stages live in
 `ci.ex`, so "adding to `ci/run.exs`" means one of two things:
 
 - editing `ci.ex`, or
@@ -232,8 +232,8 @@ whole repair.
   leaves `ci.ex` untouched.
 
 **What pins the runner hash.** `git grep -n runner_sha256 -- foundry/` finds one line,
-`lib/pramana_foundry/ci.ex:487`, inside `source_provenance/1`. It records the SHA-256 of
-**`lib/pramana_foundry/ci.ex`**, not of `ci/run.exs`, together with `workflow_sha256` of
+`lib/foundry/ci.ex:487`, inside `source_provenance/1`. It records the SHA-256 of
+**`lib/foundry/ci.ex`**, not of `ci/run.exs`, together with `workflow_sha256` of
 `.github/workflows/foundry-ci.yml`, into each run's `provenance.json`. No code in `foundry/`
 reads `runner_sha256` back, so nothing in the tree checks it.
 

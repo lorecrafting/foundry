@@ -4,7 +4,7 @@
 # the tests per trial. Two phases, per docs/COVERAGE-GUIDED-SWEEP.md:
 #
 #   1. MAP. One instrumented run of the workflow suites. Every `require_*(` call site is
-#      prefixed with `(PramanaFoundry.EV1Probe.hit(site); <call>)`, which records the site in
+#      prefixed with `(Foundry.EV1Probe.hit(site); <call>)`, which records the site in
 #      an ETS table BEFORE the call runs, so a call that raises is still attributed; an injected `setup` snapshots the table around every test. Result: site ->
 #      the tests that evaluated it. Hits that land between tests belong to a `setup_all`
 #      and go to every test of the module that owns it.
@@ -54,30 +54,30 @@
 # Ctrl-C and SIGKILL leave both behind.
 
 defmodule EV1 do
-  @kernel "lib/pramana_foundry/workflow/kernel.ex"
+  @kernel "lib/foundry/workflow/kernel.ex"
   @boundary "\n# EV1 file boundary: "
   @raw "docs/fr-08/fr08b-sweep-2026-09-21-raw.txt"
   @suites ~w(
-    test/pramana_foundry/workflow/kernel_test.exs
-    test/pramana_foundry/workflow/r4_coverage_test.exs
-    test/pramana_foundry/workflow/r4_exhaustive_test.exs
-    test/pramana_foundry/workflow/kernel_properties_test.exs
-    test/pramana_foundry/workflow/r4_guard_reachability_test.exs
+    test/foundry/workflow/kernel_test.exs
+    test/foundry/workflow/r4_coverage_test.exs
+    test/foundry/workflow/r4_exhaustive_test.exs
+    test/foundry/workflow/kernel_properties_test.exs
+    test/foundry/workflow/r4_guard_reachability_test.exs
   )
   # The two suites with no setup_all search; measured 0.6s of tests against ~230s of
   # setup_all across the other three in the 2026-09-22 baseline.
   @cheap_suites ~w(
-    test/pramana_foundry/workflow/kernel_test.exs
-    test/pramana_foundry/workflow/r4_coverage_test.exs
+    test/foundry/workflow/kernel_test.exs
+    test/foundry/workflow/r4_coverage_test.exs
   )
-  @probe "PramanaFoundry.EV1Probe"
-  @probe_path "lib/pramana_foundry/ev1_probe.ex"
+  @probe "Foundry.EV1Probe"
+  @probe_path "lib/foundry/ev1_probe.ex"
 
   # Event and State hold no guard call and are not the reducer's; KernelSearch excludes them too.
   def targets,
     do:
-      [@kernel | Path.wildcard("lib/pramana_foundry/workflow/kernel/**/*.ex")] --
-        ~w(lib/pramana_foundry/workflow/kernel/event.ex lib/pramana_foundry/workflow/kernel/state.ex)
+      [@kernel | Path.wildcard("lib/foundry/workflow/kernel/**/*.ex")] --
+        ~w(lib/foundry/workflow/kernel/event.ex lib/foundry/workflow/kernel/state.ex)
 
   def read_kernel(root \\ "."),
     do: Enum.map_join(targets(), &(@boundary <> &1 <> "\n" <> File.read!(Path.join(root, &1))))
@@ -398,7 +398,7 @@ defmodule EV1 do
   # ── Phase 1: map ──
 
   @probe_source """
-  defmodule PramanaFoundry.EV1Probe do
+  defmodule Foundry.EV1Probe do
     @moduledoc false
     @table :ev1_hits
     @log "LOG_PATH"
@@ -767,7 +767,7 @@ IO.puts("guard call sites: #{length(all_sites)} (sweeping #{length(sites)})")
     Code.require_file("test/support/kernel_search.ex")
   end)
 
-reasons = &PramanaFoundry.Test.KernelSearch.reasons_in/1
+reasons = &Foundry.Test.KernelSearch.reasons_in/1
 fixture = "with :ok <- require_x(t, {:error, :sweep_control}), do: :ok"
 
 if reasons.(EV1.mutate(fixture, hd(EV1.call_sites(fixture)))) == reasons.(fixture) do

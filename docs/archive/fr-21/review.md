@@ -46,7 +46,7 @@ shasum -a 256 /private/tmp/pramana-fr21/foundry/docs/fr-21/candidate.md
 
 ### B1. Undeclared `python3`/`tiktoken` makes the hosted job non-portable
 
-`foundry/lib/pramana_foundry/projections/benchmark.ex:162-179` invokes `python3` and imports `tiktoken`. If that import fails, the code silently changes the token-count algorithm. `test/pramana_foundry/projections/benchmark_test.exs:12` compares against a saved `tiktoken` result, so the default test suite fails. The workflow installs only BEAM (`.github/workflows/foundry-ci.yml:36-40`); `foundry/mix.exs` declares only Owl; neither Python nor `tiktoken` is pinned, installed, or included in provenance.
+`foundry/lib/foundry/projections/benchmark.ex:162-179` invokes `python3` and imports `tiktoken`. If that import fails, the code silently changes the token-count algorithm. `test/foundry/projections/benchmark_test.exs:12` compares against a saved `tiktoken` result, so the default test suite fails. The workflow installs only BEAM (`.github/workflows/foundry-ci.yml:36-40`); `foundry/mix.exs` declares only Owl; neither Python nor `tiktoken` is pinned, installed, or included in provenance.
 
 The two local passes accidentally inherited `tiktoken` 0.13.0 from the review host's user-site Python. Selecting a clean Homebrew Python without that package gives 425/426 tests and exit 2 in the CI runner. A targeted reproduction is:
 
@@ -54,7 +54,7 @@ The two local passes accidentally inherited `tiktoken` 0.13.0 from the review ho
 cd CLEAN_CHECKOUT/foundry
 PATH="PINNED_ELIXIR_BIN:PINNED_OTP_BIN:/opt/homebrew/bin:/usr/bin:/bin" \
   MIX_ENV=test MIX_BUILD_PATH=UNIQUE_BUILD MIX_DEPS_PATH=FETCHED_DEPS TMPDIR=UNIQUE_TMP \
-  mix test test/pramana_foundry/projections/benchmark_test.exs --seed 0
+  mix test test/foundry/projections/benchmark_test.exs --seed 0
 ```
 
 Observed:
@@ -74,7 +74,7 @@ Required correction: eliminate the Python runtime dependency from the default mo
 
 `source_provenance/1` records `git status` once (`ci.ex:274-280`) but does not reject dirtiness or hash dirty paths. Formatting enumerates only `git ls-files` (`ci.ex:228-247`). Mix compilation, however, compiles untracked `.ex` source.
 
-In a disposable clone only, I added formatted `foundry/lib/pramana_foundry/dirty_probe.ex` with SHA-256 `f7ed947ef638cdcc2a1fda70d3c8ac026bbce3185c4ba02a4807b5aaa21c5a50`, then ran the exact CI runner. All six commands and all 426 tests passed. The resulting escript contains `Elixir.PramanaFoundry.DirtyProbe.beam`, but the manifest still identifies the frozen commit/tree and artifact only:
+In a disposable clone only, I added formatted `foundry/lib/foundry/dirty_probe.ex` with SHA-256 `f7ed947ef638cdcc2a1fda70d3c8ac026bbce3185c4ba02a4807b5aaa21c5a50`, then ran the exact CI runner. All six commands and all 426 tests passed. The resulting escript contains `Elixir.Foundry.DirtyProbe.beam`, but the manifest still identifies the frozen commit/tree and artifact only:
 
 ```json
 {
@@ -82,7 +82,7 @@ In a disposable clone only, I added formatted `foundry/lib/pramana_foundry/dirty
   "source": {
     "commit": "85a74492959e6db51f4a0f03c218990afb97b0c3",
     "tree": "cc730c6bf3cd7b62a66cc59b754176b16ad98521",
-    "dirty_paths": ["?? foundry/lib/pramana_foundry/dirty_probe.ex"]
+    "dirty_paths": ["?? foundry/lib/foundry/dirty_probe.ex"]
   },
   "artifact": {"sha256": "00c60950f6f0ecf5482f231f35bb2130e26b319032d64168237ebad1c1e95286"}
 }
@@ -157,7 +157,7 @@ Required correction: validate the complete resolved Mix dependency set/SCM again
 
 Review root: `/private/tmp/fr21-independent-review.kS5OJB`
 
-I used two separate `git clone --no-local --no-checkout` repositories, detached each at the frozen commit, and verified before execution that each checkout was clean and lacked `foundry/deps/` and `foundry/pramana_foundry`. Artifacts were written outside both clones. The command in each `foundry/` directory was:
+I used two separate `git clone --no-local --no-checkout` repositories, detached each at the frozen commit, and verified before execution that each checkout was clean and lacked `foundry/deps/` and `foundry/foundry`. Artifacts were written outside both clones. The command in each `foundry/` directory was:
 
 ```sh
 PATH=".../elixir/1.20.3-otp-29/bin:.../erlang/29.0.5/bin:$PATH" \
@@ -226,7 +226,7 @@ The differing escript bytes are not an express FR-21 failure because the manifes
 - This review ran locally on macOS; I did not execute GitHub's hosted Ubuntu job. B1 is a deterministic dependency-boundary failure, not a claim based only on guessing the hosted image.
 - No test currently carries `@tag :live_provider` or `@tag :real_provider`. The CLI includes both `--exclude` switches, but they presently skip zero tagged tests. The manifest's static category declarations are accurate about absent evidence, yet they do not report a matched/skipped-test inventory. Adding the real bounded suite remains FR-22; reporting actual match counts would make FR-21 evidence stronger.
 - The complete suite emits pre-existing test-source and unmatched support-pattern warnings despite compile-with-warnings-as-errors passing. These were not introduced as FR-21 production compiler regressions.
-- `PramanaFoundry.Parity`'s module documentation still describes “effect-free shadow inspection” even though the path is retired. That is a minor documentation mismatch; runtime behavior is safely fail-closed.
+- `Foundry.Parity`'s module documentation still describes “effect-free shadow inspection” even though the path is retired. That is a minor documentation mismatch; runtime behavior is safely fail-closed.
 
 ## Changed-path SHA-256 inventory
 
@@ -267,13 +267,13 @@ DELETED beec7ef6cc06754755d3e1850606f4e47022c25b766f228a2dff1d62999c7ddb  foundr
 2fd5e18e89af3a2f51588df8867fd9522a65a6d121a2eea9aa9ae96ad3708835  foundry/docs/MIGRATION-TICKETS.md
 372695ca46ab4a80616fa0bd9d43a6218d425c5c519946425b264e5509c91877  foundry/docs/MIGRATION.md
 b3a6e5bb95afbc8032e98afddd44d302cfd41f664767c750dcf8767c94d6c7c2  foundry/docs/fr-21/candidate.md
-739b25f37a4b3766244a30c2f87d0c925109ba7aee218dd740e862f26e70ef46  foundry/lib/pramana_foundry/ci.ex
-b714c02f7bbb013b4a6f4a00ac015063b284635d0bd9ed2f67458787119d933b  foundry/lib/pramana_foundry/parity.ex
+739b25f37a4b3766244a30c2f87d0c925109ba7aee218dd740e862f26e70ef46  foundry/lib/foundry/ci.ex
+b714c02f7bbb013b4a6f4a00ac015063b284635d0bd9ed2f67458787119d933b  foundry/lib/foundry/parity.ex
 DELETED c8423089ead8d872d4928c9a5e337bd54295a1f4db64b2b25b1f4b88f3a57eac  foundry/pramana_diagnose.py
-DELETED 52c5152bc059b1bd85564671924e92c17e2e8b7294b641390898b799e66c4618  foundry/pramana_foundry
-467c81e8194722ebf1fd472e8c9d9c9a4eca4f2bda4d8ac26ad7b5e788aa1143  foundry/test/pramana_foundry/ci_test.exs
-407d1d3f77892e8ffe7a224ce07f54434e995ac864fc1d3beac2b4b14df03f86  foundry/test/pramana_foundry/policy_test.exs
-1217d74805d4bc6085a15327cff060ea654a312b4a48175d68eef8120d2a43d7  foundry/test/pramana_foundry/rpc_wrapper_test.exs
+DELETED 52c5152bc059b1bd85564671924e92c17e2e8b7294b641390898b799e66c4618  foundry/foundry
+467c81e8194722ebf1fd472e8c9d9c9a4eca4f2bda4d8ac26ad7b5e788aa1143  foundry/test/foundry/ci_test.exs
+407d1d3f77892e8ffe7a224ce07f54434e995ac864fc1d3beac2b4b14df03f86  foundry/test/foundry/policy_test.exs
+1217d74805d4bc6085a15327cff060ea654a312b4a48175d68eef8120d2a43d7  foundry/test/foundry/rpc_wrapper_test.exs
 ```
 
 ## Review scope and limitations

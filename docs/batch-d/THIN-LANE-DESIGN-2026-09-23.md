@@ -3,7 +3,7 @@
 **Date:** 2026-09-23. **Type:** design for T3–T7 of
 [dogfood readiness §4](../DOGFOOD-READINESS-2026-09-23.md#4-the-thin-dogfood-option). It
 changes no code. **Taken at `8ed8d233`** (`repair/fr08b-kernel`). Code paths are under
-`foundry/lib/pramana_foundry/` and test paths are under `foundry/test/pramana_foundry/`. Line
+`foundry/lib/foundry/` and test paths are under `foundry/test/foundry/`. Line
 numbers are at that commit.
 
 **Runbook.** [LANE-RUNBOOK](LANE-RUNBOOK.md) is how an operator runs the built lane: the
@@ -56,12 +56,12 @@ The lane's policy also makes Core refuse two of these
 **Non-launch test** (`manual_lane/non_launch_test.exs`, owned by W2). This is a
 module-graph test:
 
-- **Start set.** Every file under `lib/pramana_foundry/manual_lane/`, plus `work_packet.ex`.
+- **Start set.** Every file under `lib/foundry/manual_lane/`, plus `work_packet.ex`.
 - **Walk.** References are followed transitively through every `lib/` module they reach,
   using the architecture gate's resolver (`test/support/ast_modules.ex`;
   `architecture_boundary_test.exs:187-196`).
 - **Assertion.** The closure contains none of these:
-  - `PramanaFoundry.Herdr.*`
+  - `Foundry.Herdr.*`
   - `AgentServer`
   - `Coordinator`, `Coordinator.Tick`, `Coordinator.State`
   - `Effects.Launch`, `Effects.PromptDelivery`
@@ -69,13 +69,13 @@ module-graph test:
 Because the test globs the directory, it covers T5's CLI file as well.
 
 **Red controls.** Each of these fixtures must fail the test: a fixture under
-`System.tmp_dir!()` that references `PramanaFoundry.Herdr.Adapter`, following the pattern at
+`System.tmp_dir!()` that references `Foundry.Herdr.Adapter`, following the pattern at
 `architecture_boundary_test.exs:282`; a fixture that reaches `Coordinator` through one
 intermediate module, which proves the walk is transitive.
 
 ## 2. T4: the work packet
 
-`PramanaFoundry.WorkPacket` is a new file, `work_packet.ex`. It is pure: no I/O, Git,
+`Foundry.WorkPacket` is a new file, `work_packet.ex`. It is pure: no I/O, Git,
 Gateway or clock. It turns replayed store state into a packet and does nothing else.
 
 ```elixir
@@ -138,7 +138,7 @@ no field comes from a CLI argument to `packet`.
 
 ## 3. T3: the manual execution backend
 
-`PramanaFoundry.ManualLane.Backend` is a new file, `manual_lane/backend.ex`. Every function
+`Foundry.ManualLane.Backend` is a new file, `manual_lane/backend.ex`. Every function
 takes `ctx = %{gateway, capability, path, writer_epoch}`, so it runs against a Gateway a test
 started, before T6 exists.
 
@@ -253,7 +253,7 @@ path, as in `decide_e2e_test.exs:22-37`.
 
 ## 4. T5: the manual-lane CLI
 
-`PramanaFoundry.ManualLane.CLI` is a new file, `manual_lane/cli.ex`, invoked as
+`Foundry.ManualLane.CLI` is a new file, `manual_lane/cli.ex`, invoked as
 `bin/pramana lane <cmd> …`.
 
 - **Routing.** `CLI.RPC.run/1` (`cli/rpc.ex:29-34`) routes argv that begins with `"lane"` to
@@ -286,7 +286,7 @@ four of its own: `:lane_disabled`; `:gateway_recovery`; `:git_ref_unresolved`; t
 
 ## 5. T6: flagged Gateway start
 
-**Flag.** `FOUNDRY_MANUAL_LANE=1`, or `config :pramana_foundry, :manual_lane, enabled: true`.
+**Flag.** `FOUNDRY_MANUAL_LANE=1`, or `config :foundry, :manual_lane, enabled: true`.
 It is read the same way as `COORDINATOR_TICK` (`application.ex:17-19`). The default is off.
 
 **Store.** The store is `Path.join(runtime_root, "state/manual-lane/authority.sqlite3")`,
@@ -298,7 +298,7 @@ under `ManualLane` touches.
 required when the flag is on. If it is unset, startup refuses with
 `:manual_lane_repo_missing`.
 
-**Child.** `PramanaFoundry.ManualLane.Server` is a new file, `manual_lane/server.ex`. Its
+**Child.** `Foundry.ManualLane.Server` is a new file, `manual_lane/server.ex`. Its
 `init/1` does four things in order:
 
 1. If the store file is absent, it calls `Gateway.initialize(path)` (`gateway.ex:27`).

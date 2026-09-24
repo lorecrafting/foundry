@@ -19,9 +19,9 @@ relative to `foundry/`:
 | File | SHA-256 |
 |---|---|
 | `bin/pramana` | `c1c92fe1c25402d67e0ce6173e196e640e71b47c528878bb164f0318c83e5250` |
-| `lib/pramana_foundry/cli/rpc.ex` | `617fb1dc018a70abb9ffd7f97bc7e886db6d217c16ae06ea15ef233d5829b11d` |
-| `test/pramana_foundry/cli/rpc_test.exs` | `083f11bf59e6f3954e168d8f939c0fe9aa8fbb165e59daf66894d7b95d366617` |
-| `test/pramana_foundry/rpc_wrapper_test.exs` | `77ccefd68a73ac180723591fbaf3c0075e7c9f8bcb5716061c05c8259ee6e761` |
+| `lib/foundry/cli/rpc.ex` | `617fb1dc018a70abb9ffd7f97bc7e886db6d217c16ae06ea15ef233d5829b11d` |
+| `test/foundry/cli/rpc_test.exs` | `083f11bf59e6f3954e168d8f939c0fe9aa8fbb165e59daf66894d7b95d366617` |
+| `test/foundry/rpc_wrapper_test.exs` | `77ccefd68a73ac180723591fbaf3c0075e7c9f8bcb5716061c05c8259ee6e761` |
 
 The v1 review SHA-256 was also confirmed as
 `911baf8618cc3853268e383b302bb9dc009e2a33460e0e89e0e126af7ba15340`.
@@ -33,7 +33,7 @@ The v1 review SHA-256 was also confirmed as
 `decode_json/1` uses OTP `:json.decode/3` object callbacks. Every object start creates
 its own `{map, seen_keys}` accumulator. `json_object_push/3` tests the decoded binary key
 against that object's key set before `Map.put/3`, and throws the private exact tag
-`{PramanaFoundry.CLI.RPC, :duplicate_json_key}` on repetition. `decode_json/1` catches
+`{Foundry.CLI.RPC, :duplicate_json_key}` on repetition. `decode_json/1` catches
 only that throw as `:duplicate_json_key`; decoder errors remain `:invalid_json`.
 
 The callback accumulator is total for the relevant JSON nesting forms. OTP saves the
@@ -67,7 +67,7 @@ CLI reports `unblock` as unknown and raises `usage error`.
 - The source-injection correction remains intact. The shell passes original arguments
   as `"$@"` after Elixir's `--`; the encoder reads `System.argv/0`, emits JSON and
   canonical unpadded URL-safe base64, and inserts only that restricted alphabet into the
-  fixed `PramanaFoundry.CLI.RPC.run("TOKEN")` expression. Decoded strings are validated
+  fixed `Foundry.CLI.RPC.run("TOKEN")` expression. Decoded strings are validated
   as data and dispatched without atom or source construction.
 - Actual-wrapper tests still cover quotes, apostrophes, backslashes, newlines, empty
   values, literal interpolation syntax, shell-looking text, Unicode and a 60,000-byte
@@ -91,21 +91,21 @@ MIX_ENV=test mise exec -- mix compile --force --warnings-as-errors
 # compiled 72 files
 
 COORDINATOR_TICK=0 HERDR_ENV=0 MIX_ENV=test mise exec -- mix test --no-start \
-  test/pramana_foundry/cli/rpc_test.exs \
-  test/pramana_foundry/rpc_wrapper_test.exs \
-  test/pramana_foundry/cli_test.exs --seed 12092026
+  test/foundry/cli/rpc_test.exs \
+  test/foundry/rpc_wrapper_test.exs \
+  test/foundry/cli_test.exs --seed 12092026
 # 62 passed
 
 bash -n bin/pramana
 
 mise exec -- mix format --check-formatted \
-  lib/pramana_foundry/cli/rpc.ex \
-  test/pramana_foundry/cli/rpc_test.exs \
-  test/pramana_foundry/rpc_wrapper_test.exs
+  lib/foundry/cli/rpc.ex \
+  test/foundry/cli/rpc_test.exs \
+  test/foundry/rpc_wrapper_test.exs
 
-git diff --check -- bin/pramana lib/pramana_foundry/cli/rpc.ex \
-  test/pramana_foundry/cli/rpc_test.exs \
-  test/pramana_foundry/rpc_wrapper_test.exs
+git diff --check -- bin/pramana lib/foundry/cli/rpc.ex \
+  test/foundry/cli/rpc_test.exs \
+  test/foundry/rpc_wrapper_test.exs
 ```
 
 A separate trailing-whitespace scan covered the three untracked Elixir/test files,

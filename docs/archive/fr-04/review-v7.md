@@ -54,7 +54,7 @@ FakeRunner.install(table, fn
     FakeRunner.json(%{"process_info" => %{"shell_pid" => 100}})
   argv -> original_script.(argv)
 end)
-{:ok, pid} = DynamicSupervisor.start_child(PramanaFoundry.AssignmentSupervisor, child)
+{:ok, pid} = DynamicSupervisor.start_child(Foundry.AssignmentSupervisor, child)
 ref = Process.monitor(pid)
 receive do
   {:DOWN, ^ref, :process, ^pid, _} -> :ok
@@ -64,7 +64,7 @@ end
 state = Coordinator.state()
 IO.inspect(Map.take(state["assignments"]["T-RUNTIME-CLEANUP"],
   ~w(status cleanup_resources cleanup_outstanding pane_id)), label: "LIVE")
-:ok = Application.stop(:pramana_foundry)
+:ok = Application.stop(:foundry)
 {:ok, events} = Checkpoint.events(event_path)
 {:ok, %{state: replayed}} = Transition.rebuild(events)
 IO.inspect(Map.take(replayed["assignments"]["T-RUNTIME-CLEANUP"],
@@ -85,15 +85,15 @@ IO.inspect(%{
 Independently ran the full focused command below under fresh TMPDIR/operator roots, `MIX_ENV=test`, pinned toolchain and no live runtime root: **111 passed**, seed 40448, 16.6 seconds. Two existing stress-test warnings remain (unused variable and unused default argument).
 
 ```sh
-mix test test/pramana_foundry/herdr/adapter_test.exs \
-  test/pramana_foundry/agent_server_test.exs \
-  test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/transition_test.exs \
-  test/pramana_foundry/runtime_startup_boundary_test.exs \
-  test/pramana_foundry/daemon_recovery_test.exs \
-  test/pramana_foundry/autonomous_launch_test.exs \
-  test/pramana_foundry/stress_test.exs \
-  test/pramana_foundry/status/status_test.exs --seed 40448
+mix test test/foundry/herdr/adapter_test.exs \
+  test/foundry/agent_server_test.exs \
+  test/foundry/coordinator_test.exs \
+  test/foundry/transition_test.exs \
+  test/foundry/runtime_startup_boundary_test.exs \
+  test/foundry/daemon_recovery_test.exs \
+  test/foundry/autonomous_launch_test.exs \
+  test/foundry/stress_test.exs \
+  test/foundry/status/status_test.exs --seed 40448
 ```
 
 These execute the unchanged/start-timeout replacement and registration-append failure runtime fixtures, sibling/replay/status projection checks, native-session enrichment restrictions, real two-resource closure orders and developer drain deadline, pending/result append failures, FR-03 fence/topology cases, and Coordinator/Tick suspension regressions.

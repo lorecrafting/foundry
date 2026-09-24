@@ -86,13 +86,13 @@ epochs, or Git activation work assigned to FR-07/FR-08/FR-10 and later tickets.
 The original 13-file candidate remains owned. Review correction additionally owns:
 
 - `config/config.exs`
-- `lib/pramana_foundry/import.ex`
-- `lib/pramana_foundry/event_log.ex`
-- `lib/pramana_foundry/transition.ex`
-- `lib/pramana_foundry/status/report.ex`
-- `test/pramana_foundry/transition_test.exs`
-- `test/pramana_foundry/stress_test.exs`
-- `test/pramana_foundry/coordinator_test.exs`
+- `lib/foundry/import.ex`
+- `lib/foundry/event_log.ex`
+- `lib/foundry/transition.ex`
+- `lib/foundry/status/report.ex`
+- `test/foundry/transition_test.exs`
+- `test/foundry/stress_test.exs`
+- `test/foundry/coordinator_test.exs`
 - `docs/fr-03/review-response.md`
 
 The config change permits an explicit `PRAMANA_OPERATOR_RUNTIME_ROOT` for isolated

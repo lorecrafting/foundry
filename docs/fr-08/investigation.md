@@ -87,7 +87,7 @@ clock, random generation, configuration or provider effects.
 
 ## Executable handoff gate — 2026-09-17
 
-`PramanaFoundry.Repair.FR08HandoffGate` now encodes the required FR-07 handoff
+`Foundry.Repair.FR08HandoffGate` now encodes the required FR-07 handoff
 capabilities as a fixed ordered probe set. This is preparation only: it does not modify or
 substitute for the active FR-07 store implementation, and a missing provider reports
 **blocked**, never a false pass.
@@ -105,7 +105,7 @@ The current repository intentionally supplies no FR-07 adapter, so:
 
 ```bash
 cd foundry
-mix run -e 'IO.inspect(PramanaFoundry.Repair.FR08HandoffGate.run())'
+mix run -e 'IO.inspect(Foundry.Repair.FR08HandoffGate.run())'
 ```
 
 must report `blocked`. Once FR-07 lands, add one thin reviewed adapter that executes
@@ -113,8 +113,8 @@ these probes against the accepted public boundary, then run the gate with that m
 the exact accepted revision, for example:
 
 ```elixir
-PramanaFoundry.Repair.FR08HandoffGate.run(
-  PramanaFoundry.Repair.AcceptedFR07Adapter,
+Foundry.Repair.FR08HandoffGate.run(
+  Foundry.Repair.AcceptedFR07Adapter,
   subject_revision: "exact-accepted-git-revision"
 )
 ```

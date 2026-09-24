@@ -40,11 +40,11 @@ Code.require_file("test/support/kernel_harness.ex")
 Code.require_file("test/support/kernel_walk.ex")
 Code.require_file("test/support/kernel_search.ex")
 
-PramanaFoundry.Test.Harness.start()
+Foundry.Test.Harness.start()
 
-alias PramanaFoundry.Test.{KernelSearch, KernelWalk}
-alias PramanaFoundry.Workflow.Kernel, as: WorkflowKernel
-alias PramanaFoundry.Workflow.Kernel.{Event, State}
+alias Foundry.Test.{KernelSearch, KernelWalk}
+alias Foundry.Workflow.Kernel, as: WorkflowKernel
+alias Foundry.Workflow.Kernel.{Event, State}
 
 # Every value class `Event.value?/2` admits, plus one it refuses (the float) as this probe's
 # own control: if the float ever shows up as accepted, the probe is not testing what it says.

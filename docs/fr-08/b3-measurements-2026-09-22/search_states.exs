@@ -4,8 +4,8 @@
 ExUnit.start(autorun: false)
 root = Path.expand("../../../test/support", __DIR__)
 for f <- ~w(kernel_harness.ex kernel_walk.ex kernel_search.ex), do: Code.require_file(Path.join(root, f))
-alias PramanaFoundry.Test.KernelSearch
-PramanaFoundry.Test.Harness.start()
+alias Foundry.Test.KernelSearch
+Foundry.Test.Harness.start()
 
 for d <- [6, 7] do
   {t, states} = :timer.tc(fn -> KernelSearch.search(d) end)

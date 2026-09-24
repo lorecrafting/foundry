@@ -1,4 +1,4 @@
-defmodule PramanaFoundry.Test.AstModules do
+defmodule Foundry.Test.AstModules do
   @moduledoc """
   Static module resolution over unexpanded source, shared by the tests that read call
   sites and references from the AST rather than the text.

@@ -1,5 +1,5 @@
-alias PramanaFoundry.DurableStore.Gateway
-alias PramanaFoundry.Repair.FR08AProtectedBoundary
+alias Foundry.DurableStore.Gateway
+alias Foundry.Repair.FR08AProtectedBoundary
 
 source = Gateway.module_info(:compile)[:source] |> List.to_string()
 original = File.read!(source)

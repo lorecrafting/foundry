@@ -168,7 +168,7 @@ MIX_BUILD_PATH=/tmp/fr07-v3-review.r4ohlM/build
 TMPDIR=/tmp/fr07-v3-review.r4ohlM
 ```
 
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 7727`:
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 7727`:
   **49 passed, exit 0**, fresh dependency build and 85 project files compiled.
 - `mix run --no-start /tmp/fr07-v3-review.r4ohlM/probes.exs`:
   **7 passed, exit 0**, seed 941302. Four probes confirm prior corrections, three reproduce

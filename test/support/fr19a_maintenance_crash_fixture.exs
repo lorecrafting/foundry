@@ -1,4 +1,4 @@
-alias PramanaFoundry.DurableStore.Gateway
+alias Foundry.DurableStore.Gateway
 
 [path, operation, destination] = System.argv()
 point = if operation == "checkpoint", do: :after_checkpoint, else: :after_backup_snapshot

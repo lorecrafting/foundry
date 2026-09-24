@@ -157,14 +157,14 @@ awk '/^[a-f0-9]{64}  foundry\// {print}' \
 git diff --check
 
 # In foundry/, isolated pinned test environment:
-mix test test/pramana_foundry/herdr/adapter_test.exs \
-  test/pramana_foundry/agent_server_test.exs \
-  test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/transition_test.exs \
-  test/pramana_foundry/runtime_startup_boundary_test.exs \
-  test/pramana_foundry/daemon_recovery_test.exs \
-  test/pramana_foundry/autonomous_launch_test.exs \
-  test/pramana_foundry/stress_test.exs --seed 40427
+mix test test/foundry/herdr/adapter_test.exs \
+  test/foundry/agent_server_test.exs \
+  test/foundry/coordinator_test.exs \
+  test/foundry/transition_test.exs \
+  test/foundry/runtime_startup_boundary_test.exs \
+  test/foundry/daemon_recovery_test.exs \
+  test/foundry/autonomous_launch_test.exs \
+  test/foundry/stress_test.exs --seed 40427
 # 96 passed, exit 0; the two existing stress warnings.
 
 mix run --no-start -e '...'

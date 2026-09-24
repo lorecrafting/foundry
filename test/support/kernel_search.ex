@@ -1,4 +1,4 @@
-defmodule PramanaFoundry.Test.KernelSearch do
+defmodule Foundry.Test.KernelSearch do
   @moduledoc """
   Exhaustive bounded search over every state the kernel can reach.
 
@@ -21,7 +21,7 @@ defmodule PramanaFoundry.Test.KernelSearch do
   search would degenerate into a tree.
   """
 
-  alias PramanaFoundry.Test.{Harness, KernelWalk}
+  alias Foundry.Test.{Harness, KernelWalk}
   # Routed through `Test.Harness` like every other call site, after an exemption for it was
   # tried and withdrawn. The exemption's argument was that the oracle is a function of the
   # successor state alone, so asserting per accepted transition and asserting over the deduped
@@ -44,7 +44,7 @@ defmodule PramanaFoundry.Test.KernelSearch do
   # `identity_key` (`r4_congruence_test`), so roughly half of that figure is the same
   # transition judged again; distinct transitions go from roughly 250,000 to 1,052,864, and
   # distinct states judged to 268,856. Still a 4.2x gain, stated as what it is.
-  alias PramanaFoundry.Workflow.Kernel.{Event, State}
+  alias Foundry.Workflow.Kernel.{Event, State}
 
   @default_depth 6
 
@@ -240,7 +240,7 @@ defmodule PramanaFoundry.Test.KernelSearch do
   event can trip, and its own tests pin them.
   """
   def kernel_sources do
-    dir = __ENV__.file |> Path.join("../../../lib/pramana_foundry/workflow") |> Path.expand()
+    dir = __ENV__.file |> Path.join("../../../lib/foundry/workflow") |> Path.expand()
 
     [Path.join(dir, "kernel.ex") | Path.wildcard(Path.join(dir, "kernel/**/*.ex"))] --
       Enum.map(~w(event.ex state.ex plan.ex), &Path.join([dir, "kernel", &1]))

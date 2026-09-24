@@ -21,17 +21,17 @@ probes. Only LaunchEligibility and autonomous_launch_test differ from v3.
 
 | File relative to foundry/ | SHA-256 |
 |---|---|
-| lib/pramana_foundry/agent_server.ex | 1a8dbcd8d14a3f21034d50517bd797977f44a6c592d0940bbeaf0a16a80c7949 |
-| lib/pramana_foundry/coordinator.ex | 241643abf3a1be26d808bfc26055ca9f66665297400ce93b517855f5fa2db0e7 |
-| lib/pramana_foundry/coordinator/tick.ex | e4a40c7c9c056b9ca1801724ab5de40d10e0cf45a408f3c60e76238dac0669d5 |
-| lib/pramana_foundry/herdr/adapter.ex | 4ec26d65483c3c5321cab05b14beb4573f39c3131d211dc18b44aa65970c49cf |
-| lib/pramana_foundry/herdr/runner.ex | 1df506bc0444df2326de7fd9328e72038d990e2bbc36f5c9e038abbbc0fa2650 |
-| lib/pramana_foundry/launch_eligibility.ex | f8cfdf6e15a106344d8c28f58648b91fe8a6ad4906f6684d5d70dc78d03e5c2a |
-| test/pramana_foundry/agent_server_test.exs | 914d266e4e48096076e2f412de601fb6a8aa68df444ccdf1195a8e41d0411f46 |
-| test/pramana_foundry/autonomous_launch_test.exs | 438e40876401d89c1d4ca28f139beb7c5f30abaa354880f5c18cd243920c4673 |
-| test/pramana_foundry/board_test.exs | cd455afc307d9fd3b9794d2d8862d817b848016a632f7dc438f02f38c8ca6637 |
-| test/pramana_foundry/coordinator/engine_test.exs | e0471669fc52ff8db46efebcb75bda90b9e4bba1e8a1cb610602c200da20fa7c |
-| test/pramana_foundry/coordinator_test.exs | c2068847f4497e56a9c65180b670c7347e7fb2b925a1f2f8a2454e3e4b0b25a2 |
+| lib/foundry/agent_server.ex | 1a8dbcd8d14a3f21034d50517bd797977f44a6c592d0940bbeaf0a16a80c7949 |
+| lib/foundry/coordinator.ex | 241643abf3a1be26d808bfc26055ca9f66665297400ce93b517855f5fa2db0e7 |
+| lib/foundry/coordinator/tick.ex | e4a40c7c9c056b9ca1801724ab5de40d10e0cf45a408f3c60e76238dac0669d5 |
+| lib/foundry/herdr/adapter.ex | 4ec26d65483c3c5321cab05b14beb4573f39c3131d211dc18b44aa65970c49cf |
+| lib/foundry/herdr/runner.ex | 1df506bc0444df2326de7fd9328e72038d990e2bbc36f5c9e038abbbc0fa2650 |
+| lib/foundry/launch_eligibility.ex | f8cfdf6e15a106344d8c28f58648b91fe8a6ad4906f6684d5d70dc78d03e5c2a |
+| test/foundry/agent_server_test.exs | 914d266e4e48096076e2f412de601fb6a8aa68df444ccdf1195a8e41d0411f46 |
+| test/foundry/autonomous_launch_test.exs | 438e40876401d89c1d4ca28f139beb7c5f30abaa354880f5c18cd243920c4673 |
+| test/foundry/board_test.exs | cd455afc307d9fd3b9794d2d8862d817b848016a632f7dc438f02f38c8ca6637 |
+| test/foundry/coordinator/engine_test.exs | e0471669fc52ff8db46efebcb75bda90b9e4bba1e8a1cb610602c200da20fa7c |
+| test/foundry/coordinator_test.exs | c2068847f4497e56a9c65180b670c7347e7fb2b925a1f2f8a2454e3e4b0b25a2 |
 | test/support/agent_server_fake_runner.ex | c84f22d4f0e2abf518753f785f74a85682e423a8c4d58c42a9692ea37063cf7e |
 
 The original pre-baseline HEAD was a3fa302342238ae3d5a133b35bd86f4fa4f13710.
@@ -80,7 +80,7 @@ provider catalog or installed OMP selector/entitlement proof.
 
 ## Blocker B2 — nil sentinel defeats unknown-field rejection
 
-At lib/pramana_foundry/launch_eligibility.ex:200, only_known_fields/2 uses
+At lib/foundry/launch_eligibility.ex:200, only_known_fields/2 uses
 Enum.find over profile keys, then treats nil as absence of an offending key.
 An actual unknown nil key is indistinguishable from that sentinel. Consequently,
 adding nil => :invalid to an otherwise valid profile returns an authorized
@@ -120,16 +120,16 @@ exit 0:
 
     git rev-parse HEAD
     git show --stat --oneline HEAD
-    shasum -a 256 foundry/lib/pramana_foundry/agent_server.ex foundry/lib/pramana_foundry/coordinator.ex foundry/lib/pramana_foundry/coordinator/tick.ex foundry/lib/pramana_foundry/herdr/adapter.ex foundry/lib/pramana_foundry/herdr/runner.ex foundry/lib/pramana_foundry/launch_eligibility.ex foundry/test/pramana_foundry/agent_server_test.exs foundry/test/pramana_foundry/autonomous_launch_test.exs foundry/test/pramana_foundry/board_test.exs foundry/test/pramana_foundry/coordinator/engine_test.exs foundry/test/pramana_foundry/coordinator_test.exs foundry/test/support/agent_server_fake_runner.ex
+    shasum -a 256 foundry/lib/foundry/agent_server.ex foundry/lib/foundry/coordinator.ex foundry/lib/foundry/coordinator/tick.ex foundry/lib/foundry/herdr/adapter.ex foundry/lib/foundry/herdr/runner.ex foundry/lib/foundry/launch_eligibility.ex foundry/test/foundry/agent_server_test.exs foundry/test/foundry/autonomous_launch_test.exs foundry/test/foundry/board_test.exs foundry/test/foundry/coordinator/engine_test.exs foundry/test/foundry/coordinator_test.exs foundry/test/support/agent_server_fake_runner.ex
     git diff --check
     rg -n 'AgentServer|Effects.Launch|pick_fallback|fallback_profile' foundry/lib
-    rg --files foundry/lib/pramana_foundry | rg 'pm|improver'
+    rg --files foundry/lib/foundry | rg 'pm|improver'
 
 The following exact commands ran from foundry/. PATH deliberately excludes Herdr
 and OMP; --no-start prevents application/daemon startup:
 
-    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/pramana_foundry/autonomous_launch_test.exs test/pramana_foundry/agent_server_test.exs --seed 424201
-    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/pramana_foundry/herdr/adapter_test.exs test/pramana_foundry/herdr/argv_test.exs test/pramana_foundry/herdr/identity_test.exs test/pramana_foundry/quota/quota_test.exs test/pramana_foundry/reviews/reviews_test.exs test/pramana_foundry/coordinator/recovery_test.exs --seed 424201
+    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/foundry/autonomous_launch_test.exs test/foundry/agent_server_test.exs --seed 424201
+    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/foundry/herdr/adapter_test.exs test/foundry/herdr/argv_test.exs test/foundry/herdr/identity_test.exs test/foundry/quota/quota_test.exs test/foundry/reviews/reviews_test.exs test/foundry/coordinator/recovery_test.exs --seed 424201
     env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix compile --warnings-as-errors
 
 Results: focused **25 passed**, 0.6 seconds; supporting **44 passed**, 0.3 seconds;
@@ -156,17 +156,17 @@ the corrected recursive search above completed. Neither is a candidate failure.
 Exact minimal masking reproduction BODY (exit 0):
 
     Code.require_file("test/support/agent_server_fake_runner.ex")
-    p = PramanaFoundry.AgentServerTest.FakeRunner.launch_policy().profiles
+    p = Foundry.AgentServerTest.FakeRunner.launch_policy().profiles
     for extra <- [%{"credential" => "implicit"}, %{nil => :invalid, "credential" => "implicit"}] do
       bad = Map.update!(p, "test-subscription", &Map.merge(&1, extra))
-      IO.inspect({extra, PramanaFoundry.LaunchEligibility.resolve(bad, "test-subscription", :developer)}, label: "unknown_key_masking")
+      IO.inspect({extra, Foundry.LaunchEligibility.resolve(bad, "test-subscription", :developer)}, label: "unknown_key_masking")
     end
 
 Exact actual-boundary reproduction BODY (exit 0):
 
     Code.require_file("test/support/agent_server_fake_runner.ex")
-    alias PramanaFoundry.{AgentServer, Coordinator, Coordinator.State, Coordinator.Tick, Herdr.Adapter}
-    alias PramanaFoundry.AgentServerTest.FakeRunner
+    alias Foundry.{AgentServer, Coordinator, Coordinator.State, Coordinator.Tick, Herdr.Adapter}
+    alias Foundry.AgentServerTest.FakeRunner
     Logger.configure(level: :emergency)
     {tmp, 0} = System.cmd("mktemp", ["-d", "/tmp/pramana-fr01-review-v4-boundary.XXXXXX"])
     tmp = String.trim(tmp)
@@ -179,7 +179,7 @@ Exact actual-boundary reproduction BODY (exit 0):
     base = String.duplicate("1", 40)
     commit = String.duplicate("2", 40)
     System.put_env("HERDR_ENV", "1")
-    {:ok, supervisor} = DynamicSupervisor.start_link(name: PramanaFoundry.AssignmentSupervisor, strategy: :one_for_one)
+    {:ok, supervisor} = DynamicSupervisor.start_link(name: Foundry.AssignmentSupervisor, strategy: :one_for_one)
     try do
       for path <- [:tick, :server, :initial_reviewer, :retry_reviewer] do
         :ets.insert(table, {:calls, []})

@@ -118,7 +118,7 @@ SHA-256 evidence:
 8c08db7d9386c914aa04d7ca88c92f7740d06296ed7c0feb4ce5edf3010b4cf4  trace.log
 3e5b5549aa5dc9133ae4b5136180a8c787b151db0c7f588ef8407d5e1fffcc21  owner.log
 fff9a15453f6fa6333baa4b720f4c85f112827b359c47431c91673625e743f44  ci-artifacts/provenance.json
-513aa9282bebaabf75cb3f1e4ce40f8adf17e460467c4961d9ca73fb68649dd9  ci-artifacts/pramana_foundry
+513aa9282bebaabf75cb3f1e4ce40f8adf17e460467c4961d9ca73fb68649dd9  ci-artifacts/foundry
 ```
 
 The reviewer scripts `trace.exs` and `owner.exs` remain in the local review root.

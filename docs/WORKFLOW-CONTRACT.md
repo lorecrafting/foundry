@@ -165,7 +165,7 @@ is required by the selected design; actual enforcement remains to be proved.
 where each guarantee is enforced at `c3b65161`; it changes no R1–R5 decision. Sources:
 review C3 in the [subcommit 2 `decide/3` design](fr-08/FR08B-SUBCOMMIT2-DECIDE-DESIGN-2026-09-23.md)
 and the [protected items spec](fr-08/FR08B-PROTECTED-ITEMS-SPEC-2026-09-23.md). Paths are
-under `lib/pramana_foundry/`; tests under `test/pramana_foundry/`.
+under `lib/foundry/`; tests under `test/foundry/`.
 
 **Rule:** every new protected operation or plan slot adds a row here in the same commit.
 
@@ -672,7 +672,7 @@ question an operator must answer.
 1. **`reserve` moves no units.** Contract: absent → reserved moves available → held
    atomically with intent. Code: `reserve` checks the ledger is open and the units are
    within `available`, then inserts the reservation as `proposed` without touching the
-   ledger (`lib/pramana_foundry/durable_store/protected_primitives.ex:1002-1031`); the
+   ledger (`lib/foundry/durable_store/protected_primitives.ex:1002-1031`); the
    available → held move happens when `create_effect` activates it
    (`protected_primitives.ex:1319`, `activate_reservations/2` at `:3529-3549`, which
    re-checks `available`). Evidence: [ledger model, "Where the code and the contract
@@ -704,8 +704,8 @@ question an operator must answer.
    `fence_control_descendants` refuses any other value with `invalid_control_state`
    (`protected_primitives.ex:1841-1905`) and `control_active?/1` tests only `active`
    (`:3462-3463`). Pause and drain exist only as the kernel reducer's `paused` and
-   `draining` flags (`lib/pramana_foundry/workflow/kernel/state.ex:105-106`,
-   `lib/pramana_foundry/workflow/kernel/control.ex:8-21`), refused by the kernel at
+   `draining` flags (`lib/foundry/workflow/kernel/state.ex:105-106`,
+   `lib/foundry/workflow/kernel/control.ex:8-21`), refused by the kernel at
    developer issue (`control.ex:40-44`), so a controller other than the kernel is not
    held to them. Evidence: [B3 contract readings, fact
    1](fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md#two-facts-found-while-answering-which-the-inventory-did-not-record).

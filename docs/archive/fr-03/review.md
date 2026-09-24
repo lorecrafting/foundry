@@ -15,19 +15,19 @@ Paths are relative to `foundry/`; hashes are SHA-256.
 
 | File | Hash |
 |---|---|
-| lib/pramana_foundry/application.ex | `8456e819fd0b165c185ab02980c162793d91c6c43b767c0641a0ce694f99f3c4` |
-| lib/pramana_foundry/runtime_root.ex | `1bf3fe5bd5de23ce3dbac85ffff887b6f913afd64662ea4008826116267683d2` |
-| lib/pramana_foundry/runtime_owner.ex | `2b60d6408427e469411820a669de9d800d3498b3b29d86f150cb266d1fcdd679` |
-| lib/pramana_foundry/coordinator.ex | `03e6aad574c3a763118d19cc69e98169cafd6062d34e3f3940727393ef8327e1` |
-| lib/pramana_foundry/coordinator/tick.ex | `7e4fe128917126e286d6dbabab091585b9174eba191df69de007480a93f753a1` |
-| lib/pramana_foundry/fence.ex | `59ab62c203d29b2f0bf56133743f9bc3f4e4e4ce91113573844a59a880b4efb7` |
-| lib/pramana_foundry/improver.ex | `eeb5c8a353bac57409527ef4d90b7c898725d11c5d7a18d578b5530f14df186d` |
-| lib/pramana_foundry/consolidated_log.ex | `ff7eebb85bd34f39b0bf345432de3ca1ed4e7f1b6b62cc1bfa4f1b991352137c` |
-| lib/pramana_foundry/board.ex | `57b097d4cb7ad4ca1e2a10dbb0ab1862ccbae1b1ae25c7c34dca3757e32ae2c6` |
-| lib/pramana_foundry/board/findings_panel.ex | `aaa8190073b2dd81a41ddd9c6bf00bd81849195159a1a48bed57480334da9977` |
-| test/pramana_foundry/legacy_persistence_containment_test.exs | `424acdc9634d8b10cb7b20f23fbe004fac89beecf3a6b27c05a12ad5e32e94b5` |
-| test/pramana_foundry/runtime_root_test.exs | `676bcae97d52c9a832cb6474680e3ca48a9d355b2c15e67b2d498c2f71b50e3b` |
-| test/pramana_foundry/runtime_startup_boundary_test.exs | `4eab0b6e948b8639cd4802189c75ea464c5da54b070f8ada16091273bdf7a783` |
+| lib/foundry/application.ex | `8456e819fd0b165c185ab02980c162793d91c6c43b767c0641a0ce694f99f3c4` |
+| lib/foundry/runtime_root.ex | `1bf3fe5bd5de23ce3dbac85ffff887b6f913afd64662ea4008826116267683d2` |
+| lib/foundry/runtime_owner.ex | `2b60d6408427e469411820a669de9d800d3498b3b29d86f150cb266d1fcdd679` |
+| lib/foundry/coordinator.ex | `03e6aad574c3a763118d19cc69e98169cafd6062d34e3f3940727393ef8327e1` |
+| lib/foundry/coordinator/tick.ex | `7e4fe128917126e286d6dbabab091585b9174eba191df69de007480a93f753a1` |
+| lib/foundry/fence.ex | `59ab62c203d29b2f0bf56133743f9bc3f4e4e4ce91113573844a59a880b4efb7` |
+| lib/foundry/improver.ex | `eeb5c8a353bac57409527ef4d90b7c898725d11c5d7a18d578b5530f14df186d` |
+| lib/foundry/consolidated_log.ex | `ff7eebb85bd34f39b0bf345432de3ca1ed4e7f1b6b62cc1bfa4f1b991352137c` |
+| lib/foundry/board.ex | `57b097d4cb7ad4ca1e2a10dbb0ab1862ccbae1b1ae25c7c34dca3757e32ae2c6` |
+| lib/foundry/board/findings_panel.ex | `aaa8190073b2dd81a41ddd9c6bf00bd81849195159a1a48bed57480334da9977` |
+| test/foundry/legacy_persistence_containment_test.exs | `424acdc9634d8b10cb7b20f23fbe004fac89beecf3a6b27c05a12ad5e32e94b5` |
+| test/foundry/runtime_root_test.exs | `676bcae97d52c9a832cb6474680e3ca48a9d355b2c15e67b2d498c2f71b50e3b` |
+| test/foundry/runtime_startup_boundary_test.exs | `4eab0b6e948b8639cd4802189c75ea464c5da54b070f8ada16091273bdf7a783` |
 
 ## Blocking findings
 
@@ -149,7 +149,7 @@ history, no tick, cleared HERDR_ENV, and fake-backed Tick failure.
 
 | Command/check | Result |
 |---|---|
-| `mix test test/pramana_foundry/runtime_root_test.exs test/pramana_foundry/runtime_startup_boundary_test.exs test/pramana_foundry/legacy_persistence_containment_test.exs --seed 424204` | Exit 0; 15 passed, 2.8 seconds |
+| `mix test test/foundry/runtime_root_test.exs test/foundry/runtime_startup_boundary_test.exs test/foundry/legacy_persistence_containment_test.exs --seed 424204` | Exit 0; 15 passed, 2.8 seconds |
 | `mix run --no-start /tmp/fr03-review.EojoVXnQ/adversarial.exs` | Exit 0; reproduced B1–B4 above |
 | Direct `MIX_ENV=dev mix run --no-start -e ...` with startup-mode override unset; inspect actual plain arguments, start application, inspect child registrations, stop application | Exit 0; nonempty real Mix arguments, client mode, `{nil, nil, nil}` for Coordinator/Improver/HardeningPM |
 | `MIX_ENV=test mix compile --warnings-as-errors` | Exit 0; existing isolated build accepted, not a clean-build claim |

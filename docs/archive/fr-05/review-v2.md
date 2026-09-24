@@ -14,8 +14,8 @@ The following SHA-256 identities match the requested review inputs:
 | `review-response.md` | `66a1a3bdcc95e3b262e1ef1d7e6f66a65e6e9dd2ac1dcddf4b40afb16db3fee9` |
 | `candidate.md` | `45c2b19413cb4f4eb32469c35cf4a1c1bc0fd90e8e4f982cb58783c6a4386c5d` |
 | Original `review.md` | `8324ecbe8c194b056d6b5a8ae5b8e7fafdab77ccc88640d8a771def46b369991` |
-| `lib/pramana_foundry/cli.ex` | `b967dea898c28f415cee391cd1aa4f1b55fe975d831c72588e9042cd50b8c67a` |
-| `lib/pramana_foundry/integration/pipeline.ex` | `a1660d6bc9a0e4ca086d810fd7a7fba64278520af61f6bddff59c4899ad80ee5` |
+| `lib/foundry/cli.ex` | `b967dea898c28f415cee391cd1aa4f1b55fe975d831c72588e9042cd50b8c67a` |
+| `lib/foundry/integration/pipeline.ex` | `a1660d6bc9a0e4ca086d810fd7a7fba64278520af61f6bddff59c4899ad80ee5` |
 
 All 26 frozen paths in `candidate.md` matched their manifest hashes. All eight paths
 in the response manifest also matched. This review changed only this report, with no
@@ -59,15 +59,15 @@ daemon, provider, accepted ref or activation operation occurred.
 `MIX_ENV=test mix test` on the following files with `--seed 507` returned exit 0:
 **83 passed**, 18.3 seconds.
 
-- `test/pramana_foundry/fr05_containment_test.exs`
-- `test/pramana_foundry/integration/integration_test.exs`
-- `test/pramana_foundry/status/status_test.exs`
-- `test/pramana_foundry/legacy_persistence_containment_test.exs`
-- `test/pramana_foundry/runtime_startup_boundary_test.exs`
-- `test/pramana_foundry/agent_server_test.exs`
-- `test/pramana_foundry/coordinator/engine_test.exs`
-- `test/pramana_foundry/coordinator/recovery_test.exs`
-- `test/pramana_foundry/rpc_wrapper_test.exs`
+- `test/foundry/fr05_containment_test.exs`
+- `test/foundry/integration/integration_test.exs`
+- `test/foundry/status/status_test.exs`
+- `test/foundry/legacy_persistence_containment_test.exs`
+- `test/foundry/runtime_startup_boundary_test.exs`
+- `test/foundry/agent_server_test.exs`
+- `test/foundry/coordinator/engine_test.exs`
+- `test/foundry/coordinator/recovery_test.exs`
+- `test/foundry/rpc_wrapper_test.exs`
 
 These regress verbatim stale/incomplete CLI artifacts, missing candidate/check fields,
 wrong reviewer identity, missing/nonexistent checkout, admission/runtime/PM/replay

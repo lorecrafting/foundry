@@ -19,10 +19,10 @@ Candidate path SHA-256 values:
 
 | Path | SHA-256 |
 |---|---|
-| `foundry/lib/pramana_foundry/effects/process_group.ex` | `1250c2bee6d43751ac5f483224c0506e3670bf25a8c7f85cd0848d106d8dce17` |
-| `foundry/lib/pramana_foundry/checks/runner.ex` | `22610624df6102f59579808048581e7e947eab19dfcc34cbaf3661d7255af8fc` |
-| `foundry/test/pramana_foundry/effects/process_group_test.exs` | `8250e1237ceea61db5430d9c24a990f26b9d654339a7a89769f3c8484dfc76d9` |
-| `foundry/test/pramana_foundry/checks/runner_test.exs` | `ccca23ff6292e1fbdf5dc91178e272e56d5a0e42376c0b41d790e126210ebc74` |
+| `foundry/lib/foundry/effects/process_group.ex` | `1250c2bee6d43751ac5f483224c0506e3670bf25a8c7f85cd0848d106d8dce17` |
+| `foundry/lib/foundry/checks/runner.ex` | `22610624df6102f59579808048581e7e947eab19dfcc34cbaf3661d7255af8fc` |
+| `foundry/test/foundry/effects/process_group_test.exs` | `8250e1237ceea61db5430d9c24a990f26b9d654339a7a89769f3c8484dfc76d9` |
+| `foundry/test/foundry/checks/runner_test.exs` | `ccca23ff6292e1fbdf5dc91178e272e56d5a0e42376c0b41d790e126210ebc74` |
 
 ## Correction boundary
 
@@ -52,21 +52,21 @@ Passed:
 MIX_DEPS_PATH=/tmp/pramana-fr04-current/deps \
 MIX_BUILD_PATH=/tmp/pramana-fr04-current/build \
 TMPDIR=/private/tmp/pramana-fr04-current-tmp \
-PRAMANA_FOUNDRY_RUNTIME_DIR=/private/tmp/pramana-fr04-current-runtime \
+FOUNDRY_RUNTIME_DIR=/private/tmp/pramana-fr04-current-runtime \
 mise exec -- mix compile --force --warnings-as-errors
 
 MIX_DEPS_PATH=/tmp/pramana-fr04-current/deps \
 MIX_BUILD_PATH=/tmp/pramana-fr04-current/build \
 TMPDIR=/private/tmp/pramana-fr04-current-tmp \
-PRAMANA_FOUNDRY_RUNTIME_DIR=/private/tmp/pramana-fr04-current-runtime \
-mise exec -- mix test test/pramana_foundry/effects/process_group_test.exs \
-  test/pramana_foundry/checks test/pramana_foundry/daemon_recovery_test.exs --seed 8021
+FOUNDRY_RUNTIME_DIR=/private/tmp/pramana-fr04-current-runtime \
+mise exec -- mix test test/foundry/effects/process_group_test.exs \
+  test/foundry/checks test/foundry/daemon_recovery_test.exs --seed 8021
 Result: 32 passed
 
-mise exec -- mix format lib/pramana_foundry/effects/process_group.ex \
-  lib/pramana_foundry/checks/runner.ex \
-  test/pramana_foundry/effects/process_group_test.exs \
-  test/pramana_foundry/checks/runner_test.exs
+mise exec -- mix format lib/foundry/effects/process_group.ex \
+  lib/foundry/checks/runner.ex \
+  test/foundry/effects/process_group_test.exs \
+  test/foundry/checks/runner_test.exs
 
 git diff --check
 ```

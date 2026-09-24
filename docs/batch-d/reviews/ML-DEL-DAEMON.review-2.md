@@ -3,8 +3,8 @@ verdict: approved
 # ML-DEL-DAEMON correction review (attempt 1, review 2)
 Reviewer: agent:claude-fable-5-1/review-ML-DEL-DAEMON (independent; did not write the change)
 Candidate 742a60d46c3c3748e1031e2330dd6c4def7d2dbf; delta from reviewed 65e1fa3 is 2 commits, 3 files
-(docs/design/MOVED-KNOWLEDGE-2026-09-23.md, lib/pramana_foundry/application.ex,
-test/pramana_foundry/effects/process_group_test.exs). Worktree /private/tmp/review-ML-DEL-DAEMON,
+(docs/design/MOVED-KNOWLEDGE-2026-09-23.md, lib/foundry/application.ex,
+test/foundry/effects/process_group_test.exs). Worktree /private/tmp/review-ML-DEL-DAEMON,
 left clean (`git status --short` empty after every control).
 
 F1 is closed: both refusal branches of `Effects.ProcessGroup.signal/4` are now tested, and each test
@@ -31,7 +31,7 @@ immune to it.
 
 ### R2 — info: application.ex boot message
 - Elixir's release script exports `RELEASE_COMMAND="$1"` (verified in the built release at
-  /private/tmp/review-daemon-rel/bin/pramana_foundry:21-22, Elixir's own template). Values:
+  /private/tmp/review-daemon-rel/bin/foundry:21-22, Elixir's own template). Values:
   start, start_iex, daemon, daemon_iex, eval, rpc, remote, restart, stop, pid, version.
   `String.starts_with?(_, ~w(daemon start))` matches exactly the four boot commands; `rpc`/`eval`/
   `remote`/`stop` stay silent. `mode == :lane` (flag set) is silent on this line and prints the

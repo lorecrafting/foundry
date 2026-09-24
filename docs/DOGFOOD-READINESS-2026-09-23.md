@@ -8,7 +8,7 @@
 
 **Date:** 2026-09-23. **Type:** PROPOSAL; its decisions M1–M5 are now approved. It changes no ticket, dependency,
 contract or code. **Taken at `33395c92`** (`repair/fr08b-kernel`). Line numbers are at that
-commit and will drift. Paths under `lib/` are relative to `foundry/lib/pramana_foundry/`.
+commit and will drift. Paths under `lib/` are relative to `foundry/lib/foundry/`.
 
 ## 0. Answer in brief
 
@@ -69,7 +69,7 @@ Context, not requirements:
 
 **How a human would try it.** Start the release. `bin/pramana ticket create …` runs, then
 `handoff submit`, then `review submit`. The RPC allowlist admits exactly these shapes plus
-`ticket status`, `ticket list` and `ticket integrate` (`lib/pramana_foundry/cli/rpc.ex:127-151`).
+`ticket status`, `ticket list` and `ticket integrate` (`lib/foundry/cli/rpc.ex:127-151`).
 
 **What works**
 
@@ -213,8 +213,8 @@ file (`REPAIR-PLAN.md:28-31`).
 |---|---|---|---|
 | 1 | **M1–M3 below, as a plan amendment.** Record the thin-lane gate and the FR-10→FR-09 edge reading | `REPAIR-PLAN.md` (Batch D and milestone text only), `docs/PLAN.md` | **Yes.** Docs, with operator approval. The FR-08B status row stays with FR-08B's own owner |
 | 2 | **Batch D design doc**: T3–T7, the packet schema, the CLI command set, the disabled list and the non-launch test | new `docs/batch-d/…` | **Yes** |
-| 3 | **Work packet schema and validator (T4)**: a pure module plus tests. Base revision read from the store, never a literal | new `lib/pramana_foundry/work_packet.ex` and its test | **Yes**, once rank 2 is approved |
-| 4 | **Manual execution backend (T3)** against the existing protected primitives, tested at the `create_effect`→`settle_claim` level. It does not call `decide/3` yet | new `lib/pramana_foundry/manual_backend/…` and tests | **Yes on files.** It reads the effect API, which FR-10 commits 2–4 may later change. Keep it thin |
+| 3 | **Work packet schema and validator (T4)**: a pure module plus tests. Base revision read from the store, never a literal | new `lib/foundry/work_packet.ex` and its test | **Yes**, once rank 2 is approved |
+| 4 | **Manual execution backend (T3)** against the existing protected primitives, tested at the `create_effect`→`settle_claim` level. It does not call `decide/3` yet | new `lib/foundry/manual_backend/…` and tests | **Yes on files.** It reads the effect API, which FR-10 commits 2–4 may later change. Keep it thin |
 | 5 | **Operator runbook replacing the stale `steerer.md`** for the manual lane. Update the memory note's pointer | `foundry/roles/steerer.md` | **Yes** (FR-23a docs rule, `FR-23-SPLIT…:37-42`) |
 | 6 | **FR-10 commit 1, the encoder cost fix** (`FR10-DESIGN…:211`) | `durable_store/encoding.ex` | **Files yes, rebind no.** `encoding.ex` is attestation-pinned (`fr08a-protected-report.txt:19`), so its rebind serializes with FR-08B's. Protected maintenance under R3 |
 | 7 | **FR-10 Quint model** (commit 0, `:210`). No `.qnt` file exists at `33395c92` | new `docs/fr-10/*.qnt` | **Yes.** It de-risks A2's later removal |

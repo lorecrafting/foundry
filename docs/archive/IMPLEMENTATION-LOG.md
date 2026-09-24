@@ -77,8 +77,8 @@ latest prose here, remains authoritative for status and dependencies.
   `a3fa302342238ae3d5a133b35bd86f4fa4f13710`.
 - The starting working tree was not clean. Tracked edits already existed in
   `docs/PLAN.md`, `foundry/README.md`,
-  `foundry/lib/pramana_foundry/cli.ex`, and
-  `foundry/lib/pramana_foundry/coordinator.ex`. The audit, repair/design documents,
+  `foundry/lib/foundry/cli.ex`, and
+  `foundry/lib/foundry/coordinator.ex`. The audit, repair/design documents,
   `foundry/docs/audit-2026-09-12/`, `foundry/docs/fr-06/`, and three review JSON
   artifacts were untracked. These inputs belong to earlier work and must not be
   absorbed, reset, or represented by HEAD alone.
@@ -293,11 +293,11 @@ latest prose here, remains authoritative for status and dependencies.
   dirty CLI/Coordinator files.
 - Exact hashes: `bin/pramana`
   `e836621bc5d92c152f7eed2f3c00a4fb93d30b55460955abdc953704a3383e54`;
-  `lib/pramana_foundry/cli/rpc.ex`
+  `lib/foundry/cli/rpc.ex`
   `eec9bec3224207dec43df31fcc0620aae2f071572305c6b37f119bf9d7df4c59`;
-  `test/pramana_foundry/cli/rpc_test.exs`
+  `test/foundry/cli/rpc_test.exs`
   `7bb444196993fa00af64393045b9f22ca3873f17815706c6a9566ba3f94520e5`;
-  `test/pramana_foundry/rpc_wrapper_test.exs`
+  `test/foundry/rpc_wrapper_test.exs`
   `5b596d76f71764df51526d7418ca1de8c9c173c9e409987f5e81b3afe40ee26f`.
 - The wrapper now uses Elixir `System.argv/0` to encode a versioned JSON envelope and
   canonical URL-safe base64 token; user text never enters source. The daemon-side Elixir
@@ -408,7 +408,7 @@ latest prose here, remains authoritative for status and dependencies.
 
 - During implementation in isolated Git worktree `/tmp/pramana-fr03.YeVMZP/tree`, Mix
   started the OTP application before ExUnit and the committed absolute
-  `config :pramana_foundry, runtime_root: .../foundry/local/` bypassed filesystem/worktree
+  `config :foundry, runtime_root: .../foundry/local/` bypassed filesystem/worktree
   isolation. Coordinator test resets preserve configured log paths. Five focused commands
   therefore read and may have appended the live `state/current/events.jsonl`; coordinator
   and telemetry JSONL may also have been written.
@@ -3938,7 +3938,7 @@ Recorded because a single red gate is not a verdict and a single green one is no
 |---|---|---|
 | `dc9582b3` | **passed** | 949 passed / 13 skipped / 1 excluded, six commands, `dirty_paths: []`. The delta the first review was run against; recorded here because the briefing cited it and nothing in the tree sourced it, which the re-review caught |
 | 1 | **failed**, exit 2 | 948/949. `LegacyPersistenceContainmentTest` "legacy integration is suspended before Git or persistence effects". Every earlier command passed; tree clean |
-| isolation | passed 3/3 | `mix test test/pramana_foundry/legacy_persistence_containment_test.exs`, 10 tests each run |
+| isolation | passed 3/3 | `mix test test/foundry/legacy_persistence_containment_test.exs`, 10 tests each run |
 | 2 | **passed**, exit 0 | 949 passed / 13 skipped / 1 excluded, six commands, `dirty_paths: []` before and after |
 
 This is the second recorded fail/pass pair for this test at a single commit, and the isolation result
@@ -4369,7 +4369,7 @@ the file name**, and the entry above stays as written — it is history, and thi
 
 ### The measurement
 
-`mix test test/pramana_foundry/checks/runner_test.exs --seed 0`, 200 sequential runs at 9f15a5d0
+`mix test test/foundry/checks/runner_test.exs --seed 0`, 200 sequential runs at 9f15a5d0
 with nothing else touching the tree: **2 failures in 200**, runs 20 and 167, the same test both
 times — "a replacement-owner mismatch (same pid, wrong recorded start time) refuses to signal a live
 process", `runner_test.exs:117`.
@@ -4459,7 +4459,7 @@ repeat the substitution.
 ### Why the format-debt error survived eighteen green gates
 
 Separately confirmed while reading the gate: `ci/format_debt.exs` pins
-`lib/pramana_foundry/system_metrics.ex` to a sha256 that no longer matches, and the current
+`lib/foundry/system_metrics.ex` to a sha256 that no longer matches, and the current
 `ci-artifacts/provenance.json` carries `result: "passed"` beside
 `format_debt: {"error": "format-debt baseline changed"}`.
 
@@ -4970,7 +4970,7 @@ cases has a red-control fixture that failed on the prior scanner (9 of 27 red) a
 
 **What remains:** a module bound at runtime (`mod = Kernel; mod.apply(s, e)`, an argument, a
 config value) is not decidable statically; `Function.capture(K, :apply, 2)`,
-`__MODULE__.Kernel` inside `defmodule PramanaFoundry.Workflow`, and calls produced by macro
+`__MODULE__.Kernel` inside `defmodule Foundry.Workflow`, and calls produced by macro
 expansion are static but not read. The test says so; the gap bullet keeps its history and
 carries the dated close.
 
@@ -5011,7 +5011,7 @@ delete a test.
 This was picked up as "fix `SystemMetrics.system/0`" from the FR-23 row. The row was stale, not the code:
 `63ee6cb6` ("let the Improver finish a cycle for the first time", 2026-09-21) already replaced
 `:ets_data` with `unwrap_count(:erlang.system_info(:ets_count))` and added
-`test/pramana_foundry/system_metrics_test.exs`, 110 commits before `e374322b`. This entry changes
+`test/foundry/system_metrics_test.exs`, 110 commits before `e374322b`. This entry changes
 nothing in `lib`.
 
 - **Checked again rather than taken on trust.** `:erlang.system_info(:ets_data)` still raises
@@ -5030,7 +5030,7 @@ nothing in `lib`.
   cycle with new findings reaches `propose_findings/1` → `Coordinator.apply_pm_proposals/1` →
   `PM.Proposal.apply_batch/3`. That call queues up to three `create` tickets and persists
   `pm_proposal_created`. The tickets have fixed IDs `IMPRV-000..002`, stale
-  `workflow/lib/pramana_foundry/**` scopes and `cd workflow` checks, and a hard-coded
+  `workflow/lib/foundry/**` scopes and `cd workflow` checks, and a hard-coded
   `omp_gemini_developer` profile. They pass the only admission checks there are: `base_revision`
   is read from the Coordinator's own state, and there is no `auto_approve`. The Improver loop is
   on by default (`enable_loop: true`, every 300 s) and is a runtime child in every non-client
@@ -5055,7 +5055,7 @@ findings and metrics, and advances its counters; it skips the proposal log event
 does not mark fingerprints proposed, so enabling it later still sees them. Nothing in the tree passes
 `propose: true`; FR-20 owns turning it on.
 
-Red control, `test/pramana_foundry/improver_proposal_gate_test.exs`: no Coordinator runs in the test,
+Red control, `test/foundry/improver_proposal_gate_test.exs`: no Coordinator runs in the test,
 so reaching `propose_findings/1` exits the Improver. The test asserts a precondition that the cycle
 produced findings (one did), then that the Improver survives and proposed nothing. With the default
 flipped to `true` it fails (0/1); reversed, it passes.
@@ -5089,7 +5089,7 @@ in `foundry/bin/` and root `bin/` was checked for the same shape at `6bc015ed`; 
 ## Loose refusal assertions outside the kernel: audit and pins — 2026-09-22
 
 Rule 5 of [EVIDENCE-TOOLS.md](../EVIDENCE-TOOLS.md) applied to all of `test/`, not only
-`test/pramana_foundry/workflow/`, which was already audited. Population: a refusal assertion whose
+`test/foundry/workflow/`, which was already audited. Population: a refusal assertion whose
 error term is a bare wildcard — `assert {:error, _}`, `assert {:error, _reason}`,
 `assert {:reply, {:error, _reason}, _}`, `match?({:error, _}, ...)`. Rerun from `foundry/`:
 
@@ -5331,7 +5331,7 @@ carried information, and the first fix patched the one consumer that was named.
 
 ## `OperationalStorageTest` failed under load because it is CPU-bound, not because of I/O — 2026-09-22
 
-- Two tests in `test/pramana_foundry/durable_store/operational_storage_test.exs` failed three
+- Two tests in `test/foundry/durable_store/operational_storage_test.exs` failed three
   times in the CI gate on 2026-09-22 while other `mix test` runs or mutation sweeps shared the
   machine. On a quiet machine they passed. The failures were "engine interruption during
   checkpoint and backup…", which hit the 60 s ExUnit timeout, and "an owned full filesystem
@@ -5367,7 +5367,7 @@ carried information, and the first fix patched the one consumer that was named.
   runs could also collide, and one run's `on_exit` `rm_rf!` could then delete the other's live
   store. The name now includes `System.pid()`.
 - **Lib finding, not changed.** `Encoding.encode_string/1` in
-  `lib/pramana_foundry/durable_store/encoding.ex:63` allocates one binary per codepoint. One
+  `lib/foundry/durable_store/encoding.ex:63` allocates one binary per codepoint. One
   commit also visits each padding byte about 8 times in the encoder and about 23 times in
   `valid_utf8?`, going by eprof call counts at 1 MB. The product therefore spends about 0.64 s
   of CPU per MB of command payload inside the Gateway's single-process owner, and every call to

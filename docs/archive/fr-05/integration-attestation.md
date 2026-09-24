@@ -48,9 +48,9 @@ then system binaries. Used `TMPDIR=/tmp/fr05-integration-review.tOEgEw`,
 sources; fresh compilation). No inherited provider/tick variables were supplied.
 
 ```text
-mix test test/pramana_foundry/fr05_containment_test.exs \
-  test/pramana_foundry/integration/integration_test.exs \
-  test/pramana_foundry/status/status_test.exs --seed 508
+mix test test/foundry/fr05_containment_test.exs \
+  test/foundry/integration/integration_test.exs \
+  test/foundry/status/status_test.exs --seed 508
 ```
 
 Exit 0: **23 passed**, 2.0 seconds; fresh compilation of OWL's 19 files and Foundry's

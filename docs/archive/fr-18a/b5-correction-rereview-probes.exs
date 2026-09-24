@@ -9,20 +9,20 @@
 
 ExUnit.start(seed: 20926)
 
-base = File.read!("test/pramana_foundry/durable_store/atomic_bundle_test.exs")
+base = File.read!("test/foundry/durable_store/atomic_bundle_test.exs")
 
 base =
   String.replace(
     base,
-    "PramanaFoundry.DurableStore.AtomicBundleTest",
-    "PramanaFoundry.FR18AB5CorrectionRereview"
+    "Foundry.DurableStore.AtomicBundleTest",
+    "Foundry.FR18AB5CorrectionRereview"
   )
 
 base = Regex.replace(~r/\nend\s*\z/, base, "\n")
 
 extra = ~S"""
-  alias PramanaFoundry.Observations
-  alias PramanaFoundry.Observations.Query
+  alias Foundry.Observations
+  alias Foundry.Observations.Query
 
   defp rr_raw!(ctx, statements) do
     assert {:ok, raw} = Sqlite3.open(ctx.path, mode: :readwrite)

@@ -1,13 +1,13 @@
 # Elixir Foundry (workflow)
 
 > **Naming note:** This document was written when the project was `pramana_workflow`
-> under `workflow/`. The actual project is now `pramana_foundry` under `foundry/`,
-> with module prefix `PramanaFoundry`. All references to `pramana_workflow`,
+> under `workflow/`. The actual project is now `foundry` under `foundry/`,
+> with module prefix `Foundry`. All references to `pramana_workflow`,
 > `PramanaWorkflow`, and `workflow/` below refer to the same codebase at its
 > current location.
 
 **Historical status recorded 2026-09-08: migration declared complete.** The Elixir OTP
-release (`pramana_foundry`) was reported as the sole local dispatcher. The Python supervisor
+release (`foundry`) was reported as the sole local dispatcher. The Python supervisor
 and board were reported retired, with state archived, wrappers removed and a smoke check at
 `bin/pramana-retire-smoke`. The 2026-09-12 audit and `REPAIR-PLAN.md` govern current
 implementation and acceptance status.

@@ -19,12 +19,12 @@ All six frozen SHA-256 values matched on entry and were rechecked at completion:
 
 | Working-tree file | SHA-256 |
 |---|---|
-| `foundry/lib/pramana_foundry/agent_server.ex` | `43509a080f9f7b3d415364230e53293a9f35988f09f36f575da43aa212b09099` |
-| `foundry/lib/pramana_foundry/coordinator.ex` | `396f648c6710b21d6d0e639fd06f374e5def7fdb29d5501b5625df562a1bbbe0` |
-| `foundry/lib/pramana_foundry/coordinator/tick.ex` | `d0df5a69a4b6bff1ea1dc9a8aef2d70e10ba2d5881e66e90920926e8a911215a` |
-| `foundry/lib/pramana_foundry/launch_eligibility.ex` | `cd5fd0aafe88144da42d1cccaeeab30f06fb12931c5db564a48b610823afd11f` |
-| `foundry/test/pramana_foundry/agent_server_test.exs` | `e29997f9f340aec78687b227dcd30dfd4aa79672c5f54de455c4870ea37f61c1` |
-| `foundry/test/pramana_foundry/autonomous_launch_test.exs` | `8916a95b63a4bdb5e9df4c10ab441b6f97b484ba75f3e0d0ae41153dbd3f9f5a` |
+| `foundry/lib/foundry/agent_server.ex` | `43509a080f9f7b3d415364230e53293a9f35988f09f36f575da43aa212b09099` |
+| `foundry/lib/foundry/coordinator.ex` | `396f648c6710b21d6d0e639fd06f374e5def7fdb29d5501b5625df562a1bbbe0` |
+| `foundry/lib/foundry/coordinator/tick.ex` | `d0df5a69a4b6bff1ea1dc9a8aef2d70e10ba2d5881e66e90920926e8a911215a` |
+| `foundry/lib/foundry/launch_eligibility.ex` | `cd5fd0aafe88144da42d1cccaeeab30f06fb12931c5db564a48b610823afd11f` |
+| `foundry/test/foundry/agent_server_test.exs` | `e29997f9f340aec78687b227dcd30dfd4aa79672c5f54de455c4870ea37f61c1` |
+| `foundry/test/foundry/autonomous_launch_test.exs` | `8916a95b63a4bdb5e9df4c10ab441b6f97b484ba75f3e0d0ae41153dbd3f9f5a` |
 
 The starting Coordinator hash was
 `1e184cf4c52f500ad2859f6e883a5508ec83e50da2ca1811a281673c7e1cf30`.
@@ -51,7 +51,7 @@ Location: `agent_server.ex:395–431`; `launch_eligibility.ex:103–149`.
 The guard accepts any nonempty provider/account/model/approval strings when the
 subscription flags are set. AgentServer then discards account and reasoning at
 the launch boundary. It supplies provider/billing/profile as three
-`PRAMANA_FOUNDRY_*` pane environment labels and passes only `--model` and
+`FOUNDRY_*` pane environment labels and passes only `--model` and
 `--approval-mode` to OMP. Adapter and Argv merely serialize these values; no
 repository consumer makes those environment labels select an account or billing
 channel. The implementation therefore cannot establish that an allowed
@@ -222,13 +222,13 @@ Exact candidate verification command (exit 0, values above):
 
 ```sh
 git rev-parse HEAD
-shasum -a 256 foundry/lib/pramana_foundry/agent_server.ex foundry/lib/pramana_foundry/coordinator.ex foundry/lib/pramana_foundry/coordinator/tick.ex foundry/lib/pramana_foundry/launch_eligibility.ex foundry/test/pramana_foundry/agent_server_test.exs foundry/test/pramana_foundry/autonomous_launch_test.exs
+shasum -a 256 foundry/lib/foundry/agent_server.ex foundry/lib/foundry/coordinator.ex foundry/lib/foundry/coordinator/tick.ex foundry/lib/foundry/launch_eligibility.ex foundry/test/foundry/agent_server_test.exs foundry/test/foundry/autonomous_launch_test.exs
 ```
 
 Exact focused checks:
 
 ```sh
-env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/pramana_foundry/autonomous_launch_test.exs test/pramana_foundry/agent_server_test.exs --seed 424201
+env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/foundry/autonomous_launch_test.exs test/foundry/agent_server_test.exs --seed 424201
 env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix compile --warnings-as-errors
 ```
 
@@ -247,7 +247,7 @@ explicitly recorded initial temporary-directory setup mistake below.
 ### Probe 1: malformed policy and contradictory route
 
 ```elixir
-alias PramanaFoundry.LaunchEligibility, as: L
+alias Foundry.LaunchEligibility, as: L
 p = %{"provider" => "openai-codex", "account" => "approved-subscription", "billing_class" => "subscription", "subscription_authorized" => true, "premium_authorized" => false, "automatic_roles" => ["developer", "reviewer", "pm"], "quota_status" => "available", "model" => "openai-codex/explicit-model", "approval_mode" => "explicit", "reasoning" => "medium"}
 for {label, profile, state} <- [
   {"paid_model_labeled_subscription", Map.put(p, "model", "openrouter/deepseek/deepseek-v4-flash"), %{}},
@@ -267,12 +267,12 @@ for {label, profile, state} <- [
 end
 state = %{"assignments" => %{"T" => %{"status" => "queued", "ticket" => %{}}}, "queue" => ["T"]}
 result = try do
-  PramanaFoundry.Coordinator.Tick.process_queue(["T"], state, %{}, nil, 1000, self(), nil, nil, 3, profiles: %{}, role_profiles: %{"developer" => "s"}, now: 1000)
+  Foundry.Coordinator.Tick.process_queue(["T"], state, %{}, nil, 1000, self(), nil, nil, 3, profiles: %{}, role_profiles: %{"developer" => "s"}, now: 1000)
   :blocked_normally
 rescue e -> {:raised, e.__struct__} end
 IO.inspect({"well_formed_mapping_control", result})
 result = try do
-  PramanaFoundry.Coordinator.Tick.process_queue(["T"], state, %{}, nil, 1000, self(), nil, nil, 3, profiles: %{}, role_profiles: [], now: 1000)
+  Foundry.Coordinator.Tick.process_queue(["T"], state, %{}, nil, 1000, self(), nil, nil, 3, profiles: %{}, role_profiles: [], now: 1000)
 rescue e -> {:raised, e.__struct__} end
 IO.inspect({"malformed_role_mapping", result})
 ```
@@ -286,8 +286,8 @@ case raised `Protocol.UndefinedError`; mapping control blocked normally.
 
 ```elixir
 Code.require_file("test/support/agent_server_fake_runner.ex")
-alias PramanaFoundry.AgentServerTest.FakeRunner
-alias PramanaFoundry.{AgentServer, Herdr.Adapter}
+alias Foundry.AgentServerTest.FakeRunner
+alias Foundry.{AgentServer, Herdr.Adapter}
 table = :fr01_review_boundary
 FakeRunner.create_table(table)
 FakeRunner.install(table, fn
@@ -321,7 +321,7 @@ returned `:herdr_env_not_set`.
 ### Probe 3: preservation of the new reviewer block
 
 ```elixir
-alias PramanaFoundry.{Coordinator, Coordinator.Tick}
+alias Foundry.{Coordinator, Coordinator.Tick}
 {tmp, 0} = System.cmd("mktemp", ["-d", "/tmp/pramana-fr01-review.XXXXXX"])
 tmp = String.trim(tmp)
 try do

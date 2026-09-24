@@ -828,7 +828,7 @@ Over time, if an external controller consistently provides better planning/orche
 Foundry can delete overlapping planning machinery without giving up the protected contract.
 
 **Decided 2026-09-23 (operator, from the Fable strategy review):**
-`lib/pramana_foundry/workflow/kernel/software/*` is the reference Standard Controller's
+`lib/foundry/workflow/kernel/software/*` is the reference Standard Controller's
 software workflow. It is replaceable, and deletable once another controller covers it. The
 R4 exhaustive search and mutation-sweep tooling is scoped to this reference controller as a
 conformance oracle, not a bar every controller must meet; what every controller must meet is

@@ -16,7 +16,7 @@ implement stayed unexpressible.
 
 The third attempt changes the **method**, not just the guards.
 [The row-driven design](fr08b-row-driven-coverage.md) is the argument;
-`test/support/r4_rows.ex` and `test/pramana_foundry/workflow/r4_coverage_test.exs` are the
+`test/support/r4_rows.ex` and `test/foundry/workflow/r4_coverage_test.exs` are the
 mechanism. R4's transition table and R4a's domain-owner table are parsed out of the
 contract, and every row is driven through `Kernel.apply/2` with the contract's stated
 outcome asserted. Rows stating a prohibition assert the refusal too.

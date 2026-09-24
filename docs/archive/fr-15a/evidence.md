@@ -19,7 +19,7 @@ installed-harness conformance. OMP remains governing and Pi remains unselected.
 | `c8a0f96761d22420afb0e1090bea5de5129b68737459610d0328fd212b4e5201` | `foundry/docs/README.md` |
 | `3ceecfc0bf5b4cd9de7c390cc1356334325563e4a57396a3843954057254739e` | `foundry/docs/fr-15a/provisioning-manifest.exs` |
 | `e6f90482419617e58cb14bba4dde27e75d5daa21e6792bb8813c793fde35e448` | `foundry/docs/fr-15a/provisioning-specification.md` |
-| `8ff186e13332bc6da9b25f8b7039fb144c2956132ccaafaabb7c21a246e39d17` | `foundry/test/pramana_foundry/repair/fr15aa_provisioning_test.exs` |
+| `8ff186e13332bc6da9b25f8b7039fb144c2956132ccaafaabb7c21a246e39d17` | `foundry/test/foundry/repair/fr15aa_provisioning_test.exs` |
 
 ## Commands and results
 
@@ -38,11 +38,11 @@ elixir ci/validate_fr15aa.exs
 
 mix format --check-formatted ci/validate_fr15aa.exs \
   docs/fr-15a/provisioning-manifest.exs \
-  test/pramana_foundry/repair/fr15aa_provisioning_test.exs
+  test/foundry/repair/fr15aa_provisioning_test.exs
   exit 0
 
 MIX_ENV=test elixir -r test/test_helper.exs \
-  test/pramana_foundry/repair/fr15aa_provisioning_test.exs
+  test/foundry/repair/fr15aa_provisioning_test.exs
   seed 982154; 5 passed; exit 0
 
 cd ..
@@ -58,7 +58,7 @@ run:
 
 ```text
 cd foundry
-mix test test/pramana_foundry/repair/fr15aa_provisioning_test.exs --seed 0
+mix test test/foundry/repair/fr15aa_provisioning_test.exs --seed 0
   exit 1 before compilation: locked Hex packages exqlite and owl were not present
 ```
 
@@ -109,7 +109,7 @@ specification, validator and focused test:
 | `2277ad95d53a698899c71686af2303190e539737ca1a7e5e1f74279b63678dc1` | `foundry/ci/validate_fr15aa.exs` |
 | `3e63d13a563fa0663b2250a4a6ad494947559e93753671101c1a67beff7a730e` | `foundry/docs/fr-15a/provisioning-manifest.exs` |
 | `3348b298e12056d10af2f4c14859377d8c64c6399dab75aed2be58760fec304a` | `foundry/docs/fr-15a/provisioning-specification.md` |
-| `d5408a9113eb07b6ba6b18b131cede926390aec84265df4cea1e558753f39c58` | `foundry/test/pramana_foundry/repair/fr15aa_provisioning_test.exs` |
+| `d5408a9113eb07b6ba6b18b131cede926390aec84265df4cea1e558753f39c58` | `foundry/test/foundry/repair/fr15aa_provisioning_test.exs` |
 
 B1 is corrected at specification level by a distinct `_pramana_kernel` principal,
 blocked exact kernel artifact, protected `kernel.sock`, structured
@@ -140,11 +140,11 @@ elixir ci/validate_fr15aa.exs
 
 mix format --check-formatted ci/validate_fr15aa.exs \
   docs/fr-15a/provisioning-manifest.exs \
-  test/pramana_foundry/repair/fr15aa_provisioning_test.exs
+  test/foundry/repair/fr15aa_provisioning_test.exs
   exit 0
 
 MIX_ENV=test elixir -r test/test_helper.exs \
-  test/pramana_foundry/repair/fr15aa_provisioning_test.exs
+  test/foundry/repair/fr15aa_provisioning_test.exs
   seed 838389; 16 passed; exit 0
 
 cd /private/tmp/pramana-fr15aa
@@ -176,7 +176,7 @@ changes only the validator, FR-15aA specification and focused test:
 |---|---|
 | `87d7433990f81315c07614d7519e3c928a7a302210cabf53897f6120f04f2564` | `foundry/ci/validate_fr15aa.exs` |
 | `7f97089e2a3c8dfcb2d7e114898068eb5024c7de1b59a6d6749408524986e72e` | `foundry/docs/fr-15a/provisioning-specification.md` |
-| `6a0e27fe6980863ded3969135e8175c723567ce56856908add685d4c172b2a57` | `foundry/test/pramana_foundry/repair/fr15aa_provisioning_test.exs` |
+| `6a0e27fe6980863ded3969135e8175c723567ce56856908add685d4c172b2a57` | `foundry/test/foundry/repair/fr15aa_provisioning_test.exs` |
 
 Every pin now requires its exact frozen ID, kind, version, path, disposition and digest.
 Repository-backed byte reads are selected by the validator's trusted pin table and remain
@@ -197,12 +197,12 @@ elixir ci/validate_fr15aa.exs
   FR-15aA provisioning manifest: valid; exit 0
 
 MIX_ENV=test elixir -r test/test_helper.exs \
-  test/pramana_foundry/repair/fr15aa_provisioning_test.exs
+  test/foundry/repair/fr15aa_provisioning_test.exs
   seed 673062; 22 passed; exit 0
 
 mix format --check-formatted ci/validate_fr15aa.exs \
   docs/fr-15a/provisioning-manifest.exs \
-  test/pramana_foundry/repair/fr15aa_provisioning_test.exs
+  test/foundry/repair/fr15aa_provisioning_test.exs
   exit 0
 
 cd /private/tmp/pramana-fr15aa

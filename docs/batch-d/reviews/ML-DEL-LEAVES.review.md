@@ -7,16 +7,16 @@ Worktree: /private/tmp/review-ML-DEL-LEAVES (detached at 61b2c3e). 3 commits, 46
 
 ## Findings
 
-1. **info** — `test/pramana_foundry/relocation_containment_test.exs` deleted outside the packet scope
+1. **info** — `test/foundry/relocation_containment_test.exs` deleted outside the packet scope
    (scope has `relocation_test.exs` and `relocation/**`, not this file). Acceptable, no correction:
-   the file's only subject is `PramanaFoundry.Relocation` (alias line 4; both tests assert
+   the file's only subject is `Foundry.Relocation` (alias line 4; both tests assert
    `{:error, {:relocation_disabled, :fr19b_required}}` from `execute/resume/rollback`). Once
    `relocation.ex` is deleted it cannot compile, so keeping it would have broken
    `--warnings-as-errors`/the suite. Its two rules are recorded in
    `docs/archive/RELOCATION-RULES-2026-09-23.md:12` (first table row). Suggest the integrator
    note the scope overrun in the ticket record; no new ticket needed.
 2. **info** — `test/support/fr19a_maintenance_crash_fixture.exs` correctly kept: only consumer is
-   `test/pramana_foundry/durable_store/operational_storage_test.exs:439` (an in-gate test).
+   `test/foundry/durable_store/operational_storage_test.exs:439` (an in-gate test).
    It is not sync-EIO code despite matching the `test/support/fr19a_*` scope glob.
 3. **info** — check_docs: candidate reports exactly 7 broken links, base reports 0. The 7 are:
    `docs/AUDIT-2026-09-12.md` x3 (`relocation.ex#L159`, `relocation/manifest.ex`,
@@ -30,7 +30,7 @@ Worktree: /private/tmp/review-ML-DEL-LEAVES (detached at 61b2c3e). 3 commits, 46
    `docs/DURABLE-STORE.md:186-189` still says relocation entry points return
    `:relocation_disabled` and tests are "preserved but skipped until FR-19B". Both files are
    outside scope; report only.
-5. **none** — `lib/pramana_foundry/ci.ex`, `cli.ex`, `application.ex`, `docs/README.md`
+5. **none** — `lib/foundry/ci.ex`, `cli.ex`, `application.ex`, `docs/README.md`
    untouched, per acceptance criterion 4. No changes to those files are needed for compile or
    the surviving tests; only the doc-link fixes in finding 3.
 
@@ -38,14 +38,14 @@ Worktree: /private/tmp/review-ML-DEL-LEAVES (detached at 61b2c3e). 3 commits, 46
 
 - `git grep -n -iE 'assessor|relocation|fr19a_sync|sync_eio|sync-eio|LocalExclude' -- ':!docs/**' ':!*.md'`
   → 0 hits (exit 1). No live lib/test/ci/config/mix/workflow reference to any deleted module.
-  Same grep over `mix.exs test/test_helper.exs ci/run.exs lib/pramana_foundry/ci.ex config/ .github/`
+  Same grep over `mix.exs test/test_helper.exs ci/run.exs lib/foundry/ci.ex config/ .github/`
   → 0 hits.
 - `git diff --name-status -M db4334c HEAD` → 46 paths; 45 inside scope globs, 1 outside
   (finding 1). `docs/ASSESSOR.md` → `docs/archive/ASSESSOR.md` is a 95% rename with a retirement
   banner and three `../` link fixes; `docs/fr-19a/linux-sync-eio-plan.md` gains a banner and
   de-links the deleted workflow.
 - `mix compile --force --warnings-as-errors` (MIX_ENV=test) → exit 0, 119 files.
-- `mix test test/pramana_foundry/durable_store/{sync_fault_test,operational_storage_test,fr08a_fr19a_integration_test}.exs`
+- `mix test test/foundry/durable_store/{sync_fault_test,operational_storage_test,fr08a_fr19a_integration_test}.exs`
   → 24 passed, 0 failures, exit 0 (100.2 s). All three files present and unmodified by the diff.
 - `elixir bin/check_docs.exs` → candidate 7 broken, base (main checkout, db4334c) 0 broken.
 - Workflow gating confirmed: `fr19a-sync-eio.yml` pushes only on `repair/fr19a-correction`;

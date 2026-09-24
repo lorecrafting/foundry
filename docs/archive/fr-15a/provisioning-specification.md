@@ -212,9 +212,9 @@ authorization.
 
 | Path / listener | Owner and mode | Rule |
 |---|---|---|
-| `/Library/PramanaFoundry/bin` | `root:wheel`, directory `0555`, files `0555` | reviewed launcher/gateway/bridge/fetch artifacts only; no candidate writes |
-| `/Library/PramanaFoundry/manifests` | `root:wheel`, `0555`; files `0444` | active artifact/loadout/policy digests; candidate proposals never become active in place |
-| `/Library/PramanaFoundry/releases` | `root:wheel`, `0555` | immutable accepted release objects; activation pointer root-owned |
+| `/Library/Foundry/bin` | `root:wheel`, directory `0555`, files `0555` | reviewed launcher/gateway/bridge/fetch artifacts only; no candidate writes |
+| `/Library/Foundry/manifests` | `root:wheel`, `0555`; files `0444` | active artifact/loadout/policy digests; candidate proposals never become active in place |
+| `/Library/Foundry/releases` | `root:wheel`, `0555` | immutable accepted release objects; activation pointer root-owned |
 | `/var/db/pramana-foundry` | `root:wheel`, `0700` | durable store, R1/R5, policy, capability digests, accepted Git custody |
 | `/var/empty/pramana-foundry/kernel` | `_pramana_kernel`, `0700` | neutral kernel home and disposable cache only; no protected database or candidate checkout |
 | `/var/run/pramana-foundry/root.sock` | root with a dedicated peer ACL, `0660` | scoped local commands only; no BEAM distribution/eval |
@@ -514,18 +514,18 @@ done
 Then create protected roots:
 
 ```sh
-sudo install -d -o root -g wheel -m 0555 /Library/PramanaFoundry/bin /Library/PramanaFoundry/manifests /Library/PramanaFoundry/releases
-sudo install -d -o root -g wheel -m 0555 /Library/PramanaFoundry/releases/kernel /Library/PramanaFoundry/releases/kernel/CANDIDATE_SHA /Library/PramanaFoundry/releases/kernel/CANDIDATE_SHA/bin
+sudo install -d -o root -g wheel -m 0555 /Library/Foundry/bin /Library/Foundry/manifests /Library/Foundry/releases
+sudo install -d -o root -g wheel -m 0555 /Library/Foundry/releases/kernel /Library/Foundry/releases/kernel/CANDIDATE_SHA /Library/Foundry/releases/kernel/CANDIDATE_SHA/bin
 sudo install -d -o root -g wheel -m 0700 /var/db/pramana-foundry
 sudo install -d -o root -g wheel -m 0711 /var/run/pramana-foundry
 sudo install -d -o root -g wheel -m 0711 /var/tmp/pramana-foundry /var/tmp/pramana-foundry/slots /var/tmp/pramana-foundry/build
 sudo install -d -o _pramana_runtime -g _pramana_runtime -m 0700 /var/lib/pramana-foundry/runtime
 sudo install -d -o _pramana_kernel -g _pramana_kernel -m 0700 /var/empty/pramana-foundry/kernel
-sudo install -o root -g wheel -m 0555 /staging/pramana-kernel /Library/PramanaFoundry/releases/kernel/CANDIDATE_SHA/bin/pramana-kernel
-sudo install -o root -g wheel -m 0555 /staging/pf-launch /Library/PramanaFoundry/bin/pf-launch
-sudo install -o root -g wheel -m 0555 /staging/pf-auth-gateway /Library/PramanaFoundry/bin/pf-auth-gateway
-sudo install -o root -g wheel -m 0555 /staging/pf-effect-bridge /Library/PramanaFoundry/bin/pf-effect-bridge
-sudo install -o root -g wheel -m 0555 /staging/pf-fetch /Library/PramanaFoundry/bin/pf-fetch
+sudo install -o root -g wheel -m 0555 /staging/pramana-kernel /Library/Foundry/releases/kernel/CANDIDATE_SHA/bin/pramana-kernel
+sudo install -o root -g wheel -m 0555 /staging/pf-launch /Library/Foundry/bin/pf-launch
+sudo install -o root -g wheel -m 0555 /staging/pf-auth-gateway /Library/Foundry/bin/pf-auth-gateway
+sudo install -o root -g wheel -m 0555 /staging/pf-effect-bridge /Library/Foundry/bin/pf-effect-bridge
+sudo install -o root -g wheel -m 0555 /staging/pf-fetch /Library/Foundry/bin/pf-fetch
 ```
 
 Install reviewed root-owned launchd plists only after `plutil -lint` and digest comparison.
@@ -608,7 +608,7 @@ sudo pfctl -a pramana-foundry -sr >/dev/null
 
 # Boot out only labels recorded created_by_attempt=true, in reverse dependency order.
 # The reviewed rollback helper reads the canonical ledger and refuses unknown ownership.
-sudo /Library/PramanaFoundry/bin/pf-launch rollback-services --ledger "$ledger"
+sudo /Library/Foundry/bin/pf-launch rollback-services --ledger "$ledger"
 
 # Verify every account independently; present or observer error blocks removal.
 for name in _pramana_launcher _pramana_auth _pramana_harness _pramana_present \

@@ -1,5 +1,5 @@
 alias Exqlite.Sqlite3
-alias PramanaFoundry.DurableStore.{Database, Gateway}
+alias Foundry.DurableStore.{Database, Gateway}
 
 [path, extension] = System.argv()
 capability = make_ref()
@@ -60,7 +60,7 @@ bundle = fn id ->
         effect_id: "effect-#{id}",
         request_digest:
           elem(
-            PramanaFoundry.DurableStore.Encoding.semantic_digest(
+            Foundry.DurableStore.Encoding.semantic_digest(
               "pramana-foundry-effect-request-v1",
               %{
                 "effect_id" => "effect-#{id}",

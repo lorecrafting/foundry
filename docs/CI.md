@@ -24,7 +24,7 @@ rechecks the exact clean commit/tree afterward.
 7. build a fresh escript from the checked source.
 
 The output directory contains `provenance.json` and, after a successful run, the generated
-`pramana_foundry` escript. The JSON binds the source commit/tree and dirty paths, runner and
+`foundry` escript. The JSON binds the source commit/tree and dirty paths, runner and
 workflow hashes, exact lock entries and checksums, BEAM versions, isolation paths, command
 argv/exit/duration/output hashes, excluded coverage, and escript hash. It is build evidence,
 not acceptance or activation authority. FR-17 owns immutable activation; FR-22 owns final
@@ -38,9 +38,9 @@ tracked `deps/owl/` copy was removed because it duplicated that authority withou
 verification step. Restore dependencies with the runner or `mix deps.get --check-locked`.
 
 Generated executables are never source inputs. The previously tracked escript was removed;
-`pramana_foundry` and `ci-artifacts/` are ignored and reproduced by the
+`foundry` and `ci-artifacts/` are ignored and reproduced by the
 runner. A consumer must match an artifact's recorded SHA-256 and source commit rather than
-assuming a file named `pramana_foundry` represents the checkout.
+assuming a file named `foundry` represents the checkout.
 
 The policy is enforced, not descriptive: tracked dependency sources or a tracked escript fail
 preflight. After restore, every resolved dependency must be `Hex.SCM`, match its committed lock

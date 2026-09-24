@@ -8,7 +8,7 @@ Both defects are fixed at their cause and all three acceptance criteria hold. On
 required correction: the file's header comment now states a false safety claim.
 
 ### Correction (one line)
-`test/pramana_foundry/effects/process_group_test.exs` lines 19-21 still say
+`test/foundry/effects/process_group_test.exs` lines 19-21 still say
 "Nothing here ever signals a live pid". After this diff `stop_helper/2` runs
 `kill -KILL <pid>` on live helpers. The invariant that matters (never signal a
 `ps`-reported *process group*, which could be the BEAM's) still holds; the
@@ -49,9 +49,9 @@ re-checked in `stop_helper/2`.
    (no assertion existed); the check lives in `stop_helper`'s assert.
    Green loop: 10/10 runs `Result: 13 passed`, orphans 0 before, 0 after,
    0 leftover `/private/tmp/process-group-zombie-*` dirs. Each run ~0.4 s.
-5. Scope: one file, `test/pramana_foundry/effects/process_group_test.exs`,
+5. Scope: one file, `test/foundry/effects/process_group_test.exs`,
    inside packet scope.
 
 ## Commands run
-- `TMPDIR=/private/tmp MIX_ENV=test MIX_DEPS_PATH=/Users/raymondluong/dev/foundry/deps mix test test/pramana_foundry/effects/process_group_test.exs` x13 (1 initial, 10 loop, 1 red, 1 post-restore)
+- `TMPDIR=/private/tmp MIX_ENV=test MIX_DEPS_PATH=/Users/raymondluong/dev/foundry/deps mix test test/foundry/effects/process_group_test.exs` x13 (1 initial, 10 loop, 1 red, 1 post-restore)
 - orphan sweep: `ps -axo pid,ppid,args | awk '$2==1' | grep -E 'process-group-zombie|defunct-|stale-'`

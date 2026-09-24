@@ -58,7 +58,7 @@ over every caller surface found the sites listed below. None of them reaches a F
 
 - `apply(__MODULE__, :relocation_status, [])` at `relocation.ex:461`. This site takes
   `relocation_status/0` off the candidate list.
-- `apply(PramanaFoundry.Coordinator, :receive_review | :receive_handoff, …)` in
+- `apply(Foundry.Coordinator, :receive_review | :receive_handoff, …)` in
   `agent_server.ex:335,369`.
 - The adapter and transport modules held in config: `assessor.ex:20`, `assessor/jev.ex:198`
   and `herdr/adapter.ex:43`.
@@ -66,7 +66,7 @@ over every caller surface found the sites listed below. None of them reaches a F
 - `String.to_atom` on relocation step kinds, and `Import.read/2` with
   `String.to_existing_atom` in `cli.ex:565`.
 - The release `rpc` in `bin/pramana`. It evaluates only the fixed string
-  `PramanaFoundry.CLI.RPC.run("…")`.
+  `Foundry.CLI.RPC.run("…")`.
 - The escript `main_module` and the application `mod` in `mix.exs`.
 
 `config/config.exs` names no module or function atoms that dispatch. No Mix task is
@@ -76,7 +76,7 @@ defined under `lib/`.
 - The text search leans conservative. A function whose name appears as a word in a file
   that also names its module is kept as used. The tables can therefore undercount dead
   surface, but a row that is listed is not overstated.
-- A hand-written call such as `PramanaFoundry.Board.inspection()` from an operator remote
+- A hand-written call such as `Foundry.Board.inspection()` from an operator remote
   shell can't be searched. No document instructs one for any FREE row.
 - An attestation binds a file by its source SHA-256 and its BEAM MD5. That binding matters
   more for the owned rows than for the FREE rows.
@@ -85,10 +85,10 @@ defined under `lib/`.
 
 | File:line | Identifier | Search and result | Dynamic-dispatch risk checked | Owner |
 |---|---|---|---|---|
-| `lib/pramana_foundry/assessor/result.ex:89` | `Assessor.Result.statuses/0` | xref edges: none. `rg -nwF statuses lib test bin ci config mix.exs ../bin rel` finds only the `@statuses` attribute (line 12), this def and the `when status in @statuses` guard (line 91). Every other hit is a local variable in `workflow/kernel.ex` or test prose. No `Result.statuses` or `:statuses` appears anywhere | The assessor adapter is chosen dynamically (`assessor.ex:20`), but the dispatch goes to `assess/2`, not to this function | FREE |
-| `lib/pramana_foundry/assignments/handoff.ex:96` | `Assignments.Handoff.max_blocked_bytes/0` | xref edges: none. `rg -nwF max_blocked_bytes …` gives 1 hit, the def itself. The attribute `@max_blocked_handoff_bytes` stays in use inside the module | No atom, `apply` or reflection. Note: the file sits on the handoff ingress that FR-08B and FR-11 will touch. Removing the accessor changes no behaviour | FREE |
-| `lib/pramana_foundry/board.ex:118` | `Board.inspection/0,1` (one def with a default) | xref edges: none. `rg -nwF inspection …` finds prose, test names and this def. `rg -n 'Board\.inspection'` over the whole repo, docs included, finds nothing | The CLI and `bin/pramana` RPC table don't dispatch it. It is reachable only by a hand-typed remote-shell call, and none is documented. Not a GenServer message | FREE |
-| `lib/pramana_foundry/board.ex:125` | `Board.inspection_status/0,1` | xref edges: none. `rg -nwF inspection_status …` gives 1 hit, the def | Same as the row above | FREE |
+| `lib/foundry/assessor/result.ex:89` | `Assessor.Result.statuses/0` | xref edges: none. `rg -nwF statuses lib test bin ci config mix.exs ../bin rel` finds only the `@statuses` attribute (line 12), this def and the `when status in @statuses` guard (line 91). Every other hit is a local variable in `workflow/kernel.ex` or test prose. No `Result.statuses` or `:statuses` appears anywhere | The assessor adapter is chosen dynamically (`assessor.ex:20`), but the dispatch goes to `assess/2`, not to this function | FREE |
+| `lib/foundry/assignments/handoff.ex:96` | `Assignments.Handoff.max_blocked_bytes/0` | xref edges: none. `rg -nwF max_blocked_bytes …` gives 1 hit, the def itself. The attribute `@max_blocked_handoff_bytes` stays in use inside the module | No atom, `apply` or reflection. Note: the file sits on the handoff ingress that FR-08B and FR-11 will touch. Removing the accessor changes no behaviour | FREE |
+| `lib/foundry/board.ex:118` | `Board.inspection/0,1` (one def with a default) | xref edges: none. `rg -nwF inspection …` finds prose, test names and this def. `rg -n 'Board\.inspection'` over the whole repo, docs included, finds nothing | The CLI and `bin/pramana` RPC table don't dispatch it. It is reachable only by a hand-typed remote-shell call, and none is documented. Not a GenServer message | FREE |
+| `lib/foundry/board.ex:125` | `Board.inspection_status/0,1` | xref edges: none. `rg -nwF inspection_status …` gives 1 hit, the def | Same as the row above | FREE |
 
 **Removed 2026-09-22 (FR-23a).** `Board.inspection/0,1`, `Board.inspection_status/0,1`
 and `Assessor.Result.statuses/0` were removed at `4aa7ef30`, together with the
@@ -105,21 +105,21 @@ then be the only evidence that attach instructions still work.
 
 | File:line | Identifier | Search and result | Dynamic-dispatch risk checked | Owner |
 |---|---|---|---|---|
-| `lib/pramana_foundry/coordinator.ex:31` | `Coordinator.replace_projection/1` | xref edges: none. `rg -nwF replace_projection …` gives 1 hit, the def. **It sends `{:replace_projection, records}`, and no `handle_call` clause matches that message.** The recovery catch-all at line 277 matches only while `recovery_error` is set, so on a healthy server the call would crash the Coordinator. FR-08B has already recorded this in [the ingress inventory](../fr-08/fr08b-ingress-inventory.md) | GenServer message: the sender side exists, the handler side is absent | FR-08B. This is a recorded defect, not only dead surface |
-| `lib/pramana_foundry/coordinator/state.ex:350` | `Coordinator.State.integrate_candidate/2,3` | xref edges: none. `rg -nwF integrate_candidate …` gives 2 hits, the `@spec` and the def. `Coordinator.handle_call({:integrate, …})` (line 564) returns its own suspension error and never calls it. `EVENT_SOURCING.md:142` still names it as a suspended path | No atom or `apply`. Its message names FR-13 and FR-14 as the restorers of verified promotion | FR-08B (Coordinator/State ingress). Removing it also needs FR-13/14 and the `EVENT_SOURCING.md` route updated |
-| `lib/pramana_foundry/durable_store/kernel.ex:6-7` | `@callback decide/2`, `@callback apply/2` on `DurableStore.Kernel` | `rg -n '@behaviour' lib test`: no module declares `@behaviour PramanaFoundry.DurableStore.Kernel`. The behaviour has no implementer | These are callbacks, so they count as dispatch surface. But nothing implements them, so nothing can dispatch through them | FR-08B. The file is attested by `FR08AProtectedBoundary` and `H0AcceptedFR07Boundary` |
-| `lib/pramana_foundry/durable_store/kernel.ex:9` | `DurableStore.Kernel.validate_bundle/1` | xref edges: none. `rg -nwF validate_bundle …` gives 1 hit, the def. `DURABLE-STORE.md:24` and `fr-07/diagnosis-v3.md:19` still describe it | None | FR-08B. The file is attested, and a doc route needs updating |
-| `lib/pramana_foundry/durable_store/database.ex:362` | `DurableStore.Database.protected_schema_version/0` | xref edges: none. `rg -nwF protected_schema_version …` finds only the metadata key string and the `@protected_schema_version` attribute. No call to the function exists | The name also appears as a SQL key and a map key. Those are strings, not calls | FR-08B. The file is attested by `FR08AProtectedBoundary` |
-| `lib/pramana_foundry/durable_store/owner.ex:70` | `DurableStore.Owner.sidecars/1` | xref edges: none. `rg -nwF sidecars …` finds the def and two test names that are prose | None | FR-08B |
-| `lib/pramana_foundry/durable_store/record_codec.ex:591` | `DurableStore.RecordCodec.reduce_projection_plan/2` | xref edges: none. `rg -nwF reduce_projection_plan …` gives 1 hit, the def | None | FR-08B. The file is attested by both boundaries |
-| `lib/pramana_foundry/durable_store/transition_plan.ex:267` | `DurableStore.TransitionPlan.discriminator_kinds/0` | xref edges: none. `rg -nwF discriminator_kinds …` finds the attribute, the `@spec`, the def and the attribute's use in a guard. Its sibling accessors (`operation_types/0` and others) are test-only | None | FR-08B |
-| `lib/pramana_foundry/workflow/kernel/state.ex:84` | `Workflow.Kernel.State.attempt_phases/0` | xref edges: none. `rg -nwF attempt_phases …` finds the attribute, the def and the attribute's use in a guard | Its siblings are used by `kernel.ex` and the property tests, so this one belongs to a uniform accessor set | FR-08B, kernel under active review |
-| `lib/pramana_foundry/workflow/kernel/state.ex:87` | `Workflow.Kernel.State.execution_results/0` | xref edges: none. `rg -nwF execution_results …` finds the attribute, the def and the attribute's use in a guard | Same as `attempt_phases/0` | FR-08B |
-| `lib/pramana_foundry/workflow/kernel/state.ex:90` | `Workflow.Kernel.State.roles/0` | xref edges: none. `rg -nwF roles …` finds no call to `State.roles`. Every hit is another module's `@roles` or a local variable | Same as `attempt_phases/0` | FR-08B |
-| `lib/pramana_foundry/durable_store/record_codec.ex:19` | `@command_types` members `reset`, `propose`, `submit_artifact`, `submit_review`, `steer`, `cancel`, `record_receipt` | For each member v, `rg -c -F '"v"' lib` = 0 and `rg -l -F '"v"' test bin ci` = 0. Nothing produces a command of these types anywhere | These are validation vocabulary for persisted command records, so dropping one changes which stored records validate. That is a persisted-format change, which FR-23 excludes. The atom `:reset` is live as a Coordinator message and a CLI command, but it belongs to a different vocabulary | FR-08B |
-| `lib/pramana_foundry/durable_store/record_codec.ex:19` | `@command_types` members `enqueue`, `pause`, `resume`, `request_effect` | `rg -c -F '"v"' lib` = 0 for each. Test files contain them: `enqueue` 1, `pause` 2, `resume` 1, `request_effect` 7. **These are test-only.** `legacy_event_append` is produced in `lib/` by `compatibility_writer.ex` | Same as the row above | FR-08B |
-| `lib/pramana_foundry/durable_store/record_codec.ex:28` | `@legacy_event_types` members `ticket_steered`, `ticket_paused`, `ticket_resumed`, `ticket_cancelled`, `receipt_recorded` | The list-literal scan found no string, atom or keyword use outside line 28 | The code comment says: "Never remove, rename or re-point a member; stored histories depend on these names". The list is required compatibility and already says so | FR-08B (legacy JSONL). Not removable |
-| `lib/pramana_foundry/durable_store/record_codec.ex:48` | `@intent_types` members `activate`, `git_update` | The list-literal scan found no use outside line 48 | These are validation vocabulary for persisted intents, used at line 150, so removing one is a format change | FR-08B |
+| `lib/foundry/coordinator.ex:31` | `Coordinator.replace_projection/1` | xref edges: none. `rg -nwF replace_projection …` gives 1 hit, the def. **It sends `{:replace_projection, records}`, and no `handle_call` clause matches that message.** The recovery catch-all at line 277 matches only while `recovery_error` is set, so on a healthy server the call would crash the Coordinator. FR-08B has already recorded this in [the ingress inventory](../fr-08/fr08b-ingress-inventory.md) | GenServer message: the sender side exists, the handler side is absent | FR-08B. This is a recorded defect, not only dead surface |
+| `lib/foundry/coordinator/state.ex:350` | `Coordinator.State.integrate_candidate/2,3` | xref edges: none. `rg -nwF integrate_candidate …` gives 2 hits, the `@spec` and the def. `Coordinator.handle_call({:integrate, …})` (line 564) returns its own suspension error and never calls it. `EVENT_SOURCING.md:142` still names it as a suspended path | No atom or `apply`. Its message names FR-13 and FR-14 as the restorers of verified promotion | FR-08B (Coordinator/State ingress). Removing it also needs FR-13/14 and the `EVENT_SOURCING.md` route updated |
+| `lib/foundry/durable_store/kernel.ex:6-7` | `@callback decide/2`, `@callback apply/2` on `DurableStore.Kernel` | `rg -n '@behaviour' lib test`: no module declares `@behaviour Foundry.DurableStore.Kernel`. The behaviour has no implementer | These are callbacks, so they count as dispatch surface. But nothing implements them, so nothing can dispatch through them | FR-08B. The file is attested by `FR08AProtectedBoundary` and `H0AcceptedFR07Boundary` |
+| `lib/foundry/durable_store/kernel.ex:9` | `DurableStore.Kernel.validate_bundle/1` | xref edges: none. `rg -nwF validate_bundle …` gives 1 hit, the def. `DURABLE-STORE.md:24` and `fr-07/diagnosis-v3.md:19` still describe it | None | FR-08B. The file is attested, and a doc route needs updating |
+| `lib/foundry/durable_store/database.ex:362` | `DurableStore.Database.protected_schema_version/0` | xref edges: none. `rg -nwF protected_schema_version …` finds only the metadata key string and the `@protected_schema_version` attribute. No call to the function exists | The name also appears as a SQL key and a map key. Those are strings, not calls | FR-08B. The file is attested by `FR08AProtectedBoundary` |
+| `lib/foundry/durable_store/owner.ex:70` | `DurableStore.Owner.sidecars/1` | xref edges: none. `rg -nwF sidecars …` finds the def and two test names that are prose | None | FR-08B |
+| `lib/foundry/durable_store/record_codec.ex:591` | `DurableStore.RecordCodec.reduce_projection_plan/2` | xref edges: none. `rg -nwF reduce_projection_plan …` gives 1 hit, the def | None | FR-08B. The file is attested by both boundaries |
+| `lib/foundry/durable_store/transition_plan.ex:267` | `DurableStore.TransitionPlan.discriminator_kinds/0` | xref edges: none. `rg -nwF discriminator_kinds …` finds the attribute, the `@spec`, the def and the attribute's use in a guard. Its sibling accessors (`operation_types/0` and others) are test-only | None | FR-08B |
+| `lib/foundry/workflow/kernel/state.ex:84` | `Workflow.Kernel.State.attempt_phases/0` | xref edges: none. `rg -nwF attempt_phases …` finds the attribute, the def and the attribute's use in a guard | Its siblings are used by `kernel.ex` and the property tests, so this one belongs to a uniform accessor set | FR-08B, kernel under active review |
+| `lib/foundry/workflow/kernel/state.ex:87` | `Workflow.Kernel.State.execution_results/0` | xref edges: none. `rg -nwF execution_results …` finds the attribute, the def and the attribute's use in a guard | Same as `attempt_phases/0` | FR-08B |
+| `lib/foundry/workflow/kernel/state.ex:90` | `Workflow.Kernel.State.roles/0` | xref edges: none. `rg -nwF roles …` finds no call to `State.roles`. Every hit is another module's `@roles` or a local variable | Same as `attempt_phases/0` | FR-08B |
+| `lib/foundry/durable_store/record_codec.ex:19` | `@command_types` members `reset`, `propose`, `submit_artifact`, `submit_review`, `steer`, `cancel`, `record_receipt` | For each member v, `rg -c -F '"v"' lib` = 0 and `rg -l -F '"v"' test bin ci` = 0. Nothing produces a command of these types anywhere | These are validation vocabulary for persisted command records, so dropping one changes which stored records validate. That is a persisted-format change, which FR-23 excludes. The atom `:reset` is live as a Coordinator message and a CLI command, but it belongs to a different vocabulary | FR-08B |
+| `lib/foundry/durable_store/record_codec.ex:19` | `@command_types` members `enqueue`, `pause`, `resume`, `request_effect` | `rg -c -F '"v"' lib` = 0 for each. Test files contain them: `enqueue` 1, `pause` 2, `resume` 1, `request_effect` 7. **These are test-only.** `legacy_event_append` is produced in `lib/` by `compatibility_writer.ex` | Same as the row above | FR-08B |
+| `lib/foundry/durable_store/record_codec.ex:28` | `@legacy_event_types` members `ticket_steered`, `ticket_paused`, `ticket_resumed`, `ticket_cancelled`, `receipt_recorded` | The list-literal scan found no string, atom or keyword use outside line 28 | The code comment says: "Never remove, rename or re-point a member; stored histories depend on these names". The list is required compatibility and already says so | FR-08B (legacy JSONL). Not removable |
+| `lib/foundry/durable_store/record_codec.ex:48` | `@intent_types` members `activate`, `git_update` | The list-literal scan found no use outside line 48 | These are validation vocabulary for persisted intents, used at line 150, so removing one is a format change | FR-08B |
 
 **Plan claim, reconciled.** The FR-23 evidence taken at `9dd30c3` says `reset`, `propose`,
 `submit_artifact` and `submit_review` have zero uses. At `6bc015ed` that holds for their
@@ -130,8 +130,8 @@ command-type string form, and three more members are also unused anywhere: `stee
 
 | File:line | Identifier | Search and result | Dynamic-dispatch risk checked | Owner |
 |---|---|---|---|---|
-| `lib/pramana_foundry/relocation/digest.ex:17` | `Relocation.Digest.hash_file/1` | xref edges: none. `rg -nwF hash_file …` finds the `@spec` and the def. `MIGRATION-TICKETS.md:327` names it historically | Relocation turns step kinds into atoms with `String.to_atom`, but only as data, never as function names | FR-19B |
-| `lib/pramana_foundry/relocation/local_exclude.ex:174` | `Relocation.LocalExclude.tracked_ignore_present?/1,2` | xref edges: none. `rg -nwF 'tracked_ignore_present?' …` finds the `@spec` and the def. `MIGRATION-TICKETS.md:334` names it historically | Same as the row above | FR-19B |
+| `lib/foundry/relocation/digest.ex:17` | `Relocation.Digest.hash_file/1` | xref edges: none. `rg -nwF hash_file …` finds the `@spec` and the def. `MIGRATION-TICKETS.md:327` names it historically | Relocation turns step kinds into atoms with `String.to_atom`, but only as data, never as function names | FR-19B |
+| `lib/foundry/relocation/local_exclude.ex:174` | `Relocation.LocalExclude.tracked_ignore_present?/1,2` | xref edges: none. `rg -nwF 'tracked_ignore_present?' …` finds the `@spec` and the def. `MIGRATION-TICKETS.md:334` names it historically | Same as the row above | FR-19B |
 
 ## FR-10, FR-11 and FR-12
 
@@ -142,10 +142,10 @@ effects, AgentServer and correction, and Tick, scheduler and admission.
 
 | File:line | Identifier | Why it is not dead |
 |---|---|---|
-| `lib/pramana_foundry/relocation.ex:465` | `Relocation.relocation_status/0` | It has no static caller and xref shows no edge. It is called through `apply(__MODULE__, :relocation_status, [])` at line 461, a deliberate indirection. It belongs to FR-19B |
-| `lib/pramana_foundry/launch_eligibility.ex:18-19` | `@reasoning_levels` members `minimal` and `auto`, `@approval_modes` member `yolo` | Nothing in the repo produces these values. They are allowlists for operator profile input, matched at lines 178–179. Removing one changes admission, which FR-12 owns |
-| `lib/pramana_foundry/reviews/matrix.ex:6` | `@high_risk_classes` member `p0_correctness_security` | This allowlist classifies ticket `risk` input. Removing the member changes reviewer derivation |
-| `lib/pramana_foundry/telemetry/forecast.ex:4` | `@comparison_fields` member `correction_behavior` | A field compared on observation maps at line 112. Removing it changes which observations count as comparable |
+| `lib/foundry/relocation.ex:465` | `Relocation.relocation_status/0` | It has no static caller and xref shows no edge. It is called through `apply(__MODULE__, :relocation_status, [])` at line 461, a deliberate indirection. It belongs to FR-19B |
+| `lib/foundry/launch_eligibility.ex:18-19` | `@reasoning_levels` members `minimal` and `auto`, `@approval_modes` member `yolo` | Nothing in the repo produces these values. They are allowlists for operator profile input, matched at lines 178–179. Removing one changes admission, which FR-12 owns |
+| `lib/foundry/reviews/matrix.ex:6` | `@high_risk_classes` member `p0_correctness_security` | This allowlist classifies ticket `risk` input. Removing the member changes reviewer derivation |
+| `lib/foundry/telemetry/forecast.ex:4` | `@comparison_fields` member `correction_behavior` | A field compared on observation maps at line 112. Removing it changes which observations count as comparable |
 | All `handle_call`, `handle_cast` and `handle_info` clauses | — | Every handled message atom has a sender. The only mismatch runs the other way: `replace_projection` has a sender and no handler |
 | Every `@behaviour` callback implementation | — | Callbacks count as dispatched. The only behaviour with no implementer is `DurableStore.Kernel`, listed under FR-08B |
 

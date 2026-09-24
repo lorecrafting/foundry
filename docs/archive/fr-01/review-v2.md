@@ -19,12 +19,12 @@ matched at entry and completion:
 
 | File, relative to `foundry/` | SHA-256 |
 |---|---|
-| `lib/pramana_foundry/agent_server.ex` | `505ebd8a8e9de1b61c05dcac02e6597c0367b54df52c4f3800174b7b1a467057` |
-| `lib/pramana_foundry/coordinator.ex` | `1f7f65a5ebb8b6690e7ae8ee1b2a402cb8eee4d4511ae6964719f6d0cc2f3b0d` |
-| `lib/pramana_foundry/coordinator/tick.ex` | `8d06d93b001aef78928f0980eee940c2629ffadc4fc04fd27de14afe4b691f7c` |
-| `lib/pramana_foundry/launch_eligibility.ex` | `89d8f2170a89f76c05173b298880919d4bf3b6b8f648c58168f8eab22f65f0e6` |
-| `test/pramana_foundry/agent_server_test.exs` | `914d266e4e48096076e2f412de601fb6a8aa68df444ccdf1195a8e41d0411f46` |
-| `test/pramana_foundry/autonomous_launch_test.exs` | `5a47b10095d8734599eeab5f0092cb03fb01d01ef7f66719ac2db2abc8c26fec` |
+| `lib/foundry/agent_server.ex` | `505ebd8a8e9de1b61c05dcac02e6597c0367b54df52c4f3800174b7b1a467057` |
+| `lib/foundry/coordinator.ex` | `1f7f65a5ebb8b6690e7ae8ee1b2a402cb8eee4d4511ae6964719f6d0cc2f3b0d` |
+| `lib/foundry/coordinator/tick.ex` | `8d06d93b001aef78928f0980eee940c2629ffadc4fc04fd27de14afe4b691f7c` |
+| `lib/foundry/launch_eligibility.ex` | `89d8f2170a89f76c05173b298880919d4bf3b6b8f648c58168f8eab22f65f0e6` |
+| `test/foundry/agent_server_test.exs` | `914d266e4e48096076e2f412de601fb6a8aa68df444ccdf1195a8e41d0411f46` |
+| `test/foundry/autonomous_launch_test.exs` | `5a47b10095d8734599eeab5f0092cb03fb01d01ef7f66719ac2db2abc8c26fec` |
 
 The original dirty Coordinator baseline was
 `1e184cf4c52f500ad2859f6e883a5508ec83e50da2ca1811a281673c7e1cf30`.
@@ -192,13 +192,13 @@ Verification from the repository root, exit 0 with hashes above:
 
 ```sh
 git rev-parse HEAD
-shasum -a 256 foundry/lib/pramana_foundry/agent_server.ex foundry/lib/pramana_foundry/coordinator.ex foundry/lib/pramana_foundry/coordinator/tick.ex foundry/lib/pramana_foundry/launch_eligibility.ex foundry/test/pramana_foundry/agent_server_test.exs foundry/test/pramana_foundry/autonomous_launch_test.exs
+shasum -a 256 foundry/lib/foundry/agent_server.ex foundry/lib/foundry/coordinator.ex foundry/lib/foundry/coordinator/tick.ex foundry/lib/foundry/launch_eligibility.ex foundry/test/foundry/agent_server_test.exs foundry/test/foundry/autonomous_launch_test.exs
 ```
 
 Focused checks from `foundry/`:
 
 ```sh
-env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/pramana_foundry/autonomous_launch_test.exs test/pramana_foundry/agent_server_test.exs --seed 424201
+env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/foundry/autonomous_launch_test.exs test/foundry/agent_server_test.exs --seed 424201
 env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix compile --warnings-as-errors
 git diff --check
 ```
@@ -215,7 +215,7 @@ by `mix run --no-start -e 'BODY'`. Each exited 0; BODY was as follows.
 ### Malformed/container and selector probe
 
 ```elixir
-alias PramanaFoundry.LaunchEligibility, as: L
+alias Foundry.LaunchEligibility, as: L
 p = %{"provider" => "anthropic", "account" => "sub-account", "billing_class" => "subscription", "subscription_authorized" => true, "automatic_roles" => ["developer"], "quota_status" => "available", "model" => "claude", "allowed_models" => ["claude"], "approval_mode" => "write", "reasoning" => "high"}
 for {label, profiles, state} <- [
   {"whitespace_account", %{"s" => Map.put(p, "account", "   ")}, %{}},
@@ -243,7 +243,7 @@ end
 ### Late launch-failure probe
 
 ```elixir
-alias PramanaFoundry.{Coordinator, Coordinator.Tick}
+alias Foundry.{Coordinator, Coordinator.Tick}
 {tmp, 0} = System.cmd("mktemp", ["-d", "/tmp/pramana-fr01-review-v2.XXXXXX"])
 tmp = String.trim(tmp)
 try do

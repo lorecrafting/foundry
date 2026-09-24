@@ -154,7 +154,7 @@ b3c5f42cf415f04746dc0431b27d602169198740166a57cf0bbb1865388a6448  sync-isolated.
 ecdf4f0458b19a52826c578766a0626aee0fb3df428d9e2f1d26c35049535ba5  identity-negative.log
 d16dbc86544a11755136d2887b7ed442f021e21877f3d355c2a25ed20c8b91b7  evidence.log
 c7c09798902e7450eae6d03a406429041d337268e12e87d988075eb83da49e2c  ci-artifacts/provenance.json
-fcc619b9d621f370e14a12d0880b591f4254d9f58ad11ecfebe767ac51b3e962  ci-artifacts/pramana_foundry
+fcc619b9d621f370e14a12d0880b591f4254d9f58ad11ecfebe767ac51b3e962  ci-artifacts/foundry
 ```
 
 Run the committed additional probe from `foundry/` after compiling the checked source:

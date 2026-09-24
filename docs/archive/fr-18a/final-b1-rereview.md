@@ -18,8 +18,8 @@ Direct Git inspection reproduced both identities. The exact parent-to-implementa
 diff changes only:
 
 ```text
-M foundry/lib/pramana_foundry/observations/gateway_source.ex
-M foundry/test/pramana_foundry/observations_test.exs
+M foundry/lib/foundry/observations/gateway_source.ex
+M foundry/test/foundry/observations_test.exs
 ```
 
 The correction adds an exact allowlist for the two SQLite corruption messages observed
@@ -91,10 +91,10 @@ MIX_ENV=test \
 MIX_BUILD_PATH=/private/tmp/fr18a-final-b1-build \
 MIX_DEPS_PATH=/Users/raymondluong/dev/pramana/foundry/deps \
 COORDINATOR_TICK=0 \
-mix test test/pramana_foundry/observations_test.exs \
-  test/pramana_foundry/durable_store/protected_primitives_test.exs \
-  test/pramana_foundry/durable_store/fr08a_critical_corrections_test.exs \
-  test/pramana_foundry/durable_store/fr08a_fr19a_integration_test.exs \
+mix test test/foundry/observations_test.exs \
+  test/foundry/durable_store/protected_primitives_test.exs \
+  test/foundry/durable_store/fr08a_critical_corrections_test.exs \
+  test/foundry/durable_store/fr08a_fr19a_integration_test.exs \
   --seed 18101
 ```
 

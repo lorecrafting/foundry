@@ -50,7 +50,7 @@ Within the durable SQLite store, the event-type vocabulary is enforced in exactl
 place — `record_codec.ex:81`, `map["type"] in @event_types` — and nowhere in the relational
 schema.
 
-That scoping is deliberate. `PramanaFoundry.Transition` maintains a separate closed
+That scoping is deliberate. `Foundry.Transition` maintains a separate closed
 vocabulary with its own `:unknown_event_type` catch-all, but it dispatches on a record's
 `"event"` key rather than `"type"`, over the legacy coordinator journal rather than the
 `events` table. It shares no storage and no key with this mechanism, so a lifecycle name

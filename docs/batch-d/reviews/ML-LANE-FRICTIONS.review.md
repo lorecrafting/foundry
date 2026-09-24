@@ -9,14 +9,14 @@ Candidate fd208d104236c28472ec1b943975b1a9ee014770 (4 commits) on base
 
 ## Scope
 `git diff --stat 5fb7603 HEAD`: bin/pramana (usage line), docs/batch-d/LANE-RUNBOOK.md,
-lib/pramana_foundry/manual_lane/cli.ex, lib/pramana_foundry/manual_lane/log.ex,
-test/pramana_foundry/manual_lane/cli_test.exs. Nothing under
-lib/pramana_foundry/durable_store or lib/pramana_foundry/workflow. All within the packet's
+lib/foundry/manual_lane/cli.ex, lib/foundry/manual_lane/log.ex,
+test/foundry/manual_lane/cli_test.exs. Nothing under
+lib/foundry/durable_store or lib/foundry/workflow. All within the packet's
 scope list.
 
 ## Checks run
 - `TMPDIR=/private/tmp MIX_ENV=test MIX_DEPS_PATH=/Users/raymondluong/dev/foundry/deps mix test
-  test/pramana_foundry/manual_lane test/pramana_foundry/cli test/pramana_foundry/rpc_wrapper_test.exs`
+  test/foundry/manual_lane test/foundry/cli test/foundry/rpc_wrapper_test.exs`
   in the review worktree: 85 passed, 0 failures, exit 0.
 - Two throwaway `--sname` nodes (no daemon): `--rpc-eval` running `Logger.info("x")` printed
   `[info] x` on the CLIENT's stdout, after the result line; the same with

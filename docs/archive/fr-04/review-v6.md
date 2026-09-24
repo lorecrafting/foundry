@@ -96,9 +96,9 @@ awk '/^[a-f0-9]{64}  foundry\// {print}' \
   foundry/docs/fr-04/review-response-v5.md | shasum -a 256 -c
 # All 22 OK
 
-mix test test/pramana_foundry/transition_test.exs \
-  test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/runtime_startup_boundary_test.exs --seed 40440
+mix test test/foundry/transition_test.exs \
+  test/foundry/coordinator_test.exs \
+  test/foundry/runtime_startup_boundary_test.exs --seed 40440
 # 36 passed, exit 0
 
 mix run --no-start -e '...'

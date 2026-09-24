@@ -1,7 +1,7 @@
 # Elixir workflow migration tickets
 
 > **Naming note:** This document was written when the project was `pramana_workflow`
-> under `workflow/`. The actual project is now `pramana_foundry` under `foundry/`.
+> under `workflow/`. The actual project is now `foundry` under `foundry/`.
 > All references to `pramana_workflow` and `PramanaWorkflow` below refer to the same
 > codebase reorganized.
 

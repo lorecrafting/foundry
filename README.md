@@ -46,7 +46,7 @@ and any affected contract text is explicitly revised and re-reviewed.
 
 `bin/pramana` treats every user argument as inert data. It invokes Elixir with those values
 only in `System.argv/0`, encodes a bounded versioned JSON envelope as canonical URL-safe
-base64, and sends one fixed `PramanaFoundry.CLI.RPC.run/1` expression to the release.
+base64, and sends one fixed `Foundry.CLI.RPC.run/1` expression to the release.
 The daemon rejects malformed, duplicate-key, oversized, non-UTF-8 and NUL-containing
 payloads, and every command that is not a `lane` command its parser accepts. The wrapper
 preserves remote stdout, stderr and exit status.
@@ -78,7 +78,7 @@ audits) and every other dated record are in the [archive](docs/archive/README.md
 ./
   mix.exs, mix.lock, .formatter.exs
   config/config.exs           — operator runtime root only
-  lib/pramana_foundry/
+  lib/foundry/
     application.ex            — starts ManualLane.Server when FOUNDRY_MANUAL_LANE=1, else nothing
     manual_lane/              — the lane: CLI, backend, server, log, replay
     workflow/                 — the pure workflow kernel (Workflow.Kernel*)

@@ -51,9 +51,9 @@ Principal final-candidate path SHA-256 values:
 | `foundry/ci/run.exs` | `c1cecbc224fc84030e7d0ba7f80ebeadc970c74912f6d0db6020d6c6d792bc7c` |
 | `foundry/ci/toolchain.exs` | `06d9fbb6ea92206dff68d705b2cae885b44a08b21495c1c5db620b456aecacc1` |
 | `foundry/ci/format_debt.exs` | `d38e709984c4e94ed103624dfb4d18206543c628488e0013ca4c3d957ac9500d` |
-| `foundry/lib/pramana_foundry/ci.ex` | `a60bda6a26f57efbe15ab5cab37592a79471739bb90d0e06fa3cf84a596d1f66` |
-| `foundry/test/pramana_foundry/ci_test.exs` | `8da9254cde0e14715c097655d9b40cea50531d0d35b4ad043f3fe4d7a94798ef` |
-| `foundry/test/pramana_foundry/projections/benchmark_test.exs` | `9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a` |
+| `foundry/lib/foundry/ci.ex` | `a60bda6a26f57efbe15ab5cab37592a79471739bb90d0e06fa3cf84a596d1f66` |
+| `foundry/test/foundry/ci_test.exs` | `8da9254cde0e14715c097655d9b40cea50531d0d35b4ad043f3fe4d7a94798ef` |
+| `foundry/test/foundry/projections/benchmark_test.exs` | `9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a` |
 | `foundry/docs/CI.md` | `744dda8ab04e5f859c8e614ad6c07c3b6f82cf29622b52e1f1518bc91d34731c` |
 | `foundry/docs/fr-21/candidate-v2.md` | `c2df8bf68a739a453f50980b56e91302c99d4a0b8c04300d936acfdace7ca3a3` |
 | `foundry/docs/fr-21/acceptance-v2.md` | `572412b6bc7805f3c1bb17c6d1b93079eff1c881d88c546ae739c1eecf76d69c` |
@@ -199,7 +199,7 @@ final candidate. The checkout was empty under porcelain before and after the run
 
 ```sh
 cd /private/tmp/fr21-v2-review.9oIg7D/source/foundry
-env -u HERDR_ENV -u COORDINATOR_TICK -u PRAMANA_FOUNDRY_RUNTIME_DIR \
+env -u HERDR_ENV -u COORDINATOR_TICK -u FOUNDRY_RUNTIME_DIR \
   PATH=PINNED_ELIXIR_BIN:PINNED_OTP_BIN:/opt/homebrew/bin:/usr/bin:/bin \
   elixir ci/run.exs --output /private/tmp/fr21-v2-review.9oIg7D/artifacts
 ```
@@ -233,7 +233,7 @@ would need deterministic BEAM/archive inputs and its own acceptance test.
 ## Deletion, retirement and documentation scope
 
 The candidate deletes all 24 tracked `foundry/deps/owl/**` paths from the assigned base, the
-tracked generated `foundry/pramana_foundry`, and stale `foundry/pramana_diagnose.py`. None is
+tracked generated `foundry/foundry`, and stale `foundry/pramana_diagnose.py`. None is
 present in the final tree. `.gitignore` covers the generated dependency tree, escript and CI
 artifact directory. `mix.exs` and `mix.lock` are unchanged from the assigned base.
 
@@ -241,7 +241,7 @@ The former Python `Parity` implementation no longer imports or invokes Python. N
 and fixture comparison calls fail closed or return explicit `retired` metadata; README and
 migration documents date the historical claims. This meets FR-21's retirement/provenance
 scope without claiming current parity. The still-existing CLI tombstone is safe, but its
-module doc at `foundry/lib/pramana_foundry/cli.ex:2` still says “effect-free shadow
+module doc at `foundry/lib/foundry/cli.ex:2` still says “effect-free shadow
 inspection”; correcting that stale phrase is a non-blocking documentation cleanup because
 the operator README and actual route both clearly fail closed.
 
@@ -268,7 +268,7 @@ Deferred, correctly non-blocking here:
 ## Commands, secondary observations and limitations
 
 - Focused final-candidate command from `foundry/`:
-  `mix test test/pramana_foundry/ci_test.exs test/pramana_foundry/projections/benchmark_test.exs test/pramana_foundry/policy_test.exs --exclude python_tiktoken_recompute --seed 0`;
+  `mix test test/foundry/ci_test.exs test/foundry/projections/benchmark_test.exs test/foundry/policy_test.exs --exclude python_tiktoken_recompute --seed 0`;
   exit 0, 13 passed, 1 excluded.
 - `git diff --check BASE..CANDIDATE`; exit 0.
 - `git fsck --no-dangling --no-progress`; exit 0.
@@ -327,12 +327,12 @@ c2df8bf68a739a453f50980b56e91302c99d4a0b8c04300d936acfdace7ca3a3  foundry/docs/f
 b3a6e5bb95afbc8032e98afddd44d302cfd41f664767c750dcf8767c94d6c7c2  foundry/docs/fr-21/candidate.md
 9798eaf6d4e0c3105ac25c5b4f61de0b9f26fe296cadf30269170558920f068e  foundry/docs/fr-21/review-response.md
 da11d18a4cfe7f7842ccb9309e63f6dbb8319b41967c5f0e30fb723c86eac36c  foundry/docs/fr-21/review.md
-a60bda6a26f57efbe15ab5cab37592a79471739bb90d0e06fa3cf84a596d1f66  foundry/lib/pramana_foundry/ci.ex
-1ab5768b3024951a8381c4067c2a1e98c808bc735c1ff56766417c4641e7d399  foundry/lib/pramana_foundry/parity.ex
+a60bda6a26f57efbe15ab5cab37592a79471739bb90d0e06fa3cf84a596d1f66  foundry/lib/foundry/ci.ex
+1ab5768b3024951a8381c4067c2a1e98c808bc735c1ff56766417c4641e7d399  foundry/lib/foundry/parity.ex
 DELETED c8423089ead8d872d4928c9a5e337bd54295a1f4db64b2b25b1f4b88f3a57eac  foundry/pramana_diagnose.py
-DELETED 52c5152bc059b1bd85564671924e92c17e2e8b7294b641390898b799e66c4618  foundry/pramana_foundry
-8da9254cde0e14715c097655d9b40cea50531d0d35b4ad043f3fe4d7a94798ef  foundry/test/pramana_foundry/ci_test.exs
-407d1d3f77892e8ffe7a224ce07f54434e995ac864fc1d3beac2b4b14df03f86  foundry/test/pramana_foundry/policy_test.exs
-9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a  foundry/test/pramana_foundry/projections/benchmark_test.exs
-1217d74805d4bc6085a15327cff060ea654a312b4a48175d68eef8120d2a43d7  foundry/test/pramana_foundry/rpc_wrapper_test.exs
+DELETED 52c5152bc059b1bd85564671924e92c17e2e8b7294b641390898b799e66c4618  foundry/foundry
+8da9254cde0e14715c097655d9b40cea50531d0d35b4ad043f3fe4d7a94798ef  foundry/test/foundry/ci_test.exs
+407d1d3f77892e8ffe7a224ce07f54434e995ac864fc1d3beac2b4b14df03f86  foundry/test/foundry/policy_test.exs
+9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a  foundry/test/foundry/projections/benchmark_test.exs
+1217d74805d4bc6085a15327cff060ea654a312b4a48175d68eef8120d2a43d7  foundry/test/foundry/rpc_wrapper_test.exs
 ```

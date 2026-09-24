@@ -189,8 +189,8 @@ All successful commands used Elixir 1.20.3 / OTP 29.0.5, `MIX_ENV=test`, an isol
 
 | Check from `foundry/` | Outcome |
 |---|---|
-| `mix test --no-start test/pramana_foundry/workflow/kernel_test.exs --seed 92040` | Exit 0; 17 passed |
-| `mix test --no-start test/pramana_foundry/durable_store/atomic_bundle_test.exs test/pramana_foundry/workflow/kernel_test.exs --seed 92042` | Exit 0; 30 passed |
+| `mix test --no-start test/foundry/workflow/kernel_test.exs --seed 92040` | Exit 0; 17 passed |
+| `mix test --no-start test/foundry/durable_store/atomic_bundle_test.exs test/foundry/workflow/kernel_test.exs --seed 92042` | Exit 0; 30 passed |
 | `mix run --no-start docs/fr-08/fr08b-pure-kernel-review-probes.exs` | Exit 0; 11 counterexamples reproduced, fixed seed 92041 |
 | `mix compile --warnings-as-errors` | Exit 0 |
 | Candidate-file `mix format --check-formatted` and `git diff --check` | Exit 0 |

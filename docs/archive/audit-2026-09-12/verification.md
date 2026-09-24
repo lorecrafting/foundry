@@ -25,10 +25,10 @@ export FOUNDRY_AUDIT_ROOT="$(mktemp -d)"
 mkdir -p "$FOUNDRY_AUDIT_ROOT/tmp"
 export TMPDIR="$FOUNDRY_AUDIT_ROOT/tmp"
 HERDR_ENV=0 COORDINATOR_TICK=0 MIX_ENV=test mise exec -- mix run --no-start -e '
-  Application.put_env(:pramana_foundry, :runtime_root,
+  Application.put_env(:foundry, :runtime_root,
     Path.join(System.fetch_env!("FOUNDRY_AUDIT_ROOT"), "runtime"))
-  Application.put_env(:pramana_foundry, :enable_tick, false)
-  {:ok, _} = Application.ensure_all_started(:pramana_foundry)
+  Application.put_env(:foundry, :enable_tick, false)
+  {:ok, _} = Application.ensure_all_started(:foundry)
   Mix.Task.run("test", ["--no-start", "--exclude", "integration", "--seed", "12092026"])
 '
 ```

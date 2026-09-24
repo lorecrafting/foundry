@@ -87,7 +87,7 @@ and of the unfixed `infrastructure_failed` defect. Post-state coherence is unmea
 where the search happens to walk.
 
 **Scope, and the decision inside it.** Move the relational predicates into
-`PramanaFoundry.Workflow.Kernel.State.invariant?/1`, leaving `well_formed?/1` as the shape
+`Foundry.Workflow.Kernel.State.invariant?/1`, leaving `well_formed?/1` as the shape
 validator (`valid?/1` becomes a deprecated alias or is renamed at every call site in one
 edit — rule 4). Then the scope decision:
 

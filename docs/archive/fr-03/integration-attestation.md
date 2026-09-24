@@ -84,9 +84,9 @@ set `:herdr_command` to `/nonexistent/fr03-integrated-attestation-herdr` and
 
 ```elixir
 Mix.Task.run("test", [
-  "test/pramana_foundry/runtime_root_test.exs",
-  "test/pramana_foundry/legacy_persistence_containment_test.exs",
-  "test/pramana_foundry/transition_test.exs",
+  "test/foundry/runtime_root_test.exs",
+  "test/foundry/legacy_persistence_containment_test.exs",
+  "test/foundry/transition_test.exs",
   "--seed", "424213", "--max-cases", "1"
 ])
 ```

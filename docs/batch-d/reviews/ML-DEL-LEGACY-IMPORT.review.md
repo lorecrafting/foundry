@@ -6,9 +6,9 @@ Worktree: /private/tmp/review-ML-DEL-LEGACY-IMPORT. Deps via MIX_DEPS_PATH from 
 
 ## Checks run
 - `mix compile --force --warnings-as-errors`: clean.
-- `mix test test/pramana_foundry/durable_store`: 285 passed (includes reopen_property_test "every committed state reopens :ready", cancel/ledger restart probes, live_refusal_probe).
-- `mix test test/pramana_foundry/workflow test/pramana_foundry/manual_lane test/pramana_foundry/architecture_boundary`: 369 passed.
-- `mix test test/pramana_foundry/repair`: 14/17; the 3 failures are all fr08a_protected_boundary_test with `fr08a:loaded_subject_identity_mismatch` and the frozen-artifact diff (7 -> 6 capabilities, legacy_import.ex line gone). Expected; lead rebinds. fr08_handoff_gate_test passes at 6.
+- `mix test test/foundry/durable_store`: 285 passed (includes reopen_property_test "every committed state reopens :ready", cancel/ledger restart probes, live_refusal_probe).
+- `mix test test/foundry/workflow test/foundry/manual_lane test/foundry/architecture_boundary`: 369 passed.
+- `mix test test/foundry/repair`: 14/17; the 3 failures are all fr08a_protected_boundary_test with `fr08a:loaded_subject_identity_mismatch` and the frozen-artifact diff (7 -> 6 capabilities, legacy_import.ex line gone). Expected; lead rebinds. fr08_handoff_gate_test passes at 6.
 - Red control: removed `import_runs` from `@unsupported` -> authority_test:453 "every unsupported authority table fences startup" fails (store reopens :ready instead of :recovery). Restored by exact string; `git diff` empty.
 - `elixir bin/check_docs.exs`: 0 broken links.
 - Live sha256 vs pinned: RED exactly authority.ex, kernel.ex, fr08_handoff_gate.ex; the other 7 pins match. legacy_import.ex correctly dropped from the pin list; schema/atomic_file/legacy_line/h0 were never pinned.

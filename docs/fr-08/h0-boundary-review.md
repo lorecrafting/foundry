@@ -169,7 +169,7 @@ the corrected invocation below passed. No live daemon, provider, credential,
 operator runtime or deployment was exercised.
 
 - `mix compile --force --warnings-as-errors`: exit 0; 106 project files.
-- `mix test test/pramana_foundry/repair/h0_accepted_fr07_boundary_test.exs test/pramana_foundry/repair/fr08_handoff_gate_test.exs --seed 9237`:
+- `mix test test/foundry/repair/h0_accepted_fr07_boundary_test.exs test/foundry/repair/fr08_handoff_gate_test.exs --seed 9237`:
   exit 0; 17 passed.
 - `mix run --no-start /private/tmp/pramana-h0-independent.R4aXMv/public_probes.exs`:
   exit 2; one of two tests failed because the frozen import receipt differs.
@@ -179,9 +179,9 @@ operator runtime or deployment was exercised.
 - `mix run --no-start /private/tmp/pramana-h0-independent.R4aXMv/binding_probe.exs`:
   exit 0; reproduced the identity-binding defect. This successful diagnostic exit
   is evidence of B2, not an acceptance pass.
-- `mix test test/pramana_foundry/durable_store/authority_test.exs test/pramana_foundry/durable_store/gateway_test.exs test/pramana_foundry/durable_store/legacy_import_test.exs test/pramana_foundry/durable_store/path_identity_test.exs test/pramana_foundry/durable_store/record_codec_test.exs test/pramana_foundry/durable_store/review_corrections_test.exs test/pramana_foundry/durable_store/unified_contract_test.exs test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs test/pramana_foundry/repair/h0_accepted_fr07_boundary_test.exs test/pramana_foundry/repair/fr08_handoff_gate_test.exs --seed 9239`:
+- `mix test test/foundry/durable_store/authority_test.exs test/foundry/durable_store/gateway_test.exs test/foundry/durable_store/legacy_import_test.exs test/foundry/durable_store/path_identity_test.exs test/foundry/durable_store/record_codec_test.exs test/foundry/durable_store/review_corrections_test.exs test/foundry/durable_store/unified_contract_test.exs test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs test/foundry/repair/h0_accepted_fr07_boundary_test.exs test/foundry/repair/fr08_handoff_gate_test.exs --seed 9239`:
   exit 0; 107 passed.
-- `mix format --check-formatted lib/pramana_foundry/repair/h0_accepted_fr07_boundary.ex test/pramana_foundry/repair/h0_accepted_fr07_boundary_test.exs`:
+- `mix format --check-formatted lib/foundry/repair/h0_accepted_fr07_boundary.ex test/foundry/repair/h0_accepted_fr07_boundary_test.exs`:
   exit 0. Candidate `git diff --check` against the supplied base: exit 0.
 - From the repository root, `mise exec -- elixir bin/check_docs.exs`: exit 2;
   79 of 80 tests passed. The candidate record is not reachable from the shared
@@ -198,7 +198,7 @@ Independent probe files remain in `/private/tmp/pramana-h0-independent.R4aXMv/`:
 | `receipt_probe.exs` | `b0470f63665e7b783664843925ff7f6f885b06c1034b0fa74c52680e3c788b5c` |
 | `binding_probe.exs` | `857a3d73a968a9a4e5b36556fe5273848e43b251e5645ca8fe23217f808b3226` |
 
-Separately, `mix test test/pramana_foundry/durable_store/sync_fault_test.exs --seed 9238`
+Separately, `mix test test/foundry/durable_store/sync_fault_test.exs --seed 9238`
 exited **139**, without a completed ExUnit summary. Its hard-exit subprocess
 returned `{"", 139}` instead of the expected exit 73, and the overall test VM
 also exited 139. The loaded Exqlite NIF SHA-256 was

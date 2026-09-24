@@ -14,7 +14,7 @@ The candidate manifest is the exact reviewed path inventory; it excludes this re
 
 ### R1 — direct Pipeline boundary still accepts absent Git facts and runs checks
 
-`lib/pramana_foundry/integration/pipeline.ex:133` returns `:ok` when an explicitly
+`lib/foundry/integration/pipeline.ex:133` returns `:ok` when an explicitly
 supplied integration directory does not exist. The same production call also accepts
 an invented accepted/base/candidate identity, an empty review map and an
 `auto_approve` ticket. `run_gate_checks/3` at line 142 invokes its runner without any
@@ -24,7 +24,7 @@ direct boundary outside the requested suspension before runner/state effects.
 Reproduced with production-compiled `mix run --no-start`:
 
 ```elixir
-alias PramanaFoundry.Integration.Pipeline
+alias Foundry.Integration.Pipeline
 s = %{"accepted_revision" => "invented", "integration" => %{}}
 a = %{"status" => "review_approved", "review" => %{},
       "ticket" => %{"base_revision" => "invented", "auto_approve" => true},
@@ -48,7 +48,7 @@ Pipeline SHA-256:
 
 ### R2 — direct CLI ticket creation silently drops auto-approve requests
 
-`lib/pramana_foundry/cli.ex:354` parses arbitrary extra option pairs but constructs a
+`lib/foundry/cli.ex:354` parses arbitrary extra option pairs but constructs a
 ticket containing only selected fields. Calling
 `CLI.main(["ticket", "create", "--title", "probe", "--priority", "P2", "--auto_approve", "true"])`
 returned success, appended an event and queued a ticket in an isolated Coordinator.
@@ -76,12 +76,12 @@ original HOME then ran successfully.
 `MIX_ENV=test mix test` with the following six files and `--seed 506` returned exit 0,
 **61 passed**, 14.7 seconds:
 
-- `test/pramana_foundry/fr05_containment_test.exs`
-- `test/pramana_foundry/integration/integration_test.exs`
-- `test/pramana_foundry/status/status_test.exs`
-- `test/pramana_foundry/legacy_persistence_containment_test.exs`
-- `test/pramana_foundry/runtime_startup_boundary_test.exs`
-- `test/pramana_foundry/agent_server_test.exs`
+- `test/foundry/fr05_containment_test.exs`
+- `test/foundry/integration/integration_test.exs`
+- `test/foundry/status/status_test.exs`
+- `test/foundry/legacy_persistence_containment_test.exs`
+- `test/foundry/runtime_startup_boundary_test.exs`
+- `test/foundry/agent_server_test.exs`
 
 These exercise verbatim stale/incomplete CLI submissions, wrong reviewer identity,
 missing/nonexistent submission checkout, Coordinator admission and runtime/PM

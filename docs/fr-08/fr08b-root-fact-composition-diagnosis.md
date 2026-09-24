@@ -27,10 +27,10 @@ not resolve references in domain events or projections. The infrastructure ordin
 assigned from authoritative lineage while staging the settlement. The reviewed carrier
 checks authenticate the protected result, not any caller copy in the domain proposal.
 
-Source: [Gateway](../../lib/pramana_foundry/durable_store/gateway.ex),
+Source: [Gateway](../../lib/foundry/durable_store/gateway.ex),
 `normalize_atomic_envelope/2` at line 587, `stage_atomic_operations/4` at line 743 and
 `commit_accepted_atomic_bundle/7` at line 964;
-[ProtectedPrimitives](../../lib/pramana_foundry/durable_store/protected_primitives.ex),
+[ProtectedPrimitives](../../lib/foundry/durable_store/protected_primitives.ex),
 `required_bundle_prestate_revisions/3` at line 122 and
 `persist_nonstart_settlement/3` at line 182. Line references throughout bind to the
 inspected main revision unless an alternative revision is stated.
@@ -141,10 +141,10 @@ receipt retrieves the existing immutable settlement and cannot apply a second do
 transition; the current typed `duplicate_receipt` rejection can remain. Conflicting
 receipts retain protected reconciliation/quarantine behavior.
 
-Source: [Gateway](../../lib/pramana_foundry/durable_store/gateway.ex),
+Source: [Gateway](../../lib/foundry/durable_store/gateway.ex),
 `do_atomic_bundle/5` at line 571, duplicate handling in staging at line 743 and
 `persist_atomic_records/7` beginning at line 1133;
-[protected history validation](../../lib/pramana_foundry/durable_store/protected_primitives.ex),
+[protected history validation](../../lib/foundry/durable_store/protected_primitives.ex),
 `validate_bundle_operations/4` at line 4206, settlement validation at line 4436 and
 `valid_bundle_domain_row?/3` at line 4545. The existing domain-row validator binds the
 stored request to the original proposal; it needs an explicit rule for resolved plans.
@@ -158,10 +158,10 @@ separately checked; they do not silently replace command reads. A complete prest
 contract spans both sets without confusing their current key formats. The blocked
 kernel must accept the canonical field rather than requiring the adapter to strip it.
 
-Source: [RecordCodec](../../lib/pramana_foundry/durable_store/record_codec.ex),
+Source: [RecordCodec](../../lib/foundry/durable_store/record_codec.ex),
 command schema at line 18, command validation at line 227 and revision keys at line 305;
-[Gateway CAS](../../lib/pramana_foundry/durable_store/gateway.ex) at line 1734. In the
-blocked candidate, `foundry/lib/pramana_foundry/workflow/kernel.ex:1233` rejects the
+[Gateway CAS](../../lib/foundry/durable_store/gateway.ex) at line 1734. In the
+blocked candidate, `foundry/lib/foundry/workflow/kernel.ex:1233` rejects the
 canonical command because its exact allowed-key set omits `expected_revisions`.
 
 The current codec requires one projection-bearing event per ordered projection write:
@@ -171,9 +171,9 @@ in both carriers. Multi-entity transitions need an explicit ordered group of typ
 or a deliberately versioned codec extension. An adapter cannot invent event semantics,
 revision guards or correspondence from arbitrary `changes` snapshots.
 
-Source: [RecordCodec projection plan and reconstruction](../../lib/pramana_foundry/durable_store/record_codec.ex),
+Source: [RecordCodec projection plan and reconstruction](../../lib/foundry/durable_store/record_codec.ex),
 lines 505–629. The pure candidate's incompatible event/snapshot contract is in
-`foundry/lib/pramana_foundry/workflow/kernel.ex:1260` at candidate `a00decc`.
+`foundry/lib/foundry/workflow/kernel.ex:1260` at candidate `a00decc`.
 
 ## Required developer, reviewer and PM trace
 
@@ -198,7 +198,7 @@ the terminal predecessor under current authority.
 These obligations come from [R4a](../WORKFLOW-CONTRACT.md#launch-non-start-recovery--r4a),
 [FR-08B acceptance](../REPAIR-PLAN.md#fr-08b--unify-all-command-transitions-and-replay)
 and the [ingress acceptance matrices](fr08b-ingress-inventory.md).
-The present [atomic fixtures](../../test/pramana_foundry/durable_store/atomic_bundle_test.exs),
+The present [atomic fixtures](../../test/foundry/durable_store/atomic_bundle_test.exs),
 role loop at line 66 and generic proposal at line 723, write the same queued projection.
 They establish bounded atomic storage behavior, not these actual role lifecycle traces.
 
@@ -213,14 +213,14 @@ change either ticket's recorded status in this diagnosis.
 
 Affected implementation paths, relative to `foundry/`:
 
-- `lib/pramana_foundry/durable_store/gateway.ex`, `protected_primitives.ex`,
+- `lib/foundry/durable_store/gateway.ex`, `protected_primitives.ex`,
   `record_codec.ex` and `kernel.ex`; `database.ex` if new durable schema is needed.
-- Candidate `lib/pramana_foundry/workflow/kernel.ex` and `workflow/kernel/state.ex`,
+- Candidate `lib/foundry/workflow/kernel.ex` and `workflow/kernel/state.ex`,
   plus the future mechanical adapter, whose path is not yet implemented or prescribed.
 
-Affected tests include `test/pramana_foundry/durable_store/atomic_bundle_test.exs`,
+Affected tests include `test/foundry/durable_store/atomic_bundle_test.exs`,
 `record_codec_test.exs`, `protected_primitives_test.exs`, relevant protected replay/recovery
-matrices, candidate `test/pramana_foundry/workflow/kernel_test.exs` and adapter integration
+matrices, candidate `test/foundry/workflow/kernel_test.exs` and adapter integration
 tests. Required additions cover typed source/slot rejection, discriminator completeness,
 the substitution law, all-alternative prestate/absence CAS, exact retry, duplicate receipt,
 reopen/backup binding equality and the role/control/generation traces above. Existing

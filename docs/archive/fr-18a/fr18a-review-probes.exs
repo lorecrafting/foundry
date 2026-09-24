@@ -1,12 +1,12 @@
 alias Exqlite.Sqlite3
 
-alias PramanaFoundry.DurableStore.Gateway
-alias PramanaFoundry.Observations
-alias PramanaFoundry.Observations.Query
+alias Foundry.DurableStore.Gateway
+alias Foundry.Observations
+alias Foundry.Observations.Query
 
 defmodule FR18AReviewProbe do
   defmodule FakeSource do
-    @behaviour PramanaFoundry.Observations.Source
+    @behaviour Foundry.Observations.Source
 
     @impl true
     def snapshot(source), do: {:ok, source.snapshot, source.observed_at}

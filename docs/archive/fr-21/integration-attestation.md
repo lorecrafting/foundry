@@ -53,19 +53,19 @@ integrated SHA-256 values are:
 | `foundry/ci/run.exs` | `c1cecbc224fc84030e7d0ba7f80ebeadc970c74912f6d0db6020d6c6d792bc7c` |
 | `foundry/ci/toolchain.exs` | `06d9fbb6ea92206dff68d705b2cae885b44a08b21495c1c5db620b456aecacc1` |
 | `foundry/ci/format_debt.exs` | `d38e709984c4e94ed103624dfb4d18206543c628488e0013ca4c3d957ac9500d` |
-| `foundry/lib/pramana_foundry/ci.ex` | `b2cc9c67825588a38da8a22ae2141a3c90e59960a96fc86217b6a5744fcf08d1` |
-| `foundry/lib/pramana_foundry/parity.ex` | `1ab5768b3024951a8381c4067c2a1e98c808bc735c1ff56766417c4641e7d399` |
-| `foundry/test/pramana_foundry/ci_test.exs` | `284a9e4d7bc86087180ec7bab69d4e7e8bf58dc3c83fbcd4f56034c86528ff08` |
-| `foundry/test/pramana_foundry/projections/benchmark_test.exs` | `9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a` |
-| `foundry/test/pramana_foundry/policy_test.exs` | `407d1d3f77892e8ffe7a224ce07f54434e995ac864fc1d3beac2b4b14df03f86` |
-| `foundry/test/pramana_foundry/rpc_wrapper_test.exs` | `1217d74805d4bc6085a15327cff060ea654a312b4a48175d68eef8120d2a43d7` |
+| `foundry/lib/foundry/ci.ex` | `b2cc9c67825588a38da8a22ae2141a3c90e59960a96fc86217b6a5744fcf08d1` |
+| `foundry/lib/foundry/parity.ex` | `1ab5768b3024951a8381c4067c2a1e98c808bc735c1ff56766417c4641e7d399` |
+| `foundry/test/foundry/ci_test.exs` | `284a9e4d7bc86087180ec7bab69d4e7e8bf58dc3c83fbcd4f56034c86528ff08` |
+| `foundry/test/foundry/projections/benchmark_test.exs` | `9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a` |
+| `foundry/test/foundry/policy_test.exs` | `407d1d3f77892e8ffe7a224ce07f54434e995ac864fc1d3beac2b4b14df03f86` |
+| `foundry/test/foundry/rpc_wrapper_test.exs` | `1217d74805d4bc6085a15327cff060ea654a312b4a48175d68eef8120d2a43d7` |
 
 The integration deletion set exactly equals the candidate deletion set: 27 paths, comprising
 25 tracked `foundry/deps/owl/**` paths, `foundry/pramana_diagnose.py`, and the tracked generated
-`foundry/pramana_foundry` escript. `foundry/mix.exs` and `foundry/mix.lock` have the same blobs
+`foundry/foundry` escript. `foundry/mix.exs` and `foundry/mix.lock` have the same blobs
 at the assigned base, candidate, and integration (`0ed7ad2...` and `77c461f...`).
 
-No Coordinator path entered the integration diff. `foundry/lib/pramana_foundry/cli.ex` has
+No Coordinator path entered the integration diff. `foundry/lib/foundry/cli.ex` has
 the identical blob `4d280a4c8a5166ff9f12b6d5eed05c8a176d8385` in the integration parent, reviewed candidate,
 and integrated commit. Thus the no-net intermediate CLI edit and the user's dirty/untracked
 Coordinator or local artifacts did not enter the commit.
@@ -106,9 +106,9 @@ roots, I ran:
 
 ```sh
 mix deps.get --check-locked
-mix test test/pramana_foundry/ci_test.exs \
-  test/pramana_foundry/projections/benchmark_test.exs \
-  test/pramana_foundry/policy_test.exs \
+mix test test/foundry/ci_test.exs \
+  test/foundry/projections/benchmark_test.exs \
+  test/foundry/policy_test.exs \
   --exclude python_tiktoken_recompute --seed 0
 elixir ci/run.exs --output /private/tmp/fr21-integration-independent-artifacts.7bCZyZ
 ```

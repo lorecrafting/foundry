@@ -239,10 +239,10 @@ Raw warning for the typed-site update misspelling (trimmed):
 warning: expected a map with key :lifecyle in map update syntax:
     %{e | lifecyle: payload["lifecycle"]}
 but got type:
-    dynamic(%PramanaFoundry.Workflow.Kernel.Execution{execution_id: term(), role: term(),
+    dynamic(%Foundry.Workflow.Kernel.Execution{execution_id: term(), role: term(),
       lifecycle: term(), result: term(), sealed_sequence: term()})
 where "e" was given the type: dynamic(%...Execution{})  # from executions.ex:72:86
-└─ lib/pramana_foundry/workflow/kernel/executions.ex:73:12: ...Executions.do_transition/4
+└─ lib/foundry/workflow/kernel/executions.ex:73:12: ...Executions.do_transition/4
 ```
 
 Raw warning for the misspelled read (trimmed):
@@ -253,11 +253,11 @@ warning: unknown key .lifecyle in expression:
 the given type does not have the given key:
     dynamic(%...Execution{execution_id: term(), role: binary(), lifecycle: term(), ...})
 where "execution" was given the types: dynamic(%...Execution{}) = execution  # executions.ex:289:91
-└─ lib/pramana_foundry/workflow/kernel/executions.ex:290:53: ...require_no_open_developer/1
+└─ lib/foundry/workflow/kernel/executions.ex:290:53: ...require_no_open_developer/1
 ```
 
 The missing-field seed failed the build with `** (ArgumentError) the following keys must also be given
-when building struct PramanaFoundry.Workflow.Kernel.Execution: [:sealed_sequence]` at
+when building struct Foundry.Workflow.Kernel.Execution: [:sealed_sequence]` at
 `executions.ex:196`.
 
 **What this shows:**

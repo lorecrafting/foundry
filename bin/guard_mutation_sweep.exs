@@ -24,7 +24,7 @@
 targets =
   case System.argv() do
     [] ->
-      dir = "lib/pramana_foundry/workflow"
+      dir = "lib/foundry/workflow"
 
       [Path.join(dir, "kernel.ex") | Path.wildcard(Path.join(dir, "kernel/**/*.ex"))] --
         [Path.join(dir, "kernel/event.ex"), Path.join(dir, "kernel/state.ex")]
@@ -42,13 +42,13 @@ workers = String.to_integer(System.get_env("SWEEP_WORKERS") || "4")
 # one is broad and seconds long; phase two adds the two suites that each run a full state
 # search and cost a minute apiece, and is only reached by mutations phase one missed.
 fast = ~w(
-  test/pramana_foundry/workflow/kernel_test.exs
-  test/pramana_foundry/workflow/r4_coverage_test.exs
-  test/pramana_foundry/workflow/r4_exhaustive_test.exs
+  test/foundry/workflow/kernel_test.exs
+  test/foundry/workflow/r4_coverage_test.exs
+  test/foundry/workflow/r4_exhaustive_test.exs
 )
 slow = ~w(
-  test/pramana_foundry/workflow/kernel_properties_test.exs
-  test/pramana_foundry/workflow/r4_guard_reachability_test.exs
+  test/foundry/workflow/kernel_properties_test.exs
+  test/foundry/workflow/r4_guard_reachability_test.exs
 )
 
 sentinel = "/private/tmp/guard-mutation-sweep.running"

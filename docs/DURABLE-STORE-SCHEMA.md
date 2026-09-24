@@ -1,12 +1,12 @@
 # Durable store schema reference
 
-**Generated from [`lib/pramana_foundry/durable_store/database.ex`](../lib/pramana_foundry/durable_store/database.ex). Do not edit by hand.**
-`PramanaFoundry.SchemaReferenceTest` fails if this file and the schema disagree.
+**Generated from [`lib/foundry/durable_store/database.ex`](../lib/foundry/durable_store/database.ex). Do not edit by hand.**
+`Foundry.SchemaReferenceTest` fails if this file and the schema disagree.
 
 Regenerate with:
 
 ```sh
-mix run --no-start -e 'File.write!(PramanaFoundry.SchemaReference.doc_path(), PramanaFoundry.SchemaReference.render())'
+mix run --no-start -e 'File.write!(Foundry.SchemaReference.doc_path(), Foundry.SchemaReference.render())'
 ```
 
 This reference describes the schema as declared. It is not evidence that any table is

@@ -113,8 +113,8 @@ the pinned Foundry CI toolchain.
 | Command | Result |
 |---|---|
 | From `foundry/`: `elixir ci/validate_fr15aa.exs` | Exit 0, manifest valid |
-| From `foundry/`: `MIX_ENV=test elixir -r test/test_helper.exs test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | Exit 0, 16 passed, seed 3393 |
-| From `foundry/`: `mix format --check-formatted ci/validate_fr15aa.exs docs/fr-15a/provisioning-manifest.exs test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | Exit 0 |
+| From `foundry/`: `MIX_ENV=test elixir -r test/test_helper.exs test/foundry/repair/fr15aa_provisioning_test.exs` | Exit 0, 16 passed, seed 3393 |
+| From `foundry/`: `mix format --check-formatted ci/validate_fr15aa.exs docs/fr-15a/provisioning-manifest.exs test/foundry/repair/fr15aa_provisioning_test.exs` | Exit 0 |
 | `elixir bin/check_docs.exs` before review additions | Exit 0, 80 passed, seed 119662 |
 | `elixir bin/check_docs.exs` after review additions | Exit 0, 80 passed, seed 260311 |
 | From `foundry/`: `mix format --check-formatted docs/fr-15a/independent-rereview-probes.exs` | Exit 0; formatted reproduction rerun also exit 0 |
@@ -198,8 +198,8 @@ Commands ran in the same dedicated worktree with Elixir 1.20.4 / OTP 29 / ERTS 1
 | Command | Result |
 |---|---|
 | From `foundry/`: `elixir ci/validate_fr15aa.exs` | Exit 0, manifest valid |
-| From `foundry/`: `MIX_ENV=test elixir -r test/test_helper.exs test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | Exit 0, 22 passed, seed 621764 |
-| From `foundry/`: `mix format --check-formatted ci/validate_fr15aa.exs docs/fr-15a/provisioning-manifest.exs test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | Exit 0 |
+| From `foundry/`: `MIX_ENV=test elixir -r test/test_helper.exs test/foundry/repair/fr15aa_provisioning_test.exs` | Exit 0, 22 passed, seed 621764 |
+| From `foundry/`: `mix format --check-formatted ci/validate_fr15aa.exs docs/fr-15a/provisioning-manifest.exs test/foundry/repair/fr15aa_provisioning_test.exs` | Exit 0 |
 | `elixir bin/check_docs.exs` before review updates | Exit 0, 80 passed, seed 659358 |
 | `elixir bin/check_docs.exs` after staging review updates | Exit 0, 80 passed, seed 563532 |
 | `elixir foundry/docs/fr-15a/independent-final-review-probes.exs` | Exit 0, all expected rejections observed |

@@ -66,7 +66,7 @@ through `sh /private/tmp/fr08a-carrier-rereview.dPOllW/run.sh`.
 | `mix run --no-start --no-compile docs/fr-08/fr08a-transition-review-probes.exs` | exit 0; 39 passed |
 | `mix run --no-start --no-compile docs/fr-08/fr08a-carrier-rereview-probes.exs` | exit 0; 98 passed |
 | `mix run --no-start --no-compile docs/fr-08/fr08a-typed-replay-review-probes.exs` | exit 2; 45/46, sole obsolete identical-list expectation |
-| `mix test --no-start --no-compile test/pramana_foundry/durable_store/protected_primitives_test.exs test/pramana_foundry/durable_store/fr08a_critical_corrections_test.exs test/pramana_foundry/repair/fr08a_protected_boundary_test.exs --seed 19411` | exit 0; 13 passed |
+| `mix test --no-start --no-compile test/foundry/durable_store/protected_primitives_test.exs test/foundry/durable_store/fr08a_critical_corrections_test.exs test/foundry/repair/fr08a_protected_boundary_test.exs --seed 19411` | exit 0; 13 passed |
 | Root `elixir bin/check_docs.exs`, evidence explicitly staged | exit 0; 80 passed |
 | `git diff --cached --check` | exit 0 |
 

@@ -17,15 +17,15 @@ The recovered implementation was tested after transplantation onto main
 
 - `MIX_ENV=test mix compile --force --warnings-as-errors`: exit 0; 90 project files
   compiled.
-- `mix test test/pramana_foundry/durable_store --seed 9044`: exit 0; 68 tests, no
+- `mix test test/foundry/durable_store --seed 9044`: exit 0; 68 tests, no
   failures.
 - `mix test --seed 9045`: exit 2; 501 tests, one failure.
 - Isolated reproduction,
-  `mix test test/pramana_foundry/projections/benchmark_test.exs`: exit 2; two tests,
+  `mix test test/foundry/projections/benchmark_test.exs`: exit 2; two tests,
   one failure.
 
 The sole full-suite failure is
-`test/pramana_foundry/projections/benchmark_test.exs:16`. Its process output reports
+`test/foundry/projections/benchmark_test.exs:16`. Its process output reports
 that Python cannot import `tiktoken`; the benchmark consequently uses fallback token
 counts that do not match the committed expected benchmark. The isolated benchmark run
 reproduces the same mismatch. This is recorded as an unavailable non-FR-07 dependency

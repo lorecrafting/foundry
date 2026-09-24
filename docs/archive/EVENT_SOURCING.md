@@ -221,7 +221,7 @@ Historical pre-containment checklist (not executable acceptance guidance):
 
 ```
 1. Create a checkout with proper git history
-2. Start daemon: COORDINATOR_TICK=1 HERDR_ENV=1 bin/pramana_foundry daemon
+2. Start daemon: COORDINATOR_TICK=1 HERDR_ENV=1 bin/foundry daemon
 3. Enqueue: Coordinator.enqueue_ticket(%{...scope, required_checks, checkout...})
 4. Wait for tick → developer AgentServer launches → Herdr pane appears
 5. Submit handoff: AgentServer.handoff(dev_pid, %{...valid handoff...})

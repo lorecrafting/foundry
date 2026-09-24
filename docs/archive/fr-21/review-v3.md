@@ -39,8 +39,8 @@ Exact changed-path SHA-256 values:
 
 | Path | SHA-256 |
 |---|---|
-| `foundry/lib/pramana_foundry/ci.ex` | `b2cc9c67825588a38da8a22ae2141a3c90e59960a96fc86217b6a5744fcf08d1` |
-| `foundry/test/pramana_foundry/ci_test.exs` | `284a9e4d7bc86087180ec7bab69d4e7e8bf58dc3c83fbcd4f56034c86528ff08` |
+| `foundry/lib/foundry/ci.ex` | `b2cc9c67825588a38da8a22ae2141a3c90e59960a96fc86217b6a5744fcf08d1` |
+| `foundry/test/foundry/ci_test.exs` | `284a9e4d7bc86087180ec7bab69d4e7e8bf58dc3c83fbcd4f56034c86528ff08` |
 | `foundry/docs/fr-21/review-v2.md` | `f9477b3497dc925eabd97a05b5af4806c523c071ef5f1f071fe10f87a124c64f` |
 | `foundry/docs/fr-21/review-response-v2.md` | `80ce25b575cd8e9566dc92d42a657c78cc21ea87869b28daa3c8b6344a5234e5` |
 | `foundry/docs/fr-21/candidate-v3.md` | `1bf41f65e6736aebc3e811059bc97b69e5120d154322bb7281d95dd48966d33e` |
@@ -105,14 +105,14 @@ paths:
 
 ```sh
 mix deps.get --check-locked
-mix test test/pramana_foundry/ci_test.exs \
-  test/pramana_foundry/projections/benchmark_test.exs \
-  test/pramana_foundry/policy_test.exs \
+mix test test/foundry/ci_test.exs \
+  test/foundry/projections/benchmark_test.exs \
+  test/foundry/policy_test.exs \
   --exclude python_tiktoken_recompute --seed 0
-mix test test/pramana_foundry/ci_test.exs --seed 0
+mix test test/foundry/ci_test.exs --seed 0
 mix compile --force --warnings-as-errors
 mix format --check-formatted \
-  lib/pramana_foundry/ci.ex test/pramana_foundry/ci_test.exs
+  lib/foundry/ci.ex test/foundry/ci_test.exs
 ```
 
 Results:

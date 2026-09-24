@@ -6,7 +6,7 @@ contained until FR-08 routes every command through the kernel and gateway.
 
 ## Boundary
 
-`PramanaFoundry.DurableStore.Gateway` owns one in-process Exqlite connection in one
+`Foundry.DurableStore.Gateway` owns one in-process Exqlite connection in one
 GenServer. The dependency is pinned to `exqlite == 0.40.0`; its bundled native SQLite
 implementation is the necessary database engine, not a Python service or sidecar.
 An independent SQLite lock sidecar and durable unclean-owner marker admit one owner across
@@ -63,7 +63,7 @@ the Coordinator's other mutations, replay or effect dispatch, which belong to FR
 Initialization is a separate exclusive operation:
 
 ```elixir
-:ok = PramanaFoundry.DurableStore.Gateway.initialize("/absolute/offline/path.sqlite3")
+:ok = Foundry.DurableStore.Gateway.initialize("/absolute/offline/path.sqlite3")
 ```
 
 A gateway never creates a missing database. Missing initialization, a malformed SQLite
@@ -135,7 +135,7 @@ detecting missing, reordered and same-count body corruption. FR-19 owns retentio
 checkpoint/compaction interruption, archival and operational
 backup policy.
 
-`PramanaFoundry.DurableStore.Maintenance.verify/2` is the offline verification entry
+`Foundry.DurableStore.Maintenance.verify/2` is the offline verification entry
 point. It takes the same cross-process owner lock as the gateway, so a live store is
 refused. It opens through the normal schema/physical/authority validation, reads complete
 ordered content, replays projections through the shared reducer and returns a deterministic

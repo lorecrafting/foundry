@@ -29,7 +29,7 @@ elixir bin/refusal_sites.exs
 grep -o '{R4a\?\.[0-9]*\.f[0-9]*}' docs/WORKFLOW-CONTRACT.md | wc -l      # 72
 grep -o '{R4a\?\.[0-9]*\.o[0-9]*}' docs/WORKFLOW-CONTRACT.md | wc -l      # 124
 grep -o '{R4a\?\.[0-9]*\.[fo][0-9]*}' docs/WORKFLOW-CONTRACT.md | sort | uniq -d   # none
-TMPDIR=/private/tmp mix test test/pramana_foundry/workflow/r4_coverage_test.exs
+TMPDIR=/private/tmp mix test test/foundry/workflow/r4_coverage_test.exs
   # green; prints "124 - 64 asserted, 60 recorded uncited"
 ```
 
@@ -56,7 +56,7 @@ candidate's own commit message calls "wrong in the expensive direction".
 
 ```
 grep -n 'From-cell classification' docs/EVIDENCE-TOOLS.md
-grep -c '{:input\|{:effect' test/pramana_foundry/workflow/r4_coverage_test.exs
+grep -c '{:input\|{:effect' test/foundry/workflow/r4_coverage_test.exs
 ```
 
 **1b. `docs/fr-08/fr08b-evidence-reduction-tickets.md:308`.** The EV-6 row says
@@ -118,7 +118,7 @@ belongs in `{:unguarded, ...}` as a recorded defect, not in a held list explaine
 that would make it look fine.
 
 ```
-sed -n 246,256p lib/pramana_foundry/workflow/kernel.ex
+sed -n 246,256p lib/foundry/workflow/kernel.ex
 ```
 
 **2c. R4.07.f1 and R4a.03.f1 — the reading holds.** `execution_observed` (`:548-563`) guards
@@ -168,7 +168,7 @@ because the denominator is stated (rule 2); it should say "literal" and the scri
 count `ok_or(:` or say why not.
 
 ```
-grep -n 'ok_or(:' lib/pramana_foundry/workflow/kernel.ex     # :80
+grep -n 'ok_or(:' lib/foundry/workflow/kernel.ex     # :80
 ```
 
 ## Finding 5 — enumerations 3, 4, 6, 7. Observations, nothing to answer.
@@ -225,7 +225,7 @@ three documents finding 1 was about. Each is one line. None of them is about the
 
 ```
 cd foundry
-TMPDIR=/private/tmp mix test test/pramana_foundry/workflow/r4_coverage_test.exs
+TMPDIR=/private/tmp mix test test/foundry/workflow/r4_coverage_test.exs
   # 49 passed; prints "124 - 64 asserted, 60 recorded uncited"
 elixir bin/refusal_sites.exs            # 71 / 47 / 24 "(a FLOOR - see the header)" / 9 inline
 elixir bin/contract_annotation_diff.exs 16fc73db   # 196 markers, content preserved, red controls pass
@@ -304,7 +304,7 @@ The counts are right everywhere (67/40/18/5/2/2/5 in `EVIDENCE-TOOLS.md:31`, `:1
 briefing, the tickets row, the test comment and the log's "Final" line all match the tree). The
 commit references are not.
 
-**3a. `test/pramana_foundry/workflow/r4_coverage_test.exs:588`**, in the file the answer edited,
+**3a. `test/foundry/workflow/r4_coverage_test.exs:588`**, in the file the answer edited,
 47 lines above the entry it added:
 
 ```
@@ -336,8 +336,8 @@ this line to state it as fact, and the repository's rule is that a measurement s
 Either cite where it is recorded or say "per the commissioning prompt".
 
 ```
-sed -n 588p test/pramana_foundry/workflow/r4_coverage_test.exs
-git show dc9582b3:foundry/test/pramana_foundry/workflow/r4_coverage_test.exs \
+sed -n 588p test/foundry/workflow/r4_coverage_test.exs
+git show dc9582b3:foundry/test/foundry/workflow/r4_coverage_test.exs \
   | awk '/@from_obligations %\{/{f=1} /^  \}$/{if(f){f=0}} f' | grep -c '^    "R4'     # 63
 grep -n 'dc9582b3' docs/fr-08/fr08b-evidence-reduction-tickets.md docs/fr-08/fr08b-ev6-ev2-review-briefing.md
 awk 'NR>2884' docs/IMPLEMENTATION-LOG.md | grep -n -i 'passed /'      # one hit: 36ac89b9
@@ -354,17 +354,17 @@ delta `16fc73db..36ac89b9` (or `..f749c080`); make the briefing either the froze
 **Is `ok_or(:unknown_entity_kind)` the only spelling missed?** In `kernel.ex`, yes:
 
 ```
-grep -n '{:error, [^:]' lib/pramana_foundry/workflow/kernel.ex
+grep -n '{:error, [^:]' lib/foundry/workflow/kernel.ex
   :75   @spec … {:error, atom()}           (a spec)
   :85   {:error, _reason} = error -> error (pass-through, not a site)
   :1875 defp ok_or(:error, reason), do: {:error, reason}
-grep -n 'ok_or(' lib/pramana_foundry/workflow/kernel.ex     # :80 only, plus the two defp heads
+grep -n 'ok_or(' lib/foundry/workflow/kernel.ex     # :80 only, plus the two defp heads
 ```
 
 So the true `kernel.ex` count is 72 sites, 25 outside the sweep, and the floor is off by exactly one.
 
 **But the floor's file scope is also a boundary.** `apply/2` calls `Event.validate/1` at `:78`,
-and `lib/pramana_foundry/workflow/kernel/event.ex:198,201` refuse with
+and `lib/foundry/workflow/kernel/event.ex:198,201` refuse with
 `{:error, :invalid_semantic_event}`. Those are refusals outside the sweep too, in a file neither
 the script nor the doc paragraph mentions. `bin/guard_mutation_sweep.exs:22` defaults its target to
 `kernel.ex` as well. "Outside the sweep" is therefore at least 27 across the two files, and the
@@ -400,11 +400,11 @@ added assertions pin a contract value, not an implementation constant. Three obs
 of which needs answering before merge.
 
 ```
-git diff dc9582b3..f3195112 -- test/pramana_foundry/workflow/r4_coverage_test.exs
-sed -n 1205,1262p  test/pramana_foundry/workflow/r4_coverage_test.exs   # blocked_result
-sed -n 1707,1790p  test/pramana_foundry/workflow/r4_coverage_test.exs   # integration_success
-sed -n 1940,1970p  test/pramana_foundry/workflow/r4_coverage_test.exs   # cancel_finalized
-TMPDIR=/private/tmp mix test test/pramana_foundry/workflow/r4_coverage_test.exs   # 49 passed, exit 0
+git diff dc9582b3..f3195112 -- test/foundry/workflow/r4_coverage_test.exs
+sed -n 1205,1262p  test/foundry/workflow/r4_coverage_test.exs   # blocked_result
+sed -n 1707,1790p  test/foundry/workflow/r4_coverage_test.exs   # integration_success
+sed -n 1940,1970p  test/foundry/workflow/r4_coverage_test.exs   # cancel_finalized
+TMPDIR=/private/tmp mix test test/foundry/workflow/r4_coverage_test.exs   # 49 passed, exit 0
 ```
 
 ### Question 1 — the three removals. All three correct. No block.
@@ -443,19 +443,19 @@ assertion rather than a structural argument. Not required; the uncited entry is 
 `execution_observed` / `worker_closed` never touch it.
 
 ```
-grep -n 'ref_receipt_id' lib/pramana_foundry/workflow/kernel.ex
+grep -n 'ref_receipt_id' lib/foundry/workflow/kernel.ex
   :906   Map.put(&1, "ref_receipt_id", payload["ref_receipt_id"])   # write — "ref_created" branch
   :1103  "ref_receipt_id" => nil                                    # init of a FRESH attempt map
   :1298 :1406 :1521 :1533                                           # reads
 grep -rn 'ref_receipt_id' lib | grep -v workflow/kernel.ex          # event.ex field list, state.ex validation/measure — no writes
-grep -nE 'Map\.put\([^,]+, [a-z_]+[,)]|put_in\([^,]+, \[[a-z_]+\]' lib/pramana_foundry/workflow/kernel.ex   # no variable-key writes
-grep -nE 'Map\.merge|Map\.replace|struct\(' lib/pramana_foundry/workflow/kernel.ex     # none on attempts
+grep -nE 'Map\.put\([^,]+, [a-z_]+[,)]|put_in\([^,]+, \[[a-z_]+\]' lib/foundry/workflow/kernel.ex   # no variable-key writes
+grep -nE 'Map\.merge|Map\.replace|struct\(' lib/foundry/workflow/kernel.ex     # none on attempts
 grep -rnE '"attempts"' lib --include='*.ex' | grep -v workflow/kernel.ex | grep -v state.ex   # nothing
-sed -n 548,563p lib/pramana_foundry/workflow/kernel.ex     # execution_observed: put_in ["executions", id, "lifecycle"] only
-sed -n 614,632p lib/pramana_foundry/workflow/kernel.ex     # worker_closed → close_execution
-sed -n 1141,1157p lib/pramana_foundry/workflow/kernel.ex   # close_execution: put_in ["executions", id, "lifecycle"], "closed" only
-sed -n 1243,1254p lib/pramana_foundry/workflow/kernel.ex   # update_attempt / update_active_attempt are update_in wrappers; write nothing themselves
-sed -n 1085,1116p lib/pramana_foundry/workflow/kernel.ex   # open_attempt refuses an existing id before :1103 runs
+sed -n 548,563p lib/foundry/workflow/kernel.ex     # execution_observed: put_in ["executions", id, "lifecycle"] only
+sed -n 614,632p lib/foundry/workflow/kernel.ex     # worker_closed → close_execution
+sed -n 1141,1157p lib/foundry/workflow/kernel.ex   # close_execution: put_in ["executions", id, "lifecycle"], "closed" only
+sed -n 1243,1254p lib/foundry/workflow/kernel.ex   # update_attempt / update_active_attempt are update_in wrappers; write nothing themselves
+sed -n 1085,1116p lib/foundry/workflow/kernel.ex   # open_attempt refuses an existing id before :1103 runs
 grep -n 'def apply' test/support/kernel_harness.ex          # Harness.apply → WorkflowKernel.apply; no test-side state writes
 ```
 
@@ -487,7 +487,7 @@ comes from; the prompt says it was read out of `add_execution/3`.
 ```
 grep -n 'lifecycle' docs/WORKFLOW-CONTRACT.md | sed -n 1,3p
   :390  | Execution lifecycle | pending, starting, running, closing, closed, unknown; closed requires verified process/session termination or proved non-start |
-grep -n '@execution_lifecycles' lib/pramana_foundry/workflow/kernel/state.ex   # :48 ~w(pending starting running closing closed unknown) — mirrors :390
+grep -n '@execution_lifecycles' lib/foundry/workflow/kernel/state.ex   # :48 ~w(pending starting running closing closed unknown) — mirrors :390
 sed -n 467p docs/WORKFLOW-CONTRACT.md   # R4.04.o3 "Pre-intent denial remains queued and consumes no start unit"
 ```
 

@@ -1,4 +1,4 @@
-alias PramanaFoundry.DurableStore.Gateway
+alias Foundry.DurableStore.Gateway
 
 [path, boundary] = System.argv()
 fault = if boundary == "before", do: {:halt, :before_commit}, else: {:halt, :after_commit}
@@ -54,7 +54,7 @@ build = fn command_id ->
         effect_id: "effect-" <> command_id,
         request_digest:
           elem(
-            PramanaFoundry.DurableStore.Encoding.semantic_digest(
+            Foundry.DurableStore.Encoding.semantic_digest(
               "pramana-foundry-effect-request-v1",
               %{"effect_id" => "effect-" <> command_id, "operation" => %{"operation" => "check"}}
             ),

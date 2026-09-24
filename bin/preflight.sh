@@ -31,7 +31,7 @@ say "mutation sweep not running" "ok"
 #
 #    Deliberately REPOSITORY-WIDE, matching the gate exactly. This was briefly scoped to
 #    the Foundry subtree on the false premise that ci/run.exs performs no git check of its
-#    own. It does: PramanaFoundry.CI.source_provenance/1 runs the same pathspec-free
+#    own. It does: Foundry.CI.source_provenance/1 runs the same pathspec-free
 #    `git status --porcelain=v1 --untracked-files=all`, validate_source/1 fails the run as
 #    {:dirty_source, paths}, and the result is hashed into dirty_status_sha256 as build
 #    provenance. A scoped check here reported ok while the gate failed, which is the exact

@@ -1,7 +1,7 @@
 // FR-10 commit 0: the effect / claim / receipt / reconciliation protocol AS DESIGNED in
 // docs/fr-10/FR10-DESIGN-2026-09-23.md (D1-D5, operator answers Q2-Q4), not today's
 // code. Every store action cites the protected operation it models in
-// lib/pramana_foundry/durable_store/protected_primitives.ex ("PP:<line>", lines at
+// lib/foundry/durable_store/protected_primitives.ex ("PP:<line>", lines at
 // Pramāṇa 33395c92). Design-only actions cite the design section.
 //
 // Scope (design section 7): one ticket and attempt, one semantic operation with ordinals

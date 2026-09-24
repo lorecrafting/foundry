@@ -6,11 +6,11 @@ System.put_env("HERDR_ENV", "0")
 System.put_env("COORDINATOR_TICK", "0")
 ExUnit.start(seed: 12_092_026)
 
-defmodule PramanaFoundry.AuditSeptember12 do
+defmodule Foundry.AuditSeptember12 do
   use ExUnit.Case, async: false
-  alias PramanaFoundry.{Coordinator, Transition, CLI, Scheduler}
-  alias PramanaFoundry.Coordinator.State
-  alias PramanaFoundry.Effects.Checkpoint
+  alias Foundry.{Coordinator, Transition, CLI, Scheduler}
+  alias Foundry.Coordinator.State
+  alias Foundry.Effects.Checkpoint
 
   @base String.duplicate("a", 40)
   @commit String.duplicate("b", 40)
@@ -240,7 +240,7 @@ defmodule PramanaFoundry.AuditSeptember12 do
     assert {:ok, []} = Scheduler.plan_dispatch(state)
 
     {state, _, _} =
-      PramanaFoundry.Coordinator.Tick.process_queue(
+      Foundry.Coordinator.Tick.process_queue(
         state["queue"],
         state,
         %{},
@@ -257,7 +257,7 @@ defmodule PramanaFoundry.AuditSeptember12 do
 
   test "A14: default execution model is paid OpenRouter", ctx do
     {:ok, state} =
-      PramanaFoundry.AgentServer.init(
+      Foundry.AgentServer.init(
         task_id: "AUDIT-1",
         run_id: "new-run",
         checkout: ctx.root,
@@ -291,13 +291,13 @@ defmodule PramanaFoundry.AuditSeptember12 do
   end
 
   test "A16: board event-log mode loses recovered tickets", ctx do
-    previous = Application.get_env(:pramana_foundry, :runtime_root)
-    Application.put_env(:pramana_foundry, :runtime_root, ctx.root)
+    previous = Application.get_env(:foundry, :runtime_root)
+    Application.put_env(:foundry, :runtime_root, ctx.root)
 
     on_exit(fn ->
       if previous,
-        do: Application.put_env(:pramana_foundry, :runtime_root, previous),
-        else: Application.delete_env(:pramana_foundry, :runtime_root)
+        do: Application.put_env(:foundry, :runtime_root, previous),
+        else: Application.delete_env(:foundry, :runtime_root)
     end)
 
     path = Path.join(ctx.root, "state/current/events.jsonl")
@@ -307,7 +307,7 @@ defmodule PramanaFoundry.AuditSeptember12 do
         "ticket" => ticket()
       })
 
-    assert PramanaFoundry.Board.load_data(:event_log).tickets == []
+    assert Foundry.Board.load_data(:event_log).tickets == []
   end
 
   test "A17: wrapper JSON encoding permits Elixir interpolation" do
@@ -327,7 +327,7 @@ defmodule PramanaFoundry.AuditSeptember12 do
         "ticket" => ticket()
       })
 
-    File.write!(ctx.log, String.duplicate("\n", PramanaFoundry.Schema.max_bytes()), [:append])
+    File.write!(ctx.log, String.duplicate("\n", Foundry.Schema.max_bytes()), [:append])
     assert {:error, %{reason: :oversized}} = Checkpoint.events(ctx.log)
     boot(ctx)
     assert Coordinator.state()["assignments"] == %{}
@@ -356,7 +356,7 @@ defmodule PramanaFoundry.AuditSeptember12 do
     assignment_ticket = ticket(%{"checkout" => ctx.root, "base_revision" => base})
 
     assert {:ok, _} =
-             PramanaFoundry.Assignments.Handoff.validate(artifact, assignment_ticket, %{
+             Foundry.Assignments.Handoff.validate(artifact, assignment_ticket, %{
                "run_id" => "new-run"
              })
 

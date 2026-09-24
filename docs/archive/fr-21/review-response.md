@@ -52,7 +52,7 @@ bind setup-beam's necessarily duplicated inputs to the canonical policy file.
 ## B5 — dependency policy was descriptive
 
 Resolved by executable preflight and resolved-source gates. Tracked `deps/` content or a
-tracked `pramana_foundry` escript fails before work. After locked restoration and before
+tracked `foundry` escript fails before work. After locked restoration and before
 compile, the runner loads the complete selected Mix dependency graph and requires every entry
 to use `Hex.SCM`, carry the exact committed Hex lock entry, and resolve beneath the unique
 `MIX_DEPS_PATH`. Path, Git, unlocked, lock-mismatched and nonisolated inputs fail. The manifest

@@ -17,17 +17,17 @@ other ten frozen files.
 
 | File relative to foundry/ | SHA-256 |
 |---|---|
-| lib/pramana_foundry/agent_server.ex | 1a8dbcd8d14a3f21034d50517bd797977f44a6c592d0940bbeaf0a16a80c7949 |
-| lib/pramana_foundry/coordinator.ex | 241643abf3a1be26d808bfc26055ca9f66665297400ce93b517855f5fa2db0e7 |
-| lib/pramana_foundry/coordinator/tick.ex | e4a40c7c9c056b9ca1801724ab5de40d10e0cf45a408f3c60e76238dac0669d5 |
-| lib/pramana_foundry/herdr/adapter.ex | 4ec26d65483c3c5321cab05b14beb4573f39c3131d211dc18b44aa65970c49cf |
-| lib/pramana_foundry/herdr/runner.ex | 1df506bc0444df2326de7fd9328e72038d990e2bbc36f5c9e038abbbc0fa2650 |
-| lib/pramana_foundry/launch_eligibility.ex | ca331865be61be90e80d775631fff3e2fb3a94cccd12e30db6359bd221a8c70f |
-| test/pramana_foundry/agent_server_test.exs | 914d266e4e48096076e2f412de601fb6a8aa68df444ccdf1195a8e41d0411f46 |
-| test/pramana_foundry/autonomous_launch_test.exs | 8bc2350cd1e09c61a8c71e534786d49ee68c3447e24cd6c8ad94247bfca63391 |
-| test/pramana_foundry/board_test.exs | cd455afc307d9fd3b9794d2d8862d817b848016a632f7dc438f02f38c8ca6637 |
-| test/pramana_foundry/coordinator/engine_test.exs | e0471669fc52ff8db46efebcb75bda90b9e4bba1e8a1cb610602c200da20fa7c |
-| test/pramana_foundry/coordinator_test.exs | c2068847f4497e56a9c65180b670c7347e7fb2b925a1f2f8a2454e3e4b0b25a2 |
+| lib/foundry/agent_server.ex | 1a8dbcd8d14a3f21034d50517bd797977f44a6c592d0940bbeaf0a16a80c7949 |
+| lib/foundry/coordinator.ex | 241643abf3a1be26d808bfc26055ca9f66665297400ce93b517855f5fa2db0e7 |
+| lib/foundry/coordinator/tick.ex | e4a40c7c9c056b9ca1801724ab5de40d10e0cf45a408f3c60e76238dac0669d5 |
+| lib/foundry/herdr/adapter.ex | 4ec26d65483c3c5321cab05b14beb4573f39c3131d211dc18b44aa65970c49cf |
+| lib/foundry/herdr/runner.ex | 1df506bc0444df2326de7fd9328e72038d990e2bbc36f5c9e038abbbc0fa2650 |
+| lib/foundry/launch_eligibility.ex | ca331865be61be90e80d775631fff3e2fb3a94cccd12e30db6359bd221a8c70f |
+| test/foundry/agent_server_test.exs | 914d266e4e48096076e2f412de601fb6a8aa68df444ccdf1195a8e41d0411f46 |
+| test/foundry/autonomous_launch_test.exs | 8bc2350cd1e09c61a8c71e534786d49ee68c3447e24cd6c8ad94247bfca63391 |
+| test/foundry/board_test.exs | cd455afc307d9fd3b9794d2d8862d817b848016a632f7dc438f02f38c8ca6637 |
+| test/foundry/coordinator/engine_test.exs | e0471669fc52ff8db46efebcb75bda90b9e4bba1e8a1cb610602c200da20fa7c |
+| test/foundry/coordinator_test.exs | c2068847f4497e56a9c65180b670c7347e7fb2b925a1f2f8a2454e3e4b0b25a2 |
 | test/support/agent_server_fake_runner.ex | c84f22d4f0e2abf518753f785f74a85682e423a8c4d58c42a9692ea37063cf7e |
 
 Original HEAD a3fa302342238ae3d5a133b35bd86f4fa4f13710 and dirty Coordinator
@@ -74,8 +74,8 @@ remain historical inputs. The unrelated unblock_ticket change is excluded.
 
 From foundry/, exact commands, all exit 0:
 
-    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/pramana_foundry/autonomous_launch_test.exs test/pramana_foundry/agent_server_test.exs --seed 424201
-    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/pramana_foundry/herdr/adapter_test.exs test/pramana_foundry/herdr/argv_test.exs test/pramana_foundry/herdr/identity_test.exs test/pramana_foundry/quota/quota_test.exs test/pramana_foundry/reviews/reviews_test.exs test/pramana_foundry/coordinator/recovery_test.exs --seed 424201
+    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/foundry/autonomous_launch_test.exs test/foundry/agent_server_test.exs --seed 424201
+    env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix test --no-start test/foundry/herdr/adapter_test.exs test/foundry/herdr/argv_test.exs test/foundry/herdr/identity_test.exs test/foundry/quota/quota_test.exs test/foundry/reviews/reviews_test.exs test/foundry/coordinator/recovery_test.exs --seed 424201
     env -u HERDR_ENV -u COORDINATOR_TICK PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/usr/bin:/bin mix compile --warnings-as-errors
 
 Results: **26 focused passed** (0.7 seconds), **44 supporting passed** (0.2
@@ -87,9 +87,9 @@ terms, not every possible BEAM value or resource-exhaustion condition.
 Root checks:
 
     git rev-parse HEAD
-    shasum -a 256 foundry/lib/pramana_foundry/agent_server.ex foundry/lib/pramana_foundry/coordinator.ex foundry/lib/pramana_foundry/coordinator/tick.ex foundry/lib/pramana_foundry/herdr/adapter.ex foundry/lib/pramana_foundry/herdr/runner.ex foundry/lib/pramana_foundry/launch_eligibility.ex foundry/test/pramana_foundry/agent_server_test.exs foundry/test/pramana_foundry/autonomous_launch_test.exs foundry/test/pramana_foundry/board_test.exs foundry/test/pramana_foundry/coordinator/engine_test.exs foundry/test/pramana_foundry/coordinator_test.exs foundry/test/support/agent_server_fake_runner.ex
+    shasum -a 256 foundry/lib/foundry/agent_server.ex foundry/lib/foundry/coordinator.ex foundry/lib/foundry/coordinator/tick.ex foundry/lib/foundry/herdr/adapter.ex foundry/lib/foundry/herdr/runner.ex foundry/lib/foundry/launch_eligibility.ex foundry/test/foundry/agent_server_test.exs foundry/test/foundry/autonomous_launch_test.exs foundry/test/foundry/board_test.exs foundry/test/foundry/coordinator/engine_test.exs foundry/test/foundry/coordinator_test.exs foundry/test/support/agent_server_fake_runner.ex
     git diff --check
-    rg -n 'Enum\.(find|find_value|reduce)' foundry/lib/pramana_foundry/{agent_server.ex,coordinator.ex,coordinator/tick.ex,herdr/adapter.ex,herdr/runner.ex,launch_eligibility.ex}
+    rg -n 'Enum\.(find|find_value|reduce)' foundry/lib/foundry/{agent_server.ex,coordinator.ex,coordinator/tick.ex,herdr/adapter.ex,herdr/runner.ex,launch_eligibility.ex}
     rg -n 'AgentServer|Effects.Launch|pick_fallback|fallback_profile' foundry/lib
 
 HEAD/hash/diff checks passed. No full-suite, installed-daemon or real-provider
@@ -130,8 +130,8 @@ blocked: " prefix; corrected below. Candidate denial was correct in that run.
 Boundary BODY:
 
     Code.require_file("test/support/agent_server_fake_runner.ex")
-    alias PramanaFoundry.{AgentServer, Coordinator, Coordinator.State, Coordinator.Tick, Herdr.Adapter, LaunchEligibility}
-    alias PramanaFoundry.AgentServerTest.FakeRunner
+    alias Foundry.{AgentServer, Coordinator, Coordinator.State, Coordinator.Tick, Herdr.Adapter, LaunchEligibility}
+    alias Foundry.AgentServerTest.FakeRunner
     {tmp, 0} = System.cmd("mktemp", ["-d", "/tmp/pramana-fr01-review-v5-boundary.XXXXXX"])
     tmp = String.trim(tmp)
     table = :fr01_v5_boundary
@@ -180,8 +180,8 @@ Boundary BODY:
 Totality BODY:
 
     Code.require_file("test/support/agent_server_fake_runner.ex")
-    alias PramanaFoundry.LaunchEligibility, as: L
-    %{profiles: profiles, role_profiles: mappings} = PramanaFoundry.AgentServerTest.FakeRunner.launch_policy()
+    alias Foundry.LaunchEligibility, as: L
+    %{profiles: profiles, role_profiles: mappings} = Foundry.AgentServerTest.FakeRunner.launch_policy()
     name = mappings["developer"]
     profile = profiles[name]
     terms = [nil, false, true, :invalid, 0, -1, 1.5, "", <<255>>, <<1::size(1)>>, [], [:invalid], ["value" | :invalid], [["value" | :invalid]], %{}, %URI{}, self(), make_ref(), fn -> :ok end, {:x, :y}, "value\n", " value", "value\r\n"]

@@ -2,7 +2,7 @@ ExUnit.start(seed: 9302)
 
 defmodule FR08AFinalReview do
   use ExUnit.Case, async: false
-  alias PramanaFoundry.DurableStore.{Gateway, Encoding}
+  alias Foundry.DurableStore.{Gateway, Encoding}
   alias Exqlite.Sqlite3
 
   setup do

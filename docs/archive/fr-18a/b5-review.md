@@ -177,7 +177,7 @@ Verified hashes:
 
 ```text
 eb9b2245d675cf2fb86906915e20308b4d70dc337f1f143457494f791af3c378  provenance.json
-6deec271a67375ee1a1971f47a50e9b1d805b3fff0f1c8a3d8b55c78f5dbd09a  pramana_foundry
+6deec271a67375ee1a1971f47a50e9b1d805b3fff0f1c8a3d8b55c78f5dbd09a  foundry
 4f0dd34f26ec1efe00e12f052aaa25804e45e82569eabbc432322abb42ccbb90  protected_primitives.ex
 ```
 

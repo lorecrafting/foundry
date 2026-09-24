@@ -28,18 +28,18 @@ release (FR-17), or establish lifecycle acceptance (FR-22).
 ```text
 33136e5c3c25e92976762c3a581380d24d3ca2771162557d9d42bb0d4cc74c83  foundry/README.md
 11011de2498e324355be95bc1c17667663ebedc57dd62467adb5df329691c6f0  foundry/docs/DURABLE-STORE.md
-ebbf593cfb9acb975ff37ae12affcea5f9dae1896b2f4b679f56f83f85733182  foundry/lib/pramana_foundry/durable_store/compatibility_writer.ex
-7818b553bde34fb3dfd6e749d4c6d82d60f9c30c2dead1569576b8b12bc14c5f  foundry/lib/pramana_foundry/durable_store/database.ex
-b706e1976f8cd09f9fa0b311e099343e3498586539c1e92c1b78e5fa3f42e8a0  foundry/lib/pramana_foundry/durable_store/encoding.ex
-b85aa65f52eb4da8f6185e60b9b4ab58a5ecf8ea93889a1f82e2de193baefe5b  foundry/lib/pramana_foundry/durable_store/gateway.ex
-191c8038857005a4ceb6f637f14c5d8a1e4b04027b103b8c23ee23fbe9703c67  foundry/lib/pramana_foundry/durable_store/kernel.ex
-2b56047016cb74ef6354604bcbb2e0809823bf9212842ff4304616ccd4fadb4d  foundry/lib/pramana_foundry/durable_store/legacy_import.ex
-4a3dd40378a7d02fc490b5f72d9a4556d152b2d0aa5521e4700d739a8e6fdb48  foundry/lib/pramana_foundry/durable_store/protected_verifier.ex
-02735f8c61c864e003fe3ec596476cd315f8833080ee5c26e7cb152abf27fd41  foundry/lib/pramana_foundry/event_log.ex
+ebbf593cfb9acb975ff37ae12affcea5f9dae1896b2f4b679f56f83f85733182  foundry/lib/foundry/durable_store/compatibility_writer.ex
+7818b553bde34fb3dfd6e749d4c6d82d60f9c30c2dead1569576b8b12bc14c5f  foundry/lib/foundry/durable_store/database.ex
+b706e1976f8cd09f9fa0b311e099343e3498586539c1e92c1b78e5fa3f42e8a0  foundry/lib/foundry/durable_store/encoding.ex
+b85aa65f52eb4da8f6185e60b9b4ab58a5ecf8ea93889a1f82e2de193baefe5b  foundry/lib/foundry/durable_store/gateway.ex
+191c8038857005a4ceb6f637f14c5d8a1e4b04027b103b8c23ee23fbe9703c67  foundry/lib/foundry/durable_store/kernel.ex
+2b56047016cb74ef6354604bcbb2e0809823bf9212842ff4304616ccd4fadb4d  foundry/lib/foundry/durable_store/legacy_import.ex
+4a3dd40378a7d02fc490b5f72d9a4556d152b2d0aa5521e4700d739a8e6fdb48  foundry/lib/foundry/durable_store/protected_verifier.ex
+02735f8c61c864e003fe3ec596476cd315f8833080ee5c26e7cb152abf27fd41  foundry/lib/foundry/event_log.ex
 df569423c58a67452cdb93d98259615ac0996b671dccb40089de28dce8c24caf  foundry/mix.exs
 bf2a61f815533a96b2abec87b1690ae49145bec56e60703a22b4db178c56e954  foundry/mix.lock
-55048c42848fb44086bbf8864b566d20137cf2f6994baa866cafc3ac8900b52a  foundry/test/pramana_foundry/durable_store/gateway_test.exs
-dbef76cf8a02bf544617ff76b5ef2303cf20064d6fa3c7b6aac64f10e5ba3fc4  foundry/test/pramana_foundry/durable_store/legacy_import_test.exs
+55048c42848fb44086bbf8864b566d20137cf2f6994baa866cafc3ac8900b52a  foundry/test/foundry/durable_store/gateway_test.exs
+dbef76cf8a02bf544617ff76b5ef2303cf20064d6fa3c7b6aac64f10e5ba3fc4  foundry/test/foundry/durable_store/legacy_import_test.exs
 372365daecf086fd4af6e6bddc8ee16ef937ad16ef96b84669e0de759bdde371  foundry/test/support/durable_store_crash_fixture.exs
 ```
 
@@ -57,9 +57,9 @@ All commands used the pinned PATH:
 - `mix format --check-formatted` over every owned Elixir/test/Mix path: exit zero.
   The repository has unrelated pre-existing formatter drift, so whole-project formatting
   is not claimed.
-- `mix test test/pramana_foundry/durable_store
-  test/pramana_foundry/legacy_persistence_containment_test.exs
-  test/pramana_foundry/effects/checkpoint_test.exs --seed 424207`: 31 passed, exit zero.
+- `mix test test/foundry/durable_store
+  test/foundry/legacy_persistence_containment_test.exs
+  test/foundry/effects/checkpoint_test.exs --seed 424207`: 31 passed, exit zero.
 - First whole model-free attempt, without a fresh `TMPDIR`: 426/437 passed; all eleven
   failures were `Relocation.CrashRecoveryTest` setup failures whose copied fixture repo
   had nothing to commit. This superseded attempt is retained rather than hidden.

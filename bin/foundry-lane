@@ -13,7 +13,7 @@ set -euo pipefail
 FOUNDRY_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 : "${FOUNDRY_LANE_BUILD:=/private/tmp/foundry-lane-build}"
-: "${PRAMANA_RELEASE:=$FOUNDRY_LANE_BUILD/rel/pramana_foundry/bin/pramana_foundry}"
+: "${PRAMANA_RELEASE:=$FOUNDRY_LANE_BUILD/rel/foundry/bin/foundry}"
 : "${RELEASE_NODE:=foundry_lane}"
 : "${PRAMANA_RUNTIME_ROOT:=$HOME/.local/state/foundry-lane}"
 : "${FOUNDRY_MANUAL_LANE_REPO:=$FOUNDRY_DIR}"
@@ -49,7 +49,7 @@ case "${1:-}" in
       fi
       sleep 1
     done
-    echo "lane daemon did not come up; see $FOUNDRY_LANE_BUILD/rel/pramana_foundry/tmp/log" >&2
+    echo "lane daemon did not come up; see $FOUNDRY_LANE_BUILD/rel/foundry/tmp/log" >&2
     exit 1
     ;;
   stop)

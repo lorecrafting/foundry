@@ -62,14 +62,14 @@ The current system uses four append-oriented JSONL surfaces under
 
 ### ConsolidatedLog
 
-`PramanaFoundry.ConsolidatedLog.tail/1` merges coordinator, telemetry and event
+`Foundry.ConsolidatedLog.tail/1` merges coordinator, telemetry and event
 logs into a time-sorted diagnostic view with a source tag. This is useful for inspection
 and Improver classifiers; it does not turn those records into authoritative workflow
 facts.
 
 ## Canonical telemetry schemas that exist today
 
-`PramanaFoundry.Telemetry.Telemetry` implements two validated record types:
+`Foundry.Telemetry.Telemetry` implements two validated record types:
 
 - `command` records: task/run/phase, exact start/end/duration, exit code,
   resource class and sanitized argv;
@@ -440,7 +440,7 @@ baseline and enough observations to avoid inventing precision.
 
 ## System metrics
 
-`PramanaFoundry.SystemMetrics` captures VM-level and per-process metrics. The Improver
+`Foundry.SystemMetrics` captures VM-level and per-process metrics. The Improver
 includes a full snapshot in every cycle's `metrics_snapshot` event.
 
 ### VM-level (`SystemMetrics.system/0`)
@@ -494,7 +494,7 @@ Lists every child of the AssignmentSupervisor DynamicSupervisor:
 
 ## Health probe
 
-`PramanaFoundry.Coordinator.health/0` returns a structured health report:
+`Foundry.Coordinator.health/0` returns a structured health report:
 
 ```json
 {
@@ -510,7 +510,7 @@ Lists every child of the AssignmentSupervisor DynamicSupervisor:
 
 ## Self-healing Improver
 
-The `PramanaFoundry.Improver` GenServer runs every 5 minutes. Each cycle:
+The `Foundry.Improver` GenServer runs every 5 minutes. Each cycle:
 
 1. Reads the last 500 records from `ConsolidatedLog`
 2. Splits by source: telemetry vs events
@@ -549,25 +549,25 @@ metrics. The board's findings panel displays the latest snapshot.
 
 ```bash
 # Health report (JSON)
-pramana_foundry health
+foundry health
 
 # List running agents
-pramana_foundry agents
+foundry agents
 
 # System metrics overview
-pramana_foundry metrics
+foundry metrics
 
 # Consolidated log tail
-pramana_foundry logs tail N
+foundry logs tail N
 
 # Log summary (record counts per source)
-pramana_foundry logs summary
+foundry logs summary
 
 # Telemetry status projection
-pramana_foundry telemetry-status PATH
+foundry telemetry-status PATH
 
 # Telemetry export
-pramana_foundry telemetry-export jsonl|csv INPUT OUTPUT
+foundry telemetry-export jsonl|csv INPUT OUTPUT
 ```
 
 ## Raw primitives available for future diagnostics

@@ -147,7 +147,7 @@ at `2d17717a24c1f5fac691574f503322d6780bb0cd`.
 
 ## Note on the canonical gate's temp-directory sensitivity
 
-`PramanaFoundry.CI.create_run_root/1` derives its run root from `System.tmp_dir!()`, which
+`Foundry.CI.create_run_root/1` derives its run root from `System.tmp_dir!()`, which
 honors the invoking shell's `TMPDIR`. On macOS the default per-user `TMPDIR` is a symlink,
 and `Gateway.initialize/1` correctly refuses a symlinked parent with
 `:database_parent_symlink_not_allowed`, so the gate fails 74 DurableStore tests purely from

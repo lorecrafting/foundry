@@ -59,7 +59,7 @@ Search over the Foundry's own tunable parameters:
 **Trigger:** When the Foundry's own efficacy metrics cross a threshold — e.g., ticket
 throughput per cycle, agent success rate, proposal acceptance rate.
 
-**Produces:** `mix pramana_foundry.health --diagnose` that recommends parameter changes
+**Produces:** `mix foundry.health --diagnose` that recommends parameter changes
 based on observed cycle efficiency.
 
 **Risk:** Overfitting to current workload patterns. If the corpus is stable and tickets
@@ -125,7 +125,7 @@ switched at runtime without restarting agents.
 The Foundry's own coordination code — the coordinator state machine, the handoff flow,
 the integration pipeline. A coding agent rewrites the Foundry's orchestration.
 
-**What changes:** Source code in `foundry/lib/pramana_foundry/coordinator.ex`,
+**What changes:** Source code in `foundry/lib/foundry/coordinator.ex`,
 `improver.ex`, `hardening_pm.ex`, `agent_server.ex`. Not the agent behaviour — how the
 Foundry manages itself.
 
@@ -210,7 +210,7 @@ The two meta-harness progressions operate on different timescales and feed each 
 | **Eval signal** | Gold-set evals, recall@k, chain survival | Cycle metrics: throughput, proposal acceptance, agent success |
 | **Event stream** | Umbrella event store (planned) | Foundry `events.jsonl` (exists) |
 | **Auto-deploy risk** | Low — guard is architecture-independent | High — a broken coordinator stops all work |
-| **First step** | `mix pramana.retrieval.tune` (H5) | `mix pramana_foundry.health --diagnose` (FL1) |
+| **First step** | `mix pramana.retrieval.tune` (H5) | `mix foundry.health --diagnose` (FL1) |
 
 The two converge at L4/FL4 (architectural search): a coding agent that proposes changes
 to both the retrieval pipeline AND the orchestration, because a change to one may require

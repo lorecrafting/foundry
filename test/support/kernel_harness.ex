@@ -1,4 +1,4 @@
-defmodule PramanaFoundry.Test.Harness do
+defmodule Foundry.Test.Harness do
   @moduledoc """
   The single route from a test to `Kernel.apply/2`, so that the relational oracle judges
   every accepted transition the suite drives rather than only the ones the bounded search
@@ -19,8 +19,8 @@ defmodule PramanaFoundry.Test.Harness do
 
   import ExUnit.Assertions
 
-  alias PramanaFoundry.Workflow.Kernel, as: WorkflowKernel
-  alias PramanaFoundry.Workflow.Kernel.State
+  alias Foundry.Workflow.Kernel, as: WorkflowKernel
+  alias Foundry.Workflow.Kernel.State
 
   @counters {__MODULE__, :counters}
 

@@ -3,7 +3,7 @@
 ExUnit.start(seed: 18055)
 
 defmodule FR18AReviewTap do
-  alias PramanaFoundry.Observations.GatewaySource
+  alias Foundry.Observations.GatewaySource
   def snapshot(state), do: GatewaySource.snapshot(state)
 
   def fact(state, query) do
@@ -24,7 +24,7 @@ defmodule FR18AReviewTap do
 end
 
 defmodule FR18AReviewChangedSource do
-  alias PramanaFoundry.Observations.GatewaySource
+  alias Foundry.Observations.GatewaySource
   def snapshot(state), do: GatewaySource.snapshot(state)
 
   def fact(state, %{"type" => "effect_observation_page"} = query) do
@@ -36,20 +36,20 @@ defmodule FR18AReviewChangedSource do
   def fact(state, query), do: GatewaySource.fact(state, query)
 end
 
-base = File.read!("test/pramana_foundry/durable_store/atomic_bundle_test.exs")
+base = File.read!("test/foundry/durable_store/atomic_bundle_test.exs")
 
 base =
   String.replace(
     base,
-    "PramanaFoundry.DurableStore.AtomicBundleTest",
-    "PramanaFoundry.FR18AB5Review"
+    "Foundry.DurableStore.AtomicBundleTest",
+    "Foundry.FR18AB5Review"
   )
 
 base = Regex.replace(~r/\nend\s*\z/, base, "\n")
 
 extra = ~S"""
-  alias PramanaFoundry.Observations
-  alias PramanaFoundry.Observations.Query
+  alias Foundry.Observations
+  alias Foundry.Observations.Query
 
   defp observation_request(limit \\ 20, bytes \\ 65_536) do
     %{"schema_version" => 1, "type" => "effect_observation_page", "effect_id" => "effect-1", "limit" => limit, "max_bytes" => bytes, "cursor" => nil}

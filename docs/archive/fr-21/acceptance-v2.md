@@ -13,9 +13,9 @@ clean-run provenance manifest carry that final immutable commit/tree.
 From a clean Foundry checkout with Elixir 1.20.3 / OTP 29.0.5 / ERTS 17.0.5:
 
 ```bash
-mix test test/pramana_foundry/ci_test.exs \
-  test/pramana_foundry/projections/benchmark_test.exs \
-  test/pramana_foundry/policy_test.exs \
+mix test test/foundry/ci_test.exs \
+  test/foundry/projections/benchmark_test.exs \
+  test/foundry/policy_test.exs \
   --exclude python_tiktoken_recompute --seed 0
 ```
 
@@ -39,7 +39,7 @@ corpus service, provider variables or inherited build/dependency/runtime directo
 
 ```bash
 cd foundry
-env -u HERDR_ENV -u COORDINATOR_TICK -u PRAMANA_FOUNDRY_RUNTIME_DIR \
+env -u HERDR_ENV -u COORDINATOR_TICK -u FOUNDRY_RUNTIME_DIR \
   PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/opt/homebrew/bin:/usr/bin:/bin \
   elixir ci/run.exs --output /private/tmp/fr21-v2-final-artifacts-1
 ```
@@ -88,13 +88,13 @@ The principal behavior inputs at the corrected implementation commit have these 
 | `foundry/ci/run.exs` | `c1cecbc224fc84030e7d0ba7f80ebeadc970c74912f6d0db6020d6c6d792bc7c` |
 | `foundry/ci/toolchain.exs` | `06d9fbb6ea92206dff68d705b2cae885b44a08b21495c1c5db620b456aecacc1` |
 | `foundry/ci/format_debt.exs` | `d38e709984c4e94ed103624dfb4d18206543c628488e0013ca4c3d957ac9500d` |
-| `foundry/lib/pramana_foundry/ci.ex` | `a60bda6a26f57efbe15ab5cab37592a79471739bb90d0e06fa3cf84a596d1f66` |
-| `foundry/test/pramana_foundry/ci_test.exs` | `8da9254cde0e14715c097655d9b40cea50531d0d35b4ad043f3fe4d7a94798ef` |
-| `foundry/test/pramana_foundry/projections/benchmark_test.exs` | `9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a` |
+| `foundry/lib/foundry/ci.ex` | `a60bda6a26f57efbe15ab5cab37592a79471739bb90d0e06fa3cf84a596d1f66` |
+| `foundry/test/foundry/ci_test.exs` | `8da9254cde0e14715c097655d9b40cea50531d0d35b4ad043f3fe4d7a94798ef` |
+| `foundry/test/foundry/projections/benchmark_test.exs` | `9046278d515463ed9ea5e20d18c6d103091ef785c9296ed3cda2faaa63e8de2a` |
 | `foundry/docs/fr-21/review.md` | `da11d18a4cfe7f7842ccb9309e63f6dbb8319b41967c5f0e30fb723c86eac36c` |
 
 The v1 candidate removed the exact tracked `foundry/deps/owl/**` tree, generated
-`foundry/pramana_foundry`, and stale `foundry/pramana_diagnose.py`; the candidate diff is the
+`foundry/foundry`, and stale `foundry/pramana_diagnose.py`; the candidate diff is the
 authoritative exhaustive deletion inventory. `mix.exs` and `mix.lock` are unchanged from the
 assigned base.
 

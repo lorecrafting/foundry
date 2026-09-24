@@ -6,9 +6,9 @@
 ExUnit.start(autorun: false)
 root = Path.expand("../../../test/support", __DIR__)
 for f <- ~w(kernel_harness.ex kernel_walk.ex), do: Code.require_file(Path.join(root, f))
-alias PramanaFoundry.Test.KernelWalk
-alias PramanaFoundry.Workflow.Kernel.State
-PramanaFoundry.Test.Harness.start()
+alias Foundry.Test.KernelWalk
+alias Foundry.Workflow.Kernel.State
+Foundry.Test.Harness.start()
 
 broad = Enum.map(1..40, &KernelWalk.walk(State.new(), &1, 600))
 deep = Enum.map(1..25, &KernelWalk.deep(State.new(), &1, 800))
@@ -28,7 +28,7 @@ under_cancel =
     for w <- walks do
       {_, n} =
         Enum.reduce(w.accepted, {State.new(), 0}, fn e, {s, n} ->
-          {:ok, next} = PramanaFoundry.Test.Harness.apply(s, e)
+          {:ok, next} = Foundry.Test.Harness.apply(s, e)
 
           n =
             if KernelWalk.label(e) == "attempt_settled:superseded_base" and

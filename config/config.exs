@@ -8,4 +8,4 @@ operator_runtime_root =
       Path.expand("../local", __DIR__)
     end
 
-config :pramana_foundry, runtime_root: operator_runtime_root
+config :foundry, runtime_root: operator_runtime_root

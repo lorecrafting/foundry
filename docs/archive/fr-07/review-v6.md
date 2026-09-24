@@ -37,7 +37,7 @@ B6 is a source-derived bounded-query acceptance shortfall, without a performance
 
 ### B1 — A rewound projection is certified by live reads and used to commit a new decision
 
-`lib/pramana_foundry/durable_store/authority.ex:835` validates a projection against its
+`lib/foundry/durable_store/authority.ex:835` validates a projection against its
 stored last event. `validate_projection_chain/2:905` then reads only events whose sequence
 is at most that stored pointer (`seq <= last_seq`, line 913). It never establishes that
 the pointer is the current final carrier for this entity. Command event closures at line
@@ -211,7 +211,7 @@ Commands ran from the candidate `foundry/` using `mise exec --`, with
 PRAMANA_OPERATOR_RUNTIME_ROOT and PRAMANA_RUNTIME_ROOT removed from the environment.
 
 - `mix compile --force --warnings-as-errors`: exit 0; 90 project files compiled.
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 9119`:
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 9119`:
   exit 0; **81 passed**.
 - `mix test --seed 9120`: exit 0; **501 passed**. The supplement's missing-tiktoken
   benchmark failure was not reproduced in this environment; no dependency was installed

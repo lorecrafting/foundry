@@ -226,7 +226,7 @@ MIX_BUILD_PATH=/tmp/fr07-v2-review.1vZ0rI/build
 TMPDIR=/tmp/fr07-v2-review.1vZ0rI
 ```
 
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 7722`:
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 7722`:
   **44 passed, exit 0**; fresh dependency build and 85 project source files compiled.
 - `mix run --no-start /tmp/fr07-v2-review.1vZ0rI/probes.exs`: initially 7 characterization
   probes passed; after adding the separate ledger probe, **8 passed, exit 0**, seed 75468.

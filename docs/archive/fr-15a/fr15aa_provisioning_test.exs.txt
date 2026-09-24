@@ -1,10 +1,10 @@
 Code.require_file("../../../ci/validate_fr15aa.exs", __DIR__)
 
-defmodule PramanaFoundry.Repair.FR15aAProvisioningTest do
+defmodule Foundry.Repair.FR15aAProvisioningTest do
   use ExUnit.Case, async: true
 
-  alias PramanaFoundry.CI.FR15aAValidator
-  alias PramanaFoundry.CI.FR15aAProcedure
+  alias Foundry.CI.FR15aAValidator
+  alias Foundry.CI.FR15aAProcedure
 
   setup_all do
     path = Path.expand("../../../docs/fr-15a/provisioning-manifest.exs", __DIR__)

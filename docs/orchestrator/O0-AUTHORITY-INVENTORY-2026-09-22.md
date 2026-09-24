@@ -13,7 +13,7 @@ information". "Core" and "Standard Controller" are its "Distribution shape" term
 authority, evidence, acceptance, effects and budgets with no permanent PM/developer/reviewer
 topology; the Standard Controller is the software workflow above it.
 
-Paths are relative to `foundry/lib/pramana_foundry/` unless stated.
+Paths are relative to `foundry/lib/foundry/` unless stated.
 
 ## 1. The structural fact that shapes everything below
 

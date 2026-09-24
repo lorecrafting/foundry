@@ -168,8 +168,8 @@ two review files added afterward. Working tree was initially clean.
 | Command | Result |
 |---|---|
 | From `foundry/`: `elixir ci/validate_fr15aa.exs` | Exit 0, manifest valid |
-| From `foundry/`: `MIX_ENV=test elixir -r test/test_helper.exs test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | Exit 0, 5 passed, seed 284860 |
-| From `foundry/`: `mix format --check-formatted ci/validate_fr15aa.exs docs/fr-15a/provisioning-manifest.exs test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | Exit 0 |
+| From `foundry/`: `MIX_ENV=test elixir -r test/test_helper.exs test/foundry/repair/fr15aa_provisioning_test.exs` | Exit 0, 5 passed, seed 284860 |
+| From `foundry/`: `mix format --check-formatted ci/validate_fr15aa.exs docs/fr-15a/provisioning-manifest.exs test/foundry/repair/fr15aa_provisioning_test.exs` | Exit 0 |
 | `elixir bin/check_docs.exs` | Exit 0, 80 passed, seed 496428 |
 | `elixir bin/check_docs.exs` after adding review evidence | Exit 0, 80 passed, seed 157559 |
 | `git diff f5067d9..9b9b098 --check` | Exit 0 |

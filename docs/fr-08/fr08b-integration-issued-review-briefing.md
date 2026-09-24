@@ -55,9 +55,9 @@ It now tests membership of `@issued_lifecycles ~w(starting running closing unkno
 
 ## Exact numbers to reproduce
 
-- `mix test test/pramana_foundry/workflow/kernel_test.exs` → **115 passed**.
+- `mix test test/foundry/workflow/kernel_test.exs` → **115 passed**.
 - Rule 6, each reversal applied and undone by exact string replacement in
-  `lib/pramana_foundry/workflow/kernel.ex`:
+  `lib/foundry/workflow/kernel.ex`:
 
   | Neutralisation | Expected |
   |---|---|

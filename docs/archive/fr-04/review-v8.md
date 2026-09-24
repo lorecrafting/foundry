@@ -43,8 +43,8 @@ Tick's inspected admission gate depends on `cleanup_outstanding`. After the sibl
 Reproduce under isolated `MIX_ENV=test` with `mix run --no-start -e`:
 
 ```elixir
-alias PramanaFoundry.Cleanup
-alias PramanaFoundry.Coordinator.Tick
+alias Foundry.Cleanup
+alias Foundry.Coordinator.Tick
 base = %{"task_id" => "T", "execution_id" => "R", "role" => "developer",
   "pane_id" => "dev", "terminal_id" => "term", "agent_name" => "dev"}
 s = %{"assignments" => %{"T" => %{"status" => "dispatched"}}, "queue" => []}
@@ -68,15 +68,15 @@ The fence should account for every remaining unverified resource as well as pend
 Pinned Elixir `1.20.3-otp-29` / OTP `29.0.5`; fresh `mktemp` roots with independent TMPDIR/operator/runtime directories. Unset `HERDR_ENV`, `COORDINATOR_TICK`, and inherited runtime-root settings. Actual runtime probes explicitly set only their fresh fixture root and daemon startup mode and used injected fake adapters.
 
 ```sh
-mix test test/pramana_foundry/herdr/adapter_test.exs \
-  test/pramana_foundry/agent_server_test.exs \
-  test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/transition_test.exs \
-  test/pramana_foundry/runtime_startup_boundary_test.exs \
-  test/pramana_foundry/daemon_recovery_test.exs \
-  test/pramana_foundry/autonomous_launch_test.exs \
-  test/pramana_foundry/stress_test.exs \
-  test/pramana_foundry/status/status_test.exs --seed 40455
+mix test test/foundry/herdr/adapter_test.exs \
+  test/foundry/agent_server_test.exs \
+  test/foundry/coordinator_test.exs \
+  test/foundry/transition_test.exs \
+  test/foundry/runtime_startup_boundary_test.exs \
+  test/foundry/daemon_recovery_test.exs \
+  test/foundry/autonomous_launch_test.exs \
+  test/foundry/stress_test.exs \
+  test/foundry/status/status_test.exs --seed 40455
 ```
 
 **113 passed**, 17.6 seconds, exit 0. Two pre-existing stress-test warnings remain. The null-capture actual-runtime probe and sibling pure projection/Tick probe each exited 0 with the assertions/results above. A preliminary `sed` in the sibling command used an incorrect relative path; it was read-only, unrelated to the Elixir probe, and did not affect its execution.

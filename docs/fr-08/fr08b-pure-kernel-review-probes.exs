@@ -3,8 +3,8 @@ ExUnit.start(seed: 92_041)
 defmodule Fr08bPureKernelReviewProbes do
   use ExUnit.Case, async: false
 
-  alias PramanaFoundry.Workflow.Kernel
-  alias PramanaFoundry.Workflow.Kernel.State
+  alias Foundry.Workflow.Kernel
+  alias Foundry.Workflow.Kernel.State
 
   defp command(type, targets \\ %{}, payload \\ %{}, id \\ "command-1") do
     %{

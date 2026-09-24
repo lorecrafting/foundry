@@ -1,4 +1,4 @@
-defmodule PramanaFoundry.CI.FR15aAProcedure do
+defmodule Foundry.CI.FR15aAProcedure do
   @moduledoc false
 
   @type observation :: {:ok, :present | :absent} | {:error, :observer_unknown}
@@ -58,7 +58,7 @@ defmodule PramanaFoundry.CI.FR15aAProcedure do
   defp valid_ledger_entry?(_entry), do: false
 end
 
-defmodule PramanaFoundry.CI.FR15aAValidator do
+defmodule Foundry.CI.FR15aAValidator do
   @moduledoc false
 
   @schema "pramana-foundry-fr15aa-provisioning/v1"
@@ -207,47 +207,47 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
     "assignment-schema" =>
       {"config", "v1-base-f5067d9", "config/schemas/assignment-v1.json", "repository_pin"},
     "current-coordinator" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/coordinator.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/coordinator.ex",
        "legacy_blocked_route"},
     "current-tick" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/coordinator/tick.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/coordinator/tick.ex",
        "legacy_blocked_route"},
     "current-agent-server" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/agent_server.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/agent_server.ex",
        "legacy_blocked_route"},
     "current-herdr-adapter" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/herdr/adapter.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/herdr/adapter.ex",
        "legacy_blocked_route"},
     "current-herdr-argv" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/herdr/argv.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/herdr/argv.ex",
        "legacy_blocked_route"},
     "current-herdr-runner" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/herdr/runner.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/herdr/runner.ex",
        "legacy_blocked_route"},
     "current-launch-effect" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/effects/launch.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/effects/launch.ex",
        "legacy_blocked_route"},
     "current-prompt-effect" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/effects/prompt_delivery.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/effects/prompt_delivery.ex",
        "legacy_blocked_route"},
     "current-check-runner" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/checks/runner.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/checks/runner.ex",
        "legacy_blocked_route"},
     "current-process-group" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/effects/process_group.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/effects/process_group.ex",
        "legacy_blocked_route"},
     "current-cli-rpc" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/cli/rpc.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/cli/rpc.ex",
        "temporary_inert_transport_not_authority"},
     "current-git-evidence" =>
-      {"source_route", "base-f5067d9", "lib/pramana_foundry/git_evidence.ex",
+      {"source_route", "base-f5067d9", "lib/foundry/git_evidence.ex",
        "legacy_blocked_route"},
     "checkpoint-f-probe" =>
       {"evidence_fixture", "candidate-148476c", "docs/fr-09/pi_rpc_probe.exs",
        "accepted_provider_free_evidence"},
     "workflow-kernel" =>
       {"required_adapter", "fr06-r3-bundle-v1",
-       "/Library/PramanaFoundry/releases/kernel/CANDIDATE_SHA/bin/pramana-kernel", "blocked"},
+       "/Library/Foundry/releases/kernel/CANDIDATE_SHA/bin/pramana-kernel", "blocked"},
     "host-sh" => {"host_executable", "macos-26.6.2-25G83-arm64", "/bin/sh", "host_profile_pin"},
     "host-env" =>
       {"host_executable", "macos-26.6.2-25G83-arm64", "/usr/bin/env", "host_profile_pin"},
@@ -274,13 +274,13 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
     "host-mix" =>
       {"host_executable", "1.20.4-otp-29", "/opt/homebrew/bin/mix", "host_profile_inventory_only"},
     "protected-launcher" =>
-      {"required_adapter", "fr15aa-v1", "/Library/PramanaFoundry/bin/pf-launch", "blocked"},
+      {"required_adapter", "fr15aa-v1", "/Library/Foundry/bin/pf-launch", "blocked"},
     "request-gateway" =>
-      {"required_adapter", "fr15aa-v1", "/Library/PramanaFoundry/bin/pf-auth-gateway", "blocked"},
+      {"required_adapter", "fr15aa-v1", "/Library/Foundry/bin/pf-auth-gateway", "blocked"},
     "effect-bridge" =>
-      {"required_adapter", "fr15aa-v1", "/Library/PramanaFoundry/bin/pf-effect-bridge", "blocked"},
+      {"required_adapter", "fr15aa-v1", "/Library/Foundry/bin/pf-effect-bridge", "blocked"},
     "fetch-service" =>
-      {"required_adapter", "fr15aa-v1", "/Library/PramanaFoundry/bin/pf-fetch", "blocked"}
+      {"required_adapter", "fr15aa-v1", "/Library/Foundry/bin/pf-fetch", "blocked"}
   }
   @repository_pin_ids MapSet.new(~w(
     elixir-ci otp-ci foundry-lock foundry-config assignment-schema current-coordinator
@@ -654,7 +654,7 @@ unless System.get_env("MIX_ENV") == "test" do
   {manifest, _binding} =
     Code.eval_file(Path.expand("../docs/fr-15a/provisioning-manifest.exs", __DIR__))
 
-  case PramanaFoundry.CI.FR15aAValidator.validate(manifest) do
+  case Foundry.CI.FR15aAValidator.validate(manifest) do
     :ok ->
       IO.puts("FR-15aA provisioning manifest: valid")
 

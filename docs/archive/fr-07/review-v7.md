@@ -34,7 +34,7 @@ inferred failures from test counts.
 
 ### V7-R1 — Missing projection rows still satisfy an absent precondition (v6 B1)
 
-`lib/pramana_foundry/durable_store/authority.ex:850` now validates a present projection
+`lib/foundry/durable_store/authority.ex:850` now validates a present projection
 against its complete indexed carrier chain. But the empty-row branch at lines 858–859
 still immediately returns `{:ok, :absent}` without checking whether retained events require
 that projection.
@@ -122,7 +122,7 @@ runtime-root environment variables removed. Existing fetched dependency sources 
 reused; this is a fresh build, not a fresh network dependency audit.
 
 - `mix compile --force --warnings-as-errors`: exit 0; 90 project files.
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 9181`:
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 9181`:
   exit 0; **88 passed**. This includes the complete 75-test durable-store suite.
 - `mix test --seed 9182`: exit 0; **508 passed**. The candidate's recorded missing-tiktoken
   benchmark failure did not reproduce in this reviewer environment. No dependency was

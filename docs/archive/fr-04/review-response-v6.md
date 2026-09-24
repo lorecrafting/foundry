@@ -73,20 +73,20 @@ credential, model, production state or activation was accessed.
 
 ```text
 # /tmp/pramana-fr04-v6-replay2.M6kQGI
-mix test test/pramana_foundry/runtime_startup_boundary_test.exs \
-  test/pramana_foundry/transition_test.exs --seed 40445
+mix test test/foundry/runtime_startup_boundary_test.exs \
+  test/foundry/transition_test.exs --seed 40445
 27 passed; exit 0
 
 # /tmp/pramana-fr04-v6-final.KLrm3P
-mix test test/pramana_foundry/herdr/adapter_test.exs \
-  test/pramana_foundry/agent_server_test.exs \
-  test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/transition_test.exs \
-  test/pramana_foundry/runtime_startup_boundary_test.exs \
-  test/pramana_foundry/daemon_recovery_test.exs \
-  test/pramana_foundry/autonomous_launch_test.exs \
-  test/pramana_foundry/stress_test.exs \
-  test/pramana_foundry/status/status_test.exs --seed 40447
+mix test test/foundry/herdr/adapter_test.exs \
+  test/foundry/agent_server_test.exs \
+  test/foundry/coordinator_test.exs \
+  test/foundry/transition_test.exs \
+  test/foundry/runtime_startup_boundary_test.exs \
+  test/foundry/daemon_recovery_test.exs \
+  test/foundry/autonomous_launch_test.exs \
+  test/foundry/stress_test.exs \
+  test/foundry/status/status_test.exs --seed 40447
 111 passed; exit 0
 
 # /tmp/pramana-fr04-v6-compile.5VI3ae
@@ -109,25 +109,25 @@ byte/SHA-compare unrelated JSONL state after cleanup.
 
 ```text
 bbf27c265bfa56236c8884f04355432ab1156802fbe36924b723697a2c50c4cd  foundry/bin/test_daemon_recovery.sh
-3e32312f492eaaca352e5a99a4288482d2b1e3423b62cba9ccd35be84dd4cb97  foundry/lib/pramana_foundry/agent_server.ex
-2acd833e4c3bbffa87d110d6c986dc699ee98469cb884b87fbd9dfa8fdeb3786  foundry/lib/pramana_foundry/application.ex
-c57c15dc9004718e52c84be3a80eef8e25c8d467a0e8fde21f66f82fc6a90909  foundry/lib/pramana_foundry/cleanup.ex
-3a735bdf4adc696076cfc86c8b66b31aa25a91e18adfcb9899b369eba8591b6e  foundry/lib/pramana_foundry/coordinator.ex
-2877c7f5953e9a6f6ca720bae2e8b5facb6265ffa06b6536073ebd8affe2ada7  foundry/lib/pramana_foundry/coordinator/tick.ex
-404406087170a1e37fcaaa3a6bc0ea9528cc659a689260ac2664bf1e5e846189  foundry/lib/pramana_foundry/herdr/adapter.ex
-5f8f08a72a8f4146860179de61dbc65b00ff741ed1713831b3322bc6f51c97d5  foundry/lib/pramana_foundry/herdr/identity.ex
-80e8cb54aea4e47a15d2840e4177e2adcdf07ec86de231a23cd27b1a81a3ff39  foundry/lib/pramana_foundry/runtime_lease.ex
-00eea833c442ac19987e341733e513610e50e74a2aef11c484bf85e646150e2d  foundry/lib/pramana_foundry/runtime_owner.ex
-ab0c29c76446dbede22d4efe459e9fa5858c888e76415c5271c9c58a7e902274  foundry/lib/pramana_foundry/status/report.ex
-3f5b88e142a522dad2c193366ef18507ca83bc148144523c0b473b1638f22a3f  foundry/lib/pramana_foundry/transition.ex
-2da4321a628fc70757b5de3ea0507c3163cdb5eb4316d79de032e61efbf5a55b  foundry/test/pramana_foundry/agent_server_test.exs
-8a90782f8a6b5a9497a917fe6d79377555ace2d06571da137f06122882ada23f  foundry/test/pramana_foundry/autonomous_launch_test.exs
-c5594b8980b822d4a19511177cc51730d745455abdeb8ae0427e496c3507eee3  foundry/test/pramana_foundry/coordinator_test.exs
-3b4977469a61f1b21ab68ea673411197238bf5558bca160bd3c6778154714776  foundry/test/pramana_foundry/daemon_recovery_test.exs
-931843cb63a32c7050b58c8cf32caf89cc66ce9ba42cdf50fc74b5be7a5656e2  foundry/test/pramana_foundry/herdr/adapter_test.exs
-4794b21ac15c21560367f0285a791fdb964a807bd017921242fdf13297019aa6  foundry/test/pramana_foundry/runtime_startup_boundary_test.exs
-8a4776b0234c391d05caadf8816cefc39af32dd458478e76f49ae1cf48347bdb  foundry/test/pramana_foundry/stress_test.exs
-195e199f4fdf920383d2a343961ce6cb269b8095a0f5941f9013fc3c0306ca38  foundry/test/pramana_foundry/transition_test.exs
+3e32312f492eaaca352e5a99a4288482d2b1e3423b62cba9ccd35be84dd4cb97  foundry/lib/foundry/agent_server.ex
+2acd833e4c3bbffa87d110d6c986dc699ee98469cb884b87fbd9dfa8fdeb3786  foundry/lib/foundry/application.ex
+c57c15dc9004718e52c84be3a80eef8e25c8d467a0e8fde21f66f82fc6a90909  foundry/lib/foundry/cleanup.ex
+3a735bdf4adc696076cfc86c8b66b31aa25a91e18adfcb9899b369eba8591b6e  foundry/lib/foundry/coordinator.ex
+2877c7f5953e9a6f6ca720bae2e8b5facb6265ffa06b6536073ebd8affe2ada7  foundry/lib/foundry/coordinator/tick.ex
+404406087170a1e37fcaaa3a6bc0ea9528cc659a689260ac2664bf1e5e846189  foundry/lib/foundry/herdr/adapter.ex
+5f8f08a72a8f4146860179de61dbc65b00ff741ed1713831b3322bc6f51c97d5  foundry/lib/foundry/herdr/identity.ex
+80e8cb54aea4e47a15d2840e4177e2adcdf07ec86de231a23cd27b1a81a3ff39  foundry/lib/foundry/runtime_lease.ex
+00eea833c442ac19987e341733e513610e50e74a2aef11c484bf85e646150e2d  foundry/lib/foundry/runtime_owner.ex
+ab0c29c76446dbede22d4efe459e9fa5858c888e76415c5271c9c58a7e902274  foundry/lib/foundry/status/report.ex
+3f5b88e142a522dad2c193366ef18507ca83bc148144523c0b473b1638f22a3f  foundry/lib/foundry/transition.ex
+2da4321a628fc70757b5de3ea0507c3163cdb5eb4316d79de032e61efbf5a55b  foundry/test/foundry/agent_server_test.exs
+8a90782f8a6b5a9497a917fe6d79377555ace2d06571da137f06122882ada23f  foundry/test/foundry/autonomous_launch_test.exs
+c5594b8980b822d4a19511177cc51730d745455abdeb8ae0427e496c3507eee3  foundry/test/foundry/coordinator_test.exs
+3b4977469a61f1b21ab68ea673411197238bf5558bca160bd3c6778154714776  foundry/test/foundry/daemon_recovery_test.exs
+931843cb63a32c7050b58c8cf32caf89cc66ce9ba42cdf50fc74b5be7a5656e2  foundry/test/foundry/herdr/adapter_test.exs
+4794b21ac15c21560367f0285a791fdb964a807bd017921242fdf13297019aa6  foundry/test/foundry/runtime_startup_boundary_test.exs
+8a4776b0234c391d05caadf8816cefc39af32dd458478e76f49ae1cf48347bdb  foundry/test/foundry/stress_test.exs
+195e199f4fdf920383d2a343961ce6cb269b8095a0f5941f9013fc3c0306ca38  foundry/test/foundry/transition_test.exs
 26417b912b3c8f94f6823d484392584cdd9f67d91eadff71870cbc602cfc4443  foundry/test/support/runtime_cleanup_fixture.exs
 521b77cf2747b79296d79f416b3e9a40eb1e02e4d1f5f87bcf3e683c7186318a  foundry/test/support/runtime_two_resource_fixture.exs
 ```

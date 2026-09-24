@@ -111,7 +111,7 @@ own dependency and build roots.
 1. `git diff --check 25e1097..1495bca` — exit 0.
 2. `mix compile --force --warnings-as-errors` with isolated build/temp/runtime paths —
    exit 0.
-3. `mix test test/pramana_foundry/effects/process_group_test.exs test/pramana_foundry/checks test/pramana_foundry/daemon_recovery_test.exs --seed 8021`
+3. `mix test test/foundry/effects/process_group_test.exs test/foundry/checks test/foundry/daemon_recovery_test.exs --seed 8021`
    — exit 0, `32 passed`.
 4. `mix format --check-formatted` over the four changed source/test files — exit 0.
 5. Detached-base live-argv reproduction — base reported the live marker gone; candidate

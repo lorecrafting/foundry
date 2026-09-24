@@ -200,10 +200,10 @@ MIX_ENV=test \
 MIX_BUILD_PATH=/private/tmp/fr18a-review-build \
 MIX_DEPS_PATH=/Users/raymondluong/dev/pramana/foundry/deps \
 COORDINATOR_TICK=0 \
-mix test test/pramana_foundry/observations_test.exs \
-  test/pramana_foundry/durable_store/protected_primitives_test.exs \
-  test/pramana_foundry/durable_store/fr08a_critical_corrections_test.exs \
-  test/pramana_foundry/durable_store/fr08a_fr19a_integration_test.exs \
+mix test test/foundry/observations_test.exs \
+  test/foundry/durable_store/protected_primitives_test.exs \
+  test/foundry/durable_store/fr08a_critical_corrections_test.exs \
+  test/foundry/durable_store/fr08a_fr19a_integration_test.exs \
   --seed 28181
 ```
 
@@ -220,7 +220,7 @@ the candidate record:
 
 ```text
 de22881c1cd800dfb0cdcdf350eaa77c40380506b97f413e7f7ff3f73f026305  provenance.json
-39afe87487d8a76dd8c503aa005b2aedfe2f2a451adb0b3ab00c888c3a4d4897  pramana_foundry
+39afe87487d8a76dd8c503aa005b2aedfe2f2a451adb0b3ab00c888c3a4d4897  foundry
 ```
 
 That recorded run passed 619 tests with 13 intentional skips and one optional Python/

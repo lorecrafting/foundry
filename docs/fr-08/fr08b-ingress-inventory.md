@@ -21,15 +21,15 @@ planning evidence, not ticket completion, execution authority or a replacement f
 has two separate transaction surfaces: domain `Gateway.transact/4` and single-operation
 `Gateway.protected_command/4`. Neither can atomically combine an R4/R4a domain transition
 with protected claim, reservation, lease, receipt or ledger settlement
-(`lib/pramana_foundry/durable_store/gateway.ex`, lines 75–90;
-`lib/pramana_foundry/durable_store/protected_primitives.ex`, lines 10–44). The focused
+(`lib/foundry/durable_store/gateway.ex`, lines 75–90;
+`lib/foundry/durable_store/protected_primitives.ex`, lines 10–44). The focused
 [atomic-composition diagnosis](atomic-composition-diagnosis.md#finding) reaches the same
 conclusion.
 
 **Direct evidence:** no production Coordinator path uses the SQLite Gateway. Coordinator
 still recovers and writes `events.jsonl`, while live mutation remains divided among
 Coordinator, State, Tick, PM, Cleanup and AgentServer callbacks
-(`lib/pramana_foundry/coordinator.ex`, lines 121–137, 158–171 and 1245–1275).
+(`lib/foundry/coordinator.ex`, lines 121–137, 158–171 and 1245–1275).
 
 **Required migration:** after the independently accepted FR-08A atomic-bundle correction
 integrates, FR-08B should route every mutation through one command service invoking a pure
@@ -41,27 +41,27 @@ replay. The current `Transition` is a legacy event projector, not that kernel.
 The durable codec currently admits exactly these command types:
 `legacy_event_append`, `enqueue`, `steer`, `pause`, `resume`, `cancel`, `reset`, `propose`,
 `submit_artifact`, `submit_review`, `request_effect` and `record_receipt`
-(`lib/pramana_foundry/durable_store/record_codec.ex`, lines 17–23).
+(`lib/foundry/durable_store/record_codec.ex`, lines 17–23).
 
 The Gateway validates command and bundle shape but accepts a caller-supplied proposal; it
 does not bind each command type to a trusted domain decision function
-(`lib/pramana_foundry/durable_store/gateway.ex`, lines 471–560). Existing result
+(`lib/foundry/durable_store/gateway.ex`, lines 471–560). Existing result
 dispositions are `accepted`, `rejected` and `blocked`; rejected or blocked proposals may
-not contain domain mutations (`lib/pramana_foundry/durable_store/kernel.ex`, lines 9–24).
+not contain domain mutations (`lib/foundry/durable_store/kernel.ex`, lines 9–24).
 
 Protected operations currently comprise `set_policy`, `set_control`, `append_inbox`,
 `seal_inbox`, `grant_ledger`, `delegate_allocation`, `return_allocation`, `reserve`,
 `release_reservation`, `close_generation`, `reset_generation`, `create_effect`,
 `claim_effect`, `reclaim_claim`, `issue_claim`, `cancel_effect` and `settle_claim`
-(`lib/pramana_foundry/durable_store/protected_primitives.ex`, lines 6–8). Claim-settlement
+(`lib/foundry/durable_store/protected_primitives.ex`, lines 6–8). Claim-settlement
 outcomes are `succeeded`, `failed`, `non_started` and `unknown`, with fixed proof pairings
-(`lib/pramana_foundry/durable_store/protected_primitives.ex`, lines 1139–1175 and
+(`lib/foundry/durable_store/protected_primitives.ex`, lines 1139–1175 and
 3288–3291).
 
 `Coordinator.transition/1` is only a non-persisting planner for `:admit` and `:prompt`, not
-a canonical command executor (`lib/pramana_foundry/coordinator.ex`, lines 282–286;
-`lib/pramana_foundry/transition.ex`, lines 76–140). `Coordinator.replace_projection/1` is
-exposed but has no matching handler (`lib/pramana_foundry/coordinator.ex`, line 31).
+a canonical command executor (`lib/foundry/coordinator.ex`, lines 282–286;
+`lib/foundry/transition.ex`, lines 76–140). `Coordinator.replace_projection/1` is
+exposed but has no matching handler (`lib/foundry/coordinator.ex`, line 31).
 
 ## Mutation-ingress inventory
 
@@ -215,11 +215,11 @@ atomic-composition correction and rerun its authority/replay gate first.
 
 The correction is expected to own these high-conflict files:
 
-- `lib/pramana_foundry/durable_store/gateway.ex`
-- `lib/pramana_foundry/durable_store/protected_primitives.ex`
-- `lib/pramana_foundry/durable_store/database.ex`
-- `lib/pramana_foundry/durable_store/record_codec.ex`
-- `lib/pramana_foundry/durable_store/authority.ex`
+- `lib/foundry/durable_store/gateway.ex`
+- `lib/foundry/durable_store/protected_primitives.ex`
+- `lib/foundry/durable_store/database.ex`
+- `lib/foundry/durable_store/record_codec.ex`
+- `lib/foundry/durable_store/authority.ex`
 - FR-08A durable-store tests and repair-gate evidence
 - shared repair-plan and implementation-log status records
 

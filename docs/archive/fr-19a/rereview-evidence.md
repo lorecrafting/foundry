@@ -29,9 +29,9 @@ the candidate/tree. For direct Mix commands, `MIX_ENV=test`, `COORDINATOR_TICK=0
 `MIX_DEPS_PATH=/Users/raymondluong/dev/pramana/foundry/deps` were supplied.
 
 ```sh
-mix test test/pramana_foundry/durable_store/operational_storage_test.exs \
-  test/pramana_foundry/durable_store/sync_fault_test.exs \
-  test/pramana_foundry/relocation_containment_test.exs \
+mix test test/foundry/durable_store/operational_storage_test.exs \
+  test/foundry/durable_store/sync_fault_test.exs \
+  test/foundry/relocation_containment_test.exs \
   test/fr19a_sync_eio_orchestration_test.exs \
   test/fr19a_sync_eio_workflow_test.exs --seed 19233
 ```
@@ -47,7 +47,7 @@ one observation reads the WAL stat at its existing hook. Production module code 
 recompiled or replaced. BEAM tracing captures the real `Database.query/2` return.
 
 ```elixir
-alias PramanaFoundry.DurableStore.Database
+alias Foundry.DurableStore.Database
 ExUnit.start(autorun: false)
 ExUnit.configure(exclude: [review_other: true], include: [review_probe: true], seed: 19231)
 {:module, Database} = Code.ensure_loaded(Database)
@@ -63,11 +63,11 @@ tracer = spawn(fn ->
 end)
 :erlang.trace_pattern({Database, :query, 2}, [{[:_, "PRAGMA wal_checkpoint(TRUNCATE)"], [], [{:return_trace}]}], [:local])
 :erlang.trace(:all, true, [:call, {:tracer, tracer}])
-source = File.read!("test/pramana_foundry/durable_store/operational_storage_test.exs")
+source = File.read!("test/foundry/durable_store/operational_storage_test.exs")
 source = String.replace(source, "use ExUnit.Case, async: false", "use ExUnit.Case, async: false\n  @moduletag review_other: true")
 source = String.replace(source, "  test \"engine interruption during checkpoint", "  @tag review_probe: true\n  test \"engine interruption during checkpoint")
 source = String.replace(source, "fault = fn conn ->", "fault = fn conn ->\n        IO.inspect({operation, File.stat(path <> \"-wal\")}, label: \"PRE_OPERATION_WAL\")")
-Code.compile_string(source, "test/pramana_foundry/durable_store/operational_storage_test.exs")
+Code.compile_string(source, "test/foundry/durable_store/operational_storage_test.exs")
 result = ExUnit.run()
 IO.inspect(result, label: "DIAGNOSTIC_RESULT")
 ```
@@ -76,10 +76,10 @@ Observed WAL size at the checkpoint hook: `0`. Exact relevant trace/result:
 
 ```text
 CHECKPOINT_SQL_TRACE: {:trace, #PID<0.1239.0>, :call,
- {PramanaFoundry.DurableStore.Database, :query,
+ {Foundry.DurableStore.Database, :query,
   [#Reference<0.601774758.1102708759.36603>, "PRAGMA wal_checkpoint(TRUNCATE)"]}}
 CHECKPOINT_SQL_TRACE: {:trace, #PID<0.1239.0>, :return_from,
- {PramanaFoundry.DurableStore.Database, :query, 2}, {:ok, [[0, 0, 0]]}}
+ {Foundry.DurableStore.Database, :query, 2}, {:ok, [[0, 0, 0]]}}
 Result: 1 passed, 14 excluded
 DIAGNOSTIC_RESULT: %{total: 15, skipped: 0, failures: 0, excluded: 14}
 ```
@@ -96,7 +96,7 @@ deadline. The root/database and ambiguous owner marker were left as disposable e
 the orphan worker was explicitly killed and joined.
 
 ```elixir
-alias PramanaFoundry.DurableStore.Gateway
+alias Foundry.DurableStore.Gateway
 Process.flag(:trap_exit, true)
 root = "/private/tmp/fr19a-rereview.rTTr6P/health-kill-owned"
 File.mkdir!(root)

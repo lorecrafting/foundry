@@ -41,7 +41,7 @@ provider API-key variables. Runtime reported tick disabled and an empty isolated
 log. No live Herdr/provider command or production runtime state was accessed.
 
 ```text
-mix test test/pramana_foundry/transition_test.exs --seed 40460
+mix test test/foundry/transition_test.exs --seed 40460
 14 passed; exit 0
 ```
 

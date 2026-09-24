@@ -2,19 +2,19 @@
 # Run with MIX_ENV=test mix run --no-start docs/fr-08/atomic-composition-review-probes.exs
 # Required-behavior assertions deliberately fail on the reviewed candidate.
 ExUnit.start(seed: 92022)
-base = File.read!("test/pramana_foundry/durable_store/atomic_bundle_test.exs")
+base = File.read!("test/foundry/durable_store/atomic_bundle_test.exs")
 
 base =
   String.replace(
     base,
-    "PramanaFoundry.DurableStore.AtomicBundleTest",
-    "PramanaFoundry.AtomicCompositionIndependentReview"
+    "Foundry.DurableStore.AtomicBundleTest",
+    "Foundry.AtomicCompositionIndependentReview"
   )
 
 base = Regex.replace(~r/\nend\s*\z/, base, "\n")
 
 extra = ~S"""
-  alias PramanaFoundry.DurableStore.Encoding
+  alias Foundry.DurableStore.Encoding
 
   defp decode_review(bytes), do: bytes |> :json.decode() |> normalize_review()
   defp normalize_review(:null), do: nil

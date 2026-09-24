@@ -23,7 +23,7 @@ Paths below are relative to `foundry/`. R1–R5 have executed concrete reproduct
 
 ### R1 — Authority completeness and discovered-corruption fencing are incomplete
 
-`lib/pramana_foundry/durable_store/database.ex:437` validates existing result rows but does not require a result for every acknowledged command. The command/input check at line 551 does not supply that missing relation. `gateway.ex:633` uses a commands/results inner join, which converts a retained command without its result into `not_found`.
+`lib/foundry/durable_store/database.ex:437` validates existing result rows but does not require a result for every acknowledged command. The command/input check at line 551 does not supply that missing relation. `gateway.ex:633` uses a commands/results inner join, which converts a retained command without its result into `not_found`.
 
 Minimal executed trace: commit protected command A; execute `DELETE FROM command_results WHERE command_id='A'`; cleanly stop/reopen gateway. Observed `mode: :ready`, `Gateway.command(g, "A") == {:error, :not_found}`; command B commits; backup succeeds with two commands but one result. Thus startup and backup certify incomplete authority rather than fence it.
 
@@ -116,7 +116,7 @@ COORDINATOR_TICK=0
 Commands/results:
 
 ```sh
-mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 7735
+mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 7735
 # 62/62 passed; exit 0, fresh dependency and 87-module compile.
 mix compile --force --warnings-as-errors
 # 87 modules; exit 0.
@@ -135,7 +135,7 @@ The nine characterization tests intentionally assert reproduced defects as well 
 - `sync_child.exs`: SHA256 `fd7f1145e0d3e6208d30721ec275e4d7e1b8fd0c3cd096e09d434100bcaf7d37`.
 - `sync_probes.exs`: SHA256 `bedd9dbbf3b123973bce6eb0161bec6e13d46abc590c1b265d63b43d15dbddba`.
 
-Also independently ran the entire suite in a second fresh root, `/private/tmp/fr07-v5-full-review.qnv6H8`, with its own `build` and `TMPDIR`, same pinned PATH/MIX_ENV/tick settings, and `env -u HERDR_ENV -u PRAMANA_OPERATOR_RUNTIME_ROOT ... mix test --seed 7736`. Result: **470/471 passed, exit 2**, 41.0 seconds. Sole failure: `test/pramana_foundry/projections/benchmark_test.exs:12`, equality with saved benchmark output. That test is unchanged by this candidate. I have not established the cause of the saved-output difference, so do not certify the author's 471-pass result or attribute this failure to storage. Existing fixture-name and stress-test warnings were printed. Independent formatting was not run.
+Also independently ran the entire suite in a second fresh root, `/private/tmp/fr07-v5-full-review.qnv6H8`, with its own `build` and `TMPDIR`, same pinned PATH/MIX_ENV/tick settings, and `env -u HERDR_ENV -u PRAMANA_OPERATOR_RUNTIME_ROOT ... mix test --seed 7736`. Result: **470/471 passed, exit 2**, 41.0 seconds. Sole failure: `test/foundry/projections/benchmark_test.exs:12`, equality with saved benchmark output. That test is unchanged by this candidate. I have not established the cause of the saved-output difference, so do not certify the author's 471-pass result or attribute this failure to storage. Existing fixture-name and stress-test warnings were printed. Independent formatting was not run.
 
 ## Bounded WAL xSync proof — credited, not a blocker
 

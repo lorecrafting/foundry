@@ -1,6 +1,6 @@
 # Relocation rules (retired 2026-09-23)
 
-Recorded 2026-09-23. `PramanaFoundry.Relocation` and `relocation/*` were deleted under
+Recorded 2026-09-23. `Foundry.Relocation` and `relocation/*` were deleted under
 [repair-plan amendment C3](../REPAIR-PLAN.md#clean-room-amendment) (sweep question Q6).
 Mutation had been disabled since FR-19A (`relocation_status/0` returned
 `{:error, {:relocation_disabled, :fr19b_required}}`), and nothing outside `relocation/`

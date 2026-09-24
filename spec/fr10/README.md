@@ -4,7 +4,7 @@
 [the FR-10 design](../../docs/fr-10/FR10-DESIGN-2026-09-23.md). It models the protocol **as
 designed** (D1–D5 plus the operator's answers Q2–Q4), not today's code. Each store action
 cites the protected operation it models in
-`lib/pramana_foundry/durable_store/protected_primitives.ex` (`PP:<line>`, lines at
+`lib/foundry/durable_store/protected_primitives.ex` (`PP:<line>`, lines at
 Pramāṇa `33395c92`). The scope follows design §7: one ticket and attempt, and one semantic operation
 with ordinal 0 (E0) and its retry, ordinal 1 (E1). There are two writer epochs, and each
 effect has one reservation of one unit on a two-unit ledger. Failures injected: a

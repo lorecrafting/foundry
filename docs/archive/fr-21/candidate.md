@@ -36,7 +36,7 @@ and generated escript hash. Review must match those recorded identities and the 
 path hashes; a later behavior change requires renewed evidence.
 
 Owned paths are `.github/workflows/foundry-ci.yml`, `.gitignore`, the new `foundry/ci/`
-files, `PramanaFoundry.CI`, FR-21 tests/docs, narrow migration/README truth corrections,
+files, `Foundry.CI`, FR-21 tests/docs, narrow migration/README truth corrections,
 the retired `Parity` implementation and test, and the exact deleted dependency/executable/
 diagnostic artifacts. The existing RPC wrapper test now derives its compiled ebin from
 `Mix.Project.build_path/0` instead of assuming `_build/test`, which makes its actual wrapper
@@ -50,7 +50,7 @@ Using the pinned Elixir 1.20.3 / OTP 29.0.5 installations:
 - `mix deps.get --check-locked` restored OWL from Hex after the vendored directory deletion;
 - forced warnings-as-errors compilation passed after retiring the vacuous parity return;
 - focused formatting passed; and
-- `mix test test/pramana_foundry/ci_test.exs test/pramana_foundry/policy_test.exs --seed 0`
+- `mix test test/foundry/ci_test.exs test/foundry/policy_test.exs --seed 0`
   passed 7 tests.
 
 The first clean full-run attempt failed 2 of 426 tests because the pre-existing RPC wrapper

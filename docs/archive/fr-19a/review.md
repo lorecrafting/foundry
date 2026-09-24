@@ -128,10 +128,10 @@ reused for direct checks; the CI runner separately restored locked Hex dependenc
 |---|---|
 | `mix compile --force --warnings-as-errors` | Exit 0; 107 project files |
 | `mix format --check-formatted` | Exit 0 |
-| `mix test test/pramana_foundry/durable_store/operational_storage_test.exs test/pramana_foundry/relocation_containment_test.exs --seed 1921` | Exit 0; 10 passed |
+| `mix test test/foundry/durable_store/operational_storage_test.exs test/foundry/relocation_containment_test.exs --seed 1921` | Exit 0; 10 passed |
 | `mix test $(rg --files test \| rg '_test.exs$' \| rg -v 'sync_fault_test.exs$') --seed 1922` | Exit 2; 540/541 passed, 13 skipped; assessor request timing assertion failed |
-| `mix test test/pramana_foundry/assessor/jev_test.exs --seed 1922` | Exit 0; 13 passed on isolated rerun |
-| `mix test test/pramana_foundry/durable_store/sync_fault_test.exs --seed 1923`, without header override | Exit 139 |
+| `mix test test/foundry/assessor/jev_test.exs --seed 1922` | Exit 0; 13 passed on isolated rerun |
+| `mix test test/foundry/durable_store/sync_fault_test.exs --seed 1923`, without header override | Exit 139 |
 | Same sync command with bundled-header `CPATH` below | Exit 0; 2 passed |
 | Complete canonical-temp/bundled-header CI command below | Exit 0; 542 passed, 13 skipped, 1 excluded; compile, format and escript commands passed |
 | Manifest comparison and `git diff --check 4a9098d..HEAD` | Exit 0 |

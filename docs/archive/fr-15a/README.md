@@ -9,8 +9,8 @@ removed, so the validator could only be rebound to a route that no longer exists
 | File | Was at | Role |
 |---|---|---|
 | `provisioning-manifest.exs` | `docs/fr-15a/` | The provisioning manifest: principals, channels, routes, host profile, sha256 pins |
-| `validate_fr15aa.exs` | `ci/` | `PramanaFoundry.CI.FR15aAValidator`, the manifest validator |
-| `fr15aa_provisioning_test.exs.txt` | `test/pramana_foundry/repair/fr15aa_provisioning_test.exs` | The gate test; renamed so it is no longer compiled |
+| `validate_fr15aa.exs` | `ci/` | `Foundry.CI.FR15aAValidator`, the manifest validator |
+| `fr15aa_provisioning_test.exs.txt` | `test/foundry/repair/fr15aa_provisioning_test.exs` | The gate test; renamed so it is no longer compiled |
 | `independent-review-probes.exs`, `independent-rereview-probes.exs`, `independent-final-review-probes.exs` | `docs/fr-15a/` | The review rounds' mutation probes against the validator |
 
 The files are unchanged apart from the move. Their relative paths (`../../ci/…`,

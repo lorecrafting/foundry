@@ -25,7 +25,7 @@ necessary retained-event/recovery collateral, not a reopened audit of downstream
 
 ## One residual blocker: carrier decoding can raise before owner validation
 
-`foundry/lib/pramana_foundry/durable_store/authority.ex:966` iterates the indexed entity
+`foundry/lib/foundry/durable_store/authority.ex:966` iterates the indexed entity
 carrier rows. It calls `RecordCodec.decode_bound(:event, ...)`, which validates the event
 envelope but does not bind the stored projection-index columns or require a projection
 carrier. A valid carrier-free legacy event is legal to that decoder. The code then assumes
@@ -98,7 +98,7 @@ Commands ran from candidate `foundry/` via `mise exec --`. Existing dependency s
 were reused; no network dependency revalidation is claimed.
 
 - `mix compile --force --warnings-as-errors`: exit 0; 90 project files.
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 9201`:
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 9201`:
   exit 0; **91 passed**.
 - Changed Elixir source/test format check and `git diff --check` from exact v7 candidate:
   exit 0.
@@ -107,7 +107,7 @@ were reused; no network dependency revalidation is claimed.
   the exception above. Its green characterization result is not an acceptance pass.
 - Independent full-row VFS recovery oracle: exit 0; one test, both concrete branches passed.
 - `mix test --seed 9202`: exit 2; **510/511 passed**. The sole failure was the unchanged
-  telemetry test `test/pramana_foundry/telemetry/telemetry_test.exs:123`, which unexpectedly
+  telemetry test `test/foundry/telemetry/telemetry_test.exs:123`, which unexpectedly
   received `:emitter_delayed_action`. Its isolated location rerun with seed 9203 passed
   (one passed, six excluded). The fixture uses a 100 ms emitter timeout alongside the
   default `refute_receive` wait; a timing interaction is plausible, but no root-cause

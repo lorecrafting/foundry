@@ -1,8 +1,8 @@
 # Foundry boundary rules
 
-Read before any Foundry code change. Core is `lib/pramana_foundry/durable_store/`; the
-kernel is `lib/pramana_foundry/workflow/`; `kernel/software/` is the reference controller.
-"Gate" means `test/pramana_foundry/architecture_boundary_test.exs`; each rule names the test
+Read before any Foundry code change. Core is `lib/foundry/durable_store/`; the
+kernel is `lib/foundry/workflow/`; `kernel/software/` is the reference controller.
+"Gate" means `test/foundry/architecture_boundary_test.exs`; each rule names the test
 that fails, with the file and line of the offence.
 
 1. **Core never references Workflow.** Gate: `rule 1 Core references no Workflow module`.
@@ -16,7 +16,7 @@ that fails, with the file and line of the offence.
    `@families` table in `kernel.ex`. Gate: `rule 4 generic kernel modules name
    kernel/software only at the declared sites`.
 5. **Every guarantee Core owns lives in an attestation-pinned file.** Pin:
-   `test/pramana_foundry/repair/fr08a_protected_boundary_test.exs`.
+   `test/foundry/repair/fr08a_protected_boundary_test.exs`.
 6. **Foundry depends on no Pramāṇa app.** Gate: `rule 6 Foundry declares and locks no
    Pramāṇa app` and `rule 6 Foundry lib references no Pramāṇa app module`.
 7. **A guarantee Core owns never depends on a controller checking it**

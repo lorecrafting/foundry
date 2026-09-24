@@ -20,9 +20,9 @@ git diff --check
 Fresh `mktemp` TMPDIR/operator roots; pinned Elixir `1.20.3-otp-29` / OTP `29.0.5`; `MIX_ENV=test`; unset `HERDR_ENV`, `COORDINATOR_TICK`, inherited runtime-root/fresh/startup settings. Runtime tests create their own isolated roots and inject fake adapters.
 
 ```sh
-mix test test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/transition_test.exs \
-  test/pramana_foundry/runtime_startup_boundary_test.exs --seed 40459
+mix test test/foundry/coordinator_test.exs \
+  test/foundry/transition_test.exs \
+  test/foundry/runtime_startup_boundary_test.exs --seed 40459
 ```
 
 **43 passed**, 11.8 seconds, exit 0. Inspected the checked-gateway sibling helper and reran both orderings:

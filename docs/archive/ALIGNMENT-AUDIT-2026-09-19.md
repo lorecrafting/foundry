@@ -544,7 +544,7 @@ git diff --stat 8d7223b HEAD -- foundry
 git diff --name-status c4816b2 HEAD -- foundry/lib foundry/test foundry/mix.exs foundry/mix.lock
 git cat-file -e REV^{commit}
 git merge-base --is-ancestor REV HEAD
-git show 3759731 -- foundry/lib/pramana_foundry/effects/process_group.ex
+git show 3759731 -- foundry/lib/foundry/effects/process_group.ex
 git diff --check
 elixir --version
 ```
@@ -565,13 +565,13 @@ Executed bounded model-free checks, from `foundry/`, using installed Elixir 1.20
 OTP 29 / ERTS 17.0.5, without Mix/application startup, file fixtures or provider access:
 
 ```sh
-elixir -r lib/pramana_foundry/repair/fr08_handoff_gate.ex -e 'ExUnit.start(seed: 9251); Code.require_file("test/pramana_foundry/repair/fr08_handoff_gate_test.exs"); IO.inspect(PramanaFoundry.Repair.FR08HandoffGate.run(), label: "default_gate")'
+elixir -r lib/foundry/repair/fr08_handoff_gate.ex -e 'ExUnit.start(seed: 9251); Code.require_file("test/foundry/repair/fr08_handoff_gate_test.exs"); IO.inspect(Foundry.Repair.FR08HandoffGate.run(), label: "default_gate")'
 ```
 
 Exit 0: **13 passed**. Default gate is blocked, 0 passed / 7 unavailable.
 
 ```sh
-elixir -r lib/pramana_foundry/durable_store/encoding.ex -r lib/pramana_foundry/durable_store/record_codec.ex -r lib/pramana_foundry/durable_store/kernel.ex -e 'ExUnit.start(seed: 9252); Code.require_file("test/pramana_foundry/durable_store/record_codec_test.exs"); alias PramanaFoundry.DurableStore.RecordCodec; claim = %{schema_version: 1, claim_id: "c", effect_id: "e", writer_epoch: "w", status: "claimed", value: %{verified: true}}; IO.inspect(RecordCodec.normalize(:claim, claim), label: "claimed_supported"); IO.inspect(RecordCodec.normalize(:claim, %{claim | status: "issued"}), label: "issued_currently_unsupported"); gen = %{schema_version: 1, generation_id: "g", parent_generation_id: nil, revision: 0, allocation: 1, consumed: 0}; IO.inspect(RecordCodec.normalize(:ledger_generation, gen), label: "generation_zero_supported"); IO.inspect(RecordCodec.normalize(:ledger_generation, %{gen | revision: 1}), label: "ledger_revision_one_currently_unsupported")'
+elixir -r lib/foundry/durable_store/encoding.ex -r lib/foundry/durable_store/record_codec.ex -r lib/foundry/durable_store/kernel.ex -e 'ExUnit.start(seed: 9252); Code.require_file("test/foundry/durable_store/record_codec_test.exs"); alias Foundry.DurableStore.RecordCodec; claim = %{schema_version: 1, claim_id: "c", effect_id: "e", writer_epoch: "w", status: "claimed", value: %{verified: true}}; IO.inspect(RecordCodec.normalize(:claim, claim), label: "claimed_supported"); IO.inspect(RecordCodec.normalize(:claim, %{claim | status: "issued"}), label: "issued_currently_unsupported"); gen = %{schema_version: 1, generation_id: "g", parent_generation_id: nil, revision: 0, allocation: 1, consumed: 0}; IO.inspect(RecordCodec.normalize(:ledger_generation, gen), label: "generation_zero_supported"); IO.inspect(RecordCodec.normalize(:ledger_generation, %{gen | revision: 1}), label: "ledger_revision_one_currently_unsupported")'
 ```
 
 Exit 0: **3 passed**, supported positive controls succeed; issued claim returns
@@ -580,7 +580,7 @@ Exit 0: **3 passed**, supported positive controls succeed; issued claim returns
 not failed FR-07 regressions.
 
 ```sh
-elixir -r lib/pramana_foundry/effects/process_group.ex -e 'probe_label = "defunct-positive-control"; os_pid = String.to_integer(System.pid()); {:ok, identity} = PramanaFoundry.Effects.ProcessGroup.identity(os_pid); IO.inspect(%{label: probe_label, current_beam_is_running: Process.alive?(self()), argv_contains_marker: String.contains?(identity.command, "defunct"), reported_gone: PramanaFoundry.Effects.ProcessGroup.gone?(os_pid)})'
+elixir -r lib/foundry/effects/process_group.ex -e 'probe_label = "defunct-positive-control"; os_pid = String.to_integer(System.pid()); {:ok, identity} = Foundry.Effects.ProcessGroup.identity(os_pid); IO.inspect(%{label: probe_label, current_beam_is_running: Process.alive?(self()), argv_contains_marker: String.contains?(identity.command, "defunct"), reported_gone: Foundry.Effects.ProcessGroup.gone?(os_pid)})'
 ```
 
 Exit 0 with the false-death result above. Successful command execution is evidence the

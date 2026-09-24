@@ -1,7 +1,7 @@
 # R5 budget ledger — Quint model
 
 `ledger.qnt` models the R5 budget ledger as the code implements it
-(`lib/pramana_foundry/durable_store/protected_primitives.ex` at Pramāṇa `df1ac5f8`; every
+(`lib/foundry/durable_store/protected_primitives.ex` at Pramāṇa `df1ac5f8`; every
 action cites its line). The contract is the "Budget ledger — R5" section of
 [the workflow contract](../../docs/WORKFLOW-CONTRACT.md). Where the code and the contract
 disagree, the model follows the code and marks the spot `DISAGREE`.
@@ -85,7 +85,7 @@ refuses to reopen. None of the three findings breaks numeric conservation.
 Both fixes refuse the operation; neither moves units. The model still describes the code
 at `df1ac5f8`, so `HeldOwnerLive` and `RestartValid` still report findings 2 and 3 until
 it is updated to match. The probes are in
-`test/pramana_foundry/durable_store/ledger_restart_probe_test.exs`: each drives
+`test/foundry/durable_store/ledger_restart_probe_test.exs`: each drives
 the real API to the refused operation, then reopens the database.
 
 - **Finding 2 (5f021010).** `create_effect` refuses reservations on more than one

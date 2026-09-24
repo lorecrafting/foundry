@@ -1,8 +1,8 @@
 # Review-only independent integration variations; reuse the public fixture helpers.
 ExUnit.start(seed: 20933)
-source_path = "test/pramana_foundry/durable_store/fr08a_fr19a_integration_test.exs"
+source_path = "test/foundry/durable_store/fr08a_fr19a_integration_test.exs"
 base = File.read!(source_path)
-base = String.replace(base, "PramanaFoundry.DurableStore.FR08AFR19AIntegrationTest", "FR08ACombinedIndependentReview")
+base = String.replace(base, "Foundry.DurableStore.FR08AFR19AIntegrationTest", "FR08ACombinedIndependentReview")
 base = Regex.replace(~r/\nend\s*\z/, base, "\n")
 
 extra = ~S"""

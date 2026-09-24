@@ -26,7 +26,7 @@
 # that both annotates and intentionally edits the contract. Split those.
 
 Code.require_file("test/support/r4_rows.ex")
-alias PramanaFoundry.Test.R4Rows
+alias Foundry.Test.R4Rows
 
 contract = "docs/WORKFLOW-CONTRACT.md"
 

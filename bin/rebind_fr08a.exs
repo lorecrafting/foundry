@@ -10,15 +10,15 @@
 # It changes no protected code and cannot make a failing probe pass: the report's
 # ready= line is printed so a false one is seen.
 
-alias PramanaFoundry.Repair.FR08AProtectedBoundary
+alias Foundry.Repair.FR08AProtectedBoundary
 
 {subject, 0} = System.cmd("git", ["rev-parse", "HEAD"])
 {tree, 0} = System.cmd("git", ["rev-parse", "HEAD^{tree}"])
 {status, 0} = System.cmd("git", ["status", "--porcelain", "--", "."])
 if status != "", do: raise("tree is dirty; commit the subject change first:\n" <> status)
 
-provider = "lib/pramana_foundry/repair/fr08a_protected_boundary.ex"
-test = "test/pramana_foundry/repair/fr08a_protected_boundary_test.exs"
+provider = "lib/foundry/repair/fr08a_protected_boundary.ex"
+test = "test/foundry/repair/fr08a_protected_boundary_test.exs"
 report = "docs/fr-08/fr08a-protected-report.txt"
 source = File.read!(provider)
 
@@ -29,7 +29,7 @@ identity_pairs =
   for %{path: path, sha256: old_sha, beam_md5: old_md5} <-
         FR08AProtectedBoundary.identity().exercised_api do
     [[module_name]] =
-      Regex.scan(~r/\{(PramanaFoundry\.[A-Za-z0-9.]+),\s*"#{Regex.escape(path)}"/, source,
+      Regex.scan(~r/\{(Foundry\.[A-Za-z0-9.]+),\s*"#{Regex.escape(path)}"/, source,
         capture: :all_but_first
       )
 

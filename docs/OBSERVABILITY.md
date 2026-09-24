@@ -17,7 +17,7 @@ observation surfaces, and nothing reads any of them back to decide anything:
 | Daemon console | the release's `tmp/log/erlang.log.*` | `Logger` start and finish lines per lane command, and recovery entry and exit |
 
 `lane log` also runs while the Gateway is in recovery, because it opens SQLite read-only.
-`PramanaFoundry.Observations` is a bounded, read-only query surface over the same protected
+`Foundry.Observations` is a bounded, read-only query surface over the same protected
 facts; tests exercise it, and no lane command calls it yet.
 
 ## What is gone

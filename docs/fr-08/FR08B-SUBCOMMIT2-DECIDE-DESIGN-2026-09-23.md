@@ -49,7 +49,7 @@ Subcommit 3 extends the same function to the reviewer
 gates every successor launch in `decide/3`" (`:151`).
 
 The producer is the module that `durable_store/transition_plan.ex:9-11` names and that does
-not exist yet: `PramanaFoundry.Workflow.Kernel.Plan`. It is candidate-side code. Gateway never
+not exist yet: `Foundry.Workflow.Kernel.Plan`. It is candidate-side code. Gateway never
 calls it (`plan-binding-specification.md:46-53`).
 
 ## Two findings that shape the design
@@ -74,7 +74,7 @@ Both need protected maintenance under R3. See commit 0 and O1 below.
 ## Signature and return shape
 
 ```elixir
-# PramanaFoundry.Workflow.Kernel
+# Foundry.Workflow.Kernel
 @spec decide(State.t(), command :: map(), facts :: map()) ::
         {:ok, %{"command" => map(), "plan" => map()}}
         | {:reject, reason :: atom()}

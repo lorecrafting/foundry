@@ -31,12 +31,12 @@ protected facts produced during staging, including
 `atomic_result/5` for the durable record and `persist_atomic_records/7` for history, but
 never reaches the domain proposal that actually commits.
 
-Sources at this base: [Gateway](../../lib/pramana_foundry/durable_store/gateway.ex)
+Sources at this base: [Gateway](../../lib/foundry/durable_store/gateway.ex)
 `do_atomic_bundle/5` line 571, `normalize_atomic_envelope/2` line 588,
 `stage_atomic_operations/4` line 743, `maybe_persist_nonstart/3` line 936,
 `atomic_operation_result/4` line 951, `commit_accepted_atomic_bundle/6` line 964 and
 `persist_atomic_records/7` line 1133;
-[ProtectedPrimitives](../../lib/pramana_foundry/durable_store/protected_primitives.ex)
+[ProtectedPrimitives](../../lib/foundry/durable_store/protected_primitives.ex)
 ordinal assignment at line 212 and `validate_nonstart_predecessor/6` at line 300.
 
 A domain transition therefore cannot depend on a fact the protected layer derives inside
@@ -45,9 +45,9 @@ correction the diagnosis assigns to FR-08A, not new FR-08B lifecycle scope.
 
 ## Module boundary
 
-A new trusted module `PramanaFoundry.DurableStore.TransitionPlan` owns the codec. It is
+A new trusted module `Foundry.DurableStore.TransitionPlan` owns the codec. It is
 protected-side code and deliberately does **not** call, load or depend on
-`PramanaFoundry.Workflow.Kernel.Plan`. The kernel's copy is the candidate-side producer of
+`Foundry.Workflow.Kernel.Plan`. The kernel's copy is the candidate-side producer of
 conforming plans; this one is the authoritative validator and binder. Two independent
 implementations of one closed codec is the intended arrangement, because Gateway must
 never execute candidate code to decide what commits.

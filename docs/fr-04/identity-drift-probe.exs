@@ -18,8 +18,8 @@
 # `:stale_identity` is EXPECTED and deliberate -- the destructive path keeps the strictest
 # check, and `Runner.terminate/3` backstops it by writing the cancellation file first.
 
-alias PramanaFoundry.Checks.{Runner, Status, Adoption}
-alias PramanaFoundry.Effects.ProcessGroup
+alias Foundry.Checks.{Runner, Status, Adoption}
+alias Foundry.Effects.ProcessGroup
 
 runs = String.to_integer(System.get_env("PROBE_RUNS", "12"))
 

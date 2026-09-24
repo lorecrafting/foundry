@@ -53,8 +53,8 @@ changed.
 Using pinned Elixir 1.20.3 / OTP 29.0.5 and fresh `/private/tmp` roots:
 
 - `MIX_ENV=test mix compile --force --warnings-as-errors`: exit 0; 90 files.
-- `mix test test/pramana_foundry/durable_store --seed 9137`: exit 0; 75 passed.
-- `mix test test/pramana_foundry/durable_store test/pramana_foundry/legacy_persistence_containment_test.exs test/pramana_foundry/effects/checkpoint_test.exs --seed 9138`:
+- `mix test test/foundry/durable_store --seed 9137`: exit 0; 75 passed.
+- `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 9138`:
   exit 0; 88 passed.
 - `mix test --seed 9139`: exit 2; 508 tests, one failure. The sole failure is the
   pre-existing projections benchmark mismatch when Python cannot import `tiktoken`; the

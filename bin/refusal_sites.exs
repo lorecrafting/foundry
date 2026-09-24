@@ -38,9 +38,9 @@
 # Since 2026-09-23 the reducer is kernel.ex plus one module per event family under kernel/,
 # so the family modules are read too. State stays out, as it always did.
 sources =
-  ["lib/pramana_foundry/workflow/kernel.ex"
-   | Path.wildcard("lib/pramana_foundry/workflow/kernel/**/*.ex")] --
-    ["lib/pramana_foundry/workflow/kernel/state.ex"]
+  ["lib/foundry/workflow/kernel.ex"
+   | Path.wildcard("lib/foundry/workflow/kernel/**/*.ex")] --
+    ["lib/foundry/workflow/kernel/state.ex"]
 
 lines =
   Enum.flat_map(sources, fn file ->

@@ -117,7 +117,7 @@ extension, environment/FD, process and Git dispositions; they are not isolation 
 
 The two synthetic model requests had no Foundry reservation/claim handshake. Current
 Foundry source has no Pi adapter, protected request broker or isolated tool bridge, and
-`PramanaFoundry.Herdr.Runner.System.subscription_route_capability/1` returns
+`Foundry.Herdr.Runner.System.subscription_route_capability/1` returns
 `:unsupported`. The report therefore correctly keeps subscription routing, credential
 separation, R1/R5 request authority and tool isolation blocked. A permissive loopback
 server proves protocol feasibility only, not provider entitlement, subscription billing,

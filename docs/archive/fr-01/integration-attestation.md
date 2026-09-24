@@ -48,8 +48,8 @@ Independent read-only checks:
     git rev-parse 55c6bf5^{tree}
     git show --stat --oneline 55c6bf5
     git diff-tree --no-commit-id --name-only -r 55c6bf5
-    git diff 55c6bf5 -- foundry/lib/pramana_foundry/coordinator.ex
-    git diff --exit-code 55c6bf5^ 55c6bf5 -- foundry/lib/pramana_foundry/cli.ex
+    git diff 55c6bf5 -- foundry/lib/foundry/coordinator.ex
+    git diff --exit-code 55c6bf5^ 55c6bf5 -- foundry/lib/foundry/cli.ex
     git grep -n unblock_ticket 55c6bf5 -- foundry/lib foundry/test
     git diff --check 55c6bf5^ 55c6bf5
 

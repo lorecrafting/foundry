@@ -24,7 +24,7 @@ Only review documents and navigation are changed by this review commit.
 ## Remaining B3 blocker: absent settlement carrier is accepted
 
 `valid_committed_settlement_carrier/4`, at
-`lib/pramana_foundry/durable_store/protected_primitives.ex:4446`, matches:
+`lib/foundry/durable_store/protected_primitives.ex:4446`, matches:
 
 ```elixir
 case {operation["type"], operation["outcome"], settlement} do

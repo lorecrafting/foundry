@@ -1,11 +1,11 @@
 # Independent variants against 154a9fb; disposable fixture stores only.
 # MIX_ENV=test mix run --no-start docs/fr-08/atomic-composition-rereview-probes.exs
 ExUnit.start(seed: 92032)
-base = File.read!("test/pramana_foundry/durable_store/atomic_bundle_test.exs")
-base = String.replace(base, "PramanaFoundry.DurableStore.AtomicBundleTest", "PramanaFoundry.AtomicCompositionRereview")
+base = File.read!("test/foundry/durable_store/atomic_bundle_test.exs")
+base = String.replace(base, "Foundry.DurableStore.AtomicBundleTest", "Foundry.AtomicCompositionRereview")
 base = Regex.replace(~r/\nend\s*\z/, base, "\n")
 extra = ~S"""
-  alias PramanaFoundry.DurableStore.Encoding
+  alias Foundry.DurableStore.Encoding
   defp change_bundle(ctx, id, transform) do
     stop_supervised!(Gateway)
     {:ok, conn} = Sqlite3.open(ctx.path, mode: :readwrite)

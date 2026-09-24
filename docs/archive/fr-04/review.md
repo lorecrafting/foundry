@@ -189,13 +189,13 @@ git diff --check                         # exit 0
 bash -n foundry/bin/test_daemon_recovery.sh  # exit 0
 
 # From foundry/, under the isolated environment above:
-mix test test/pramana_foundry/herdr/adapter_test.exs \
-  test/pramana_foundry/agent_server_test.exs \
-  test/pramana_foundry/coordinator_test.exs \
-  test/pramana_foundry/daemon_recovery_test.exs --seed 40423
+mix test test/foundry/herdr/adapter_test.exs \
+  test/foundry/agent_server_test.exs \
+  test/foundry/coordinator_test.exs \
+  test/foundry/daemon_recovery_test.exs --seed 40423
 # 29 passed, exit 0
 
-mix run --no-start -r test/pramana_foundry/herdr/support/fake_runner.exs -e '...'
+mix run --no-start -r test/foundry/herdr/support/fake_runner.exs -e '...'
 # Two direct probes, exit 0; observed unsafe outcomes recorded under B1–B3.
 ```
 
@@ -218,14 +218,14 @@ test parents were left in place; no external resources were deleted.
 
 ```text
 bbf27c265bfa56236c8884f04355432ab1156802fbe36924b723697a2c50c4cd  foundry/bin/test_daemon_recovery.sh
-bd120f83e2d5beb4f338fa36ace1d5b8073de506db5bf2e7c2ee440f6e75a244  foundry/lib/pramana_foundry/agent_server.ex
-21af0e0395a43fd70e537438a0974f9b32bf1ca4b206807ad157bc64afda68de  foundry/lib/pramana_foundry/coordinator.ex
-86712cbebcdb2f8a98bbd891a90c14354f5b3ea4d63a5aa53e6c728274310a3d  foundry/lib/pramana_foundry/herdr/adapter.ex
-6c21873fdb88595d96f9d327b5c199d9e71ab7be6ce21f8487aae58d3132d6b4  foundry/lib/pramana_foundry/transition.ex
-1642d610f7296b2519733ea8936b2eff0e648e8311e742925a065a3b9e730f58  foundry/test/pramana_foundry/agent_server_test.exs
-61e18969713801717e84a455dd926c4b6030e6085fd8d202fb098d7a0901803e  foundry/test/pramana_foundry/autonomous_launch_test.exs
-472d53972606b8a631cdda622c13f5b4037f240213d357b3d90afd7e11f54d07  foundry/test/pramana_foundry/coordinator_test.exs
-24ad1f069954c50f83db86272d625bb9cd5e1d2c8ea3a9755be274851b00b958  foundry/test/pramana_foundry/daemon_recovery_test.exs
-176ab828eb22d00e9f2b9c7f48cf2b51f777746c3e2418e8d0fe0b36a0c5634b  foundry/test/pramana_foundry/herdr/adapter_test.exs
-20c964b5afff9a058e2f944dacc440bfb83e0e0853e796921a791b8be84a7d0f  foundry/test/pramana_foundry/stress_test.exs
+bd120f83e2d5beb4f338fa36ace1d5b8073de506db5bf2e7c2ee440f6e75a244  foundry/lib/foundry/agent_server.ex
+21af0e0395a43fd70e537438a0974f9b32bf1ca4b206807ad157bc64afda68de  foundry/lib/foundry/coordinator.ex
+86712cbebcdb2f8a98bbd891a90c14354f5b3ea4d63a5aa53e6c728274310a3d  foundry/lib/foundry/herdr/adapter.ex
+6c21873fdb88595d96f9d327b5c199d9e71ab7be6ce21f8487aae58d3132d6b4  foundry/lib/foundry/transition.ex
+1642d610f7296b2519733ea8936b2eff0e648e8311e742925a065a3b9e730f58  foundry/test/foundry/agent_server_test.exs
+61e18969713801717e84a455dd926c4b6030e6085fd8d202fb098d7a0901803e  foundry/test/foundry/autonomous_launch_test.exs
+472d53972606b8a631cdda622c13f5b4037f240213d357b3d90afd7e11f54d07  foundry/test/foundry/coordinator_test.exs
+24ad1f069954c50f83db86272d625bb9cd5e1d2c8ea3a9755be274851b00b958  foundry/test/foundry/daemon_recovery_test.exs
+176ab828eb22d00e9f2b9c7f48cf2b51f777746c3e2418e8d0fe0b36a0c5634b  foundry/test/foundry/herdr/adapter_test.exs
+20c964b5afff9a058e2f944dacc440bfb83e0e0853e796921a791b8be84a7d0f  foundry/test/foundry/stress_test.exs
 ```
