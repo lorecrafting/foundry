@@ -62,7 +62,8 @@ defmodule PramanaFoundry.CITest do
 
     assert length(refs) == 3
     assert Enum.all?(refs, fn [revision] -> String.match?(revision, ~r/\A[0-9a-f]{40}\z/) end)
-    assert workflow =~ "fetch-depth: 0"
+    # Shallow checkout: nothing in the gate reads history since H0 was retired.
+    refute workflow =~ "fetch-depth"
     assert workflow =~ ~s(otp-version: "#{toolchain.otp}")
     assert workflow =~ ~s(elixir-version: "#{toolchain.elixir_distribution}")
     refute workflow =~ "postgres"
