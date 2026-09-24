@@ -35,13 +35,14 @@ also depend on these internals:
   `Gateway.module_info(:compile)[:source]` after splicing text in at the exact line
   `  def command(server, command_id), do: GenServer.call(server, {:command, command_id})`.
 
-**Internal structure.** Every public function is a `GenServer.call` into one process. Each
-`handle_call` has a `%{mode: :recovery}` clause and ends in `transition_after_result/2`.
+**Internal structure.** Every public function is a `GenServer.call` into one process. Every
+`handle_call` except `:status` (127-129, which answers in both modes) has a
+`%{mode: :recovery}` clause, and the ready clauses end in `transition_after_result/2`.
 
 | Region | Lines | Contents | Calls into |
 |---|---|---|---|
 | A. API and GenServer | 1-489 | `initialize`, API wrappers, `init`, `terminate`, 14 `handle_call`, 3 `handle_info`, `find_health_request`, `open` | Owner, PathIdentity, Database, ProtectedPrimitives (`authority_mode`, `execute`, `query`, `snapshot`), B, C, D |
-| B. v1 domain commit | 491-551, 1471-2054, 2069-2075, 2450-2455 | `do_transact`, `do_verified_transact`, `normalize_candidate`, `prepare_command`, `commit_bundle`, `commit_accepted_bundle`, `commit_rejected_command`, `insert_*`, `existing`, `fetch_command`, `current_seq`, `check_expected_revisions` and its helpers, `validate_actor`, `reduce_insert`, `inject`, `semantic_rejection?`, `get` | Kernel, RecordCodec, Encoding, Authority, Database, ProtectedVerifier, `ProtectedPrimitives.root_command_id_exists?` |
+| B. v1 domain commit | 491-551, 1471-2054, 2069-2075, 2450-2455 | `do_transact`, `do_verified_transact`, `normalize_candidate`, `prepare_command`, `commit_bundle`, `commit_accepted_bundle`, `commit_rejected_command`, `insert_*`, `existing`, `fetch_command`, `current_seq`, `check_expected_revisions` and its helpers, `validate_actor`, `reduce_insert`, `inject`, `semantic_rejection?`, `get` | Kernel, TransitionPlan (`slot_event_types/0`, 1477), RecordCodec, Encoding, Authority, Database, ProtectedVerifier, `ProtectedPrimitives.root_command_id_exists?` |
 | C. v2 atomic bundle | 553-1469 | `do_atomic_bundle` through `nonstarts_bound?`, plus the domain-read checks and `@domain_read_namespaces` (1407-1469) | B (9 functions, below), TransitionPlan, ProtectedPrimitives (8 functions), RecordCodec, Encoding, Authority, Database |
 | D. Operations | 2098-2433 | `read_operational_health`, `add_physical_capacity`, `query_recent_events`, `checkpoint_database`, maintenance fault helpers, capacity-probe controller, `file_size`, backup and `verify_backup`, `sync_*`, `publication_reconstruction` | Database, Authority, PathIdentity, Encoding |
 | A (kept) | 2056-2067, 2077-2096, 2435-2448 | `transition_after_result`, `maybe_limit_pages`, `recovery_state` | — |
@@ -116,15 +117,33 @@ owns lives in a pinned file. The CAS, idempotency, transaction and fencing code 
 `gateway.ex`, so `DomainCommit` and `AtomicBundle` must be pinned. `Maintenance` must be
 pinned too, since it will hold the backup-equality and checkpoint-equality checks (it is
 unpinned today). That makes 10 + 3 = 13 pins, or 12 if ML-DEAD-ROUTES removes
-`ProtectedVerifier` (§5). `bin/rebind_fr08a.exs` only rewrites hashes that already exist,
-so the rebind needs three extra steps:
+`ProtectedVerifier` (§5). `bin/rebind_fr08a.exs` only rewrites values that already exist:
+it builds `{old_sha, new_sha}` and `{old_md5, new_md5}` pairs per pinned entry and applies
+each with `String.replace/3` over the whole provider and test (30-49). So one placeholder
+per tuple would be overwritten twice with the sha256, and the binding would stay
+`mismatch`. The lead's steps, on the integrated HEAD that contains M1-M3 and T1-T2:
 
-- add the three `@api_identity` tuples by hand, each with a distinct placeholder hash;
-- change the test's `== 10`;
-- run the script, which then replaces the placeholders.
+1. In `lib/foundry/repair/fr08a_protected_boundary.ex`, add the three tuples by hand with
+   **two distinct placeholders each, six in total**, none a substring of any other text in
+   the provider or test: `"pin-sha256-domaincommit"`/`"pin-md5-domaincommit"`,
+   `"pin-sha256-atomicbundle"`/`"pin-md5-atomicbundle"`,
+   `"pin-sha256-maintenance"`/`"pin-md5-maintenance"`. In
+   `test/foundry/repair/fr08a_protected_boundary_test.exs:12`, change `== 10` to `== 13`
+   (`== 12` without `ProtectedVerifier`). The test's per-file source lines (45-49) cover
+   only `gateway.ex` and `protected_primitives.ex`, so the new modules need none.
+2. **Commit** those two files. The script raises on a dirty tree (16-17) and binds the
+   subject to `HEAD`.
+3. `MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs`. It prints `old -> new` for every
+   changed value; check that all six placeholders appear.
+4. Regenerate the frozen report **in a fresh VM**, with the command the script prints
+   (52-56): `MIX_ENV=test mix run --no-start -e 'File.write!("docs/fr-08/fr08a-protected-report.txt", Foundry.Repair.FR08AProtectedBoundary.report_artifact())'`.
+   The test asserts byte-equality with this file (test line 41).
+5. `TMPDIR=/private/tmp MIX_ENV=test mix test test/foundry/repair/fr08a_protected_boundary_test.exs`
+   must be green, and the report must say `ready=true`. Commit the provider, the test and
+   the report as the rebind commit.
 
-The developer proves only that FR-08A is red in a scratch worktree. The lead rebinds once,
-after integration.
+The developer proves only that FR-08A is red in a scratch worktree and never commits a
+rebind.
 
 ## 4. Commit sequence
 
@@ -138,25 +157,43 @@ until the rebind.
 | M1 | Move region D into `Maintenance` | Cut 2098-2433. Moved functions that Gateway calls go from `defp` to `def` with `@doc false`. Gateway call sites become `Maintenance.f(`. | Move check (below); `operational_storage_test`, `fr08a_fr19a_integration_test`, `sync_fault_test`, `gateway_test` | ≈ −336 +345 |
 | M2 | Move region B into `DomainCommit` | Cut 491-551, 1471-2054, 2069-2075 and 2450-2455. `defp` goes to `def`, with `@doc false`, only for the 3 functions Gateway calls and the 9 that C calls. Aliases follow the calls. | Move check; `gateway_test`, `review_corrections_test`, `authority_test`, `fr08a_critical_corrections_test`, `live_refusal_probe_test`, `unified_contract_test` | ≈ −660 +675 |
 | M3 | Move region C into `AtomicBundle` | Cut 553-1469. Gateway's `atomic_domain_request/1` and `domain_read_namespaces/0` become `defdelegate`. C's calls into B become `DomainCommit.f(`. | Move check; `atomic_bundle_test`, `domain_read_check_test`, `reopen_property_test`, `*_restart_probe_test`, `quarantine_exit_probe_test`, `test/foundry/manual_lane/*` | ≈ −917 +925 |
-| T1 | Delete duplicates | `publication_reconstruction/1` and `replay_evidence/1` become one function. The three copies of `SELECT coalesce(max(seq), 0) FROM events` in D become one call. | `operational_storage_test`, `fr08a_fr19a_integration_test` | ≈ −20 |
-| T2 | Update citations | Change the `gateway.ex` paths in [the workflow contract](../WORKFLOW-CONTRACT.md#enforcement-matrix) (rows at lines 178 and 184) and in [the durable store](../DURABLE-STORE.md) "Boundary" section, plus the comment at `domain_read_check_test.exs:75`. Leave function names alone: those rows cite `check_expected_revisions/4` and `protected_discriminator/3`, and neither is renamed. | `elixir bin/check_docs.exs` | docs only |
+| T1 | Delete duplicates | `publication_reconstruction/1` and `replay_evidence/1` become one function. After M1, Maintenance holds three copies of `SELECT coalesce(max(seq), 0) FROM events`: the two moved from D (2103, 2170) and its own `last_sequence/1` (maintenance.ex:42-47). They become one call. `current_seq/1` (1946) is in B and stays in DomainCommit. | `operational_storage_test`, `fr08a_fr19a_integration_test` | ≈ −20 |
+| T2 | Update citations | Change the `gateway.ex` paths in [the workflow contract](../WORKFLOW-CONTRACT.md#enforcement-matrix) (rows at lines 178 and 184) and the comment at `domain_read_check_test.exs:75`. [The durable store](../DURABLE-STORE.md) names only the module and its API, which stay true, so it needs no edit. `REPAIR-PLAN.md:240`'s "`gateway.ex` (2,377)" is a dated figure; leave it. Leave function names alone: those rows cite `check_expected_revisions/4` and `protected_discriminator/3`, and neither is renamed. | `elixir bin/check_docs.exs` | docs only |
 | R | FR-08A rebind (the lead's commit) | Pins grow to 13 (or 12), then run the rebind script as in §3 | `fr08a_protected_boundary_test` green; report `ready=true` | 3 files |
 
-**Move check (M1-M3).** The implementer ships this as a committed script so the
-protected_primitives split can reuse it and the reviewer can rerun it. The check:
+**Move check (M1-M3).** The check compares compiled definitions, not source. Source AST
+cannot see alias or attribute resolution. For example, `gateway.ex:13-25` aliases
+`Foundry.DurableStore.Kernel` over Elixir's `Kernel`, and `normalize_candidate/1` (1475)
+calls `Kernel.normalize_bundle/1`. A `DomainCommit` that forgot the alias would have an
+AST-identical clause that means something else. The implementer ships the check as a
+committed script so the protected_primitives split can reuse it and the reviewer can rerun
+it:
 
-1. Parse the base `gateway.ex` and the post-commit files with `Code.string_to_quoted!/2`.
-2. Collect every `def` and `defp` clause keyed by `{name, arity}`, with line metadata
-   stripped.
-3. Normalise `defp` to `def`, and rewrite `DomainCommit.f(…)`, `AtomicBundle.f(…)` and
-   `Maintenance.f(…)` as the local call `f(…)`.
-4. Assert that each moved clause is AST-equal to its base clause, and that the union of
-   clauses equals the base set plus the declared `defdelegate`s.
+1. Build the base in a scratch worktree (`git worktree add --detach <dir> e74fb88`,
+   `MIX_ENV=test mix compile`), and build the candidate the same way.
+2. For each of `Gateway` and `Maintenance` at base, and `Gateway`, `DomainCommit`,
+   `AtomicBundle` and `Maintenance` in the candidate, read
+   `{:ok, {mod, [debug_info: {:debug_info_v1, backend, data}]}} = :beam_lib.chunks(beam, [:debug_info])`,
+   then `{:ok, %{definitions: defs}} = backend.debug_info(:elixir_v1, mod, data, [])`. Each
+   definition is `{{name, arity}, kind, meta, clauses}`, with aliases expanded to full module
+   atoms, attributes inlined and `__MODULE__` substituted. I checked this against the base
+   build: `Gateway` yields 131 definitions (25 `def`, 106 `defp`), `normalize_candidate/1`
+   calls `Foundry.DurableStore.Kernel.normalize_bundle`, and `open/2` contains the inlined
+   `5000`.
+3. Normalise: strip all meta, map `defp` to `def`, and rewrite a remote call
+   `{{:., _, [M, f]}, _, args}` whose `M` is one of the four modules into the local call
+   `{f, [], args}`.
+4. Assert that the multiset of candidate definitions equals the base multiset plus exactly
+   the declared `defdelegate`s (`atomic_domain_request/1` and `domain_read_namespaces/0` on
+   `Gateway`).
 
-Also assert that the grep counts from §3 match: `Database.transaction`, the digest
-literals, the refusal-atom set and `System.halt`. `git diff --color-moved=plain
---color-moved-ws=allow-indentation-change` must show no uncoloured `+` or `-` lines other
-than the listed edits.
+This proves that the compiler saw the same expanded body for every moved function, apart
+from the module rename. Also keep the grep counts from §3 (`Database.transaction`, the
+digest literals, the refusal-atom set, `System.halt`) and read
+`git diff --color-moved=plain --color-moved-ws=allow-indentation-change`. `mix format` will
+reflow lines that grow a `DomainCommit.`, `AtomicBundle.` or `Maintenance.` prefix past the
+line limit, so reflowed lines are expected. The definition check, not the diff, is the
+authority.
 
 **Deliberately not done:** renaming `do_*` functions. That costs citations and buys nothing.
 Merging the two `inject/2` vocabularies (Gateway 2047-2054 and ProtectedPrimitives 737-739) is
@@ -186,6 +223,9 @@ from `DomainCommit` and `Gateway`, and T3 follows it.
 | S3: `inject/2` fault vocabulary duplicated | `gateway.ex:2047-2054`, `protected_primitives.ex:737-739` | Leave both copies. If one is ever merged, the protected_primitives split owns it |
 | S4: `root_commands` read by SQL in C | `existing_atomic_bundle` (650) | Leave. The table name is Core-internal |
 | S5: FR-08A rebind | Both designs change pinned files | One rebind per landed split, run serially ([sweep](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md): "serial by rebind") |
+
+No protected_primitives design note exists at this base, so S1-S5 are the surface to
+re-check when it lands.
 
 **Which lands first: the Gateway split.** It is smaller (M against L), it touches
 ProtectedPrimitives at zero lines (or one, under the Q2 alternative), and it proves the move
