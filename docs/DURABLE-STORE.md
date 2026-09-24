@@ -23,23 +23,26 @@ The updatable kernel supplies only a versioned, pure-data proposal containing a 
 known domain events, projections and pending effect requests. Exact domain-tagged request
 digests bind effect identities and bounded operations. `Kernel.normalize_bundle/1` rejects
 SQL, callbacks, protected rows, candidate-issued/terminal status and rejected decisions
-that attempt domain mutation. The protected controller path passes facts through the
-fixed `ProtectedVerifier`, which derives claim and reservation rows, and requires an
-unforgeable reference supplied to the gateway at protected startup. It is absent from the
+that attempt domain mutation. Protected operations (policy, control, ledger, reservation,
+effect, claim, receipt, lease) enter only through `Gateway.protected_command/4` and
+`Gateway.atomic_bundle/4`, which write the `root_*` tables and require an unforgeable
+reference supplied to the gateway at protected startup. It is absent from the
 candidate-facing operation and all status/results. FR-15a must prove the separate kernel
 process/account cannot inspect the protected BEAM or obtain this capability; an Elixir
 reference is an interface capability, not the eventual OS security boundary.
-Protected facts name the root-required revision set; omission is rejected before SQL,
-then every expected projection/dependency/policy/control/ledger revision is checked from
-authority inside the write transaction. The fixed verifier also requires one authorization per proposed intent and
-checks that a newly introduced top-level allocation is consumed exactly by its request.
-Parent/child allocation transfer is rejected until its owning ledger ticket implements
-an authoritative in-transaction debit; FR-07 does not claim that lifecycle early.
+
+The FR-07 legacy protected route (`transact_verified` with its `ProtectedVerifier`, the only
+writer of the `ledger_generations`, `claims` and `reservations` tables) was deleted by
+ML-DEAD-ROUTES: it was already refused once a store held a root command, and the lane seeds
+its root policy on first start. Those three tables stay in the v1 schema and nothing writes
+them. `Authority` still verifies any retained rows at open and on reads, and a store that
+holds them with no root command is in legacy authority mode, where `protected_command` and
+`atomic_bundle` refuse with `legacy_authority_mode_active`.
 
 The gateway calculates command identity from the authenticated actor and complete
 canonical request, checks an existing command ID before current proposal processing, and
-commits the input, command, result, events, projections, intents, claims and ledger rows
-in one `BEGIN IMMEDIATE` transaction. The reply happens only after checked `COMMIT`. Same actor/ID/digest returns the stored result; a different
+commits the input, command, result, events, projections and intents in one
+`BEGIN IMMEDIATE` transaction. The reply happens only after checked `COMMIT`. Same actor/ID/digest returns the stored result; a different
 actor or request returns an idempotency conflict. Storage errors put the gateway into
 visible recovery mode. Constraint-invalid proposals roll back without poisoning an
 otherwise valid store.
@@ -144,12 +147,12 @@ The acceptance suite uses the real pinned binding and exercises an actual SQLite
 `RLIMIT_FSIZE` SQLite commit/write error. It also checks that WAL/FULL is active on real
 commits. Deterministic failures after each bundle
 table test rollback/fencing, and subprocess `System.halt/1` fixtures test process loss
-immediately before and after multi-table protected commits over prior protected history.
+immediately before and after multi-table domain commits over prior committed history.
 A test-only loadable extension interposes only the tested connection's WAL
 `sqlite3_io_methods`. It observes successful WAL writes, then returns
 `SQLITE_IOERR_FSYNC` from the targeted WAL `xSync` during checked COMMIT. Ordinary and
-hard-exit fixtures submit complete protected bundles, including effect, claim, reservation
-and ledger rows, and prove no success acknowledgment, immediate write fencing, explicit
+hard-exit fixtures submit complete domain bundles, including input, command, result,
+event, projection and effect rows, and prove no success acknowledgment, immediate write fencing, explicit
 owner recovery, full-table-content/reconstruction consistency, and ambiguity-safe
 same-command retry whether recovery retained the full bundle or none of it. This is
 attributed SQLite VFS `xSync` fault evidence through the production

@@ -55,19 +55,11 @@ defmodule Foundry.DurableStore.GatewayTest do
   end
 
   test "one commit atomically writes separately constrained authority rows", %{path: path} do
-    capability = make_ref()
-    gateway = ready_gateway(path, protected_capability: capability)
+    gateway = ready_gateway(path)
     command = command("C1")
 
     assert {:ok, %{"committed_seq" => 1, "disposition" => "accepted"}, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "operator",
-               command,
-               bundle("C1"),
-               protected("C1")
-             )
+             Gateway.transact(gateway, "operator", command, bundle("C1"))
 
     assert {:ok,
             %{
@@ -76,21 +68,11 @@ defmodule Foundry.DurableStore.GatewayTest do
               "command_results" => 1,
               "events" => 1,
               "projections" => 1,
-              "effects" => 1,
-              "claims" => 1,
-              "ledger_generations" => 1,
-              "reservations" => 1
+              "effects" => 1
             }} = Gateway.counts(gateway)
 
     assert {:ok, _result, :idempotent} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "operator",
-               command,
-               bundle("C1"),
-               protected("C1")
-             )
+             Gateway.transact(gateway, "operator", command, bundle("C1"))
 
     assert {:error, :idempotency_conflict} =
              Gateway.transact(gateway, "other", command, bundle("C1"))
@@ -160,10 +142,7 @@ defmodule Foundry.DurableStore.GatewayTest do
               %{
                 "commands" => ^expected_events,
                 "events" => ^expected_events,
-                "effects" => ^expected_events,
-                "claims" => ^expected_events,
-                "ledger_generations" => ^expected_events,
-                "reservations" => ^expected_events
+                "effects" => ^expected_events
               }} =
                Gateway.counts(gateway)
 
@@ -327,34 +306,6 @@ defmodule Foundry.DurableStore.GatewayTest do
     assert Enum.all?(counts, fn {_table, count} -> count == 0 end)
   end
 
-  test "protected facts require the root's unforgeable capability", %{path: path} do
-    capability = make_ref()
-    gateway = ready_gateway(path, protected_capability: capability)
-
-    assert {:error, :unauthorized_protected_operation} =
-             Gateway.transact_verified(
-               gateway,
-               make_ref(),
-               "operator",
-               command("FORGED"),
-               bundle("FORGED"),
-               protected("FORGED")
-             )
-
-    assert {:ok, counts} = Gateway.counts(gateway)
-    assert Enum.all?(counts, fn {_table, count} -> count == 0 end)
-
-    assert {:error, :incomplete_protected_read_set} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "operator",
-               put_in(command("OMITTED")["expected_revisions"], %{}),
-               bundle("OMITTED"),
-               protected("OMITTED")
-             )
-  end
-
   test "SQLite WAL/FULL and verified content backup survive reopen", %{root: root, path: path} do
     gateway = ready_gateway(path)
 
@@ -425,32 +376,6 @@ defmodule Foundry.DurableStore.GatewayTest do
           request_digest: effect_digest(id),
           status: "pending",
           value: %{"operation" => "check"}
-        }
-      ]
-    }
-  end
-
-  defp protected(id) do
-    %{
-      writer_epoch: "epoch-1",
-      required_revisions: %{projection_key(id) => "absent"},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "generation-#{id}",
-          parent_generation_id: nil,
-          allocation: 1,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: [
-        %{
-          effect_id: "effect-#{id}",
-          claim_id: "claim-#{id}",
-          generation_id: "generation-#{id}",
-          reservation_id: "reservation-#{id}",
-          dimension: "starts.developer",
-          units: 1
         }
       ]
     }

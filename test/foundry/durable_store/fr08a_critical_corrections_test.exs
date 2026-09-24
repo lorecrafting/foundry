@@ -1,7 +1,10 @@
+Code.require_file("../../support/legacy_protected_rows.ex", __DIR__)
+
 defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
   use ExUnit.Case, async: false
 
   alias Foundry.DurableStore.{Encoding, Gateway}
+  alias Foundry.Test.LegacyProtectedRows
 
   setup do
     root =
@@ -168,7 +171,7 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
   end
 
   test "legacy and root authority operate in explicit mutually exclusive modes", ctx do
-    assert {:ok, _, :committed} = legacy_write(ctx)
+    seed_legacy_mode(ctx)
 
     assert {:ok, %{"authority_mode" => "legacy"}} =
              Gateway.protected_snapshot(ctx.gateway, ctx.capability)
@@ -194,8 +197,6 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
 
     other_ctx = %{ctx | gateway: other, capability: other_capability, path: other_path}
     accept_current!(other_ctx, policy("policy-1"))
-
-    assert {:error, :legacy_protected_route_retired} = legacy_write(other_ctx)
 
     assert {:ok, %{"authority_mode" => "root"}} =
              Gateway.protected_snapshot(other, other_capability)
@@ -328,12 +329,15 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
     end
   end
 
-  defp legacy_write(ctx) do
+  # Legacy mode is a store holding FR-07 claim and ledger rows and no root command. Their only
+  # writer, Gateway.transact_verified, is deleted (ML-DEAD-ROUTES), so the retained store is
+  # simulated: the domain command commits its effect, then the rows are seeded beside it.
+  defp seed_legacy_mode(ctx) do
     operation = %{"operation" => "check"}
 
     {:ok, digest} =
       Encoding.semantic_digest("foundry-effect-request-v1", %{
-        "effect_id" => "legacy-effect",
+        "effect_id" => "effect-legacy",
         "operation" => operation
       })
 
@@ -345,7 +349,7 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
       intents: [
         %{
           schema_version: 1,
-          effect_id: "legacy-effect",
+          effect_id: "effect-legacy",
           request_digest: digest,
           status: "pending",
           value: operation
@@ -353,45 +357,22 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
       ]
     }
 
-    facts = %{
-      writer_epoch: "legacy-epoch",
-      required_revisions: %{},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "legacy-generation",
-          parent_generation_id: nil,
-          allocation: 1,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: [
-        %{
-          effect_id: "legacy-effect",
-          claim_id: "legacy-claim",
-          generation_id: "legacy-generation",
-          reservation_id: "legacy-reservation",
-          dimension: "starts.developer",
-          units: 1
-        }
-      ]
-    }
+    assert {:ok, _, :committed} =
+             Gateway.transact(
+               ctx.gateway,
+               "operator",
+               %{
+                 "schema_version" => 1,
+                 "command_id" => unique_id(),
+                 "expected_revisions" => %{},
+                 "type" => "enqueue",
+                 "target_ids" => %{},
+                 "payload" => %{}
+               },
+               bundle
+             )
 
-    Gateway.transact_verified(
-      ctx.gateway,
-      ctx.capability,
-      "operator",
-      %{
-        "schema_version" => 1,
-        "command_id" => unique_id(),
-        "expected_revisions" => %{},
-        "type" => "enqueue",
-        "target_ids" => %{},
-        "payload" => %{}
-      },
-      bundle,
-      facts
-    )
+    LegacyProtectedRows.insert!(ctx.gateway, "legacy", "legacy-epoch")
   end
 
   defp command(id, reads, operation) do

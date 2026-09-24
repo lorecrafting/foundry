@@ -19,7 +19,6 @@ defmodule Foundry.DurableStore.Gateway do
     Owner,
     PathIdentity,
     ProtectedPrimitives,
-    ProtectedVerifier,
     RecordCodec,
     TransitionPlan
   }
@@ -56,14 +55,6 @@ defmodule Foundry.DurableStore.Gateway do
 
   def transact(server, actor_id, command, proposal),
     do: GenServer.call(server, {:transact, actor_id, command, proposal})
-
-  @doc false
-  def transact_verified(server, capability, actor_id, command, proposal, protected_facts),
-    do:
-      GenServer.call(
-        server,
-        {:transact_verified, capability, actor_id, command, proposal, protected_facts}
-      )
 
   def command(server, command_id), do: GenServer.call(server, {:command, command_id})
 
@@ -190,41 +181,7 @@ defmodule Foundry.DurableStore.Gateway do
   end
 
   def handle_call({:transact, actor_id, command, proposal}, _from, state) do
-    result = do_transact(state.conn, actor_id, command, proposal, %{}, state.fault)
-
-    next_state = transition_after_result(state, result)
-
-    {:reply, result, next_state}
-  end
-
-  def handle_call(
-        {:transact_verified, _capability, _actor_id, _command, _proposal, _facts},
-        _from,
-        %{mode: :recovery} = state
-      ) do
-    {:reply, {:error, {:recovery_mode, state.reason}}, state}
-  end
-
-  def handle_call(
-        {:transact_verified, capability, actor_id, command, proposal, facts},
-        _from,
-        state
-      ) do
-    result =
-      with true <- capability === state.protected_capability do
-        case ProtectedPrimitives.authority_mode(state.conn) do
-          {:ok, :root} ->
-            {:error, :legacy_protected_route_retired}
-
-          {:ok, _legacy_mode} ->
-            do_verified_transact(state.conn, actor_id, command, proposal, facts, state.fault)
-
-          {:error, _reason} = error ->
-            error
-        end
-      else
-        false -> {:error, :unauthorized_protected_operation}
-      end
+    result = do_transact(state.conn, actor_id, command, proposal, state.fault)
 
     next_state = transition_after_result(state, result)
 
@@ -488,7 +445,7 @@ defmodule Foundry.DurableStore.Gateway do
     end
   end
 
-  defp do_transact(conn, actor_id, command, proposal, protected, fault) do
+  defp do_transact(conn, actor_id, command, proposal, fault) do
     with {:ok, canonical, digest, normalized_command} <- prepare_command(actor_id, command) do
       command_id = normalized_command["command_id"]
 
@@ -506,42 +463,11 @@ defmodule Foundry.DurableStore.Gateway do
                 canonical,
                 digest,
                 normalized,
-                protected,
                 fault
               )
 
             {:error, reason} ->
               {:error, reason}
-          end
-
-        {:error, reason} ->
-          {:error, reason}
-      end
-    end
-  end
-
-  defp do_verified_transact(conn, actor_id, command, proposal, facts, fault) do
-    with {:ok, canonical, digest, normalized_command} <- prepare_command(actor_id, command) do
-      command_id = normalized_command["command_id"]
-
-      case existing(conn, command_id, actor_id, digest) do
-        {:ok, result} ->
-          {:ok, result, :idempotent}
-
-        {:error, :not_found} ->
-          with {:ok, normalized} <- normalize_candidate(proposal),
-               {:ok, protected} <-
-                 ProtectedVerifier.derive(normalized_command, normalized, facts) do
-            commit_bundle(
-              conn,
-              actor_id,
-              normalized_command,
-              canonical,
-              digest,
-              normalized,
-              protected,
-              fault
-            )
           end
 
         {:error, reason} ->
@@ -957,7 +883,7 @@ defmodule Foundry.DurableStore.Gateway do
 
     with {:ok, proposal, discriminator} <-
            atomic_domain_proposal(conn, envelope, operation_results),
-         :ok <- check_expected_revisions(conn, command, proposal, %{}),
+         :ok <- check_expected_revisions(conn, command, proposal),
          {:ok, {:accepted, domain_result}} <-
            commit_accepted_bundle(
              conn,
@@ -966,7 +892,6 @@ defmodule Foundry.DurableStore.Gateway do
              domain_canonical,
              domain_digest,
              proposal,
-             %{},
              nil,
              :bundle_v2
            ),
@@ -1505,10 +1430,10 @@ defmodule Foundry.DurableStore.Gateway do
     end
   end
 
-  defp commit_bundle(conn, actor_id, command, canonical, digest, proposal, protected, fault) do
+  defp commit_bundle(conn, actor_id, command, canonical, digest, proposal, fault) do
     transaction_result =
       Database.transaction(conn, fn ->
-        case check_expected_revisions(conn, command, proposal, protected) do
+        case check_expected_revisions(conn, command, proposal) do
           :ok ->
             commit_accepted_bundle(
               conn,
@@ -1517,7 +1442,6 @@ defmodule Foundry.DurableStore.Gateway do
               canonical,
               digest,
               proposal,
-              protected,
               fault
             )
 
@@ -1562,7 +1486,6 @@ defmodule Foundry.DurableStore.Gateway do
          canonical,
          digest,
          proposal,
-         protected,
          fault,
          durable_owner \\ :domain_v1
        ) do
@@ -1583,12 +1506,6 @@ defmodule Foundry.DurableStore.Gateway do
          :ok <-
            insert_intents(conn, get(proposal, :intents, []), get(command, "command_id")),
          :ok <- inject(fault, :after_intents),
-         :ok <- insert_generations(conn, get(protected, :ledger_generations, [])),
-         :ok <- inject(fault, :after_generations),
-         :ok <- insert_claims(conn, get(protected, :claims, [])),
-         :ok <- inject(fault, :after_claims),
-         :ok <- insert_reservations(conn, get(protected, :reservations, [])),
-         :ok <- inject(fault, :after_reservations),
          {:ok, committed_seq} <- current_seq(conn),
          {:ok, result} <-
            insert_result(
@@ -1605,7 +1522,7 @@ defmodule Foundry.DurableStore.Gateway do
              %{
                command_id: get(command, "command_id"),
                committed_seq: committed_seq,
-               revisions: touched_revisions(proposal, protected)
+               revisions: touched_revisions(proposal)
              }
            }),
          :ok <- inject(fault, :before_commit) do
@@ -1827,63 +1744,6 @@ defmodule Foundry.DurableStore.Gateway do
     end)
   end
 
-  defp insert_generations(conn, generations) do
-    reduce_insert(generations, fn generation ->
-      retained = Map.put(generation, "revision", 0)
-
-      with {:ok, normalized} <- RecordCodec.normalize(:ledger_generation, retained) do
-        Database.execute(
-          conn,
-          "INSERT INTO ledger_generations(generation_id, parent_generation_id, schema_version, revision, allocation, consumed) VALUES (?, ?, 1, 0, ?, ?)",
-          [
-            normalized["generation_id"],
-            normalized["parent_generation_id"],
-            normalized["allocation"],
-            normalized["consumed"]
-          ]
-        )
-      end
-    end)
-  end
-
-  defp insert_claims(conn, claims) do
-    reduce_insert(claims, fn claim ->
-      with {:ok, encoded} <- RecordCodec.encode(:claim, claim) do
-        Database.execute(
-          conn,
-          "INSERT INTO claims(claim_id, effect_id, writer_epoch, status, claim) VALUES (?, ?, ?, ?, ?)",
-          [
-            get(claim, :claim_id),
-            get(claim, :effect_id),
-            get(claim, :writer_epoch),
-            get(claim, :status),
-            {:blob, encoded}
-          ]
-        )
-      end
-    end)
-  end
-
-  defp insert_reservations(conn, reservations) do
-    reduce_insert(reservations, fn reservation ->
-      with {:ok, encoded} <- RecordCodec.encode(:reservation, reservation) do
-        Database.execute(
-          conn,
-          "INSERT INTO reservations(reservation_id, generation_id, claim_id, dimension, units, status, reservation) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [
-            get(reservation, :reservation_id),
-            get(reservation, :generation_id),
-            get(reservation, :claim_id),
-            get(reservation, :dimension),
-            get(reservation, :units),
-            get(reservation, :status),
-            {:blob, encoded}
-          ]
-        )
-      end
-    end)
-  end
-
   defp insert_result(conn, command_id, result, committed_seq) do
     with {:ok, durable} <- RecordCodec.materialize_result(result, committed_seq),
          {:ok, encoded} <- RecordCodec.encode(:result, durable),
@@ -1949,11 +1809,9 @@ defmodule Foundry.DurableStore.Gateway do
     end
   end
 
-  defp check_expected_revisions(conn, command, proposal, protected) do
+  defp check_expected_revisions(conn, command, proposal) do
     expected = get(command, "expected_revisions")
-
-    required =
-      required_projection_reads(proposal) |> Map.merge(get(protected, :required_revisions, %{}))
+    required = required_projection_reads(proposal)
 
     with true <- Enum.all?(required, fn {key, value} -> Map.get(expected, key) == value end),
          :ok <- validate_projection_read_alignment(proposal, expected) do
@@ -1983,18 +1841,10 @@ defmodule Foundry.DurableStore.Gateway do
     end)
   end
 
-  defp touched_revisions(proposal, protected) do
-    projection_keys =
-      Enum.map(get(proposal, :projections, []), fn projection ->
-        {:projection, projection["namespace"], projection["entity_id"]}
-      end)
-
-    ledger_keys =
-      Enum.map(get(protected, :ledger_generations, []), fn generation ->
-        {:ledger, generation["generation_id"]}
-      end)
-
-    projection_keys ++ ledger_keys
+  defp touched_revisions(proposal) do
+    Enum.map(get(proposal, :projections, []), fn projection ->
+      {:projection, projection["namespace"], projection["entity_id"]}
+    end)
   end
 
   defp validate_projection_read_alignment(proposal, expected) do

@@ -2,7 +2,6 @@ alias Exqlite.Sqlite3
 alias Foundry.DurableStore.{Database, Gateway}
 
 [path, extension] = System.argv()
-capability = make_ref()
 
 projection_key = fn id ->
   "projection/" <>
@@ -76,44 +75,11 @@ bundle = fn id ->
   }
 end
 
-protected = fn id ->
-  %{
-    writer_epoch: "sync-crash-epoch",
-    required_revisions: %{projection_key.(id) => "absent"},
-    ledger_generations: [
-      %{
-        schema_version: 1,
-        generation_id: "generation-#{id}",
-        parent_generation_id: nil,
-        allocation: 1,
-        consumed: 0
-      }
-    ],
-    effect_authorizations: [
-      %{
-        effect_id: "effect-#{id}",
-        claim_id: "claim-#{id}",
-        generation_id: "generation-#{id}",
-        reservation_id: "reservation-#{id}",
-        dimension: "starts.developer",
-        units: 1
-      }
-    ]
-  }
-end
-
 :ok = Gateway.initialize(path)
-{:ok, gateway} = Gateway.start_link(path: path, protected_capability: capability)
+{:ok, gateway} = Gateway.start_link(path: path)
 
 {:ok, _result, :committed} =
-  Gateway.transact_verified(
-    gateway,
-    capability,
-    "actor",
-    command.("SEED"),
-    bundle.("SEED"),
-    protected.("SEED")
-  )
+  Gateway.transact(gateway, "actor", command.("SEED"), bundle.("SEED"))
 
 conn = :sys.get_state(gateway).conn
 :ok = Sqlite3.enable_load_extension(conn, true)
@@ -128,14 +94,7 @@ conn = :sys.get_state(gateway).conn
 {:ok, [[1]]} = Database.query(conn, "SELECT fr07_sync_arm()")
 
 result =
-  Gateway.transact_verified(
-    gateway,
-    capability,
-    "actor",
-    command.("SYNC-CRASH"),
-    bundle.("SYNC-CRASH"),
-    protected.("SYNC-CRASH")
-  )
+  Gateway.transact(gateway, "actor", command.("SYNC-CRASH"), bundle.("SYNC-CRASH"))
 
 {:ok, [[hits, code, writes, write_sequence, sync_sequence]]} =
   Database.query(

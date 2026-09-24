@@ -2,7 +2,6 @@ alias Foundry.DurableStore.Gateway
 
 [path, boundary] = System.argv()
 fault = if boundary == "before", do: {:halt, :before_commit}, else: {:halt, :after_commit}
-capability = make_ref()
 
 build = fn command_id ->
   projection_key =
@@ -66,49 +65,18 @@ build = fn command_id ->
     ]
   }
 
-  protected = %{
-    writer_epoch: "fixture-epoch",
-    required_revisions: %{projection_key => "absent"},
-    ledger_generations: [
-      %{
-        schema_version: 1,
-        generation_id: "generation-" <> command_id,
-        parent_generation_id: nil,
-        allocation: 1,
-        consumed: 0
-      }
-    ],
-    effect_authorizations: [
-      %{
-        effect_id: "effect-" <> command_id,
-        claim_id: "claim-" <> command_id,
-        generation_id: "generation-" <> command_id,
-        reservation_id: "reservation-" <> command_id,
-        dimension: "starts.developer",
-        units: 1
-      }
-    ]
-  }
-
-  {command, proposal, protected}
+  {command, proposal}
 end
 
 :ok = Gateway.initialize(path)
-{:ok, baseline_gateway} = Gateway.start_link(path: path, protected_capability: capability)
-{baseline_command, baseline_proposal, baseline_protected} = build.("crash-baseline")
+{:ok, baseline_gateway} = Gateway.start_link(path: path)
+{baseline_command, baseline_proposal} = build.("crash-baseline")
 
 {:ok, _result, :committed} =
-  Gateway.transact_verified(
-    baseline_gateway,
-    capability,
-    "fixture",
-    baseline_command,
-    baseline_proposal,
-    baseline_protected
-  )
+  Gateway.transact(baseline_gateway, "fixture", baseline_command, baseline_proposal)
 
 :ok = GenServer.stop(baseline_gateway)
-{:ok, gateway} = Gateway.start_link(path: path, fault: fault, protected_capability: capability)
-{command, proposal, protected} = build.("crash-" <> boundary)
-Gateway.transact_verified(gateway, capability, "fixture", command, proposal, protected)
+{:ok, gateway} = Gateway.start_link(path: path, fault: fault)
+{command, proposal} = build.("crash-" <> boundary)
+Gateway.transact(gateway, "fixture", command, proposal)
 System.halt(70)

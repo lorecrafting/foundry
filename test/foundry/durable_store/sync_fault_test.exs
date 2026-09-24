@@ -14,19 +14,11 @@ defmodule Foundry.DurableStore.SyncFaultTest do
 
   test "connection-scoped WAL xSync fault is attributed, unacknowledged and ambiguity safe",
        ctx do
-    capability = make_ref()
     assert :ok = Gateway.initialize(ctx.path)
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: ctx.path})
 
     assert {:ok, _seed, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("SEED"),
-               protected_bundle("SEED"),
-               protected("SEED")
-             )
+             Gateway.transact(gateway, "actor", command("SEED"), effect_bundle("SEED"))
 
     baseline_path = Path.join(ctx.root, "baseline.sqlite3")
     assert {:ok, %{content: baseline}} = Gateway.backup(gateway, baseline_path)
@@ -47,19 +39,12 @@ defmodule Foundry.DurableStore.SyncFaultTest do
     assert {:ok, [[1]]} = Database.query(conn, "SELECT fr07_sync_arm()")
 
     failed_command = command("SYNC-FAIL")
-    failed_bundle = protected_bundle("SYNC-FAIL")
+    failed_bundle = effect_bundle("SYNC-FAIL")
 
     assert {:error,
             {:storage_unavailable,
              {:rollback_failed, _rollback_error, {:error, {:commit_failed, _binding_error}}}}} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               failed_command,
-               failed_bundle,
-               protected("SYNC-FAIL")
-             )
+             Gateway.transact(gateway, "actor", failed_command, failed_bundle)
 
     assert %{mode: :recovery} = Gateway.status(gateway)
 
@@ -75,21 +60,14 @@ defmodule Foundry.DurableStore.SyncFaultTest do
     assert sync_sequence > write_sequence
 
     assert {:error, {:recovery_mode, _reason}} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("LATER"),
-               protected_bundle("LATER"),
-               protected("LATER")
-             )
+             Gateway.transact(gateway, "actor", command("LATER"), effect_bundle("LATER"))
 
     assert {:ok, [[1]]} = Database.query(conn, "SELECT fr07_sync_disarm()")
 
     assert :ok = stop_supervised(Gateway)
 
     reopened =
-      start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
+      start_supervised!({Gateway, path: ctx.path})
 
     assert %{mode: :ready} = Gateway.status(reopened)
     reopened_rows = sql_snapshot(reopened)
@@ -102,27 +80,13 @@ defmodule Foundry.DurableStore.SyncFaultTest do
         assert baseline_rows == sql_snapshot_path(after_path)
 
         assert {:ok, _result, :committed} =
-                 Gateway.transact_verified(
-                   reopened,
-                   capability,
-                   "actor",
-                   failed_command,
-                   failed_bundle,
-                   protected("SYNC-FAIL")
-                 )
+                 Gateway.transact(reopened, "actor", failed_command, failed_bundle)
 
       {:ok, result} ->
         refute reopened_rows == baseline_rows
 
         assert {:ok, ^result, :idempotent} =
-                 Gateway.transact_verified(
-                   reopened,
-                   capability,
-                   "actor",
-                   failed_command,
-                   %{},
-                   %{}
-                 )
+                 Gateway.transact(reopened, "actor", failed_command, %{})
     end
 
     assert_complete_counts(reopened, 2)
@@ -135,29 +99,20 @@ defmodule Foundry.DurableStore.SyncFaultTest do
 
     unrelated_path = Path.join(ctx.root, "unrelated.sqlite3")
     assert :ok = Gateway.initialize(unrelated_path)
-    unrelated_capability = make_ref()
 
     unrelated =
       start_supervised!(
-        {Gateway, path: unrelated_path, protected_capability: unrelated_capability},
+        {Gateway, path: unrelated_path},
         id: :unrelated_sync_store
       )
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               unrelated,
-               unrelated_capability,
-               "actor",
-               command("CONTROL"),
-               protected_bundle("CONTROL"),
-               protected("CONTROL")
-             )
+             Gateway.transact(unrelated, "actor", command("CONTROL"), effect_bundle("CONTROL"))
 
     assert_complete_counts(unrelated, 1)
   end
 
   test "hard exit after attributed xSync failure reopens without a partial bundle", ctx do
-    capability = make_ref()
     fixture = Path.expand("test/support/fr07_sync_crash_fixture.exs")
 
     {output, 73} =
@@ -182,29 +137,19 @@ defmodule Foundry.DurableStore.SyncFaultTest do
 
     gateway =
       start_supervised!(
-        {Gateway,
-         path: ctx.path,
-         recovery_evidence: "verified xSync fixture hard exit",
-         protected_capability: capability},
+        {Gateway, path: ctx.path, recovery_evidence: "verified xSync fixture hard exit"},
         id: :recovered_sync_store
       )
 
     assert %{mode: :ready} = Gateway.status(gateway)
     assert {:ok, counts} = Gateway.counts(gateway)
     assert counts["commands"] in [1, 2]
-    assert_consistent_protected_counts(counts)
+    assert_consistent_counts(counts)
 
     before_retry = sql_snapshot(gateway)
 
     retry =
-      Gateway.transact_verified(
-        gateway,
-        capability,
-        "actor",
-        command("SYNC-CRASH"),
-        protected_bundle("SYNC-CRASH"),
-        protected("SYNC-CRASH")
-      )
+      Gateway.transact(gateway, "actor", command("SYNC-CRASH"), effect_bundle("SYNC-CRASH"))
 
     assert {:ok, _result, retry_status} = retry
     assert retry_status in [:committed, :idempotent]
@@ -306,7 +251,7 @@ defmodule Foundry.DurableStore.SyncFaultTest do
     }
   end
 
-  defp protected_bundle(id) do
+  defp effect_bundle(id) do
     Map.put(bundle(id), :intents, [
       %{
         schema_version: 1,
@@ -316,32 +261,6 @@ defmodule Foundry.DurableStore.SyncFaultTest do
         value: %{"operation" => "check"}
       }
     ])
-  end
-
-  defp protected(id) do
-    %{
-      writer_epoch: "sync-fixture-epoch",
-      required_revisions: %{projection_key(id) => "absent"},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "generation-#{id}",
-          parent_generation_id: nil,
-          allocation: 1,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: [
-        %{
-          effect_id: "effect-#{id}",
-          claim_id: "claim-#{id}",
-          generation_id: "generation-#{id}",
-          reservation_id: "reservation-#{id}",
-          dimension: "starts.developer",
-          units: 1
-        }
-      ]
-    }
   end
 
   defp effect_digest(id) do
@@ -357,25 +276,25 @@ defmodule Foundry.DurableStore.SyncFaultTest do
   defp assert_complete_counts(gateway, expected) do
     assert {:ok, counts} = Gateway.counts(gateway)
     assert counts["commands"] == expected
-    assert_consistent_protected_counts(counts)
+    assert_consistent_counts(counts)
   end
 
-  defp assert_consistent_protected_counts(counts) do
+  defp assert_consistent_counts(counts) do
     for table <-
-          ~w(inputs command_results events projections effects claims ledger_generations reservations) do
+          ~w(inputs command_results events projections effects) do
       assert counts[table] == counts["commands"]
     end
   end
 
   defp assert_snapshot_counts(content, expected) do
     for table <-
-          ~w(inputs commands command_results events projections effects claims ledger_generations reservations) do
+          ~w(inputs commands command_results events projections effects) do
       assert content[table].count == expected
       assert byte_size(content[table].sha256) == 64
     end
 
     for table <-
-          ~w(metadata receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records sqlite_sequence) do
+          ~w(metadata claims ledger_generations reservations receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records sqlite_sequence) do
       assert is_integer(content[table].count)
       assert byte_size(content[table].sha256) == 64
     end

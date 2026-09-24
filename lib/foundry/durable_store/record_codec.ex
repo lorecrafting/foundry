@@ -11,7 +11,6 @@ defmodule Foundry.DurableStore.RecordCodec do
   @intent ~w(schema_version effect_id request_digest status value)
   @claim ~w(schema_version claim_id effect_id writer_epoch status value)
   @reservation ~w(schema_version reservation_id generation_id claim_id dimension units status value)
-  @candidate_ledger ~w(schema_version generation_id parent_generation_id allocation consumed)
   @ledger ~w(schema_version generation_id parent_generation_id revision allocation consumed)
   @command_request ~w(domain schema_version actor_id command)
   @command ~w(schema_version command_id expected_revisions type target_ids payload)
@@ -165,22 +164,6 @@ defmodule Foundry.DurableStore.RecordCodec do
     else
       {:error, _reason} = error -> error
       _ -> {:error, :invalid_reservation}
-    end
-  end
-
-  def normalize(:candidate_ledger_generation, value) do
-    with {:ok, map} <- normalize_map(value),
-         :ok <- keys(map, @candidate_ledger, @candidate_ledger),
-         1 <- map["schema_version"],
-         :ok <- nonempty(map, ~w(generation_id)),
-         nil <- map["parent_generation_id"],
-         allocation when is_integer(allocation) and allocation >= 0 <- map["allocation"],
-         consumed when is_integer(consumed) and consumed >= 0 and consumed <= allocation <-
-           map["consumed"] do
-      {:ok, map}
-    else
-      {:error, _reason} = error -> error
-      _ -> {:error, :unsupported_ledger_generation}
     end
   end
 

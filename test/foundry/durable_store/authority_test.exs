@@ -1,3 +1,5 @@
+Code.require_file("../../support/legacy_protected_rows.ex", __DIR__)
+
 defmodule Foundry.DurableStore.AuthorityTest do
   use ExUnit.Case, async: false
 
@@ -8,6 +10,8 @@ defmodule Foundry.DurableStore.AuthorityTest do
     Gateway,
     RecordCodec
   }
+
+  alias Foundry.Test.LegacyProtectedRows
 
   setup do
     root = Path.join(System.tmp_dir!(), "fr07-authority-#{System.unique_integer([:positive])}")
@@ -207,79 +211,13 @@ defmodule Foundry.DurableStore.AuthorityTest do
     assert Enum.all?(counts, fn {_table, count} -> count == 0 end)
   end
 
-  test "protected admission rejects improper collections without crashing", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
-
-    for field <- [:ledger_generations, :effect_authorizations] do
-      facts = Map.put(protected("BAD-#{field}"), field, [nil | :improper])
-
-      assert {:error, _reason} =
-               Gateway.transact_verified(
-                 gateway,
-                 capability,
-                 "actor",
-                 command("BAD-#{field}"),
-                 protected_bundle("BAD-#{field}"),
-                 facts
-               )
-
-      assert Process.alive?(gateway)
-      assert %{mode: :ready} = Gateway.status(gateway)
-    end
-  end
-
-  test "a zero-available root generation requires no invented reservation", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
-
-    facts = %{
-      writer_epoch: "epoch",
-      required_revisions: %{projection_key("ZERO") => "absent"},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "generation-ZERO",
-          parent_generation_id: nil,
-          allocation: 0,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: []
-    }
-
-    assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("ZERO"),
-               bundle("ZERO"),
-               facts
-             )
-
-    conn = :sys.get_state(gateway).conn
-
-    assert {:ok, [[0, 0]]} =
-             Database.query(
-               conn,
-               "SELECT (SELECT count(*) FROM reservations), (SELECT consumed FROM ledger_generations WHERE generation_id='generation-ZERO')"
-             )
-  end
-
   test "a semantically unsupported ledger row cannot satisfy a live revision read", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: ctx.path})
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("A"),
-               protected_bundle("A"),
-               protected("A")
-             )
+             Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
+
+    LegacyProtectedRows.insert!(gateway, "A")
 
     conn = :sys.get_state(gateway).conn
 
@@ -300,18 +238,12 @@ defmodule Foundry.DurableStore.AuthorityTest do
   end
 
   test "a second reservation on a retained claim cannot hide behind another generation", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: ctx.path})
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("A"),
-               protected_bundle("A"),
-               protected("A")
-             )
+             Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
+
+    LegacyProtectedRows.insert!(gateway, "A")
 
     conn = :sys.get_state(gateway).conn
 
@@ -471,23 +403,17 @@ defmodule Foundry.DurableStore.AuthorityTest do
     for {{table, sql, params}, index} <- Enum.with_index(inserts) do
       path = Path.join(ctx.root, "unsupported-#{index}.sqlite3")
       assert :ok = Gateway.initialize(path)
-      capability = make_ref()
 
       gateway =
         start_supervised!(
-          {Gateway, path: path, protected_capability: capability},
+          {Gateway, path: path},
           id: {:unsupported_seed, index}
         )
 
       assert {:ok, _result, :committed} =
-               Gateway.transact_verified(
-                 gateway,
-                 capability,
-                 "actor",
-                 command("A"),
-                 protected_bundle("A"),
-                 protected("A")
-               )
+               Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
+
+      LegacyProtectedRows.insert!(gateway, "A")
 
       assert :ok = stop_supervised({:unsupported_seed, index})
       {:ok, conn} = Database.open(path)
@@ -553,23 +479,17 @@ defmodule Foundry.DurableStore.AuthorityTest do
     for family <- [:projection, :ledger] do
       path = Path.join(ctx.root, "owner-#{family}.sqlite3")
       assert :ok = Gateway.initialize(path)
-      capability = make_ref()
 
       gateway =
         start_supervised!(
-          {Gateway, path: path, protected_capability: capability},
+          {Gateway, path: path},
           id: {:owner_closure, family}
         )
 
       assert {:ok, _result, :committed} =
-               Gateway.transact_verified(
-                 gateway,
-                 capability,
-                 "actor",
-                 command("A"),
-                 protected_bundle("A"),
-                 protected("A")
-               )
+               Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
+
+      LegacyProtectedRows.insert!(gateway, "A")
 
       conn = :sys.get_state(gateway).conn
       assert :ok = Database.execute(conn, "DELETE FROM command_results WHERE command_id='A'")
@@ -592,18 +512,10 @@ defmodule Foundry.DurableStore.AuthorityTest do
   end
 
   test "global reads reject orphan effects before backup publication", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: ctx.path})
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("A"),
-               protected_bundle("A"),
-               protected("A")
-             )
+             Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
 
     conn = :sys.get_state(gateway).conn
     assert :ok = Database.execute(conn, "PRAGMA foreign_keys=OFF")
@@ -622,31 +534,8 @@ defmodule Foundry.DurableStore.AuthorityTest do
     assert %{mode: :recovery} = Gateway.status(gateway)
   end
 
-  test "malformed protected facts and command lookups are total and nonfencing", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
-
-    malformed = [
-      %{protected("A") | required_revisions: %URI{scheme: "x"}},
-      %{protected("A") | required_revisions: %{<<255>> => "absent"}},
-      %{protected("A") | writer_epoch: <<255>>},
-      put_in(protected("A"), [:effect_authorizations, Access.at(0), :claim_id], <<255>>)
-    ]
-
-    Enum.each(malformed, fn facts ->
-      assert {:error, _reason} =
-               Gateway.transact_verified(
-                 gateway,
-                 capability,
-                 "actor",
-                 command("A"),
-                 protected_bundle("A"),
-                 facts
-               )
-
-      assert Process.alive?(gateway)
-      assert %{mode: :ready} = Gateway.status(gateway)
-    end)
+  test "malformed command lookups are total and nonfencing", ctx do
+    gateway = start_supervised!({Gateway, path: ctx.path})
 
     for command_id <- ["", <<255>>, %URI{scheme: "x"}] do
       assert {:error, :invalid_command_id} = Gateway.command(gateway, command_id)
@@ -857,23 +746,17 @@ defmodule Foundry.DurableStore.AuthorityTest do
     for family <- [:projection, :ledger] do
       path = Path.join(ctx.root, "owner-watermark-#{family}.sqlite3")
       assert :ok = Gateway.initialize(path)
-      capability = make_ref()
 
       gateway =
         start_supervised!(
-          {Gateway, path: path, protected_capability: capability},
+          {Gateway, path: path},
           id: {:owner_watermark, family}
         )
 
       assert {:ok, _result, :committed} =
-               Gateway.transact_verified(
-                 gateway,
-                 capability,
-                 "actor",
-                 command("A"),
-                 protected_bundle("A"),
-                 protected("A")
-               )
+               Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
+
+      LegacyProtectedRows.insert!(gateway, "A")
 
       conn = :sys.get_state(gateway).conn
 
@@ -914,18 +797,12 @@ defmodule Foundry.DurableStore.AuthorityTest do
   end
 
   test "a rejected owner retaining effects returns typed corruption", ctx do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: ctx.path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: ctx.path})
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("A"),
-               protected_bundle("A"),
-               protected("A")
-             )
+             Gateway.transact(gateway, "actor", command("A"), protected_bundle("A"))
+
+    LegacyProtectedRows.insert!(gateway, "A")
 
     conn = :sys.get_state(gateway).conn
 
@@ -1020,32 +897,6 @@ defmodule Foundry.DurableStore.AuthorityTest do
     }
 
     Map.put(bundle(id), :intents, [intent])
-  end
-
-  defp protected(id) do
-    %{
-      writer_epoch: "epoch",
-      required_revisions: %{projection_key(id) => "absent"},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "generation-#{id}",
-          parent_generation_id: nil,
-          allocation: 1,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: [
-        %{
-          effect_id: "effect-#{id}",
-          claim_id: "claim-#{id}",
-          generation_id: "generation-#{id}",
-          reservation_id: "reservation-#{id}",
-          dimension: "starts.developer",
-          units: 1
-        }
-      ]
-    }
   end
 
   defp projection_key(id),

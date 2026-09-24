@@ -18,7 +18,10 @@ observation surfaces, and nothing reads any of them back to decide anything:
 
 `lane log` also runs while the Gateway is in recovery, because it opens SQLite read-only.
 `Foundry.Observations` is a bounded, read-only query surface over the same protected
-facts; tests exercise it, and no lane command calls it yet.
+facts; tests exercise it, and no lane command calls it yet. It is kept as the in-progress
+FR-18A slice ([repair plan](REPAIR-PLAN.md#fr-18a--minimal-honest-observations), its
+[bounded effect query design](design/bounded-effect-query-design.md)): ML-DEAD-ROUTES left it
+in place for an operator decision rather than delete a live plan item.
 
 ## What is gone
 

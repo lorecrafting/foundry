@@ -20,8 +20,8 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
 
   test "operational inspection is bounded and reports capacity without inventing it", ctx do
     gateway = ready_gateway(ctx.path, capacity_probe: fn _path -> {:ok, 12_345} end)
-    commit_protected(gateway, "A")
-    commit_protected(gateway, "B")
+    commit(gateway, "A")
+    commit(gateway, "B")
 
     assert {:ok,
             %{
@@ -206,7 +206,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
   test "backup is content/replay verified and offline verification refuses a live owner", ctx do
     capability = make_ref()
     gateway = ready_gateway(ctx.path, protected_capability: capability)
-    commit_protected(gateway, "BACKUP", capability)
+    commit(gateway, "BACKUP")
 
     backup = Path.join(ctx.root, "backup.sqlite3")
 
@@ -228,15 +228,13 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
               replay: %{sha256: ^replay_digest, projection_count: 1}
             }} = Maintenance.verify(backup)
 
-    assert source_content["claims"].count == 1
-    assert source_content["ledger_generations"].count == 1
-    assert source_content["reservations"].count == 1
+    assert_complete_authority(source_content)
   end
 
-  test "real WAL checkpoint preserves complete claim and ledger history", ctx do
+  test "real WAL checkpoint preserves complete committed history", ctx do
     capability = make_ref()
     gateway = ready_gateway(ctx.path, protected_capability: capability)
-    commit_protected(gateway, "CHECKPOINT", capability)
+    commit(gateway, "CHECKPOINT")
     assert File.stat!(ctx.path <> "-wal").size > 0
 
     assert {:ok, %{busy: 0, last_durable_sequence: 1}} = Gateway.checkpoint(gateway)
@@ -244,9 +242,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
 
     backup = Path.join(ctx.root, "checkpoint.sqlite3")
     assert {:ok, %{content: content}} = Gateway.backup(gateway, backup)
-    assert content["claims"].count == 1
-    assert content["ledger_generations"].count == 1
-    assert content["reservations"].count == 1
+    assert_complete_authority(content)
   end
 
   test "harmless backup preflight refusal does not fence the store", ctx do
@@ -317,7 +313,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
       prior_count = 4
 
       for index <- 1..prior_count do
-        commit_protected(seed, "#{operation}-PRIOR-#{index}", capability, 4_000_000)
+        commit(seed, "#{operation}-PRIOR-#{index}", 4_000_000)
       end
 
       baseline_path = Path.join(ctx.root, "#{operation}-baseline.sqlite3")
@@ -367,13 +363,11 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
       end
 
       assert {:error, {:recovery_mode, _reason}} =
-               Gateway.transact_verified(
+               Gateway.transact(
                  seed,
-                 capability,
                  "operator",
                  command("#{operation}-LATER"),
-                 bundle("#{operation}-LATER"),
-                 protected("#{operation}-LATER")
+                 bundle("#{operation}-LATER")
                )
 
       assert {:error, {:recovery_mode, _reason}} =
@@ -408,7 +402,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
   test "physical SQLite corruption is retained and fenced while verified backup survives", ctx do
     capability = make_ref()
     gateway = ready_gateway(ctx.path, protected_capability: capability)
-    commit_protected(gateway, "CORRUPT", capability)
+    commit(gateway, "CORRUPT")
     backup = Path.join(ctx.root, "before-corruption.sqlite3")
     assert {:ok, %{content: content}} = Gateway.backup(gateway, backup)
     assert :ok = stop_supervised(Gateway)
@@ -448,7 +442,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
           capacity_probe: fn _path -> {:ok, 1} end
         )
 
-      commit_protected(gateway, String.upcase(operation), capability)
+      commit(gateway, String.upcase(operation))
       baseline = Path.join(ctx.root, "#{operation}-baseline.sqlite3")
       assert {:ok, %{content: content}} = Gateway.backup(gateway, baseline)
       assert :ok = stop_supervised(Path.basename(path))
@@ -480,8 +474,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
 
       after_path = Path.join(ctx.root, "#{operation}-after.sqlite3")
       assert {:ok, %{content: ^content}} = Gateway.backup(recovered, after_path)
-      assert content["claims"].count == 1
-      assert content["ledger_generations"].count == 1
+      assert_complete_authority(content)
       assert :ok = stop_supervised({:recovered, operation})
     end
   end
@@ -490,7 +483,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
     test "an owned full filesystem produces real ENOSPC and preserves prior authority", ctx do
       capability = make_ref()
       gateway = ready_gateway(ctx.path, protected_capability: capability)
-      commit_protected(gateway, "PHYSICAL-ENOSPC", capability, 4_000_000)
+      commit(gateway, "PHYSICAL-ENOSPC", 4_000_000)
 
       baseline_path = Path.join(ctx.root, "enospc-baseline.sqlite3")
       assert {:ok, %{content: baseline}} = Gateway.backup(gateway, baseline_path)
@@ -534,7 +527,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
       gateway = ready_gateway(source, protected_capability: capability)
       conn = :sys.get_state(gateway).conn
       assert {:ok, [[0]]} = Database.query(conn, "PRAGMA wal_autocheckpoint = 0")
-      commit_protected(gateway, "CHECKPOINT-ENOSPC", capability, 2_000_000)
+      commit(gateway, "CHECKPOINT-ENOSPC", 2_000_000)
       assert File.stat!(source <> "-wal").size > 0
 
       baseline_path = Path.join(ctx.root, "checkpoint-enospc-baseline.sqlite3")
@@ -557,13 +550,11 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
       assert File.stat!(source <> "-wal").size > 0
 
       assert {:error, {:recovery_mode, _reason}} =
-               Gateway.transact_verified(
+               Gateway.transact(
                  gateway,
-                 capability,
                  "operator",
                  command("CHECKPOINT-ENOSPC-LATER"),
-                 bundle("CHECKPOINT-ENOSPC-LATER"),
-                 protected("CHECKPOINT-ENOSPC-LATER")
+                 bundle("CHECKPOINT-ENOSPC-LATER")
                )
 
       assert :ok = stop_supervised(Gateway)
@@ -594,7 +585,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
       end
 
       seed = ready_gateway(ctx.path, protected_capability: capability)
-      commit_protected(seed, "PHYSICAL-SYNC", capability)
+      commit(seed, "PHYSICAL-SYNC")
       source_baseline = Path.join(ctx.root, "sync-source-baseline.sqlite3")
       assert {:ok, %{content: baseline}} = Gateway.backup(seed, source_baseline)
       assert_complete_authority(baseline)
@@ -677,18 +668,15 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
     start_supervised!({Gateway, Keyword.put(opts, :path, path)}, id: Path.basename(path))
   end
 
-  defp commit_protected(gateway, id, capability \\ nil, padding_bytes \\ 0) do
-    capability = capability || :sys.get_state(gateway).protected_capability
-
-    # Gateway.transact_verified/6 is GenServer.call/2 with the 5 s default. A
+  defp commit(gateway, id, padding_bytes \\ 0) do
+    # Gateway.transact/4 is GenServer.call/2 with the 5 s default. A
     # 4 MB padded commit spends ~0.64 s/MB of CPU in canonical encoding (measured
     # 2.0-2.9 s at load 3-7 on 8 cores), so CPU contention from a concurrent
     # suite pushed it past 5 s. The explicit bound keeps a stuck owner failing.
     assert {:ok, _result, :committed} =
              GenServer.call(
                gateway,
-               {:transact_verified, capability, "operator", command(id, padding_bytes),
-                bundle(id), protected(id)},
+               {:transact, "operator", command(id, padding_bytes), bundle(id)},
                @padded_commit_timeout_ms
              )
   end
@@ -741,32 +729,6 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
           request_digest: effect_digest(id),
           status: "pending",
           value: %{"operation" => "check"}
-        }
-      ]
-    }
-  end
-
-  defp protected(id) do
-    %{
-      writer_epoch: "epoch-1",
-      required_revisions: %{projection_key(id) => "absent"},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "generation-#{id}",
-          parent_generation_id: nil,
-          allocation: 1,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: [
-        %{
-          effect_id: "effect-#{id}",
-          claim_id: "claim-#{id}",
-          generation_id: "generation-#{id}",
-          reservation_id: "reservation-#{id}",
-          dimension: "starts.developer",
-          units: 1
         }
       ]
     }
@@ -833,9 +795,6 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
     assert content["events"].count == expected
     assert content["projections"].count == expected
     assert content["effects"].count == expected
-    assert content["claims"].count == expected
-    assert content["ledger_generations"].count == expected
-    assert content["reservations"].count == expected
   end
 
   defp attach_disk_image(root, name, size_mb) do

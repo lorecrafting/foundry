@@ -45,10 +45,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
     # the non-start discriminator rule, settlement identity, and predicate derivation.
     {Foundry.DurableStore.TransitionPlan, "lib/foundry/durable_store/transition_plan.ex",
      "cc0fbb3265e3dbb94a70383bdbbc76597f40f3225b220c1f5b15c45eecc300bf",
-     "bf16bdc00b301265786c4eef1089111c"},
-    {Foundry.DurableStore.ProtectedVerifier, "lib/foundry/durable_store/protected_verifier.ex",
-     "0366e3e68c0fe6680828b947023e5e401f8e177c996b2bf09ac5855f07cade92",
-     "17a825663acef8c7208870e35e1e27c3"}
+     "bf16bdc00b301265786c4eef1089111c"}
   ]
 
   def identity do

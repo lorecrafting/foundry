@@ -1,7 +1,10 @@
+Code.require_file("../../support/legacy_protected_rows.ex", __DIR__)
+
 defmodule Foundry.DurableStore.ReviewCorrectionsTest do
   use ExUnit.Case, async: false
 
   alias Foundry.DurableStore.{Database, Encoding, Gateway}
+  alias Foundry.Test.LegacyProtectedRows
 
   setup do
     root = Path.join(System.tmp_dir!(), "fr07-corrections-#{System.unique_integer([:positive])}")
@@ -106,33 +109,17 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
     assert %{mode: :ready} = Gateway.status(gateway)
   end
 
-  test "same semantic protected retry returns durable result before changed current facts", %{
+  test "same semantic retry returns the durable result before validating the proposal", %{
     path: path
   } do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: path})
     command = command("RETRY")
     proposal = bundle("RETRY")
 
-    assert {:ok, result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command,
-               proposal,
-               protected("RETRY")
-             )
+    assert {:ok, result, :committed} = Gateway.transact(gateway, "actor", command, proposal)
 
     assert {:ok, ^result, :idempotent} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command,
-               %{proposal | schema_version: 99},
-               %{}
-             )
+             Gateway.transact(gateway, "actor", command, %{proposal | schema_version: 99})
   end
 
   test "corrupt bodies fence startup and corrupt reads fence the live gateway", %{path: path} do
@@ -212,58 +199,26 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
              Gateway.status(gateway)
   end
 
-  test "ordinary and protected idempotent corruption both fence", %{root: root} do
-    for mode <- [:ordinary, :protected] do
+  test "malformed and unknown-version idempotent results both fence", %{root: root} do
+    for {mode, damaged, cause} <- [
+          {:malformed, "not-json", :malformed_json},
+          {:unknown_version, ~s({"schema_version":99}), :unsupported_version}
+        ] do
       path = Path.join(root, "retry-#{mode}.sqlite3")
       assert :ok = Gateway.initialize(path)
-      capability = make_ref()
-
-      gateway =
-        start_supervised!({Gateway, path: path, protected_capability: capability}, id: mode)
-
+      gateway = start_supervised!({Gateway, path: path}, id: mode)
       id = "RETRY-#{mode}"
       command = command(id)
       proposal = bundle(id)
 
-      case mode do
-        :ordinary ->
-          assert {:ok, _result, :committed} =
-                   Gateway.transact(gateway, "actor", command, proposal)
-
-        :protected ->
-          assert {:ok, _result, :committed} =
-                   Gateway.transact_verified(
-                     gateway,
-                     capability,
-                     "actor",
-                     command,
-                     proposal,
-                     protected(id)
-                   )
-      end
+      assert {:ok, _result, :committed} = Gateway.transact(gateway, "actor", command, proposal)
 
       conn = :sys.get_state(gateway).conn
-      damaged = if mode == :ordinary, do: "not-json", else: ~s({"schema_version":99})
-      cause = if mode == :ordinary, do: :malformed_json, else: :unsupported_version
 
       assert :ok =
                Database.execute(conn, "UPDATE command_results SET result = ?", [{:blob, damaged}])
 
-      result =
-        case mode do
-          :ordinary ->
-            Gateway.transact(gateway, "actor", command, proposal)
-
-          :protected ->
-            Gateway.transact_verified(
-              gateway,
-              capability,
-              "actor",
-              command,
-              proposal,
-              protected(id)
-            )
-        end
+      result = Gateway.transact(gateway, "actor", command, proposal)
 
       assert {:error, {:authority_corrupt, "command_results", ^id, ^cause}} = result
 
@@ -335,42 +290,6 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
     assert %{mode: :ready} = Gateway.status(gateway)
   end
 
-  test "unsupported child ledger allocation cannot mint authority", %{path: path} do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: path, protected_capability: capability})
-
-    assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("PARENT"),
-               bundle("PARENT"),
-               protected("PARENT")
-             )
-
-    facts =
-      put_in(
-        protected("CHILD"),
-        [:ledger_generations, Access.at(0), :parent_generation_id],
-        "generation-PARENT"
-      )
-
-    facts = put_in(facts, [:ledger_generations, Access.at(0), :allocation], 100)
-
-    assert {:error, :unsupported_child_ledger_generation} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("CHILD"),
-               bundle("CHILD"),
-               facts
-             )
-
-    assert {:ok, %{"ledger_generations" => 1, "commands" => 1}} = Gateway.counts(gateway)
-  end
-
   test "one persistent owner excludes a second gateway", %{path: path} do
     first = start_supervised!({Gateway, path: path})
     second = start_supervised!({Gateway, path: path}, id: :second_gateway)
@@ -392,21 +311,13 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
     refute Process.alive?(first)
   end
 
-  test "every protected-table failpoint rolls back and preserves prior committed content", %{
+  test "every domain-table failpoint rolls back and preserves prior committed content", %{
     path: path
   } do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: path})
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("BASE"),
-               bundle("BASE"),
-               protected("BASE")
-             )
+             Gateway.transact(gateway, "actor", command("BASE"), bundle("BASE"))
 
     assert {:ok, %{content: baseline_content, reconstruction: baseline_reconstruction}} =
              Gateway.backup(gateway, Path.join(Path.dirname(path), "baseline.sqlite3"))
@@ -419,38 +330,28 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
           :after_events,
           :after_projections,
           :after_intents,
-          :after_generations,
-          :after_claims,
-          :after_reservations,
           :after_result
         ] do
-      gateway =
-        start_supervised!(
-          {Gateway, path: path, protected_capability: capability, fault: {:after_insert, point}}
-        )
+      gateway = start_supervised!({Gateway, path: path, fault: {:after_insert, point}})
 
       assert {:error, {:storage_unavailable, {:injected_after_insert, ^point}}} =
-               Gateway.transact_verified(
+               Gateway.transact(
                  gateway,
-                 capability,
                  "actor",
                  command("FAIL-#{point}"),
-                 bundle("FAIL-#{point}"),
-                 protected("FAIL-#{point}")
+                 bundle("FAIL-#{point}")
                )
 
       assert :ok = stop_supervised(Gateway)
-      gateway = start_supervised!({Gateway, path: path, protected_capability: capability})
+      gateway = start_supervised!({Gateway, path: path})
+      assert %{mode: :ready} = Gateway.status(gateway)
 
       assert {:ok,
               %{
                 "inputs" => 1,
                 "commands" => 1,
                 "events" => 1,
-                "effects" => 1,
-                "claims" => 1,
-                "ledger_generations" => 1,
-                "reservations" => 1
+                "effects" => 1
               }} = Gateway.counts(gateway)
 
       assert {:ok, %{content: ^baseline_content, reconstruction: ^baseline_reconstruction}} =
@@ -520,18 +421,12 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
     root: root,
     path: path
   } do
-    capability = make_ref()
-    gateway = start_supervised!({Gateway, path: path, protected_capability: capability})
+    gateway = start_supervised!({Gateway, path: path})
 
     assert {:ok, _result, :committed} =
-             Gateway.transact_verified(
-               gateway,
-               capability,
-               "actor",
-               command("BACKUP"),
-               bundle("BACKUP"),
-               protected("BACKUP")
-             )
+             Gateway.transact(gateway, "actor", command("BACKUP"), bundle("BACKUP"))
+
+    LegacyProtectedRows.insert!(gateway, "BACKUP")
 
     conn = :sys.get_state(gateway).conn
 
@@ -690,32 +585,6 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
           request_digest: effect_digest(id),
           status: "pending",
           value: %{"operation" => "check"}
-        }
-      ]
-    }
-  end
-
-  defp protected(id) do
-    %{
-      writer_epoch: "epoch",
-      required_revisions: %{projection_key(id) => "absent"},
-      ledger_generations: [
-        %{
-          schema_version: 1,
-          generation_id: "generation-#{id}",
-          parent_generation_id: nil,
-          allocation: 1,
-          consumed: 0
-        }
-      ],
-      effect_authorizations: [
-        %{
-          effect_id: "effect-#{id}",
-          claim_id: "claim-#{id}",
-          generation_id: "generation-#{id}",
-          reservation_id: "reservation-#{id}",
-          dimension: "starts.developer",
-          units: 1
         }
       ]
     }
