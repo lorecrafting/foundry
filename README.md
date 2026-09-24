@@ -1,8 +1,8 @@
 # Foundry
 
 Split from [lorecrafting/pramana](https://github.com/lorecrafting/pramana) on 2026-09-23 with
-its full history. Commit SHAs recorded before the split name Pramāṇa commits; the two that
-tests resolve survive here as `pramana/<sha>` tags.
+its full history. Commit SHAs recorded before the split name Pramāṇa commits; two of them
+survive here as `pramana/<sha>` tags, which no test reads any more.
 
 **Current shape, 2026-09-23:** Foundry is not in production. The legacy daemon stack
 (Coordinator, AgentServer, the Herdr adapter, launch effects, JSONL persistence, Board,

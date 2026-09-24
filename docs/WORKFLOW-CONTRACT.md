@@ -49,7 +49,8 @@ working-tree changes; source was not changed by FR-06.
 
 The [storage spike](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/storage_spike.py) and [machine output](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/storage-results.json)
 compare the same command/result/event/state/intent bundle in SQLite WAL and a checksummed,
-locked, fsynced journal. Run `python3 docs/fr-06/storage_spike.py` from the repository root.
+locked, fsynced journal. To rerun it, `git show records/2026-09-24:docs/archive/fr-06/storage_spike.py > storage_spike.py`
+and run `python3 storage_spike.py`.
 It uses fresh temporary files and subprocess exits, no Foundry startup or model calls.
 Python is experiment tooling only; production storage stays in the standalone Elixir app.
 

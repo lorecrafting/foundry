@@ -543,8 +543,8 @@ defmodule Foundry.ManualLane.RestartDrillTest do
           try do
             RPC.run(payload)
             true
-          rescue
-            RuntimeError -> false
+          catch
+            :exit, {:shutdown, 1} -> false
           end
 
         send(self(), {:ok?, ok?})

@@ -1759,7 +1759,7 @@ acceptance. FR-07 is now ready because both FR-03 and FR-06 have completion evid
 
 2026-09-13, FR-04: candidate `cd77de43475b1fbb4ef600384817b3f2434c6b4d`
 received independent [PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-04/review-v9.md) after an adversarial review chain retained
-in `docs/fr-04/`. Destructive cleanup now requires exact pane, terminal, native-session,
+in [`docs/archive/fr-04/`](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/archive/fr-04). Destructive cleanup now requires exact pane, terminal, native-session,
 shell-generation and foreground-generation evidence; split ownership is durably recorded
 before agent start, unverified/unknown resources are preserved, and developer/reviewer
 resources remain distinct in a bounded role/execution inventory. Cleanup pending/results

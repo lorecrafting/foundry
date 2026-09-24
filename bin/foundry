@@ -5,7 +5,10 @@
 # `rpc`, so lane commands execute in the daemon's BEAM (docs/batch-d/LANE-RUNBOOK.md).
 # The daemon dispatches only `lane` commands; every other argv is refused there.
 #
-# Works from both the main repo and worktrees.
+# The release is FOUNDRY_RELEASE: for `lane` commands, `bin/foundry-lane env` supplies it
+# (the lane build, from any checkout or worktree) unless it is already set. There is no
+# fallback search: a missing or unexecutable release is an error, never a different daemon.
+# A refusal prints `refused` and `error: <atom>` and exits non-zero.
 #
 # Usage:
 #   foundry lane status [TICKET] [--json]
@@ -16,7 +19,6 @@ set -euo pipefail
 # ── Resolve release binary path ──
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-FOUNDRY_DIR="$(dirname "$SCRIPT_DIR")"
 
 # `lane` commands go to the lane daemon that bin/foundry-lane starts (its own release and
 # node name), never to a legacy daemon. Explicit FOUNDRY_RELEASE and RELEASE_NODE still win.
@@ -24,58 +26,17 @@ if [ "${1:-}" = "lane" ]; then
   eval "$("$SCRIPT_DIR/foundry-lane" env)"
 fi
 
-# 1. Try relative to script (main repo case)
-RELEASE_BIN="$FOUNDRY_DIR/_build/prod/rel/foundry/bin/foundry"
-
-# 2. Try env var override. An explicit but invalid override is an error; silently
-# falling back could send a command to a different daemon than the caller chose.
-if [ -n "${FOUNDRY_RELEASE:-}" ]; then
-  if [ ! -x "$FOUNDRY_RELEASE" ]; then
-    echo "Error: FOUNDRY_RELEASE is not executable: $FOUNDRY_RELEASE" >&2
-    exit 69
-  fi
-
-  RELEASE_BIN="$FOUNDRY_RELEASE"
+if [ -z "${FOUNDRY_RELEASE:-}" ]; then
+  echo "Error: FOUNDRY_RELEASE is not set; usage: $0 lane <command> ..." >&2
+  exit 64
 fi
 
-# 3. Worktree detection via .git file
-if [ ! -x "$RELEASE_BIN" ]; then
-  GIT_FILE="$FOUNDRY_DIR/.git"
-  if [ -f "$GIT_FILE" ]; then
-    GITDIR_LINE=$(head -1 "$GIT_FILE" 2>/dev/null || echo "")
-    case "$GITDIR_LINE" in
-      gitdir:*)
-        MAIN_DIR="${GITDIR_LINE#gitdir: }"
-        MAIN_DIR="${MAIN_DIR%/.git*}"
-        RELEASE_BIN="$MAIN_DIR/_build/prod/rel/foundry/bin/foundry"
-        ;;
-    esac
-  fi
+if [ ! -x "$FOUNDRY_RELEASE" ]; then
+  echo "Error: FOUNDRY_RELEASE is not executable: $FOUNDRY_RELEASE" >&2
+  exit 69
 fi
 
-# 4. Last resort: common user paths
-if [ ! -x "$RELEASE_BIN" ]; then
-  for candidate in \
-    "$HOME/dev/foundry/_build/prod/rel/foundry/bin/foundry" \
-    "$HOME/foundry/_build/prod/rel/foundry/bin/foundry"; do
-    if [ -x "$candidate" ]; then
-      RELEASE_BIN="$candidate"
-      break
-    fi
-  done
-fi
-
-if [ ! -x "$RELEASE_BIN" ]; then
-  echo "Error: cannot find foundry release binary" >&2
-  echo "" >&2
-  echo "The release binary is at _build/prod/rel/foundry/bin/foundry" >&2
-  echo "Build it from the root of the main checkout:" >&2
-  echo "  MIX_ENV=prod mix release" >&2
-  echo "" >&2
-  echo "Or set FOUNDRY_RELEASE env var:" >&2
-  echo "  export FOUNDRY_RELEASE=/path/to/foundry/_build/prod/rel/foundry/bin/foundry" >&2
-  exit 1
-fi
+RELEASE_BIN="$FOUNDRY_RELEASE"
 
 # ── Encode arguments as inert data for the fixed RPC entry point ──
 

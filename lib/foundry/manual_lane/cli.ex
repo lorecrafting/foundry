@@ -10,8 +10,8 @@ defmodule Foundry.ManualLane.CLI do
 
   It runs in the daemon's BEAM against the flag-started `ManualLane.Server`, and only
   translates arguments into `ManualLane.Backend` calls. Output is human-readable, or one
-  JSON object with `--json`. A refusal prints its atom and raises, so the release `rpc`
-  exits non-zero, as the legacy CLI does.
+  JSON object with `--json`. A refusal prints its atom and exits `{:shutdown, 1}`, so the
+  release `rpc` exits non-zero without a stack trace.
   """
 
   alias Foundry.DurableStore.Gateway
@@ -63,7 +63,7 @@ defmodule Foundry.ManualLane.CLI do
   @outcomes %{"non_started" => :non_started, "unknown" => :unknown}
   @awaiting_operator ~w(issued unknown reconciliation_required)
 
-  @doc "Runs one lane command (argv after `lane`), prints its result, raises on refusal."
+  @doc "Runs one lane command (argv after `lane`), prints its result, exits `{:shutdown, 1}` on refusal."
   def main(argv) do
     json? = "--json" in argv
     command = List.first(argv)
@@ -83,7 +83,10 @@ defmodule Foundry.ManualLane.CLI do
           render(%{"ok" => false, "error" => to_string(reason), "detail" => detail}, json?)
         )
 
-        raise "lane #{List.first(argv)} refused: #{reason}"
+        # F17: the release `rpc` (`--rpc-eval`) re-raises this exit on the client, whose CLI
+        # halts with status 1 and prints nothing more (a raise printed a stack trace). It ends
+        # only the RPC's own process, never the daemon.
+        exit({:shutdown, 1})
     end
   end
 
@@ -587,12 +590,16 @@ defmodule Foundry.ManualLane.CLI do
   defp render(result, true), do: JSON.encode!(result) <> "\n"
   defp render(%{"ok" => true, "trail" => _} = result, false), do: Log.text(result)
 
+  # F13: every refusal prints `refused` then `error: <atom>` first, ahead of a detail that
+  # may run to many lines.
+  defp render(%{"ok" => false, "error" => error, "detail" => detail}, false),
+    do: "refused\nerror: #{error}\ndetail: #{human(detail)}\n"
+
   defp render(result, false) do
     result
     |> Map.delete("ok")
     |> Enum.sort()
     |> Enum.map_join(fn {key, value} -> "#{key}: #{human(value)}\n" end)
-    |> then(&if(result["ok"], do: &1, else: "refused\n" <> &1))
   end
 
   defp human(value) when is_binary(value), do: value

@@ -43,6 +43,21 @@ bin/foundry-lane stop       # clean stop; the next start comes up ready
 `start` itself; every later command reaches the running node. The example seed grants 50
 developer and 50 reviewer starts for the whole store; a store is seeded once.
 
+**Rotating an exhausted store** (F7). When `lane packet` refuses `allocation_unavailable`
+and no ticket is mid-flight, archive the runtime root; the next start seeds a fresh store
+from the policy. Open tickets do not carry over: admit them again under a new id.
+
+```sh
+bin/foundry-lane stop
+mv ~/.local/state/foundry-lane ~/.local/state/foundry-lane.storeN-archived-$(date +%F)
+bin/foundry-lane start
+```
+
+**Landing a ticket that renames the release or the RPC entry** (F15). Once `main` has the
+rename, the scripts can no longer reach the daemon built from the old name. Stop it first:
+`lane integrated` on the ticket, then `bin/foundry-lane stop` with the scripts still at the
+old revision, then fast-forward `main`, `bin/foundry-lane build`, `bin/foundry-lane start`.
+
 ## 3. One ticket, phase by phase
 
 Ticket ids match `ML-[A-Za-z0-9-]+`. Take the base from git, never from memory.
@@ -64,7 +79,9 @@ bin/foundry lane packet ML-42 --role developer \
 Hand it to a developer agent in its own worktree (`isolation: "worktree"`), with the packet
 file as the brief. Tell it: start from the packet's `base_revision`, stay in `scope`, meet
 `acceptance_criteria`, commit, and report the commit SHA and worktree path. Check the
-worktree's base yourself: agents have started on the wrong base.
+worktree's base yourself: agents have started on the wrong base. Tell it too that the
+candidate is its checkout's `HEAD`, entirely (F14): optional or speculative work goes on no
+commit at all, since dropping a trailing commit later means resetting its worktree.
 
 **Candidate and checkout.** The candidate is a commit whose ancestry contains the base, in a
 checkout whose `HEAD` is that commit and whose tree is clean:

@@ -262,6 +262,37 @@ defmodule Foundry.RPCWrapperTest do
              )
   end
 
+  test "a lane command reaches the lane build from foundry-lane env, with no fallback", ctx do
+    build = Path.join(ctx.root, "lane-build")
+    File.mkdir_p!(Path.join(build, "rel/foundry/bin"))
+    File.ln_s!(ctx.fake_release, Path.join(build, "rel/foundry/bin/foundry"))
+    env = [{"FOUNDRY_RELEASE", nil}, {"FOUNDRY_LANE_BUILD", build}, {"RPC_CAPTURE", ctx.capture}]
+
+    assert {"", 0} = System.cmd(@wrapper, ~w(lane status), env: env, stderr_to_stdout: true)
+    assert {:ok, ~w(lane status)} = ctx.capture |> File.read!() |> token!() |> RPC.decode()
+
+    # Without the lane build there is no other release to try.
+    File.rm!(Path.join(build, "rel/foundry/bin/foundry"))
+    expected = "Error: FOUNDRY_RELEASE is not executable: #{build}/rel/foundry/bin/foundry\n"
+
+    assert {^expected, 69} =
+             System.cmd(@wrapper, ~w(lane status), env: env, stderr_to_stdout: true)
+
+    assert {"Error: FOUNDRY_RELEASE is not set" <> _, 64} =
+             System.cmd(@wrapper, ~w(ticket list), env: env, stderr_to_stdout: true)
+  end
+
+  # F17: the daemon's refusal reaches the caller as its text and status 1, with no stack trace.
+  test "a refused lane command exits 1 through the wrapper without a stack trace", ctx do
+    {output, status} =
+      run_wrapper(ctx, ~w(lane status), env: [{"RPC_EVAL", "1"}, {"RPC_EBIN", app_ebin()}])
+
+    assert status == 1
+    assert output =~ "refused\nerror: lane_disabled\ndetail: -\n"
+    refute output =~ "RuntimeError"
+    refute output =~ "** ("
+  end
+
   defp run_wrapper(ctx, argv, opts \\ []) do
     extra_env = Keyword.get(opts, :env, [])
 

@@ -70,8 +70,16 @@ defmodule Foundry.ManualLane.CLITest do
 
   # Runs `bin/foundry lane ARGV --json` through the RPC entry point: {exit_ok?, decoded}.
   defp lane(argv) do
+    {ok?, out} = lane_text(argv ++ ["--json"])
+    decoded = JSON.decode!(out)
+    assert decoded["ok"] == ok?, "exit status and output disagree: #{out}"
+    {ok?, decoded}
+  end
+
+  # F17: a refusal exits `{:shutdown, 1}` (status 1 under `--rpc-eval`) rather than raising.
+  defp lane_text(argv) do
     payload =
-      %{"version" => 1, "argv" => ["lane" | argv] ++ ["--json"]}
+      %{"version" => 1, "argv" => ["lane" | argv]}
       |> JSON.encode!()
       |> Base.url_encode64(padding: false)
 
@@ -81,17 +89,15 @@ defmodule Foundry.ManualLane.CLITest do
           try do
             RPC.run(payload)
             true
-          rescue
-            RuntimeError -> false
+          catch
+            :exit, {:shutdown, 1} -> false
           end
 
         send(self(), {:ok?, ok?})
       end)
 
     assert_received {:ok?, ok?}
-    decoded = JSON.decode!(out)
-    assert decoded["ok"] == ok?, "exit status and output disagree: #{out}"
-    {ok?, decoded}
+    {ok?, out}
   end
 
   defp ok!(argv) do
@@ -177,6 +183,19 @@ defmodule Foundry.ManualLane.CLITest do
     out = capture_io(fn -> RPC.run(payload) end)
     assert out =~ "mode: ready\n"
     refute out =~ ~s("ok")
+  end
+
+  # F13: every refusal renders through one clause that leads with `error: <atom>`, before a
+  # detail that may run to many lines. F17: and exits `{:shutdown, 1}` instead of raising.
+  test "F13/F17: a human-readable refusal leads with its atom and exits without raising", c do
+    assert lane_text(~w(status)) == {false, "refused\nerror: lane_disabled\ndetail: -\n"}
+    start!(c)
+
+    assert lane_text(~w(integrated ML-9)) ==
+             {false, "refused\nerror: ticket_not_found\ndetail: -\n"}
+
+    assert {false, "refused\nerror: option_required\ndetail: [" <> _} =
+             lane_text(~w(admit ML-1 --title t))
   end
 
   # F1: OTP forwards a log event to the node of its group leader, which under the release
