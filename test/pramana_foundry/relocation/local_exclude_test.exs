@@ -14,7 +14,7 @@ defmodule PramanaFoundry.Relocation.LocalExcludeTest do
     {_, 0} = System.cmd("git", ["config", "user.email", "test@pramana.local"], cd: tmp)
     {_, 0} = System.cmd("git", ["config", "user.name", "Pramana Test"], cd: tmp)
 
-    # Commit initial tracked files (including one in workflow/)
+    # Commit initial tracked files (including one in a subdirectory)
     tracked_file = Path.join(tmp, "tracked_user_file.txt")
     File.write!(tracked_file, "tracked content\n")
     workflow_tracked = Path.join(tmp, "workflow/tracked_mod.txt")
@@ -32,18 +32,19 @@ defmodule PramanaFoundry.Relocation.LocalExcludeTest do
     {:ok, repo: tmp, tracked_file: tracked_file, untracked_file: untracked_file}
   end
 
-  test "protect hides workflow/local/ from git status without staging user files or exclude", %{
-    repo: repo,
-    untracked_file: untracked_file
-  } do
-    runtime_dir = Path.join(repo, "workflow/local")
+  test "protect hides the local/ runtime root from git status without staging user files or exclude",
+       %{
+         repo: repo,
+         untracked_file: untracked_file
+       } do
+    runtime_dir = Path.join(repo, "local")
     File.mkdir_p!(runtime_dir)
     runtime_file = Path.join(runtime_dir, "coordinator_state.json")
     File.write!(runtime_file, "{\"active\": true}\n")
 
-    # Before protection: workflow/local/ is visible in git status
+    # Before protection: local/ is visible in git status
     {status_before, 0} = System.cmd("git", ["status", "--porcelain"], cd: repo)
-    assert String.contains?(status_before, "workflow/local")
+    assert String.contains?(status_before, "local/")
     assert String.contains?(status_before, "user_scratchpad.txt")
 
     refute LocalExclude.protected?(repo)
@@ -56,9 +57,9 @@ defmodule PramanaFoundry.Relocation.LocalExcludeTest do
     # Verify protection using probe
     assert :ok = LocalExclude.verify_protection(repo)
 
-    # After protection: workflow/local/ is completely hidden, untracked user file remains
+    # After protection: local/ is completely hidden, untracked user file remains
     {status_after, 0} = System.cmd("git", ["status", "--porcelain"], cd: repo)
-    refute String.contains?(status_after, "workflow/local")
+    refute String.contains?(status_after, "local/")
     assert String.contains?(status_after, "?? user_scratchpad.txt")
 
     # Guarantee: git exclude is NEVER staged
@@ -71,16 +72,16 @@ defmodule PramanaFoundry.Relocation.LocalExcludeTest do
     # Protect is idempotent
     assert {:ok, _} = LocalExclude.protect(repo)
     exclude_content = File.read!(exclude_path)
-    # Pattern appears exactly once
-    assert length(String.split(exclude_content, "workflow/local/")) == 2
+    # The default pattern is the root-level runtime root, as one exact line
+    assert Enum.count(String.split(exclude_content, "\n"), &(&1 == "local/")) == 1
 
     # Clean unprotect
     assert :ok = LocalExclude.unprotect(repo)
     refute LocalExclude.protected?(repo)
 
-    # After unprotect: workflow/local is visible again, and no user files were staged
+    # After unprotect: local/ is visible again, and no user files were staged
     {status_restored, 0} = System.cmd("git", ["status", "--porcelain"], cd: repo)
-    assert String.contains?(status_restored, "workflow/local")
+    assert String.contains?(status_restored, "local/")
     {staged_restored, 0} = System.cmd("git", ["diff", "--cached", "--name-only"], cd: repo)
     assert staged_restored == ""
   end
@@ -99,7 +100,7 @@ defmodule PramanaFoundry.Relocation.LocalExcludeTest do
     content = File.read!(exclude_path)
     assert String.contains?(content, "*.user_tmp")
     assert String.contains?(content, "my_private_notes.md")
-    assert String.contains?(content, "workflow/local/")
+    assert "local/" in String.split(content, "\n")
 
     # Unprotect
     assert :ok = LocalExclude.unprotect(repo)
@@ -108,6 +109,6 @@ defmodule PramanaFoundry.Relocation.LocalExcludeTest do
     cleaned = File.read!(exclude_path)
     assert String.contains?(cleaned, "*.user_tmp")
     assert String.contains?(cleaned, "my_private_notes.md")
-    refute String.contains?(cleaned, "workflow/local/")
+    refute "local/" in String.split(cleaned, "\n")
   end
 end

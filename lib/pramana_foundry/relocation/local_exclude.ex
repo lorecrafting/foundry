@@ -2,14 +2,14 @@ defmodule PramanaFoundry.Relocation.LocalExclude do
   @moduledoc """
   Temporary original-checkout runtime root protection.
 
-  Protects `workflow/local/` in the original checkout with a narrowly scoped
+  Protects `local/` in the original checkout with a narrowly scoped
   entry in `.git/info/exclude` before any tracked ignore is available on that
   checkout's current branch. Proves in disposable fixtures that the entry
-  hides `workflow/local/` without ever staging `.git/info/exclude` or user files,
+  hides `local/` without ever staging `.git/info/exclude` or user files,
   and is cleanly removed when tracked ignore is in place.
   """
 
-  @default_pattern "workflow/local/"
+  @default_pattern "local/"
   @header_comment "# Temporary pramana workflow runtime root exclusion"
 
   @doc """
@@ -75,7 +75,7 @@ defmodule PramanaFoundry.Relocation.LocalExclude do
   end
 
   @doc """
-  Verifies that `workflow/local/` (or specified pattern) is genuinely hidden from
+  Verifies that `local/` (or specified pattern) is genuinely hidden from
   `git status --porcelain` and git ignore checks, and that `.git/info/exclude` is not staged.
   """
   @spec verify_protection(Path.t(), binary()) :: :ok | {:error, term()}
@@ -168,7 +168,7 @@ defmodule PramanaFoundry.Relocation.LocalExclude do
   end
 
   @doc """
-  Checks if tracked `.gitignore` on the current branch already ignores `workflow/local/`.
+  Checks if tracked `.gitignore` on the current branch already ignores `local/`.
   """
   @spec tracked_ignore_present?(Path.t(), binary()) :: boolean()
   def tracked_ignore_present?(repo_path, pattern \\ @default_pattern)

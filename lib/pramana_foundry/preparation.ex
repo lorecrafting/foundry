@@ -3,7 +3,7 @@ defmodule PramanaFoundry.Preparation do
 
   @workflow_checks [
     %{argv: ["mise", "trust"], cwd: "."},
-    %{argv: ["mise", "exec", "--", "mix", "deps.get", "--locked"], cwd: "workflow"}
+    %{argv: ["mise", "exec", "--", "mix", "deps.get", "--locked"], cwd: "."}
   ]
   @database_checks [
     %{argv: ["mise", "exec", "--", "mix", "deps.get", "--locked"], cwd: "."},

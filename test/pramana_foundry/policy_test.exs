@@ -16,7 +16,7 @@ defmodule PramanaFoundry.PolicyTest do
 
     refute "ecto.create" in argv
     refute Enum.any?(commands, &(&1.cwd == "apps/pramana" or "apps/pramana" in &1.argv))
-    assert Enum.any?(commands, &(&1.cwd == "workflow"))
+    assert Enum.all?(commands, &(&1.cwd == "."))
   end
 
   test "database-declaring control retains database prerequisites" do
