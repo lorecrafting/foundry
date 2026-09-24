@@ -173,4 +173,4 @@ and are not claimed.
 
 Offline relocation was retired on 2026-09-23 ([plan amendment C3](REPAIR-PLAN.md#clean-room-amendment));
 its rules and the tests that encoded them are in
-[the archived relocation rules](archive/RELOCATION-RULES-2026-09-23.md).
+[the archived relocation rules](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/RELOCATION-RULES-2026-09-23.md).

@@ -69,8 +69,8 @@ evaluation credential.
 - [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — the SQLite authority store,
   initialization and recovery.
 
-Why the repairs exist (the [2026-09-12 audit](docs/archive/AUDIT-2026-09-12.md) and later
-audits) and every other dated record are in the [archive](docs/archive/README.md).
+Why the repairs exist (the [2026-09-12 audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/AUDIT-2026-09-12.md) and later
+audits) and every other dated record are archived (tag `records/2026-09-24`, [docs/archive at the tag](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/archive)).
 
 ## Tracked layout
 

@@ -28,7 +28,7 @@ to the reviewed FR-08A parent.
 Read shared workflow, Foundry orientation/strategy summary, H0/FR-08A and FR-19A/B
 criteria, R1/R5 and protected/recovery contracts, H0 PASS, the FR-08A residual review
 chain and final [carrier PASS](fr08a-carrier-rereview.md), accepted FR-19A
-[final PASS](../archive/fr-19a/final-rereview.md) at `95eccd6b160b6f339376cfd79e7de81f997c4ba6`,
+[final PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-19a/final-rereview.md) at `95eccd6b160b6f339376cfd79e7de81f997c4ba6`,
 the [combined candidate](fr08a-fr19a-integration-candidate.md), changed source and
 relevant tests. Earlier green reports were treated as evidence to recheck.
 

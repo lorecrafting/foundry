@@ -11,10 +11,10 @@ revision-bound attestation rebound in the same commit as its subject. It exclude
 behaviour change.
 
 **Evidence used**, all dated 2026-09-22 and all in the tree:
-[documentation retirement inventory](../archive/DOC-RETIREMENT-INVENTORY-2026-09-22.md) (`5ba15f3b`),
-[bin script health check](../archive/BIN-SCRIPT-HEALTH-2026-09-22.md) (`87ee6d57`),
+[documentation retirement inventory](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/DOC-RETIREMENT-INVENTORY-2026-09-22.md) (`5ba15f3b`),
+[bin script health check](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/BIN-SCRIPT-HEALTH-2026-09-22.md) (`87ee6d57`),
 [O0 authority inventory](../orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) (`b4396ac0`),
-and the [implementation log](../archive/IMPLEMENTATION-LOG.md) entries of that date named below.
+and the [implementation log](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/IMPLEMENTATION-LOG.md) entries of that date named below.
 A **dead-identifier inventory is forthcoming** and is not in this tree. This proposal does
 not state its contents. It only says where its rows would go.
 
@@ -158,7 +158,7 @@ FR-23's rules apply unchanged:
   REPAIR-PLAN's FR-08B section is FR-08B's own item, not this ticket's.
 - *Dead surface removal* in the rewrite set.
 - The retirement inventory's RETIRE sections, which are file splits of
-  [MIGRATION.md](../archive/MIGRATION.md) and [MIGRATION-TICKETS.md](../archive/MIGRATION-TICKETS.md).
+  [MIGRATION.md](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/MIGRATION.md) and [MIGRATION-TICKETS.md](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/MIGRATION-TICKETS.md).
 - The OWNED-ELSEWHERE rows, once their owners finish.
 - **Rename the namespace away from Pramāṇa** (operator request, 2026-09-23): OTP app
   `:foundry`, modules `Foundry.*`, `lib/foundry/` and `test/foundry/`, each dropping its
@@ -239,11 +239,11 @@ reads `runner_sha256` back, so nothing in the tree checks it.
 
 The only other records of these files' hashes are the dated FR-21 evidence files:
 
-- [integration attestation](../archive/fr-21/integration-attestation.md): `ci.ex` `b2cc9c67…` and
+- [integration attestation](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-21/integration-attestation.md): `ci.ex` `b2cc9c67…` and
   `ci/run.exs` `c1cecbc2…`;
-- [review-v2](../archive/fr-21/review-v2.md) and [acceptance-v2](../archive/fr-21/acceptance-v2.md);
-- [review](../archive/fr-21/review.md);
-- [review-v3](../archive/fr-21/review-v3.md).
+- [review-v2](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-21/review-v2.md) and [acceptance-v2](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-21/acceptance-v2.md);
+- [review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-21/review.md);
+- [review-v3](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-21/review-v3.md).
 
 These are prose evidence of what was checked at that time. `ci.ex` has already changed since
 then (`d311a03d`), and `shasum -a 256` at `b46d3825` gives `f863e070…`, with no test

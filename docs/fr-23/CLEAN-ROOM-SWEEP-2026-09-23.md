@@ -5,9 +5,9 @@ run beyond `git`, `gh`, `grep`, `find`, `du`, `ls`, `cat`, `diff`. No test, gate
 **Baseline:** `25f7174` (`integ/lane-batch-1`). While this sweep ran, PR #2 merged and
 `origin/main` moved to the same commit (`git ls-remote origin main` → `25f7174…`; `gh pr list
 --state all` → #1 and #2 `MERGED`). Every path and line below is at that tree.
-**Builds on:** [dead surface](../archive/DEAD-SURFACE-INVENTORY-2026-09-22.md), [doc retirement](../archive/DOC-RETIREMENT-INVENTORY-2026-09-22.md),
+**Builds on:** [dead surface](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/DEAD-SURFACE-INVENTORY-2026-09-22.md), [doc retirement](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/DOC-RETIREMENT-INVENTORY-2026-09-22.md),
 [split proposal](FR-23-SPLIT-PROPOSAL-2026-09-22.md), [worktree inventory](WORKTREE-INVENTORY-2026-09-23.md),
-[bin health](../archive/BIN-SCRIPT-HEALTH-2026-09-22.md). Where a verdict differs from theirs it is because the
+[bin health](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/BIN-SCRIPT-HEALTH-2026-09-22.md). Where a verdict differs from theirs it is because the
 operator's 2026-09-23 stance (not in production; clean-room rebuild; fresh stores) removes the
 "behaviour-preserving, persisted-format-frozen" constraint those inventories were written under.
 **Forward path used as the yardstick:** the manual lane (`ManualLane.*` → `DurableStore.Gateway`/

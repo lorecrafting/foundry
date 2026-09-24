@@ -27,5 +27,5 @@ The legacy telemetry described here before 2026-09-23 (the four JSONL logs under
 the health probe, the Improver and their CLI commands) was deleted with the daemon stack in
 batch A1 ([clean-room amendment](REPAIR-PLAN.md#clean-room-amendment)). That document, with
 its OpenTelemetry direction, correlation model and target execution-observation contract,
-is [archived](archive/OBSERVABILITY.md): read it as design input for FR-18, not as a
+is [archived](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/OBSERVABILITY.md): read it as design input for FR-18, not as a
 description of the code.

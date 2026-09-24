@@ -1,10 +1,10 @@
 # Foundry repair plan
 
-Created 2026-09-12 from [the audit](archive/AUDIT-2026-09-12.md) and the operator's agreed
+Created 2026-09-12 from [the audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/AUDIT-2026-09-12.md) and the operator's agreed
 contract. This is an external Markdown backlog; it does not depend on Foundry's
 admission, state tracking, or agents. No repairs are marked complete by creating it.
 
-The [independent alignment audit](archive/ALIGNMENT-AUDIT-2026-09-19.md), SHA-256
+The [independent alignment audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/ALIGNMENT-AUDIT-2026-09-19.md), SHA-256
 `c825b22bb857ccccd08171d79fae3b2d33ce76025fdf7dcb5db91ecc3ff63fe7`, was
 performed read-only against `2f603675e3feb1a65f0ce57a3bd69aa93deec29d`. Its
 coordinator-approved dispositions are incorporated here. The report is durable evidence,
@@ -64,7 +64,7 @@ updated operator/developer documentation, and a status entry here and in
 results and remaining limitations. Required review evaluates the exact candidate.
 Changing it after review requires renewed validation appropriate to the change.
 
-The [audit probes](archive/audit-2026-09-12/probes.exs) assert **broken behavior**. Use them
+The [audit probes](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/audit-2026-09-12/probes.exs) assert **broken behavior**. Use them
 to understand a defect, then add regression tests for the required behavior to the
 normal suite. Do not preserve a bug just to keep a characterization probe passing.
 Keep the original audit as a dated record; link new evidence from ticket completion.
@@ -497,7 +497,7 @@ Suggested fresh-session instruction:
 Substitute the next ready ID. Before ending each session, leave a short completion
 or continuation entry under that ticket with files, decisions, tests and exact next
 step. FR-06's R4a correction and exact revision-3 inputs passed
-[focused independent verification](archive/fr-06/r4a-focused-review.md). This closes the
+[focused independent verification](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/r4a-focused-review.md). This closes the
 design gate only; every routed implementation obligation remains open.
 
 ## Dependency inventory
@@ -760,25 +760,25 @@ no unresolved contradiction in these contracts before FR-07 starts.
 SQLite WAL with checked transactional decisions/projections/intents, one pure kernel,
 fresh-attempt corrections, explicit unknown effects, fast-forward exact-candidate
 integration, and a protected controller outside candidate execution authority. The
-[storage experiment](archive/fr-06/storage_spike.py) and [results](archive/fr-06/storage-results.json)
+[storage experiment](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/storage_spike.py) and [results](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/storage-results.json)
 record observed crash/deduplication/writer/capacity cases and untested durability limits.
 No runtime implementation or provider invocation occurred.
 
 **Independent review — 2026-09-12, v1 (historical):**
-[FR-06 design review](archive/FR-06-DESIGN-REVIEW.md) recorded verdict **not ready**, R1–R5.
+[FR-06 design review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/FR-06-DESIGN-REVIEW.md) recorded verdict **not ready**, R1–R5.
 The original manifest matched before the documented plan-status edits. The review and
 its reviewed hashes remain unchanged; the current manifest now identifies revision v2.
 
-**Revision v2 — 2026-09-12:** [Response and dispositions](archive/fr-06/review-response-v2.md)
+**Revision v2 — 2026-09-12:** [Response and dispositions](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/review-response-v2.md)
 revises claim/issue ordering, isolated authentication, autonomous kernel activation,
 legal lifecycle/cleanup and conserved budget generations. It also settles encoding,
 revision read sets, lost-reply lookup order, projection authority and routing. The agreed
 product/authority contract above is unchanged. Protocol arguments are design evidence;
 OS/OMP/fault/activation proof remains in implementation acceptance. R1–R5 are addressed
 for independent re-review, not certified closed. FR-07 stays blocked. Verify the current
-[manifest](archive/fr-06/manifest.json) and [verification record](archive/fr-06/verification.md).
+[manifest](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/manifest.json) and [verification record](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/verification.md).
 
-**Independent v2 re-review — 2026-09-12:** [Review v2](archive/FR-06-DESIGN-REVIEW-V2.md)
+**Independent v2 re-review — 2026-09-12:** [Review v2](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/FR-06-DESIGN-REVIEW-V2.md)
 verified the supplied manifest digest and all 13 input hashes. Verdict: **ready after
 specified corrections**. R1/R2/R3/R5 are resolved at design level; R4a remains: map
 proved developer/reviewer launch non-start into explicit domain retry/block/attempt
@@ -790,7 +790,7 @@ The v2 manifest is retained unchanged; this status edit intentionally changes th
 file's hash. Neither the proposal nor historical review was silently repaired.
 
 **Revision v3 — R4a correction proposed, 2026-09-12:**
-[Response v3](archive/fr-06/review-response-v3.md) adds only launch-non-start domain recovery.
+[Response v3](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/review-response-v3.md) adds only launch-non-start domain recovery.
 Developer non-start retains its active attempt for bounded retry; reviewer non-start
 retains the frozen candidate and reviewer ownership. Pre-intent waiting, proved non-start
 and unknown possible start have separate outcomes. Retries require the R1 predecessor and
@@ -800,7 +800,7 @@ pause/drain/cancel/generation/restart behavior explicit. R1/R2/R3/R5 are unchang
 FR-07 remains blocked pending focused independent verification and FR-03.
 
 **Focused independent verification — 2026-09-12:**
-[R4a review](archive/fr-06/r4a-focused-review.md) verified the revision-3 manifest digest
+[R4a review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/r4a-focused-review.md) verified the revision-3 manifest digest
 `27e8315697ad84db96dfbcf985f2055014b3065c91561c5c6cba7067d307dd38`
 and every entry, then returned **PASS**. R4a is resolved at design level without
 reopening R1/R2/R3/R5. Review SHA-256:
@@ -814,7 +814,7 @@ blocked on FR-03.
 
 **Status (2026-09-19): Complete, independently reviewed and locally integrated; not
 deployed.** Exact v9 candidate `8d7223b79cb237d3406f156c7d1a06a8bcb48d81`
-received an independent Astra-high [PASS](archive/fr-07/review-v9.md). All 56 manifest hashes,
+received an independent Astra-high [PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-07/review-v9.md). All 56 manifest hashes,
 92 focused tests and the bounded carrier/closure/full-row recovery probes passed. The
 reviewed source and evidence were integrated at
 `c4816b2e1ef5ae41943c98591246851b2672561f`, then combined with current GitHub
@@ -1687,14 +1687,14 @@ Retain the complete original F01–F24 matrix and publish unresolved implementat
 [WORKFLOW-CONTRACT.md](WORKFLOW-CONTRACT.md). No production repair implemented.
 Independent design review was pending when that proposal was recorded.
 
-2026-09-12, FR-06 independent review v1: [review](archive/FR-06-DESIGN-REVIEW.md) completed;
+2026-09-12, FR-06 independent review v1: [review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/FR-06-DESIGN-REVIEW.md) completed;
 verdict **not ready**, R1–R5 unresolved. Manifest matched before review-status edits;
 the isolated storage rerun exactly reproduced the recorded JSON. No proposal or runtime
 repair performed. Next: resolve the review findings, record revised input hashes and
 review their disposition. Continue FR-01–FR-05 containment independently. FR-07 stays
 blocked; stop this session after the review.
 
-2026-09-12, FR-06 revision v2: [response](archive/fr-06/review-response-v2.md) records R1–R5
+2026-09-12, FR-06 revision v2: [response](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/review-response-v2.md) records R1–R5
 protocol dispositions and smaller clarifications. Original manifest inputs verified;
 reversing only the documented review-status edits reproduces both original plan hashes.
 Historical review preserved. Current manifest identifies the revised input set. No
@@ -1702,7 +1702,7 @@ production repair or model invocation. **FR-07 remains blocked pending independe
 re-review; no self-certification.** Next at that revision: verify v2 hashes, review protocols/dispositions
 and implementation routing, record a new independent verdict. Stop after this design revision.
 
-2026-09-12, FR-06 independent re-review v2: [review](archive/FR-06-DESIGN-REVIEW-V2.md)
+2026-09-12, FR-06 independent re-review v2: [review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/FR-06-DESIGN-REVIEW-V2.md)
 records **ready after specified corrections**. Manifest digest and all inputs matched;
 dependency and F01–F24 routing checks passed. R1/R2/R3/R5 resolved at design level;
 R4a retains the missing role-specific launch-non-start recovery transitions. Next:
@@ -1710,19 +1710,19 @@ make that bounded design correction and check its passages, acceptance traces an
 hashes. FR-07 stays blocked on R4a and FR-03. No implementation, provisioning or model
 invocation occurred; the workflow proposal and historical review remain unchanged.
 
-2026-09-12, FR-06 revision v3: [response](archive/fr-06/review-response-v3.md) proposes the
+2026-09-12, FR-06 revision v3: [response](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/review-response-v3.md) proposes the
 bounded R4a correction and routes its acceptance traces to FR-08/10/11/12. Both independent
 reviews and response v2 remain historical evidence. No production code, tests, daemon,
 credentials or model execution changed. **FR-07 remains blocked pending focused independent
 verification of the refreshed manifest, plus FR-03.** This entry does not certify R4a.
 
 2026-09-12, FR-06 focused independent verification:
-[review](archive/fr-06/r4a-focused-review.md) returned **PASS** against the exact v3 manifest
+[review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/r4a-focused-review.md) returned **PASS** against the exact v3 manifest
 and resolved R4a at design level. FR-06's design gate is complete. No production
 implementation finding closed; FR-07 still waits for FR-03 completion evidence.
 
 2026-09-12, FR-01: candidate v5 received an independent Astra-high
-[PASS](archive/fr-01/review-v5.md) for static containment. Every current automatic developer
+[PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-01/review-v5.md) for static containment. Every current automatic developer
 and reviewer path requires the common validated policy plus an enforced subscription
 route capability; the production System runner deliberately reports that capability as
 unsupported, so no real automatic model launch is currently possible. PM eligibility is
@@ -1731,10 +1731,10 @@ and full-suite acceptance passed; the final isolated full run reported 323 passe
 integration-tag exclusions. Real OMP subscription/account/billing conformance and safe
 re-enablement remain FR-09/15a, dynamic switching remains FR-16, and full lifecycle
 acceptance remains FR-22. Candidate hashes and the review chain are retained in
-[IMPLEMENTATION-LOG.md](archive/IMPLEMENTATION-LOG.md).
+[IMPLEMENTATION-LOG.md](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/IMPLEMENTATION-LOG.md).
 
 2026-09-12, FR-02: Elixir-only candidate v2 received an independent
-[PASS](archive/fr-02/review-v2.md). `bin/foundry` now transports user argv as a bounded,
+[PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-02/review-v2.md). `bin/foundry` now transports user argv as a bounded,
 versioned JSON envelope inside canonical URL-safe base64 to one fixed RPC expression;
 the daemon-side decoder rejects duplicate keys, malformed/oversized/noncanonical data,
 NUL and unknown command shapes before dispatch. Actual-wrapper tests preserve literal
@@ -1744,9 +1744,9 @@ interpolation in `tickets_from_review.sh` and `test_daemon_recovery.sh` remains 
 to FR-03/04/05. No live daemon/provider was used.
 
 2026-09-12, FR-03: candidate `69ede99128b14134cec9bddd728883e56f8cf62c`
-received an independent [PASS](archive/fr-03/review-v2.md) for immediate F02/F14 containment
-after the original [review](archive/fr-03/review.md) reproduced four blockers and the
-[response](archive/fr-03/review-response.md) corrected them. Startup now admits one fenced
+received an independent [PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-03/review-v2.md) for immediate F02/F14 containment
+after the original [review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-03/review.md) reproduced four blockers and the
+[response](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-03/review-response.md) corrected them. Startup now admits one fenced
 runtime whose owner contains the effectful subtree; clean release follows subtree
 quiescence, while abrupt/uncertain loss leaves an unclean marker and refuses automatic
 takeover. Unterminated or invalid authoritative history is preserved and enters visible
@@ -1758,7 +1758,7 @@ POSIX-lock boundary. This is integrated containment, not deployment or FR-22 lif
 acceptance. FR-07 is now ready because both FR-03 and FR-06 have completion evidence.
 
 2026-09-13, FR-04: candidate `cd77de43475b1fbb4ef600384817b3f2434c6b4d`
-received independent [PASS](archive/fr-04/review-v9.md) after an adversarial review chain retained
+received independent [PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-04/review-v9.md) after an adversarial review chain retained
 in `docs/fr-04/`. Destructive cleanup now requires exact pane, terminal, native-session,
 shell-generation and foreground-generation evidence; split ownership is durably recorded
 before agent start, unverified/unknown resources are preserved, and developer/reviewer
@@ -1770,8 +1770,8 @@ This is immediate F05/F23 containment, not FR-10 reconciliation or atomic backen
 compare-and-close; no live backend/provider or deployment was exercised.
 
 2026-09-13, FR-05: candidate `5bc8c1ca81bfe65dff2b40a164ea8e12e2424f80`
-received independent [PASS](archive/fr-05/review-v2.md) after its original
-[review](archive/fr-05/review.md) found and the [response](archive/fr-05/review-response.md) closed
+received independent [PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-05/review-v2.md) after its original
+[review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-05/review.md) found and the [response](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-05/review-response.md) closed
 two direct-boundary bypasses. CLI submissions no longer synthesize artifact, revision,
 check or reviewer identity; automatic approval and production Git-check bypasses fail
 closed. Every public legacy Pipeline/integration operation refuses before runner, state,
@@ -1783,7 +1783,7 @@ deployed or re-enabled.
 
 2026-09-19, FR-07: exact v9 candidate
 `8d7223b79cb237d3406f156c7d1a06a8bcb48d81` received an independent Astra-high
-[PASS](archive/fr-07/review-v9.md), SHA-256
+[PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-07/review-v9.md), SHA-256
 `08379ffd3315ec2724c4578a0a14e690f535238104107c778bd8d777efbf8638`.
 All 56 manifest hashes matched; the focused 92-test suite and independent carrier,
 retained-authority closure and both full-row recovery branches passed. Reviewed source and
@@ -1811,7 +1811,7 @@ without claiming FR-08A readiness or enabling execution.
 2026-09-19, checkpoint F: corrected provider-free candidate
 `148476c93497653abbbc52fb040cf76927478d3f`, tree
 `e23217f94f295c115b893ac936c86ab719331647`, received a fresh independent Sol-high
-[PASS](archive/fr-09/checkpoint-f-rereview.md) at review commit
+[PASS](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-09/checkpoint-f-rereview.md) at review commit
 `ca8c6d0b5edc9a5cfb9c265e710b29f3210f5cbe`. The exact synthetic Pi RPC fixture
 proved its bounded raw lifecycle and useful model-free Bash path while also reproducing
 the missing credential gateway, R1/R5 broker/reservations, startup-extension denial,
