@@ -50,3 +50,26 @@ Python-era projections, the tokenizer benchmark, `Preparation` and the retired `
 `preparation_test`, `policy_test`), and the split-layout scope checks of `HardeningPM` and
 `Improver` (`hardening_pm_test`, `improver_test`, `improver_proposal_gate_test`; FR-20
 re-derives constrained improvement on Core).
+
+## Legacy import and H0 retired
+
+Plan amendment C3/C4 (ticket ML-DEL-LEGACY-IMPORT) deleted `LegacyImport`, `LegacyLine`,
+`Schema`, `AtomicFile`, `H0AcceptedFR07Boundary`, their tests and `test/fixtures/python`, and
+dropped the `immutable_legacy_import` capability from `FR08HandoffGate` (six capabilities
+now). Every deleted path exists at `5fb7603`. `DurableStore.Kernel` lost only its unused
+`decide`/`apply` callbacks and `validate_bundle/1`; `normalize_bundle/1` stays because
+`Gateway` calls it. `Authority` now lists `import_runs` and `legacy_records` as unsupported
+retained authority: a row in either fences startup (`authority_test` "every unsupported
+authority table fences startup").
+
+| Knowledge | Deleted test | Now |
+|---|---|---|
+| Path aliases (symlink, hardlink, dot-dot, manifest path equal to the source) are refused before any write, leaving the original untouched | `legacy_import_test` "aliases are rejected before publication…", importer halves of `review_corrections_test` and `unified_contract_test` alias tests | **Covered** for the store: the Gateway halves of those tests, `PathIdentity`, and the namespace-reservation test in `authority_test` |
+| An offline tool holds the same exclusive owner as the Gateway and is refused while the Gateway runs | `legacy_import_test` "import owns the store offline…" | **Covered:** `DurableStore.Owner` tests (two OS owners, stale PID is not authority) |
+| A multi-step write that fails midway (injected interruption, or its input mutated under it) rolls back every retained row, and a rerun is idempotent | `legacy_import_test` "interrupted import rolls back and reruns…", "archive mutation during import rolls back…", "rerun is idempotent…" | **Covered** for Core commits: `sync_fault_test`, `atomic_bundle_test`, `protected_primitives_test` |
+| A crash-safe file write: temp file, fsync, synced intent, rename, recovery that discards an uncheckpointed temp and completes a synced one, never exposing partial JSON | `atomic_file_test` (three tests) | **Gap, no owner yet:** the manual lane writes its packet with a plain `File.write` (`manual_lane/cli.ex:380`) and appends `operator.log.jsonl` unsynced (`manual_lane/log.ex:184`). A torn packet or log line after a crash is possible; `ci.ex` uses temp+rename without fsync |
+| Unknown fields and unsupported versions fail closed with the input preserved as evidence; malformed, non-UTF-8 and oversized JSON are refused, not truncated | `schema_test` "fails closed on unknown authority fields…", "contains malformed, non-UTF8, and oversized JSON artifacts" | **Covered** for Core records: `RecordCodec` strict decoding (`:unknown_field`) in `record_codec_test` and `gateway_test`. Lane inputs (`WorkPacket`, receipts) are covered by their own decoders in `manual_lane/*_test` |
+| Frozen evidence is bound to source SHA-256 and loaded BEAM MD5; a changed loaded implementation or another revision refuses every positive result | `h0_accepted_fr07_boundary_test` (six tests) | **Covered:** `fr08a_protected_boundary_test` "changed loaded Gateway implementation refuses all positive evidence" and "revision mismatch cannot claim readiness". The dated H0 report stays under `docs/fr-08` as history |
+
+CI no longer fetches full history: only the H0 tests read the `pramana/<sha>` tags. The tags
+stay until the operator deletes them.

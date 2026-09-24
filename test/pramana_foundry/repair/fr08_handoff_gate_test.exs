@@ -96,8 +96,8 @@ defmodule PramanaFoundry.Repair.FR08HandoffGateTest do
     assert report.status == "ready"
     assert FR08HandoffGate.ready?(report)
     assert report.subject_revision == @subject_revision
-    assert report.mandatory_count == 7
-    assert report.passed_count == 7
+    assert report.mandatory_count == 6
+    assert report.passed_count == 6
     assert report.failed_count == 0
     assert report.unavailable_count == 0
 
@@ -157,7 +157,7 @@ defmodule PramanaFoundry.Repair.FR08HandoffGateTest do
     assert report.status == "failed"
     assert report.failed_count == 1
     assert report.unavailable_count == 1
-    assert report.passed_count == 5
+    assert report.passed_count == 4
 
     assert Enum.find(report.capabilities, &(&1.id == "protected_field_boundary")).status ==
              "failed"

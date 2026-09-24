@@ -3,15 +3,15 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundaryTest do
 
   alias PramanaFoundry.Repair.{FR08AProtectedBoundary, FR08HandoffGate}
 
-  test "all seven revision-bound protected capabilities pass substantive public probes" do
+  test "all six revision-bound protected capabilities pass substantive public probes" do
     report = FR08AProtectedBoundary.report()
 
     assert report.identity.implementation_binding == "verified:source-sha256+beam-md5/v1"
     assert report.identity.subject_revision == "66b921122a1b5d059e95c601c27c1722b81182e7"
     assert report.identity.subject_tree == "bc8ffb509f68f4d11fcdf4533f904e4f50236c63"
-    assert length(report.identity.exercised_api) == 11
+    assert length(report.identity.exercised_api) == 10
     assert FR08HandoffGate.ready?(report.gate)
-    assert report.gate.passed_count == 7
+    assert report.gate.passed_count == 6
     assert report.gate.failed_count == 0
     assert report.gate.unavailable_count == 0
 
@@ -29,7 +29,7 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundaryTest do
       )
 
     refute FR08HandoffGate.ready?(report)
-    assert report.unavailable_count == 7
+    assert report.unavailable_count == 6
   end
 
   test "frozen artifact is deterministic and bound to the protected sources" do

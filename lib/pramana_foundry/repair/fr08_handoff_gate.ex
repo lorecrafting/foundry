@@ -35,9 +35,7 @@ defmodule PramanaFoundry.Repair.FR08HandoffGate do
     {:protected_field_boundary,
      "kernel-originated domain changes cannot forge protected claims, balances, refs or receipts"},
     {:fail_closed_recovery,
-     "storage/recovery errors are explicit and no external effect is issued before checked commit"},
-    {:immutable_legacy_import,
-     "legacy import preserves originals and reports unsupported or invalid records explicitly"}
+     "storage/recovery errors are explicit and no external effect is issued before checked commit"}
   ]
 
   @type capability_id ::
@@ -47,7 +45,6 @@ defmodule PramanaFoundry.Repair.FR08HandoffGate do
           | :revision_and_inbox_facts
           | :protected_field_boundary
           | :fail_closed_recovery
-          | :immutable_legacy_import
 
   @type probe_result ::
           {:pass, String.t()} | {:fail, String.t()} | {:unavailable, String.t()}

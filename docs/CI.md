@@ -78,6 +78,7 @@ No current test has a live-provider tag, which the manifest reports as zero/abse
 implying provider coverage was skipped. The tokenizer benchmark and its separately tagged
 Python/tiktoken recomputation were deleted with the legacy projections on 2026-09-23.
 
-The Python-migration parity harness and `pramana_diagnose.py` were retired on 2026-09-13.
-Sanitized Python fixtures remain only for `Schema`, which the legacy import still calls until
-its own deletion ticket; they are not current parity proof.
+The Python-migration parity harness and `pramana_diagnose.py` were retired on 2026-09-13; the
+last sanitized Python fixtures went with `Schema` and the legacy import on 2026-09-23. CI checks
+out a shallow clone: no test reads history or the `pramana/<sha>` tags, which only the retired
+H0 evidence tests did.

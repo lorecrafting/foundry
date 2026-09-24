@@ -10,9 +10,6 @@ defmodule PramanaFoundry.DurableStore.FR08AFR19AIntegrationTest do
     Maintenance
   }
 
-  alias PramanaFoundry.Repair.{FR08HandoffGate, H0AcceptedFR07Boundary}
-
-  @accepted_h0_revision "af0c51b4682c50080e67194dd853fbaa1eebace7"
   @protected_tables ~w(root_attempt_closures root_infrastructure_settlements durable_operations atomic_bundles root_leases root_receipts root_reservations root_claims root_effects root_ledgers root_control_history root_controls root_policy_history root_policies authenticated_inbox_items authenticated_inboxes root_pointers root_commands)
   @legacy_tables ~w(inputs commands command_results events projections effects ledger_generations claims reservations receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records sqlite_sequence)
 
@@ -292,29 +289,6 @@ defmodule PramanaFoundry.DurableStore.FR08AFR19AIntegrationTest do
 
       assert :ok = GenServer.stop(reopened)
     end
-  end
-
-  test "frozen H0 stays historical while the evolved live provider refuses all seven", %{
-    root: _root
-  } do
-    artifact =
-      Path.expand("../../../docs/fr-08/h0-accepted-fr07-report.txt", __DIR__)
-      |> File.read!()
-
-    assert artifact =~ "subject_revision=#{@accepted_h0_revision}\n"
-    assert artifact =~ "passed_count=4\n"
-    assert artifact =~ "unavailable_count=3\n"
-
-    live = H0AcceptedFR07Boundary.report(String.duplicate("a", 40))
-    refute FR08HandoffGate.ready?(live.gate)
-    assert live.gate.passed_count == 0
-    assert live.gate.failed_count == 0
-    assert live.gate.unavailable_count == 7
-
-    assert Enum.all?(live.gate.capabilities, fn capability ->
-             capability.status == "unavailable" and
-               capability.reason == "h0:loaded_accepted_api_identity_mismatch"
-           end)
   end
 
   defp start_gateway(path, capability, epoch, opts \\ []) do

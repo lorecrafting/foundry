@@ -3,8 +3,6 @@ defmodule PramanaFoundry.DurableStore.Authority do
 
   alias PramanaFoundry.DurableStore.{
     Database,
-    Encoding,
-    LegacyLine,
     ProtectedPrimitives,
     RecordCodec
   }
@@ -73,14 +71,14 @@ defmodule PramanaFoundry.DurableStore.Authority do
     {"sqlite_sequence", "name", ~w(name seq)}
   ]
 
-  @unsupported ~w(receipts leases policy_revisions control_revisions artifact_references)
+  @unsupported ~w(receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records)
   def registry, do: @registry
 
   def read(conn, :all) do
     with :ok <- validate_foreign_keys(conn),
          :ok <- validate_schema(conn),
          {:ok, rows} <- validation_rows(conn),
-         {:ok, view} <- validate_content(conn, rows),
+         {:ok, view} <- validate_content(rows),
          :ok <- ProtectedPrimitives.validate(conn),
          {:ok, content} <- content(conn) do
       {:ok, Map.put(view, :content, content)}
@@ -146,21 +144,6 @@ defmodule PramanaFoundry.DurableStore.Authority do
     end
   end
 
-  def read(conn, {:import, digest}) when is_binary(digest) do
-    with {:ok, rows} <-
-           query(
-             conn,
-             "SELECT source_digest, source_path, archived_path, source_bytes, line_count, valid_count, invalid_count, manifest FROM import_runs WHERE source_digest = ?",
-             [digest]
-           ) do
-      case rows do
-        [] -> {:ok, :absent}
-        [row] -> validate_import_group(conn, row)
-        _ -> corrupt("import_runs", digest, :duplicate_identity)
-      end
-    end
-  end
-
   def read(conn, {:touched, %{command_id: command_id} = touched}) do
     with {:ok, command_view} <- read(conn, {:command, command_id}),
          true <- command_view != :absent,
@@ -197,15 +180,11 @@ defmodule PramanaFoundry.DurableStore.Authority do
   end
 
   defp validation_rows(conn) do
-    Enum.reduce_while(@registry, {:ok, %{}}, fn
-      {"legacy_records", _ordering, _columns}, {:ok, acc} ->
-        {:cont, {:ok, Map.put(acc, "legacy_records", [])}}
-
-      {table, ordering, _columns}, {:ok, acc} ->
-        case stream_rows(conn, "SELECT * FROM #{table} ORDER BY #{ordering}") do
-          {:ok, rows} -> {:cont, {:ok, Map.put(acc, table, rows)}}
-          {:error, _reason} = error -> {:halt, error}
-        end
+    Enum.reduce_while(@registry, {:ok, %{}}, fn {table, ordering, _columns}, {:ok, acc} ->
+      case stream_rows(conn, "SELECT * FROM #{table} ORDER BY #{ordering}") do
+        {:ok, rows} -> {:cont, {:ok, Map.put(acc, table, rows)}}
+        {:error, _reason} = error -> {:halt, error}
+      end
     end)
   end
 
@@ -220,7 +199,7 @@ defmodule PramanaFoundry.DurableStore.Authority do
     end
   end
 
-  defp validate_content(conn, content) do
+  defp validate_content(content) do
     with :ok <- validate_metadata(content["metadata"]),
          :ok <- validate_unsupported(content),
          {:ok, commands} <- decode_commands(content),
@@ -235,8 +214,7 @@ defmodule PramanaFoundry.DurableStore.Authority do
          :ok <- validate_event_owners(events, commands),
          :ok <- validate_effect_owners(effects, commands),
          :ok <- validate_protected(effects, ledgers, claims, reservations),
-         {:ok, reconstructed} <- validate_reconstruction(events, projections),
-         {:ok, imports} <- validate_imports(conn, content["import_runs"]) do
+         {:ok, reconstructed} <- validate_reconstruction(events, projections) do
       {:ok,
        %{
          commands: commands,
@@ -246,8 +224,7 @@ defmodule PramanaFoundry.DurableStore.Authority do
          effects: effects,
          ledgers: ledgers,
          claims: claims,
-         reservations: reservations,
-         imports: imports
+         reservations: reservations
        }}
     end
   end
@@ -659,144 +636,6 @@ defmodule PramanaFoundry.DurableStore.Authority do
       {:ok, state} -> {:ok, state}
       {:error, reason} -> corrupt("projections", "reconstruction", reason)
     end
-  end
-
-  defp validate_imports(conn, import_rows) do
-    with {:ok, [[orphan_count]]} <-
-           query(
-             conn,
-             "SELECT count(*) FROM legacy_records r LEFT JOIN import_runs i ON i.source_digest = r.source_digest WHERE i.source_digest IS NULL"
-           ),
-         true <- orphan_count == 0 do
-      Enum.reduce_while(import_rows, {:ok, %{}}, fn row, {:ok, acc} ->
-        digest = hd(row)
-
-        case validate_import_group(conn, row) do
-          {:ok, manifest} -> {:cont, {:ok, Map.put(acc, digest, manifest)}}
-          error -> {:halt, error}
-        end
-      end)
-    else
-      false -> corrupt("legacy_records", "orphan", :missing_import_run)
-      {:error, _reason} = error -> error
-    end
-  end
-
-  defp validate_import_group(
-         conn,
-         [digest, source_path, archived_path, source_bytes, lines, valid, invalid, bytes]
-       ) do
-    columns = %{
-      source_digest: digest,
-      source_path: source_path,
-      archived_path: archived_path,
-      source_bytes: source_bytes,
-      line_count: lines,
-      valid_count: valid,
-      invalid_count: invalid
-    }
-
-    initial = %{
-      offset: 0,
-      lines: 0,
-      valid: 0,
-      invalid: 0,
-      errors: [],
-      hash: :crypto.hash_init(:sha256)
-    }
-
-    with {:ok, manifest} <- bound("import_runs", digest, :import_manifest, bytes, columns),
-         {:ok, summary} <-
-           Database.fold(
-             conn,
-             "SELECT source_digest, line_number, byte_start, byte_end, record_digest, valid, error, raw_record FROM legacy_records WHERE source_digest = ? ORDER BY line_number",
-             [digest],
-             initial,
-             &reduce_legacy_row(digest, &1, &2)
-           ),
-         summary <- finish_legacy_summary(summary),
-         true <-
-           summary.offset == source_bytes and summary.lines == lines and
-             summary.valid == valid and summary.invalid == invalid,
-         true <- summary.errors == manifest["errors"],
-         true <- summary.digest == digest do
-      {:ok, manifest}
-    else
-      false -> corrupt("legacy_records", digest, :import_evidence_mismatch)
-      {:error, {:authority_corrupt, _table, _identity, _reason} = reason} -> {:error, reason}
-      {:error, reason} -> {:error, {:storage_unavailable, reason}}
-    end
-  end
-
-  defp reduce_legacy_row(
-         digest,
-         [source, line, start, finish, record_digest, valid, error, raw],
-         acc
-       ) do
-    {classified_valid, classified_error} = LegacyLine.classify(raw)
-
-    row_value = %{
-      "schema_version" => 1,
-      "source_digest" => source,
-      "line_number" => line,
-      "byte_start" => start,
-      "byte_end" => finish,
-      "record_digest" => record_digest,
-      "valid" => valid == 1,
-      "error" => error,
-      "raw_record_digest" => Encoding.digest(raw)
-    }
-
-    columns = %{
-      source_digest: source,
-      line_number: line,
-      byte_start: start,
-      byte_end: finish,
-      record_digest: record_digest,
-      valid: valid == 1,
-      error: error
-    }
-
-    with true <-
-           source == digest and line == acc.lines + 1 and start == acc.offset and
-             finish == start + byte_size(raw),
-         true <- record_digest == Encoding.digest(raw),
-         true <- {valid == 1, error} == {classified_valid, classified_error},
-         {:ok, _decoded} <-
-           bound_value("legacy_records", {digest, line}, :legacy_record, row_value, columns) do
-      errors =
-        if valid == 0 do
-          [
-            %{
-              "line" => line,
-              "byte_start" => start,
-              "byte_end" => finish,
-              "record_digest" => record_digest,
-              "error" => error
-            }
-            | acc.errors
-          ]
-        else
-          acc.errors
-        end
-
-      %{
-        offset: finish,
-        lines: line,
-        valid: acc.valid + valid,
-        invalid: acc.invalid + if(valid == 0, do: 1, else: 0),
-        errors: errors,
-        hash: :crypto.hash_update(acc.hash, raw)
-      }
-    else
-      false -> {:halt, corrupt("legacy_records", {digest, line}, :invalid_retained_evidence)}
-      {:error, _reason} = error_value -> {:halt, error_value}
-    end
-  end
-
-  defp finish_legacy_summary(summary) do
-    digest = summary.hash |> :crypto.hash_final() |> Base.encode16(case: :lower)
-    summary |> Map.put(:errors, Enum.reverse(summary.errors)) |> Map.put(:digest, digest)
   end
 
   defp read_command_closure(conn, [id, _input_id, _actor, _digest, _type, _protocol]) do

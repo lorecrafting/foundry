@@ -2,7 +2,7 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
   @moduledoc """
   Revision-bound executable acceptance provider for the FR-08A protected boundary.
 
-  Every probe uses only the public `Gateway` or `LegacyImport` API against a disposable
+  Every probe uses only the public `Gateway` API against a disposable
   store. Evidence strings are canonical digests of bounded semantic observations, never
   table contents. The subject is the core protected-primitives revision; this provider and
   its frozen report are a separate evidence layer.
@@ -10,7 +10,7 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
 
   @behaviour PramanaFoundry.Repair.FR08HandoffGate
 
-  alias PramanaFoundry.DurableStore.{Gateway, LegacyImport}
+  alias PramanaFoundry.DurableStore.Gateway
   alias PramanaFoundry.Repair.FR08HandoffGate
 
   @subject_revision "66b921122a1b5d059e95c601c27c1722b81182e7"
@@ -38,10 +38,6 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
     {PramanaFoundry.DurableStore.Encoding, "lib/pramana_foundry/durable_store/encoding.ex",
      "140730a723527d3e7c9f71f0e54c209f14ce4a8b74004e553f12f14ce7c987ba",
      "5f1bff0562b0fed9407a8af02bc84241"},
-    {PramanaFoundry.DurableStore.LegacyImport,
-     "lib/pramana_foundry/durable_store/legacy_import.ex",
-     "158a8419cc59ee7e3998f2e497308d2a03a88871f79c1e031849cfcfef24a322",
-     "c91b85e002244d83b85410de3c2f666b"},
     {PramanaFoundry.Repair.FR08HandoffGate, "lib/pramana_foundry/repair/fr08_handoff_gate.ex",
      "710f42d0467e97f58540342ba1c566959d995f1d561242c275f88eab2017228b",
      "e1eef77b648eb850b9a643629982d091"},
@@ -343,29 +339,6 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
         pass("fail-closed", %{"mode" => "recovery", "file" => "absent"})
       else
         other -> fail("fail-closed", other)
-      end
-    end)
-  end
-
-  defp verified_probe(:immutable_legacy_import) do
-    with_raw_fixture("legacy", fn root, path ->
-      source = Path.join(root, "legacy.jsonl")
-      archive = Path.join(root, "archive")
-      bytes = ~s({"schema_version":99,"event":"unsupported_fr08a"}\n{malformed}\n)
-
-      with :ok <- initialize(path),
-           :ok <- File.write(source, bytes),
-           {:ok, manifest} <- LegacyImport.run(path, source, archive),
-           true <- manifest["invalid_count"] == 2,
-           true <- manifest["valid_count"] == 0,
-           true <- File.read!(manifest["archived_path"]) == bytes do
-        pass("legacy-import", %{
-          "source_digest" => manifest["source_digest"],
-          "invalid" => manifest["invalid_count"],
-          "preserved" => true
-        })
-      else
-        other -> fail("legacy-import", other)
       end
     end)
   end

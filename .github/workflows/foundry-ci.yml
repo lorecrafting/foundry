@@ -20,9 +20,6 @@ jobs:
     steps:
       - name: Check out exact source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          # Full history and tags: the H0 evidence tests read the `pramana/<sha>` tags.
-          fetch-depth: 0
 
       - name: Install pinned BEAM toolchain
         uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124

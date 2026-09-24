@@ -1,7 +1,7 @@
 defmodule PramanaFoundry.DurableStore.ReviewCorrectionsTest do
   use ExUnit.Case, async: false
 
-  alias PramanaFoundry.DurableStore.{Database, Encoding, Gateway, LegacyImport}
+  alias PramanaFoundry.DurableStore.{Database, Encoding, Gateway}
 
   setup do
     root = Path.join(System.tmp_dir!(), "fr07-corrections-#{System.unique_integer([:positive])}")
@@ -308,24 +308,16 @@ defmodule PramanaFoundry.DurableStore.ReviewCorrectionsTest do
            } = Gateway.status(gateway)
   end
 
-  test "database symlink and hardlink aliases cannot create another owner or importer", %{
+  test "database symlink and hardlink aliases cannot create another owner", %{
     root: root,
     path: path
   } do
     gateway = start_supervised!({Gateway, path: path})
-    source = Path.join(root, "alias-source.jsonl")
-    archive = Path.join(root, "alias-archive")
-
-    File.write!(
-      source,
-      ~s({"schema_version":1,"event":"old","at":"2026-09-13T00:00:00Z","attributes":{},"evidence":{}}\n)
-    )
 
     symlink = Path.join(root, "alias.sqlite3")
     File.ln_s!(path, symlink)
     second = start_supervised!({Gateway, path: symlink}, id: :symlink_gateway)
     assert %{mode: :recovery, reason: :database_symlink_not_allowed} = Gateway.status(second)
-    assert {:error, :database_symlink_not_allowed} = LegacyImport.run(symlink, source, archive)
 
     fixture = Path.expand("test/support/durable_store_owner_probe.exs")
 
@@ -340,7 +332,6 @@ defmodule PramanaFoundry.DurableStore.ReviewCorrectionsTest do
     File.ln!(path, hardlink)
     third = start_supervised!({Gateway, path: hardlink}, id: :hardlink_gateway)
     assert %{mode: :recovery, reason: :database_hardlink_not_allowed} = Gateway.status(third)
-    assert {:error, :database_hardlink_not_allowed} = LegacyImport.run(hardlink, source, archive)
     assert %{mode: :ready} = Gateway.status(gateway)
   end
 
@@ -538,15 +529,6 @@ defmodule PramanaFoundry.DurableStore.ReviewCorrectionsTest do
     root: root,
     path: path
   } do
-    source = Path.join(root, "legacy.jsonl")
-
-    File.write!(
-      source,
-      ~s({"schema_version":1,"event":"old","at":"2026-09-13T00:00:00Z","attributes":{},"evidence":{}}\n)
-    )
-
-    assert {:ok, _manifest} = LegacyImport.run(path, source, Path.join(root, "archive"))
-
     capability = make_ref()
     gateway = start_supervised!({Gateway, path: path, protected_capability: capability})
 
@@ -576,19 +558,20 @@ defmodule PramanaFoundry.DurableStore.ReviewCorrectionsTest do
     assert Enum.sort(Map.keys(content)) == Enum.sort(expected)
 
     for table <-
-          ~w(inputs commands command_results events projections effects claims ledger_generations reservations import_runs legacy_records) do
+          ~w(inputs commands command_results events projections effects claims ledger_generations reservations) do
       assert content[table].count > 0
       assert byte_size(content[table].sha256) == 64
     end
 
-    for table <- ~w(receipts leases policy_revisions control_revisions artifact_references) do
+    for table <-
+          ~w(receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records) do
       assert content[table].count == 0
       assert byte_size(content[table].sha256) == 64
     end
 
     {:ok, copied} = Database.open(backup)
 
-    assert {:ok, [[1, 1, 0]]} =
+    assert {:ok, [[0, 1, 0]]} =
              Database.query(
                copied,
                "SELECT (SELECT count(*) FROM import_runs), (SELECT count(*) FROM claims), (SELECT count(*) FROM receipts)"

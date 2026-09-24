@@ -9,19 +9,19 @@ contained until FR-08 routes every command through the kernel and gateway.
 `PramanaFoundry.DurableStore.Gateway` owns one in-process Exqlite connection in one
 GenServer. The dependency is pinned to `exqlite == 0.40.0`; its bundled native SQLite
 implementation is the necessary database engine, not a Python service or sidecar.
-An independent SQLite lock sidecar and durable unclean-owner marker admit one gateway or
-offline importer across BEAM/OS processes. Ambiguous owner loss requires explicit
+An independent SQLite lock sidecar and durable unclean-owner marker admit one owner across
+BEAM/OS processes. Ambiguous owner loss requires explicit
 recovery evidence before redispatch. The authority connection is configured and checked
 for WAL, `synchronous=FULL`, foreign keys and schema/application versions before ready.
 One strict `PathIdentity` is established before ownership or SQLite. Relative or lexical
 alias paths, dot/dotdot components, repeated/trailing separators, symlinks in any parent
 or leaf, hardlinks and non-regular database files are refused. The same identity is
 revalidated around owner acquisition and database open and is passed through gateway,
-migration, importer and backup operations.
+migration and backup operations.
 
 The updatable kernel supplies only a versioned, pure-data proposal containing a result,
 known domain events, projections and pending effect requests. Exact domain-tagged request
-digests bind effect identities and bounded operations. `Kernel.validate_bundle/1` rejects
+digests bind effect identities and bounded operations. `Kernel.normalize_bundle/1` rejects
 SQL, callbacks, protected rows, candidate-issued/terminal status and rejected decisions
 that attempt domain mutation. The protected controller path passes facts through the
 fixed `ProtectedVerifier`, which derives claim and reservation rows, and requires an
@@ -82,7 +82,8 @@ is rerun-safe.
 
 Schema v1 has separate metadata, authenticated inputs, commands/results, ordered events,
 projections, effects, claims, receipts, leases, ledger generations/reservations,
-policy/control revisions, artifact references and legacy-import evidence. Foreign keys
+policy/control revisions, artifact references and the retired legacy-import tables
+(`import_runs`, `legacy_records`), which must stay empty. Foreign keys
 bind owners. Unique constraints cover command, event, effect, receipt/request and
 outstanding-claim identities. Effect and claim status retain
 `pending/claimed/issued/unknown/succeeded/failed/non_started/cancelled` distinctions.
@@ -93,27 +94,15 @@ Projection carriers are stored beside ordered events and indexed by entity. Thei
 are checked against canonical event bodies, and live reads stream only the requested
 entity through the shared reducer while proving the retained row is its final carrier.
 
-## Offline legacy import
+## Retired legacy import
 
-`PramanaFoundry.DurableStore.LegacyImport.run/4` is explicitly offline maintenance. It
-streams JSONL without the legacy eight-MiB whole-file limit, copies the original to a
-digest-named archive, fsyncs it, verifies its SHA-256 before publication, and retains every
-line as raw bytes with its digest and half-open byte range. Torn, malformed, invalid UTF-8,
-schema-invalid and unknown-version rows remain invalid evidence; they never become
-authority and are never silently skipped. The manifest records source/archive paths,
-full digest/range, counts and each error. A repeated source digest returns the original
-database manifest and regenerates a missing external manifest without duplicate rows.
-
-The importer validates strict path identities against the database, its
-sidecars, archive and manifest before writing. It parses only the digest-verified archive
-and holds the same exclusive owner as the gateway. Import and manifest-publication
-interruptions can rerun without duplicate database rows.
-Archive staging is exclusively created. Preexisting staging evidence is adopted only when
-its identity and full digest match the planned archive; mismatched evidence is refused and
-left untouched, and cleanup is restricted to staging created by the current operation.
-
-The importer does not remove or relocate the source. FR-19 still owns live-handle/space
-preflight, retention, checkpoint interruption and archival removal.
+The offline JSONL importer (`LegacyImport`, with `LegacyLine`, `Schema` and `AtomicFile`)
+was deleted on 2026-09-23 under [plan amendment C3](REPAIR-PLAN.md#clean-room-amendment):
+Foundry stores start fresh and nothing is imported. The `import_runs` and `legacy_records`
+tables stay in the v1 schema so existing stores keep their exact schema contract, but they
+are now unsupported retained authority: any row in them fences startup like a retained
+receipt or lease. The edge cases the importer proved are recorded in
+[moved knowledge](design/MOVED-KNOWLEDGE-2026-09-23.md#legacy-import-and-h0-retired).
 
 ## Operational health and bounded diagnostics
 

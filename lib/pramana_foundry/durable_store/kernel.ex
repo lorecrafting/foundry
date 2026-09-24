@@ -1,14 +1,7 @@
 defmodule PramanaFoundry.DurableStore.Kernel do
-  @moduledoc "Pure, independently updatable workflow policy above the fixed record codec."
+  @moduledoc "Bundle normalization above the fixed record codec: the Gateway's candidate check."
 
   alias PramanaFoundry.DurableStore.RecordCodec
-
-  @callback decide(map(), map()) :: {:ok, map()} | {:error, term()}
-  @callback apply(map(), map()) :: {:ok, map()} | {:error, term()}
-
-  def validate_bundle(bundle) do
-    with {:ok, _normalized} <- normalize_bundle(bundle), do: :ok
-  end
 
   def normalize_bundle(bundle) do
     with {:ok, normalized} <- RecordCodec.normalize_bundle(bundle),

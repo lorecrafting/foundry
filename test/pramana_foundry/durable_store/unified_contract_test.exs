@@ -1,7 +1,7 @@
 defmodule PramanaFoundry.DurableStore.UnifiedContractTest do
   use ExUnit.Case, async: false
 
-  alias PramanaFoundry.DurableStore.{Database, Gateway, LegacyImport}
+  alias PramanaFoundry.DurableStore.{Database, Gateway}
 
   setup do
     root = Path.join(System.tmp_dir!(), "fr07-unified-#{System.unique_integer([:positive])}")
@@ -72,7 +72,7 @@ defmodule PramanaFoundry.DurableStore.UnifiedContractTest do
              Gateway.backup(gateway, Path.join(ctx.root, "multi.sqlite3"))
   end
 
-  test "parent symlink and dotdot aliases never reach gateway or importer", ctx do
+  test "parent symlink and dotdot aliases never reach the gateway", ctx do
     other = Path.join(ctx.root, "other")
     File.mkdir!(other)
     link = Path.join(ctx.root, "link")
@@ -82,10 +82,6 @@ defmodule PramanaFoundry.DurableStore.UnifiedContractTest do
     alias_gateway = start_supervised!({Gateway, path: alias_path}, id: :alias_gateway)
     assert %{mode: :recovery, reason: :noncanonical_database_path} = Gateway.status(alias_gateway)
 
-    source = Path.join(ctx.root, "legacy.jsonl")
-    archive = Path.join(ctx.root, "archive")
-    File.write!(source, "{}\n")
-    assert {:error, :noncanonical_database_path} = LegacyImport.run(alias_path, source, archive)
     assert {:error, :noncanonical_database_path} = Gateway.initialize(alias_path)
     assert {:error, :noncanonical_database_path} = Gateway.migrate(alias_path)
 

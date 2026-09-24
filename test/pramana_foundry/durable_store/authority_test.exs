@@ -6,7 +6,6 @@ defmodule PramanaFoundry.DurableStore.AuthorityTest do
     Database,
     Encoding,
     Gateway,
-    LegacyImport,
     RecordCodec
   }
 
@@ -352,22 +351,6 @@ defmodule PramanaFoundry.DurableStore.AuthorityTest do
     assert %{mode: :recovery} = Gateway.status(gateway)
   end
 
-  test "an import manifest never certifies missing retained bytes", ctx do
-    source = Path.join(ctx.root, "legacy.jsonl")
-    archive = Path.join(ctx.root, "archive")
-    File.write!(source, valid_legacy_line())
-    assert {:ok, manifest} = LegacyImport.run(ctx.path, source, archive)
-
-    assert {:ok, conn} = Database.open(ctx.path)
-    assert :ok = Database.execute(conn, "DELETE FROM legacy_records")
-    assert :ok = Database.close(conn)
-
-    assert {:error, {:authority_corrupt, "legacy_records", digest, :import_evidence_mismatch}} =
-             LegacyImport.run(ctx.path, source, archive)
-
-    assert digest == manifest["source_digest"]
-  end
-
   test "backup cannot occupy any owner database journal path", ctx do
     gateway = start_supervised!({Gateway, path: ctx.path})
     target = ctx.path <> ".owner.sqlite3-journal"
@@ -408,12 +391,6 @@ defmodule PramanaFoundry.DurableStore.AuthorityTest do
     assert {:error, {:prospective_sidecar_exists, ^journal}} = Gateway.backup(gateway, backup)
     refute File.exists?(backup)
     assert File.read!(journal) == "foreign"
-
-    source = Path.join(ctx.root, "namespace-source.jsonl")
-    File.write!(source, valid_legacy_line())
-    archive_root = ctx.path <> "-journal"
-    assert {:error, :store_path_collision} = LegacyImport.run(ctx.path, source, archive_root)
-    refute File.exists?(archive_root)
   end
 
   test "mismatched retained owner recovery evidence refuses ownership", ctx do
@@ -484,6 +461,10 @@ defmodule PramanaFoundry.DurableStore.AuthorityTest do
        [{:blob, "{}"}]},
       {"artifact_references",
        "INSERT INTO artifact_references VALUES ('artifact', 'A', 1, 'digest', ?)",
+       [{:blob, "{}"}]},
+      # The legacy JSONL import is retired (plan amendment C3): a store holding an import
+      # run is refused, never re-verified against an importer that no longer exists.
+      {"import_runs", "INSERT INTO import_runs VALUES ('digest', 's', 'a', 0, 0, 0, 0, ?)",
        [{:blob, "{}"}]}
     ]
 
@@ -674,39 +655,6 @@ defmodule PramanaFoundry.DurableStore.AuthorityTest do
 
     assert {:ok, counts} = Gateway.counts(gateway)
     assert Enum.all?(counts, fn {_table, count} -> count == 0 end)
-  end
-
-  test "archive staging adopts only exact evidence and preserves foreign bytes", ctx do
-    source = Path.join(ctx.root, "source.jsonl")
-    archive = Path.join(ctx.root, "archive")
-    bytes = "{}\n"
-    File.write!(source, bytes)
-    File.mkdir!(archive)
-    digest = Encoding.digest(bytes)
-    temp = Path.join(archive, digest <> ".jsonl.tmp-" <> String.slice(digest, 0, 16))
-    File.write!(temp, "PRESERVE PREEXISTING EVIDENCE")
-
-    assert {:error, {:archive_staging_occupied, ^temp}} =
-             LegacyImport.run(ctx.path, source, archive)
-
-    assert File.read!(temp) == "PRESERVE PREEXISTING EVIDENCE"
-    refute File.exists?(Path.join(archive, digest <> ".jsonl"))
-
-    {:ok, conn} = Database.open(ctx.path)
-
-    assert {:ok, [[0, 0]]} =
-             Database.query(
-               conn,
-               "SELECT (SELECT count(*) FROM import_runs), (SELECT count(*) FROM legacy_records)"
-             )
-
-    assert :ok = Database.close(conn)
-    File.rm!(temp)
-    File.write!(temp, bytes)
-
-    assert {:ok, %{"source_digest" => ^digest}} = LegacyImport.run(ctx.path, source, archive)
-    refute File.exists?(temp)
-    assert File.read!(Path.join(archive, digest <> ".jsonl")) == bytes
   end
 
   test "schema validation checks exact uniqueness keys and partial predicates", ctx do
@@ -1121,9 +1069,5 @@ defmodule PramanaFoundry.DurableStore.AuthorityTest do
       assert {:ok, rows} = Database.query(conn, "SELECT * FROM #{table} ORDER BY #{ordering}")
       {table, rows}
     end)
-  end
-
-  defp valid_legacy_line do
-    ~s({"event_id":"legacy","event_type":"ticket_created","event_version":1,"payload":{},"recorded_at":"2026-01-01T00:00:00Z","schema_version":1,"source":"legacy"}\n)
   end
 end
