@@ -33,6 +33,8 @@ on every candidate whether or not the session knows they exist.
 | **Semantic invariants** | `State.invariant?/1`, asserted by `Test.Harness` after every accepted transition and by `r4_exhaustive_test.exs` over the reachable set | Are the facts in an accepted state mutually coherent? Distinct from `State.well_formed?/1`, which checks shapes. This is the only mechanism that inspects an effect body's result rather than a guard's decision. It asserts; it does not refuse — `apply/2` never calls it. |
 | **Harness routing** | `test/foundry/workflow/r4_no_direct_apply_test.exs` | Does every test call site actually reach the kernel through the wrapper that asserts? A wrapper nothing is obliged to use decays into one nothing uses, and the claim it supports stays standing while becoming false. It scans for the module's last segment, not one spelling — the first version matched `WorkflowKernel` only and missed a fully-qualified call live in the same commit, which is the declared-reason inventory's one-of-two-spellings defect reproduced in a new mechanism. **2026-09-22:** it now reads the AST rather than the text — aliases (plain, `as:`, multi-alias, with any options) and module attributes resolved per file, each name to every module it is ever bound to, and a remote call, capture, `apply/3` or `:erlang.apply/3` reflection, `import` or `defdelegate` of the kernel reported, with a red-control fixture per shape. Not covered: a module bound at runtime, `Function.capture/3`, `__MODULE__.Kernel`, and calls produced by macro expansion. |
 | **Guard reachability** | `test/foundry/workflow/r4_guard_reachability_test.exs` | Which declared refusals can actually happen. A guard nothing can trip is dead code that reads as a safeguard. |
+| **Refusal sites outside the sweep** | `test/foundry/evidence_tools/evidence_scripts_test.exs` runs `bin/refusal_sites.exs` | Its red control must pass, and its table of refusal sites no `require_*` call reaches must equal the table committed in the test. A new refusal the sweep cannot neutralise fails the gate until someone acknowledges it by updating that table — ideally with a refusal test pinned to its atom. |
+| **Contract annotation diff, plumbing only** | same file runs `bin/contract_annotation_diff.exs HEAD` | Its two red controls (annotation-only text is clean, a one-word edit is caught) pass and it still runs against this repository's layout. On a committed candidate both sides are the same text, so this proves nothing about any annotation pass; see below. |
 
 If you add a guard or a transition and the gate stays green, **that is not evidence the
 guard works**. See the sweep below.
@@ -97,6 +99,14 @@ Gotchas, each of which has cost real work:
   instruction before deleting it: hash the target against a known-good revision first. Entries
   are the call text ALONE, `require_cleanup_complete(ticket)` — the `:430` that the output and
   the sweep records append for display is not part of the key.
+
+### Contract annotation diff against the pass's baseline — `bin/contract_annotation_diff.exs <rev>`
+
+**Run it when a commit annotates `WORKFLOW-CONTRACT.md`**, with `<rev>` the commit before the
+annotation pass. An empty diff proves the pass changed no contract text. It is not in the gate
+because the meaningful baseline is a human choice per pass, and CI checks out one commit
+(`fetch-depth: 1`), so no earlier revision exists there to compare against. The gate runs it
+against `HEAD`, which only proves the script still works.
 
 ## The rules that make any of this worth anything
 
@@ -176,7 +186,8 @@ These are not style preferences. Each was bought with a review round.
   its conjuncts are still the check to do by hand. `bin/contract_annotation_diff.exs` is the proof that an annotation pass
   changed no contract text, and its header states the three things it does not prove.
 - The sweep's population is every non-definition `require_*(` call. A refusal expressed any
-  other way is outside it. **Run `elixir bin/refusal_sites.exs` for the split** — how many refusal
+  other way is outside it. **Run `elixir bin/refusal_sites.exs` for the split** (the gate pins
+  its outside table, so a new site outside the sweep fails there) — how many refusal
   sites across `kernel.ex` and `kernel/event.ex` sit inside `require_*` definitions, and how many
   are inline in `do_transition` clauses or in the envelope pipeline, the state builders and
   `Event.validate/1`. The counts used to be restated here (74 / 47 / 27) and were stale within a

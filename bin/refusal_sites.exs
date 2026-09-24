@@ -8,6 +8,10 @@
 #
 #   elixir bin/refusal_sites.exs
 #
+# `test/foundry/evidence_tools/evidence_scripts_test.exs` runs this in the gate: the red control
+# must pass and the "outside" table must equal the one committed in that test, so a new refusal
+# the sweep cannot neutralise fails the gate until it is acknowledged there.
+#
 # Every `{:error, :atom}` in the reducer (`kernel.ex` and its event-family modules) is
 # attributed to its enclosing `defp`/`def`. A site
 # inside a `require_*` definition is reachable by the sweep, because the sweep neutralises
@@ -38,8 +42,10 @@
 # Since 2026-09-23 the reducer is kernel.ex plus one module per event family under kernel/,
 # so the family modules are read too. State stays out, as it always did.
 sources =
-  ["lib/foundry/workflow/kernel.ex"
-   | Path.wildcard("lib/foundry/workflow/kernel/**/*.ex")] --
+  [
+    "lib/foundry/workflow/kernel.ex"
+    | Path.wildcard("lib/foundry/workflow/kernel/**/*.ex")
+  ] --
     ["lib/foundry/workflow/kernel/state.ex"]
 
 lines =
@@ -112,7 +118,7 @@ IO.puts(
 )
 
 {in_guards, outside} =
-  Enum.split_with(sites, fn {_, fun, _} -> fun && fun && String.contains?(fun, "require_") end)
+  Enum.split_with(sites, fn {_, fun, _} -> fun && String.contains?(fun, "require_") end)
 
 IO.puts(
   "refusal sites across #{Enum.join(Enum.map(sources, &Path.basename/1), " + ")}: #{length(sites)}"
@@ -124,7 +130,7 @@ IO.puts("  outside, so NO mutation trial exists for them:           #{length(out
 
 outside
 |> Enum.group_by(fn {_, fun, _} -> fun end)
-|> Enum.sort_by(fn {_, group} -> -length(group) end)
+|> Enum.sort_by(fn {fun, group} -> {-length(group), fun || ""} end)
 |> Enum.each(fn {fun, group} ->
   atoms = group |> Enum.map(&elem(&1, 2)) |> Enum.uniq() |> Enum.sort()
 

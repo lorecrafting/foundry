@@ -12,6 +12,11 @@
 #   elixir bin/contract_annotation_diff.exs                  # against HEAD
 #   elixir bin/contract_annotation_diff.exs <rev>            # against a named revision
 #
+# `test/foundry/evidence_tools/evidence_scripts_test.exs` runs it against HEAD in the gate.
+# On a committed candidate both sides are the same text, so the gate proves the red controls
+# hold and the script still runs against this layout - not that an annotation pass preserved
+# content. That proof needs the pass's own baseline rev, passed by hand.
+#
 # What it does NOT prove, each of which needs its own check:
 #
 #   - That the IDs are RIGHT. A marker carrying the wrong row number strips exactly like
@@ -78,7 +83,7 @@ IO.puts("red controls passed: annotation-only is clean, a one-word edit is caugh
 rev = List.first(System.argv()) || "HEAD"
 
 {subject, 0} = System.cmd("git", ["log", "-1", "--format=%h %s", rev])
-{old, 0} = System.cmd("git", ["show", "#{rev}:#{Path.join("foundry", contract)}"])
+{old, 0} = System.cmd("git", ["show", "#{rev}:#{contract}"])
 new = File.read!(contract)
 
 count = fn text -> length(Regex.scan(~r/\{R4a?\.\d{2}\.[fo]\d{1,2}\}/, text)) end
