@@ -9,6 +9,14 @@ defmodule PramanaFoundry.Application do
     operator_root = PramanaFoundry.RuntimeRoot.initialize_operator_root!()
     PramanaFoundry.RuntimeRoot.resolve_and_publish!(mix_env, operator_root)
 
+    # A release booted by hand without the flag would otherwise idle silently.
+    if mode == :client and
+         String.starts_with?(System.get_env("RELEASE_COMMAND", ""), ~w(daemon start)),
+       do:
+         IO.puts(
+           "PramanaFoundry: FOUNDRY_MANUAL_LANE is not 1; starting no children (use bin/foundry-lane)"
+         )
+
     Supervisor.start_link(runtime_children(mode),
       strategy: :one_for_one,
       name: PramanaFoundry.Supervisor
