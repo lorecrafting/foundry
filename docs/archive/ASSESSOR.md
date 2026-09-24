@@ -1,10 +1,12 @@
+> Retired 2026-09-23 under [repair-plan amendment C3](../REPAIR-PLAN.md#clean-room-amendment): the Assessor code, tests and `bin/assessor_eval.exs` were deleted; this is the Stage A research record.
+
 # Semantic assessor — Stage A
 
 **Status:** model-free/fixture implementation for issue #26. This is not an enabled
 production provider route and it does not close or bypass any Foundry repair ticket.
 
-[Foundry strategy](STRATEGY.md) · [Repair plan](REPAIR-PLAN.md) ·
-[Workflow contract](WORKFLOW-CONTRACT.md)
+[Foundry strategy](../STRATEGY.md) · [Repair plan](../REPAIR-PLAN.md) ·
+[Workflow contract](../WORKFLOW-CONTRACT.md)
 
 ## Purpose
 
