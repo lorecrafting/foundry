@@ -113,8 +113,7 @@ its identity and full digest match the planned archive; mismatched evidence is r
 left untouched, and cleanup is restricted to staging created by the current operation.
 
 The importer does not remove or relocate the source. FR-19 still owns live-handle/space
-preflight, retention, checkpoint interruption, archival removal and collision-safe
-relocation.
+preflight, retention, checkpoint interruption and archival removal.
 
 ## Operational health and bounded diagnostics
 
@@ -183,7 +182,6 @@ observed kernel `fsync(2)` failure, power loss, controller/cache flush proof or 
 durability evidence. Those physical guarantees were unavailable on the development host
 and are not claimed.
 
-All mutating relocation entry points (`execute/2`, `resume/2`, `rollback/2`) return
-`{:error, {:relocation_disabled, :fr19b_required}}` before journal or path access. Inventory
-and planning remain read-only; the historical mutation/recovery tests remain preserved but
-skipped until FR-19B repairs or retires that implementation.
+Offline relocation was retired on 2026-09-23 ([plan amendment C3](REPAIR-PLAN.md#clean-room-amendment));
+its rules and the tests that encoded them are in
+[the archived relocation rules](archive/RELOCATION-RULES-2026-09-23.md).
