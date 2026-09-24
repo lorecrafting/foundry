@@ -9,7 +9,7 @@
 #
 # Usage:
 #   pramana lane status [TICKET] [--json]
-#   pramana lane admit|packet|submit|review|settle|log|recover ...
+#   pramana lane admit|packet|submit|review|settle|log|integrated|recover ...
 
 set -euo pipefail
 

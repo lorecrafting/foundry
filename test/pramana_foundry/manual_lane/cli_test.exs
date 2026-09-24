@@ -489,6 +489,44 @@ defmodule PramanaFoundry.ManualLane.CLITest do
     assert tampered["notes"]["body"] == nil
   end
 
+  # F6/F10: the operator once cherry-picked a candidate's tip commit and missed the one below.
+  test "lane integrated needs every base..candidate commit in the ref, and writes nothing", c do
+    start!(c)
+    refused!(~w(integrated ML-1), "ticket_not_found")
+    admit!(c)
+    ok!(~w(packet ML-1 --role developer --principal #{@dev}))
+    refused!(~w(integrated ML-1), "no_candidate")
+
+    # A two-commit candidate on a detached worktree off the base.
+    wt = Path.join(c.root, "dev")
+    git!(c.repo, ["worktree", "add", "-q", "--detach", wt, c.base])
+    first = commit!(wt, "c1.txt", "first")
+    tip = commit!(wt, "c2.txt", "tip")
+    ok!(~w(submit ML-1 --principal #{@dev} --candidate #{tip} --checkout #{wt}))
+    events = fn -> ok!(~w(log ML-1))["trail"]["ML-1"]["events"] end
+    before = events.()
+
+    missing = fn r -> Enum.map(r["missing"], &hd(String.split(&1))) end
+
+    r = ok!(~w(integrated ML-1))
+    assert %{"integrated" => false, "commits" => 2, "candidate_id" => ^tip, "ref" => "main"} = r
+    assert missing.(r) == [first, tip]
+
+    # The tip alone is not the candidate.
+    git!(c.repo, ["cherry-pick", tip])
+    r = ok!(~w(integrated ML-1 --ref main))
+    assert %{"integrated" => false} = r
+    assert missing.(r) == [first]
+
+    # Patch-equivalent commits count, as does ancestry.
+    git!(c.repo, ["cherry-pick", first])
+    assert %{"integrated" => true, "missing" => []} = ok!(~w(integrated ML-1))
+    assert %{"integrated" => true, "missing" => []} = ok!(~w(integrated ML-1 --ref #{tip}))
+
+    refused!(~w(integrated ML-1 --ref nope), "git_ref_unresolved")
+    assert events.() == before
+  end
+
   test "an operator log write failure warns and leaves the outcome unchanged", c do
     start!(c)
     File.mkdir_p!(operator_log(c))
@@ -622,6 +660,8 @@ defmodule PramanaFoundry.ManualLane.CLITest do
       ~w(lane status ML-1 --json),
       ~w(lane log),
       ~w(lane log ML-1 --json),
+      ~w(lane integrated ML-1),
+      ~w(lane integrated ML-1 --ref main --json),
       ~w(lane packet ML-1)
     ]
 
@@ -630,6 +670,8 @@ defmodule PramanaFoundry.ManualLane.CLITest do
       ~w(lane launch ML-1),
       ~w(lane status ML-1 ML-2),
       ~w(lane log ML-1 --principal p),
+      ~w(lane integrated),
+      ~w(lane integrated ML-1 --ref a --ref b),
       ~w(lane packet),
       ~w(lane packet ML-1 --role developer --role reviewer),
       ~w(lane packet ML-1 --verdict approved),

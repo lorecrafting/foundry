@@ -1,8 +1,8 @@
 defmodule PramanaFoundry.ManualLane.CLI do
   @moduledoc """
   T5, the manual-lane CLI (`docs/batch-d/THIN-LANE-DESIGN-2026-09-23.md` §4):
-  `bin/pramana lane admit|packet|submit|review|settle|status|log|recover`, routed here by
-  `CLI.RPC`.
+  `bin/pramana lane admit|packet|submit|review|settle|status|log|integrated|recover`,
+  routed here by `CLI.RPC`.
 
   Every command appends one line to the operator log and logs its start and finish to the
   daemon's own log, never the RPC client's stdout (`ManualLane.Log`): observation only,
@@ -42,6 +42,7 @@ defmodule PramanaFoundry.ManualLane.CLI do
        ], :required},
     "status" => {[], :optional},
     "log" => {[], :optional},
+    "integrated" => {[ref: :string], :required},
     "recover" => {[evidence: :string], :none}
   }
 
@@ -53,6 +54,7 @@ defmodule PramanaFoundry.ManualLane.CLI do
     "settle" => [:principal, :role, :outcome, :attest],
     "status" => [],
     "log" => [],
+    "integrated" => [],
     "recover" => [:evidence]
   }
 
@@ -234,6 +236,34 @@ defmodule PramanaFoundry.ManualLane.CLI do
 
       {:error, reason} ->
         {:error, :store_unreadable, inspect(reason)}
+    end
+  end
+
+  # F6/F10: read-only. Every commit of base..candidate must be in the ref by ancestry or,
+  # after a cherry-pick, by patch-equivalence: `git cherry REF CANDIDATE BASE` lists each
+  # commit of that range the ref lacks by ancestry, `-` when an equivalent patch is there.
+  defp command("integrated", ctx, id, opts) do
+    ref = opts[:ref] || "main"
+
+    with %{} = ticket <- ticket(ctx, id) || {:error, :ticket_not_found, nil},
+         {:ok, candidate} <- latest_candidate(ticket),
+         base = ticket["spec"]["base_revision"],
+         {:ok, ref_sha} <- rev_parse(ctx.repo, ref),
+         {:ok, cherry} <- git(ctx.repo, ["cherry", "-v", ref_sha, candidate, base]),
+         {:ok, range} <- git(ctx.repo, ["rev-list", "--count", "#{base}..#{candidate}"]) do
+      missing = for "+ " <> commit <- String.split(cherry, "\n", trim: true), do: commit
+
+      {:ok,
+       %{
+         "ticket_id" => id,
+         "ref" => ref,
+         "ref_sha" => ref_sha,
+         "base_revision" => base,
+         "candidate_id" => candidate,
+         "commits" => String.to_integer(range),
+         "integrated" => missing == [],
+         "missing" => missing
+       }}
     end
   end
 
@@ -440,6 +470,24 @@ defmodule PramanaFoundry.ManualLane.CLI do
          ) do
       {sha, 0} -> {:ok, String.trim(sha)}
       _ -> {:error, :git_ref_unresolved, ref}
+    end
+  end
+
+  # The active attempt's candidate, else the latest prior attempt's.
+  defp latest_candidate(ticket) do
+    [ticket["active_attempt_id"] | Enum.reverse(ticket["prior_attempt_ids"] || [])]
+    |> Enum.find_value({:error, :no_candidate, nil}, fn attempt_id ->
+      case get_in(ticket, ["attempts", attempt_id, "candidate_id"]) do
+        nil -> nil
+        candidate -> {:ok, candidate}
+      end
+    end)
+  end
+
+  defp git(repo, args) do
+    case System.cmd("git", ["-C", repo | args], stderr_to_stdout: true) do
+      {out, 0} -> {:ok, String.trim(out)}
+      {out, _} -> {:error, :git_failed, String.trim(out)}
     end
   end
 

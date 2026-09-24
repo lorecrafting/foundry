@@ -117,11 +117,26 @@ bin/pramana lane settle ML-42 --role developer --principal agent:claude-opus-5-5
 `non_started` needs both `--issuer-gone` and `--channel-quiet` (A1: attested, not proved).
 `unknown` is permanent (A2): it holds its units, and the ticket is abandoned; admit a new id.
 
-**Status and log.** Both write nothing to the store.
+**Integrate.** Manual git (§7). Cherry-pick the whole range, never only the candidate's own
+commit: `<base_revision>..<candidate>` for a first candidate, or
+`<previous candidate>..<candidate>` for a correction whose earlier candidate is already in.
+Then check it:
+
+```sh
+git cherry-pick <base_revision>..<candidate>
+bin/pramana lane integrated ML-42 [--ref main]
+```
+
+`integrated: true` means every commit of `<base_revision>..<candidate>` is in the ref, by
+ancestry or as an equivalent patch (`git cherry`); otherwise `missing` lists each commit
+the ref lacks, oldest first. It records nothing: the ticket stays `ready_to_integrate`.
+
+**Status, log and integrated.** All three write nothing to the store.
 
 ```sh
 bin/pramana lane status [ML-42]    # phase, attempts, executions; awaits_operator marks issued claims
 bin/pramana lane log [ML-42]       # committed events, refused commands, each effect's claim
+bin/pramana lane integrated ML-42 [--ref main]   # is base..candidate in the ref?
 ```
 
 ## 4. Principals
@@ -153,6 +168,8 @@ only as real as your choice of a fresh agent on a different model.
 | `receipt_provenance_mismatch` | submit, review or settle by a principal that did not issue the effect | use the packet's principal |
 | `notes_unreadable` | `review --notes` does not name a readable file | fix the path |
 | `notes_archive_failed` | the notes body could not be archived beside the store (nothing was recorded) | fix `<runtime root>/state/manual-lane/notes/`, then rerun |
+| `no_candidate` | `integrated` on a ticket no attempt has submitted a candidate for | submit first |
+| `git_failed` | `integrated` could not read the range (the candidate is not in the configured repo, say) | fetch the candidate into `FOUNDRY_MANUAL_LANE_REPO` |
 | `lane_disabled` | no lane server on the node | `bin/foundry-lane start` |
 | `gateway_recovery` | the previous daemon stopped uncleanly; the store is fenced | see below |
 
@@ -189,6 +206,7 @@ epoch; `submit` and `settle` still work on them.
 ## 7. Out of scope
 
 - **Integration** is manual git outside Foundry (A5). The lane ends at `ready_to_integrate`;
-  merge or cherry-pick the candidate yourself. Nothing records `integrated`.
+  cherry-pick the range yourself (§3, Integrate). Nothing records `integrated`;
+  `lane integrated` only checks it.
 - Checks: the policy's check set is empty; record the checks you ran in the review notes.
 - Legacy commands (`ticket …`, `handoff …`) do not work against the lane node.
