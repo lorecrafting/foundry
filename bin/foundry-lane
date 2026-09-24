@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # foundry-lane — build, start and stop the manual-lane daemon (docs/batch-d/LANE-RUNBOOK.md).
 #
-# The lane daemon runs ManualLane.Server alone (no Coordinator, Improver or PM) on its own
-# release build, node name and runtime root, so it never collides with a legacy daemon.
+# The lane daemon runs ManualLane.Server alone on its own
+# release build, node name and runtime root. FOUNDRY_MANUAL_LANE=1 is what makes the node a daemon.
 # Every setting below can be overridden from the environment. `bin/pramana lane …` reads
 # the same settings through `foundry-lane env`.
 #
@@ -40,8 +40,7 @@ case "${1:-}" in
     need_release
     if "$PRAMANA_RELEASE" pid >/dev/null 2>&1; then echo "lane daemon already running" >&2; exit 0; fi
     mkdir -p "$PRAMANA_RUNTIME_ROOT"
-    # A release boots with plain args ["--no-halt"], which Application reads as a client.
-    PRAMANA_STARTUP_MODE=daemon "$PRAMANA_RELEASE" daemon
+    "$PRAMANA_RELEASE" daemon
     for _ in $(seq 30); do
       if "$PRAMANA_RELEASE" pid >/dev/null 2>&1; then
         # Up is up: a refused status (gateway_recovery, say) is reported, not a failed start.

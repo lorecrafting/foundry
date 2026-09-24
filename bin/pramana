@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
-# pramana — CLI wrapper for Pramāṇa Foundry agent commands.
+# pramana — CLI wrapper for the Foundry manual lane.
 #
-# Routes all commands to the running daemon via the release binary's `rpc`
-# so agent-facing commands (handoff submit, review submit, ticket status)
-# execute in the daemon's BEAM and can call the Coordinator GenServer.
+# Sends argv, encoded as inert data, to the running lane daemon via the release binary's
+# `rpc`, so lane commands execute in the daemon's BEAM (docs/batch-d/LANE-RUNBOOK.md).
+# The daemon dispatches only `lane` commands; every other argv is refused there.
 #
-# Works from both the main repo and OMP worktrees.
+# Works from both the main repo and worktrees.
 #
 # Usage:
-#   pramana handoff submit TASK_ID --handoff-path PATH
-#   pramana handoff block TASK_ID --reason TEXT
-#   pramana review submit TASK_ID --review-path PATH
-#   pramana ticket status TASK_ID
-#   pramana ticket list
-#   pramana ticket create --title TITLE --priority P0|P1|P2|P3
+#   pramana lane status [TICKET] [--json]
+#   pramana lane admit|packet|submit|review|settle|log|recover ...
 
 set -euo pipefail
 

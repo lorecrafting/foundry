@@ -21,16 +21,7 @@ defmodule PramanaFoundry.BoundaryTest do
     assert Enum.all?(@forbidden_packages, &(not String.contains?(downcased, ":#{&1}")))
   end
 
-  test "OTP tree exposes one bounded coordinator boundary" do
-    children = Supervisor.which_children(PramanaFoundry.Supervisor)
-
-    assert 1 ==
-             Enum.count(children, fn {_id, pid, _type, _modules} ->
-               pid == Process.whereis(PramanaFoundry.Coordinator)
-             end)
-
-    assert Process.whereis(PramanaFoundry.Registry)
-    assert Process.whereis(PramanaFoundry.AssignmentSupervisor)
-    assert Process.whereis(PramanaFoundry.TaskSupervisor)
+  test "the test node's application supervisor starts no runtime children" do
+    assert Supervisor.which_children(PramanaFoundry.Supervisor) == []
   end
 end

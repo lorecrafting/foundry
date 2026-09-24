@@ -186,8 +186,8 @@ defmodule PramanaFoundry.Effects.ProcessGroup do
   Distinct from `same_process?/2`, which also compares `command`. A live process may change
   its `command` without becoming a different process: `/usr/bin/python3` re-execs into the
   framework Python, and `sh -c "<one command>"` tail-call-execs into that command. Measured
-  through `Checks.Runner`, 5 of 12 launches read back a different `command` for the same pid,
-  process group and start time — see `docs/fr-04/identity-drift-probe.exs`.
+  through the since-deleted `Checks.Runner`, 5 of 12 launches read back a different
+  `command` for the same pid, process group and start time — see `docs/fr-04/identity-drift-probe.exs`.
 
   So ask this when the question is "is the process I recorded still running", and
   `same_process?/2` when the question is "may I signal this", where the strictest available

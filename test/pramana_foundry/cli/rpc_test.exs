@@ -8,42 +8,32 @@ defmodule PramanaFoundry.CLI.RPCTest do
       source_looking = "literal " <> <<35>> <> "{1 + 1}"
 
       argv = [
-        "ticket",
-        "create",
+        "lane",
+        "admit",
+        "T-1",
+        "--base-ref",
+        "main",
         "--title",
         "quote \" slash \\ newline\nUnicode प्रमाण #{source_looking}",
-        "--priority",
-        "P0",
+        "--scope",
+        "lib/**",
         "--acceptance",
         ""
       ]
 
       assert {:ok, ^argv} = argv |> envelope() |> encode() |> RPC.decode()
-      assert Enum.at(argv, 3) =~ source_looking
-      refute Enum.at(argv, 3) =~ "literal 2"
+      assert Enum.at(argv, 6) =~ source_looking
+      refute Enum.at(argv, 6) =~ "literal 2"
     end
 
-    test "accepts every documented remote command shape" do
+    test "accepts lane command shapes, the only dispatched ones" do
       commands = [
-        ["handoff", "submit", "TASK-1", "--handoff-path", "/tmp/handoff.json"],
-        ["handoff", "block", "TASK-1", "--reason", "one", "two"],
-        ["review", "submit", "TASK-1", "--review-path", "/tmp/review.json"],
-        ["ticket", "create", "--title", "title", "--priority", "P0"],
-        [
-          "ticket",
-          "create",
-          "--title",
-          "title",
-          "--priority",
-          "P3",
-          "--scope",
-          "lib/**",
-          "--acceptance",
-          "passes"
-        ],
-        ["ticket", "status", "TASK-1"],
-        ["ticket", "list"],
-        ["ticket", "integrate", "TASK-1"]
+        ["lane", "status"],
+        ["lane", "status", "T-1", "--json"],
+        ["lane", "log"],
+        ["lane", "recover", "--evidence", "no other lane process"],
+        ["lane", "packet", "T-1", "--role", "developer", "--principal", "p"],
+        ["lane", "admit", "T-1", "--acceptance", "a", "--acceptance", "b"]
       ]
 
       Enum.each(commands, fn argv ->
@@ -105,6 +95,24 @@ defmodule PramanaFoundry.CLI.RPCTest do
     end
 
     test "rejects unknown commands, subcommands, options and shapes" do
+      # The retired legacy CLI shapes are refused like any other unknown shape.
+      legacy = [
+        ["handoff", "submit", "TASK-1", "--handoff-path", "/tmp/handoff.json"],
+        ["review", "submit", "TASK-1", "--review-path", "/tmp/review.json"],
+        ["ticket", "create", "--title", "title", "--priority", "P0"],
+        ["ticket", "status", "TASK-1"],
+        ["ticket", "list"],
+        ["ticket", "integrate", "TASK-1"]
+      ]
+
+      lane = [
+        ["lane"],
+        ["lane", "launch", "T-1"],
+        ["lane", "admit"],
+        ["lane", "status", "--title", "x"],
+        ["lane", "packet", "T-1", "--role", "a", "--role", "b"]
+      ]
+
       invalid = [
         [],
         ["health"],
@@ -132,7 +140,7 @@ defmodule PramanaFoundry.CLI.RPCTest do
         ]
       ]
 
-      Enum.each(invalid, fn argv ->
+      Enum.each(invalid ++ legacy ++ lane, fn argv ->
         assert RPC.decode(encode(envelope(argv))) == {:error, :unknown_command_shape}
       end)
     end
