@@ -4,8 +4,9 @@ defmodule PramanaFoundry.ManualLane.CLI do
   `bin/pramana lane admit|packet|submit|review|settle|status|log|recover`, routed here by
   `CLI.RPC`.
 
-  Every command appends one line to the operator log and logs its start and finish
-  (`ManualLane.Log`): observation only, never read back to decide.
+  Every command appends one line to the operator log and logs its start and finish to the
+  daemon's own log, never the RPC client's stdout (`ManualLane.Log`): observation only,
+  never read back to decide.
 
   It runs in the daemon's BEAM against the flag-started `ManualLane.Server`, and only
   translates arguments into `ManualLane.Backend` calls. Output is human-readable, or one
@@ -66,7 +67,7 @@ defmodule PramanaFoundry.ManualLane.CLI do
     command = List.first(argv)
     store = store_path()
     started = System.monotonic_time(:millisecond)
-    Logger.info("lane #{command} started", lane_command: command)
+    daemon_log("lane #{command} started", lane_command: command)
     outcome = run(argv)
     duration = System.monotonic_time(:millisecond) - started
     observe(store, argv, outcome, duration)
@@ -480,7 +481,7 @@ defmodule PramanaFoundry.ManualLane.CLI do
         _ -> {nil, nil}
       end
 
-    Logger.info("lane #{List.first(argv)} finished: #{result} in #{duration}ms",
+    daemon_log("lane #{List.first(argv)} finished: #{result} in #{duration}ms",
       lane_command: List.first(argv),
       lane_result: result,
       duration_ms: duration
@@ -496,6 +497,13 @@ defmodule PramanaFoundry.ManualLane.CLI do
       "duration_ms" => duration
     })
   end
+
+  # F1: a Logger event carries its process's group leader, and OTP forwards an event whose
+  # group leader is on another node to that node. Under the release `rpc` that is the client,
+  # so these lines printed around the result on its stdout. Pinned to this node's `user`,
+  # they stay in the daemon's own log.
+  defp daemon_log(message, metadata),
+    do: Logger.info(message, [gl: Process.whereis(:user) || Process.group_leader()] ++ metadata)
 
   # ── Helpers ───────────────────────────────────────────────────────────────────
 

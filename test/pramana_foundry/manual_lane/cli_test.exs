@@ -179,6 +179,45 @@ defmodule PramanaFoundry.ManualLane.CLITest do
     refute out =~ ~s("ok")
   end
 
+  # F1: OTP forwards a log event to the node of its group leader, which under the release
+  # `rpc` is the client's. The lane's lines must name this node's `user`, never the caller's.
+  test "F1: lane log lines stay on the daemon, stdout carries only the JSON result", c do
+    start!(c)
+    handler = :"lane_cli_test_#{System.unique_integer([:positive])}"
+    :ok = :logger.add_handler(handler, __MODULE__, %{config: %{pid: self()}})
+    on_exit(fn -> :logger.remove_handler(handler) end)
+
+    admit!(c)
+
+    lines =
+      for {:lane_log, msg, meta} <- flush_logs(),
+          String.starts_with?(msg, "lane admit"),
+          do: {msg, meta.gl}
+
+    assert [{"lane admit started", gl}, {"lane admit finished: ok" <> _, gl}] = lines
+    assert gl == Process.whereis(:user)
+  end
+
+  @doc false
+  def log(%{msg: msg, meta: meta}, %{config: %{pid: pid}}) do
+    text =
+      case msg do
+        {:string, s} -> IO.chardata_to_string(s)
+        {format, args} when is_list(args) -> :io_lib.format(format, args) |> to_string()
+        other -> inspect(other)
+      end
+
+    send(pid, {:lane_log, text, meta})
+  end
+
+  defp flush_logs do
+    receive do
+      {:lane_log, _, _} = log -> [log | flush_logs()]
+    after
+      100 -> []
+    end
+  end
+
   # ── Refusals, each before any write where the CLI owns the guard ────────────────
 
   test "red control: lane packet without --principal is refused before any Gateway call" do
