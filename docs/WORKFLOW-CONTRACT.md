@@ -440,6 +440,9 @@ reducer ordering is durable event sequence, with raw receipt provenance checked 
 | Control | Orthogonal pause/drain flags; stop_requested → stop_completed (or pending with reason); per-target cancel_requested → cancel_finalized and revocation_pending → revocation_finalized with actual outcomes; not ticket phases |
 | Check run | pending, running, passed, failed, timed_out, unknown, cancelled; bound to candidate/tree/check definition |
 
+Core has no pause or drain control state today; see [known divergence
+4](#r5-known-divergences).
+
 <a id="r4a"></a>
 
 ### Launch non-start recovery — R4a
@@ -656,6 +659,58 @@ policy demands a total ceiling, new grants are refused unless the ceiling includ
 holds and consumption. Only explicit operator steering can change that ceiling. Keep all
 old reservations/receipts and reset provenance; restart rebuilds their conservation
 invariants. No implicit credits from a new profile, attempt, ticket or projection version.
+
+<a id="r5-known-divergences"></a>
+
+### Known divergences between code and contract
+
+These record where the code does something other than the text above, at revision
+`55037db`. They are facts, not contract changes: the text above keeps its meaning, and
+none of them decides whether the code or the contract should move. Each ends with the
+question an operator must answer.
+
+1. **`reserve` moves no units.** Contract: absent → reserved moves available → held
+   atomically with intent. Code: `reserve` checks the ledger is open and the units are
+   within `available`, then inserts the reservation as `proposed` without touching the
+   ledger (`lib/pramana_foundry/durable_store/protected_primitives.ex:1002-1031`); the
+   available → held move happens when `create_effect` activates it
+   (`protected_primitives.ex:1319`, `activate_reservations/2` at `:3529-3549`, which
+   re-checks `available`). Evidence: [ledger model, "Where the code and the contract
+   disagree"](../spec/ledger/README.md#where-the-code-and-the-contract-disagree).
+   Operator question: should the contract place the hold at activation, or the code at
+   `reserve`?
+2. **A root reset grants fresh authority instead of transferring it.** Contract: an
+   explicit transfer of old unspent units decreases old authorized/retired and increases
+   new authorized. Code: the root `reset_generation` closes the old subtree, which moves
+   each node's `available` into `retired` and leaves `authorized` unchanged
+   (`protected_primitives.ex:1695-1716`), then creates the new generation with
+   `authorized = available = units`, bounded by the old generation's `available`
+   (`protected_primitives.ex:1102-1148`, `transfer_kind`
+   `explicit_root_reset_unused_authority`). The old generation's authorized and retired
+   are not reduced. `NoUnitsCreated` still holds in the model. Evidence: [ledger
+   model](../spec/ledger/README.md#where-the-code-and-the-contract-disagree). Operator
+   question: should the transfer reduce the old generation's authorized/retired, or
+   should the contract describe the grant as the code makes it?
+3. **`return_allocation` requires an idle child.** Contract: unused child available may
+   return; consumed/held cannot. Code: it additionally refuses unless the child has
+   nothing held and nothing delegated (`0 <- child.held`, `0 <- child.delegated`,
+   `protected_primitives.ex:973-974`; refusal `allocation_return_not_permitted`).
+   Evidence: [ledger model](../spec/ledger/README.md#where-the-code-and-the-contract-disagree).
+   Operator question: is a partial return from a busy child required, or should the
+   contract state the idle-child guard?
+4. **Core has no `paused` control state.** Contract ([R4](#legal-lifecycle-and-controls--r4)
+   Control row): orthogonal pause/drain flags; R3 has the verifier check current control
+   on every effect claim. Code: Core's control status is `active` or `cancel_requested`;
+   `fence_control_descendants` refuses any other value with `invalid_control_state`
+   (`protected_primitives.ex:1841-1905`) and `control_active?/1` tests only `active`
+   (`:3462-3463`). Pause and drain exist only as the kernel reducer's `paused` and
+   `draining` flags (`lib/pramana_foundry/workflow/kernel/state.ex:105-106`,
+   `lib/pramana_foundry/workflow/kernel/control.ex:8-21`), refused by the kernel at
+   developer issue (`control.ex:40-44`), so a controller other than the kernel is not
+   held to them. Evidence: [B3 contract readings, fact
+   1](fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md#two-facts-found-while-answering-which-the-inventory-did-not-record).
+   Operator question: should Core carry pause/drain and refuse claims under them, or
+   should the contract place pause/drain enforcement on the controller?
 
 <a id="integration"></a>
 
