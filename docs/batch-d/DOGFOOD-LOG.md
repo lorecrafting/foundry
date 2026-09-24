@@ -35,6 +35,7 @@ onto `main`, one gate run per push.
 | ML-PROCESS-GROUP-TESTS-2 | `69855d9` | `1f5f487` | [approved](reviews/ML-PROCESS-GROUP-TESTS-2.review.md) | batch PG | store 2's first ticket: `c32df8a` cherry-picked unchanged plus the header-comment correction |
 | ML-RENAME-NS | `b30d0a2` | `ff0b5d5`, then `f4ca196` | [correction](reviews/ML-RENAME-NS.review-1.md) (the regex made the rename's own descriptions tautological), then [approved](reviews/ML-RENAME-NS.review-2.md) | batch B1 + FR-08A rebind | FR-23b rename 1/3, 314 files. Operator exception: pinned-commit permalinks in `archive/AUDIT-2026-09-12.md` keep their old paths (rewriting them 404s). The developer opened a copy of store 2 with the renamed build: `mode: :ready`, so no rotation here |
 | ML-RENAME-BIN-ENV | `9c7fe01` | `c73b6ea` | [approved](reviews/ML-RENAME-BIN-ENV.review.md) | batch B2 | FR-23b rename 2/3: the wrapper is `bin/foundry`, five env vars are `FOUNDRY_*`, no aliases. Retired Pramāṇa-only `bin/pramana-*` script names left for the archive drop (Q10). Reviewer: `FOUNDRY_STARTUP_MODE` has no reader (batch C dead vocabulary) |
+| ML-DOCS-ARCHIVE-DROP | `ecdbc84` | `29185be` | [approved](reviews/ML-DOCS-ARCHIVE-DROP.review.md) | batch B3 | Q10: `docs/archive` (138 files) deleted; 67 inbound links are permalinks at tag `records/2026-09-24`, all verified at the tag. `pramana` matches 675 → 197 |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -107,6 +108,7 @@ F14–F16 in store 2's first two.
 | ML-PROCESS-GROUP-TESTS-2 | 1 | 0 | 0 | 0 / 0 |
 | ML-RENAME-NS | 2 | 1 L (tautologies) | 0 | 0 / 0 |
 | ML-RENAME-BIN-ENV | 1 | 0 (3 informational notes) | 0 | 0 / 0 |
+| ML-DOCS-ARCHIVE-DROP | 1 | 0 (2 pre-existing stale prose paths) | 0 | 0 / 0 |
 
 **Reading, 2026-09-24 (11 tickets, before ML-RENAME-BIN-ENV).** Independent review pays: 7 defects caught, one of them
 high, against 2 escapes. The lane itself has caught no real error yet and has blocked one
