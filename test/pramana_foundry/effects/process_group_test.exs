@@ -16,9 +16,10 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
   # Real termination and descendant-cleanup behaviour was exercised in the deleted
   # `PramanaFoundry.Checks.RunnerTest` (2026-09-23; FR-10 owns it now, see
   # docs/design/MOVED-KNOWLEDGE-2026-09-23.md) against a process it itself spawned
-  # into its own session. Nothing here ever signals a live pid: a raw `ps`-reported
-  # process group for an arbitrary process could be shared with the test runner's own
-  # BEAM VM, and blindly signalling it would be able to kill the test run itself.
+  # into its own session. Nothing here signals a process group: a raw `ps`-reported
+  # group for an arbitrary process could be the test runner's own BEAM VM. The only
+  # pid signalled is a helper this file spawned, and only after `stop_helper/2`
+  # re-checks its bound identity.
 
   test "identity/1 resolves the current OS process" do
     self_pid = self_os_pid()
