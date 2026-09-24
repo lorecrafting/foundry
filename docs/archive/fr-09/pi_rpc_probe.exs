@@ -361,7 +361,7 @@ defmodule CheckpointF.Probe do
     "AWS_PROFILE" => "synthetic-hostile-profile",
     "GIT_ASKPASS" => "/synthetic/hostile/askpass",
     "HERDR_CONFIG_PATH" => "/synthetic/hostile/herdr.toml",
-    "PRAMANA_OPERATOR_RUNTIME_ROOT" => "/synthetic/hostile/operator-root",
+    "FOUNDRY_OPERATOR_RUNTIME_ROOT" => "/synthetic/hostile/operator-root",
     "PI_PACKAGE_DIR" => "/synthetic/hostile/pi-packages",
     "NODE_OPTIONS" => "--no-warnings",
     "NPM_CONFIG_USERCONFIG" => "/synthetic/hostile/npmrc"

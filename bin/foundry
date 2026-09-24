@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pramana — CLI wrapper for the Foundry manual lane.
+# foundry — CLI wrapper for the Foundry manual lane.
 #
 # Sends argv, encoded as inert data, to the running lane daemon via the release binary's
 # `rpc`, so lane commands execute in the daemon's BEAM (docs/batch-d/LANE-RUNBOOK.md).
@@ -8,8 +8,8 @@
 # Works from both the main repo and worktrees.
 #
 # Usage:
-#   pramana lane status [TICKET] [--json]
-#   pramana lane admit|packet|submit|review|settle|log|integrated|recover ...
+#   foundry lane status [TICKET] [--json]
+#   foundry lane admit|packet|submit|review|settle|log|integrated|recover ...
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FOUNDRY_DIR="$(dirname "$SCRIPT_DIR")"
 
 # `lane` commands go to the lane daemon that bin/foundry-lane starts (its own release and
-# node name), never to a legacy daemon. Explicit PRAMANA_RELEASE and RELEASE_NODE still win.
+# node name), never to a legacy daemon. Explicit FOUNDRY_RELEASE and RELEASE_NODE still win.
 if [ "${1:-}" = "lane" ]; then
   eval "$("$SCRIPT_DIR/foundry-lane" env)"
 fi
@@ -29,13 +29,13 @@ RELEASE_BIN="$FOUNDRY_DIR/_build/prod/rel/foundry/bin/foundry"
 
 # 2. Try env var override. An explicit but invalid override is an error; silently
 # falling back could send a command to a different daemon than the caller chose.
-if [ -n "${PRAMANA_RELEASE:-}" ]; then
-  if [ ! -x "$PRAMANA_RELEASE" ]; then
-    echo "Error: PRAMANA_RELEASE is not executable: $PRAMANA_RELEASE" >&2
+if [ -n "${FOUNDRY_RELEASE:-}" ]; then
+  if [ ! -x "$FOUNDRY_RELEASE" ]; then
+    echo "Error: FOUNDRY_RELEASE is not executable: $FOUNDRY_RELEASE" >&2
     exit 69
   fi
 
-  RELEASE_BIN="$PRAMANA_RELEASE"
+  RELEASE_BIN="$FOUNDRY_RELEASE"
 fi
 
 # 3. Worktree detection via .git file
@@ -72,8 +72,8 @@ if [ ! -x "$RELEASE_BIN" ]; then
   echo "Build it from the root of the main checkout:" >&2
   echo "  MIX_ENV=prod mix release" >&2
   echo "" >&2
-  echo "Or set PRAMANA_RELEASE env var:" >&2
-  echo "  export PRAMANA_RELEASE=/path/to/foundry/_build/prod/rel/foundry/bin/foundry" >&2
+  echo "Or set FOUNDRY_RELEASE env var:" >&2
+  echo "  export FOUNDRY_RELEASE=/path/to/foundry/_build/prod/rel/foundry/bin/foundry" >&2
   exit 1
 fi
 

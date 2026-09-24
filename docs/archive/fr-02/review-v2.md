@@ -18,7 +18,7 @@ relative to `foundry/`:
 
 | File | SHA-256 |
 |---|---|
-| `bin/pramana` | `c1c92fe1c25402d67e0ce6173e196e640e71b47c528878bb164f0318c83e5250` |
+| `bin/foundry` | `c1c92fe1c25402d67e0ce6173e196e640e71b47c528878bb164f0318c83e5250` |
 | `lib/foundry/cli/rpc.ex` | `617fb1dc018a70abb9ffd7f97bc7e886db6d217c16ae06ea15ef233d5829b11d` |
 | `test/foundry/cli/rpc_test.exs` | `083f11bf59e6f3954e168d8f939c0fe9aa8fbb165e59daf66894d7b95d366617` |
 | `test/foundry/rpc_wrapper_test.exs` | `77ccefd68a73ac180723591fbaf3c0075e7c9f8bcb5716061c05c8259ee6e761` |
@@ -96,14 +96,14 @@ COORDINATOR_TICK=0 HERDR_ENV=0 MIX_ENV=test mise exec -- mix test --no-start \
   test/foundry/cli_test.exs --seed 12092026
 # 62 passed
 
-bash -n bin/pramana
+bash -n bin/foundry
 
 mise exec -- mix format --check-formatted \
   lib/foundry/cli/rpc.ex \
   test/foundry/cli/rpc_test.exs \
   test/foundry/rpc_wrapper_test.exs
 
-git diff --check -- bin/pramana lib/foundry/cli/rpc.ex \
+git diff --check -- bin/foundry lib/foundry/cli/rpc.ex \
   test/foundry/cli/rpc_test.exs \
   test/foundry/rpc_wrapper_test.exs
 ```

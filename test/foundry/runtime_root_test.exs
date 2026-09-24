@@ -8,8 +8,8 @@ defmodule Foundry.RuntimeRootTest do
     operator = Application.get_env(:foundry, :operator_runtime_root)
     active = Application.get_env(:foundry, :active_runtime_root)
     resolved = Application.get_env(:foundry, :runtime_root_resolved)
-    override = System.get_env("PRAMANA_RUNTIME_ROOT")
-    fresh = System.get_env("PRAMANA_RUNTIME_ROOT_FRESH")
+    override = System.get_env("FOUNDRY_RUNTIME_ROOT")
+    fresh = System.get_env("FOUNDRY_RUNTIME_ROOT_FRESH")
     test_parent = exclusive_parent!()
 
     Application.delete_env(:foundry, :operator_runtime_root, persistent: true)
@@ -29,15 +29,15 @@ defmodule Foundry.RuntimeRootTest do
       restore_app_env(:operator_runtime_root, operator)
       restore_app_env(:active_runtime_root, active)
       restore_app_env(:runtime_root_resolved, resolved)
-      restore_env("PRAMANA_RUNTIME_ROOT", override)
-      restore_env("PRAMANA_RUNTIME_ROOT_FRESH", fresh)
+      restore_env("FOUNDRY_RUNTIME_ROOT", override)
+      restore_env("FOUNDRY_RUNTIME_ROOT_FRESH", fresh)
     end)
 
     :ok
   end
 
   test "test resolution exclusively creates and publishes a non-PID random root" do
-    System.delete_env("PRAMANA_RUNTIME_ROOT")
+    System.delete_env("FOUNDRY_RUNTIME_ROOT")
     operator = RuntimeRoot.initialize_operator_root!()
     first = RuntimeRoot.resolve_and_publish!(:test, operator)
     second = RuntimeRoot.resolve_and_publish!(:test, operator)
@@ -69,10 +69,10 @@ defmodule Foundry.RuntimeRootTest do
     Application.put_env(:foundry, :runtime_root, operator, persistent: true)
     assert RuntimeRoot.initialize_operator_root!() == operator
 
-    System.put_env("PRAMANA_RUNTIME_ROOT", first)
+    System.put_env("FOUNDRY_RUNTIME_ROOT", first)
     RuntimeRoot.resolve_and_publish!(:test, operator)
 
-    System.put_env("PRAMANA_RUNTIME_ROOT", Path.join(operator, "descendant"))
+    System.put_env("FOUNDRY_RUNTIME_ROOT", Path.join(operator, "descendant"))
     assert_raise ArgumentError, fn -> RuntimeRoot.resolve_and_publish!(:test, operator) end
     assert Application.fetch_env!(:foundry, :operator_runtime_root) == operator
 
@@ -87,7 +87,7 @@ defmodule Foundry.RuntimeRootTest do
     root = Path.join(root_parent, "first")
     on_exit(fn -> File.rm_rf!(root_parent) end)
 
-    System.put_env("PRAMANA_RUNTIME_ROOT", root)
+    System.put_env("FOUNDRY_RUNTIME_ROOT", root)
     RuntimeRoot.resolve_and_publish!(:test, operator)
     assert RuntimeRoot.fetch!() == root
 
@@ -108,18 +108,18 @@ defmodule Foundry.RuntimeRootTest do
     operator = RuntimeRoot.initialize_operator_root!()
 
     for invalid <- ["", "relative/runtime", configured, Path.join(configured, "child")] do
-      System.put_env("PRAMANA_RUNTIME_ROOT", invalid)
+      System.put_env("FOUNDRY_RUNTIME_ROOT", invalid)
       assert_raise ArgumentError, fn -> RuntimeRoot.resolve_and_publish!(:test, operator) end
     end
 
-    System.delete_env("PRAMANA_RUNTIME_ROOT")
-    System.put_env("PRAMANA_RUNTIME_ROOT_FRESH", "1")
+    System.delete_env("FOUNDRY_RUNTIME_ROOT")
+    System.put_env("FOUNDRY_RUNTIME_ROOT_FRESH", "1")
     assert_raise ArgumentError, fn -> RuntimeRoot.resolve_and_publish!(:dev, operator) end
 
     existing = Path.join(parent, "existing")
     File.mkdir!(existing)
-    System.put_env("PRAMANA_RUNTIME_ROOT", existing)
-    System.put_env("PRAMANA_RUNTIME_ROOT_FRESH", "1")
+    System.put_env("FOUNDRY_RUNTIME_ROOT", existing)
+    System.put_env("FOUNDRY_RUNTIME_ROOT_FRESH", "1")
     assert_raise ArgumentError, fn -> RuntimeRoot.resolve_and_publish!(:dev, operator) end
   end
 
@@ -133,7 +133,7 @@ defmodule Foundry.RuntimeRootTest do
 
     Application.put_env(:foundry, :runtime_root, operator, persistent: true)
     immutable_operator = RuntimeRoot.initialize_operator_root!()
-    System.put_env("PRAMANA_RUNTIME_ROOT", Path.join(alias_path, "child"))
+    System.put_env("FOUNDRY_RUNTIME_ROOT", Path.join(alias_path, "child"))
 
     assert_raise ArgumentError, fn ->
       RuntimeRoot.resolve_and_publish!(:test, immutable_operator)
@@ -149,7 +149,7 @@ defmodule Foundry.RuntimeRootTest do
     on_exit(fn -> File.rm_rf!(parent) end)
 
     operator = RuntimeRoot.initialize_operator_root!()
-    System.put_env("PRAMANA_RUNTIME_ROOT", Path.join(left, "child"))
+    System.put_env("FOUNDRY_RUNTIME_ROOT", Path.join(left, "child"))
 
     assert_raise ArgumentError, ~r/symlink cycle/, fn ->
       RuntimeRoot.resolve_and_publish!(:test, operator)
@@ -163,8 +163,8 @@ defmodule Foundry.RuntimeRootTest do
     on_exit(fn -> File.rm_rf!(parent) end)
 
     operator = RuntimeRoot.initialize_operator_root!()
-    System.put_env("PRAMANA_RUNTIME_ROOT", root)
-    System.delete_env("PRAMANA_RUNTIME_ROOT_FRESH")
+    System.put_env("FOUNDRY_RUNTIME_ROOT", root)
+    System.delete_env("FOUNDRY_RUNTIME_ROOT_FRESH")
 
     # A daemon restart deliberately reuses the same explicit root. Exclusivity is
     # then enforced by the lane store's owner lock, not by fresh-root provisioning.

@@ -44,7 +44,7 @@ and any affected contract text is explicitly revised and re-reviewed.
 
 ## Command transport
 
-`bin/pramana` treats every user argument as inert data. It invokes Elixir with those values
+`bin/foundry` treats every user argument as inert data. It invokes Elixir with those values
 only in `System.argv/0`, encodes a bounded versioned JSON envelope as canonical URL-safe
 base64, and sends one fixed `Foundry.CLI.RPC.run/1` expression to the release.
 The daemon rejects malformed, duplicate-key, oversized, non-UTF-8 and NUL-containing
@@ -103,12 +103,12 @@ transcripts, caches, logs, releases, temporary files, worktrees and provider aut
 do not.
 
 The operator runtime root defaults to `local/` in the main checkout (`config/config.exs`;
-`PRAMANA_OPERATOR_RUNTIME_ROOT` overrides it). It is ignored by Git and is fixed when the
+`FOUNDRY_OPERATOR_RUNTIME_ROOT` overrides it). It is ignored by Git and is fixed when the
 release is built from the main checkout; it must never be derived from a task worktree.
 Provider credentials stay in provider-owned locations outside that root.
 
 ## Running
 
 `bin/foundry-lane build|start|stop|status` builds and drives the lane daemon's release; the
-[runbook](docs/batch-d/LANE-RUNBOOK.md) covers its settings, every `bin/pramana lane …`
+[runbook](docs/batch-d/LANE-RUNBOOK.md) covers its settings, every `bin/foundry lane …`
 command and recovery. A node started without `FOUNDRY_MANUAL_LANE=1` starts no children.

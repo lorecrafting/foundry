@@ -4,7 +4,7 @@ defmodule Foundry.CLI.RPC do
 
   The release still exposes a general evaluation command until FR-15a replaces it
   with the protected local command protocol. This module only ensures that arguments
-  sent by `bin/pramana` are data rather than generated Elixir source, and that only a
+  sent by `bin/foundry` are data rather than generated Elixir source, and that only a
   `lane` command the lane's own parser accepts is dispatched: the lane is the only ingress.
   """
 

@@ -3,7 +3,7 @@
 #
 # The lane daemon runs ManualLane.Server alone on its own
 # release build, node name and runtime root. FOUNDRY_MANUAL_LANE=1 is what makes the node a daemon.
-# Every setting below can be overridden from the environment. `bin/pramana lane …` reads
+# Every setting below can be overridden from the environment. `bin/foundry lane …` reads
 # the same settings through `foundry-lane env`.
 #
 # Usage: foundry-lane build|start|stop|status|env
@@ -13,19 +13,19 @@ set -euo pipefail
 FOUNDRY_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 : "${FOUNDRY_LANE_BUILD:=/private/tmp/foundry-lane-build}"
-: "${PRAMANA_RELEASE:=$FOUNDRY_LANE_BUILD/rel/foundry/bin/foundry}"
+: "${FOUNDRY_RELEASE:=$FOUNDRY_LANE_BUILD/rel/foundry/bin/foundry}"
 : "${RELEASE_NODE:=foundry_lane}"
-: "${PRAMANA_RUNTIME_ROOT:=$HOME/.local/state/foundry-lane}"
+: "${FOUNDRY_RUNTIME_ROOT:=$HOME/.local/state/foundry-lane}"
 : "${FOUNDRY_MANUAL_LANE_REPO:=$FOUNDRY_DIR}"
 : "${FOUNDRY_MANUAL_LANE_POLICY:=$FOUNDRY_DIR/docs/batch-d/lane-policy.example.json}"
 FOUNDRY_MANUAL_LANE=1
-VARS="FOUNDRY_LANE_BUILD PRAMANA_RELEASE RELEASE_NODE PRAMANA_RUNTIME_ROOT FOUNDRY_MANUAL_LANE
+VARS="FOUNDRY_LANE_BUILD FOUNDRY_RELEASE RELEASE_NODE FOUNDRY_RUNTIME_ROOT FOUNDRY_MANUAL_LANE
 FOUNDRY_MANUAL_LANE_REPO FOUNDRY_MANUAL_LANE_POLICY"
 # shellcheck disable=SC2086
 export $VARS
 
 need_release() {
-  [ -x "$PRAMANA_RELEASE" ] || { echo "no lane release at $PRAMANA_RELEASE; run: $0 build" >&2; exit 69; }
+  [ -x "$FOUNDRY_RELEASE" ] || { echo "no lane release at $FOUNDRY_RELEASE; run: $0 build" >&2; exit 69; }
 }
 
 case "${1:-}" in
@@ -38,13 +38,13 @@ case "${1:-}" in
     ;;
   start)
     need_release
-    if "$PRAMANA_RELEASE" pid >/dev/null 2>&1; then echo "lane daemon already running" >&2; exit 0; fi
-    mkdir -p "$PRAMANA_RUNTIME_ROOT"
-    "$PRAMANA_RELEASE" daemon
+    if "$FOUNDRY_RELEASE" pid >/dev/null 2>&1; then echo "lane daemon already running" >&2; exit 0; fi
+    mkdir -p "$FOUNDRY_RUNTIME_ROOT"
+    "$FOUNDRY_RELEASE" daemon
     for _ in $(seq 30); do
-      if "$PRAMANA_RELEASE" pid >/dev/null 2>&1; then
+      if "$FOUNDRY_RELEASE" pid >/dev/null 2>&1; then
         # Up is up: a refused status (gateway_recovery, say) is reported, not a failed start.
-        "$FOUNDRY_DIR/bin/pramana" lane status || echo "lane daemon is up but not ready; see LANE-RUNBOOK.md" >&2
+        "$FOUNDRY_DIR/bin/foundry" lane status || echo "lane daemon is up but not ready; see LANE-RUNBOOK.md" >&2
         exit 0
       fi
       sleep 1
@@ -54,12 +54,12 @@ case "${1:-}" in
     ;;
   stop)
     need_release
-    "$PRAMANA_RELEASE" stop
+    "$FOUNDRY_RELEASE" stop
     ;;
   status)
     need_release
-    echo "node $RELEASE_NODE pid $("$PRAMANA_RELEASE" pid)"
-    exec "$FOUNDRY_DIR/bin/pramana" lane status
+    echo "node $RELEASE_NODE pid $("$FOUNDRY_RELEASE" pid)"
+    exec "$FOUNDRY_DIR/bin/foundry" lane status
     ;;
   *)
     echo "usage: $0 build|start|stop|status|env" >&2

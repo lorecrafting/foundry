@@ -208,7 +208,7 @@ review does not claim a new independent redownload/verification of every Hex pac
 Commands ran from the candidate `foundry/` using `mise exec --`, with
 `MIX_ENV=test`, `MIX_BUILD_PATH=/private/tmp/fr07-v6-review.MmDty1/build`,
 `TMPDIR=/private/tmp/fr07-v6-review.MmDty1`, `COORDINATOR_TICK=0`, and HERDR_ENV,
-PRAMANA_OPERATOR_RUNTIME_ROOT and PRAMANA_RUNTIME_ROOT removed from the environment.
+FOUNDRY_OPERATOR_RUNTIME_ROOT and FOUNDRY_RUNTIME_ROOT removed from the environment.
 
 - `mix compile --force --warnings-as-errors`: exit 0; 90 project files compiled.
 - `mix test test/foundry/durable_store test/foundry/legacy_persistence_containment_test.exs test/foundry/effects/checkpoint_test.exs --seed 9119`:

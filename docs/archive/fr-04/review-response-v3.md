@@ -44,8 +44,8 @@ those effects rather than calling Tick alone.
 ## Isolated evidence
 
 Every run used fresh TMPDIR/operator roots, explicit Elixir 1.20.3 / OTP 29 paths,
-and unset `HERDR_ENV`, `COORDINATOR_TICK`, `PRAMANA_RUNTIME_ROOT` and
-`PRAMANA_RUNTIME_ROOT_FRESH`. Fixtures were model-free; no real Herdr, provider,
+and unset `HERDR_ENV`, `COORDINATOR_TICK`, `FOUNDRY_RUNTIME_ROOT` and
+`FOUNDRY_RUNTIME_ROOT_FRESH`. Fixtures were model-free; no real Herdr, provider,
 daemon, pane, credential, model, production state or activation was accessed.
 
 ```text

@@ -8,7 +8,7 @@ Candidate fd208d104236c28472ec1b943975b1a9ee014770 (4 commits) on base
 ~/.local/state/foundry-lane were not touched.
 
 ## Scope
-`git diff --stat 5fb7603 HEAD`: bin/pramana (usage line), docs/batch-d/LANE-RUNBOOK.md,
+`git diff --stat 5fb7603 HEAD`: bin/foundry (usage line), docs/batch-d/LANE-RUNBOOK.md,
 lib/foundry/manual_lane/cli.ex, lib/foundry/manual_lane/log.ex,
 test/foundry/manual_lane/cli_test.exs. Nothing under
 lib/foundry/durable_store or lib/foundry/workflow. All within the packet's

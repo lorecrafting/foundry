@@ -135,13 +135,13 @@ Common environment used explicit installed paths:
 ```sh
 PATH=/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin:/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin:/opt/homebrew/bin:/usr/bin:/bin
 TMPDIR=/tmp/fr03-review.EojoVXnQ
-PRAMANA_RUNTIME_ROOT_FRESH=1
+FOUNDRY_RUNTIME_ROOT_FRESH=1
 ```
 
 Every execution cleared `HERDR_ENV` and `COORDINATOR_TICK`. The two test/probe
 application roots were respectively `focused-runtime` and `adversarial-runtime`
 beneath that private parent; neither existed before its startup. Both used
-`MIX_ENV=test` and `PRAMANA_STARTUP_MODE=client`; Application intentionally chooses
+`MIX_ENV=test` and `FOUNDRY_STARTUP_MODE=client`; Application intentionally chooses
 the isolated test stack in test mode. The independent adversarial script explicitly
 configured `/nonexistent/fr03-review-herdr`. The supplied focused test boot still
 printed the configured Herdr executable, but did not invoke it: empty initial

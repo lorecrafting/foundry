@@ -175,8 +175,8 @@ call-site inventory.
 
 All executable probes used fresh `mktemp -d /tmp/pramana-fr04-review*.XXXXXX`
 parents, separate child TMPDIR, explicit separate
-`PRAMANA_OPERATOR_RUNTIME_ROOT`, `MIX_ENV=test`, and unset `HERDR_ENV`,
-`COORDINATOR_TICK`, `PRAMANA_RUNTIME_ROOT`, `PRAMANA_RUNTIME_ROOT_FRESH`.
+`FOUNDRY_OPERATOR_RUNTIME_ROOT`, `MIX_ENV=test`, and unset `HERDR_ENV`,
+`COORDINATOR_TICK`, `FOUNDRY_RUNTIME_ROOT`, `FOUNDRY_RUNTIME_ROOT_FRESH`.
 PATH was pinned to installed Elixir `1.20.3-otp-29`, Erlang `29.0.5`, `/usr/bin`
 and `/bin`. `elixir --version` reported Elixir 1.20.3 / OTP 29, erts-17.0.5.
 

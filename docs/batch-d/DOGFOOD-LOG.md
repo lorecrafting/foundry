@@ -2,7 +2,7 @@
 
 The operator's running record of Foundry work driven through the manual lane
 ([runbook](LANE-RUNBOOK.md)). One entry per ticket, then the frictions found in the lane,
-its tooling or the runbook. The lane store is the authoritative trail (`bin/pramana lane
+its tooling or the runbook. The lane store is the authoritative trail (`bin/foundry lane
 log`); this log records what the operator saw and decided.
 
 Roles: operator = an LLM session (Claude Opus 5.5); developer = a worktree agent
@@ -57,13 +57,13 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q4 | `Preparation`'s `@database_checks` (`ecto.create`) are Pramāṇa-project checks with no Foundry caller: delete, or keep for project profiles? | open |
 | Q5 | Clean-room sweep Q1–Q12 ([sweep](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#7-operator-questions)) | **Decided 2026-09-23:** delete the legacy daemon stack and amend the plan ([C1–C4](../REPAIR-PLAN.md#clean-room-amendment)); archive FR-15aA; retire H0 + legacy import, Relocation, FR-19A sync-EIO, Assessor; operator hygiene done (legacy `local/`, `handoffs/`, `ci-artifacts/` removed; 3 worktrees, 2 merged branches and 12 `archive/2026-09-20/*` tags deleted). Q2–Q4 above become moot with the deletions |
 | Q6 | FR-23b renames: do dated records (`docs/archive`, reviews, fr-08 evidence, this log) keep the old names? | **Decided 2026-09-24: rewrite everything**; only references to the Pramāṇa repository keep the name |
-| Q7 | Do `PRAMANA_*` and `bin/pramana` keep working as aliases after the rename? | **Decided 2026-09-24: hard rename, no aliases** |
+| Q7 | Do the Pramāṇa-era env names and wrapper keep working as aliases after the rename? | **Decided 2026-09-24: hard rename, no aliases** |
 
 ## Frictions
 
 | # | Where | What happened | Candidate fix |
 |---|---|---|---|
-| F1 | `bin/pramana lane …` | Every command prints the daemon's `[info] lane <cmd> started/finished` log lines around its result, so output needs filtering before it can be read or parsed | keep lane command logging off the RPC client's stdout, or only at debug |
+| F1 | `bin/foundry lane …` | Every command prints the daemon's `[info] lane <cmd> started/finished` log lines around its result, so output needs filtering before it can be read or parsed | keep lane command logging off the RPC client's stdout, or only at debug |
 | F2 | `.github/workflows/foundry-ci.yml`, AGENTS.md | CI runs only on pushes to `main` and on pull requests, but AGENTS.md said every push; a pushed branch got no run, so Linux CI needs a PR before `main` moves | AGENTS.md corrected; operator opens a PR per integration batch |
 | F3 | GitHub CI | The handoff expected one known Linux failure; there were 107 (hardcoded `/private/tmp`, `/bin/zsh`). Linux runs 1229 tests against macOS's 1232: the three darwin-only filesystem tests in `operational_storage_test.exs:489` | fixed in `f8e6b44`; conventions now forbid both |
 | F4 | reviewer briefs | Reviewers ran tests in the developer's candidate worktree; one used `git checkout -- .` for a red control (brief forbids it). Nothing uncommitted was lost, but a reviewer can alter the checkout the lane recorded | give each reviewer its own detached worktree at the candidate |

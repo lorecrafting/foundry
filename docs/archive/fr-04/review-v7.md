@@ -43,7 +43,7 @@ V7_CAPTURE: %{close: false, start: false, resource_events: 0, marker: false}
 
 ### Reproduction
 
-Run from `foundry/` with a fresh `mktemp -d /tmp/pramana-fr04-v7-capture.XXXXXX` root, its own `tmp`, operator and runtime subdirectories, pinned Elixir `1.20.3-otp-29` / Erlang `29.0.5` PATH, `MIX_ENV=dev`, `PRAMANA_STARTUP_MODE=daemon`, `PRAMANA_RUNTIME_ROOT_FRESH=1`, `FR04_SHUTDOWN_MODE=success`, and unset `HERDR_ENV` / `COORDINATOR_TICK`. This starts only the isolated application fixture, not the live daemon.
+Run from `foundry/` with a fresh `mktemp -d /tmp/pramana-fr04-v7-capture.XXXXXX` root, its own `tmp`, operator and runtime subdirectories, pinned Elixir `1.20.3-otp-29` / Erlang `29.0.5` PATH, `MIX_ENV=dev`, `FOUNDRY_STARTUP_MODE=daemon`, `FOUNDRY_RUNTIME_ROOT_FRESH=1`, `FR04_SHUTDOWN_MODE=success`, and unset `HERDR_ENV` / `COORDINATOR_TICK`. This starts only the isolated application fixture, not the live daemon.
 
 Execute via `mix run --no-start -e`, evaluating the existing runtime fixture prefix before its `{:ok, agent_pid} = DynamicSupervisor.start_child` line, followed by:
 

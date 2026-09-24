@@ -1,7 +1,7 @@
 import Config
 
 operator_runtime_root =
-  System.get_env("PRAMANA_OPERATOR_RUNTIME_ROOT") ||
+  System.get_env("FOUNDRY_OPERATOR_RUNTIME_ROOT") ||
     if config_env() == :test do
       Path.join(System.tmp_dir!(), "pramana-foundry-test-operator")
     else

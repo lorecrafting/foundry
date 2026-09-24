@@ -233,7 +233,7 @@ Reproduce from `foundry/`, with the pinned toolchain on PATH:
 ```sh
 TMPDIR=/private/tmp MIX_ENV=test mix run --no-start docs/fr-08/atomic-composition-review-probes.exs
 TMPDIR=/private/tmp mix test --no-start test/foundry/durable_store/atomic_bundle_test.exs --seed 92021
-TMPDIR=/private/tmp COORDINATOR_TICK=0 PRAMANA_RUNTIME_ROOT_FRESH=1 PRAMANA_OPERATOR_RUNTIME_ROOT=/private/tmp/fr08a-atomic-independent-operator mix test test/foundry/durable_store test/foundry/repair test/foundry/legacy_persistence_containment_test.exs --seed 92023
+TMPDIR=/private/tmp COORDINATOR_TICK=0 FOUNDRY_RUNTIME_ROOT_FRESH=1 FOUNDRY_OPERATOR_RUNTIME_ROOT=/private/tmp/fr08a-atomic-independent-operator mix test test/foundry/durable_store test/foundry/repair test/foundry/legacy_persistence_containment_test.exs --seed 92023
 ```
 
 The probe reuses the frozen maintained fixture and appends independent assertions;

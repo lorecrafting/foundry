@@ -74,8 +74,8 @@ replay, queued-entry and competing-ticket tests cover these cases.
 ## Isolated evidence
 
 All executable runs used fresh roots/TMPDIR, an explicit separate operator root,
-unset `HERDR_ENV`, `COORDINATOR_TICK`, `PRAMANA_RUNTIME_ROOT` and
-`PRAMANA_RUNTIME_ROOT_FRESH`, and PATH pinned to Elixir 1.20.3 / OTP 29. No real
+unset `HERDR_ENV`, `COORDINATOR_TICK`, `FOUNDRY_RUNTIME_ROOT` and
+`FOUNDRY_RUNTIME_ROOT_FRESH`, and PATH pinned to Elixir 1.20.3 / OTP 29. No real
 Herdr, provider, daemon, pane, credential, model or activation was used.
 
 ```text

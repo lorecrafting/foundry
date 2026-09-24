@@ -92,13 +92,13 @@ as positive lifecycle evidence.
 Pinned Elixir 1.20.3 / OTP 29.0.5, from candidate `foundry/`, with prefix:
 
 ```sh
-env -u HERDR_ENV -u PRAMANA_RUNTIME_ROOT -u PRAMANA_STARTUP_MODE \
+env -u HERDR_ENV -u FOUNDRY_RUNTIME_ROOT -u FOUNDRY_STARTUP_MODE \
   MIX_ENV=test \
   MIX_DEPS_PATH=/private/tmp/pramana-foundry-ci-VAYKRbmQCUqdoK6-TuKHEdj9/deps \
   MIX_BUILD_PATH=/private/tmp/pramana-h0-rereview.ndRSLU/build \
   TMPDIR=/private/tmp/pramana-h0-rereview.ndRSLU \
-  PRAMANA_OPERATOR_RUNTIME_ROOT=/private/tmp/pramana-h0-rereview.ndRSLU/operator \
-  PRAMANA_RUNTIME_ROOT_FRESH=1 COORDINATOR_TICK=0 mise exec --
+  FOUNDRY_OPERATOR_RUNTIME_ROOT=/private/tmp/pramana-h0-rereview.ndRSLU/operator \
+  FOUNDRY_RUNTIME_ROOT_FRESH=1 COORDINATOR_TICK=0 mise exec --
 ```
 
 Build/runtime roots were fresh; existing dependency sources were reused.

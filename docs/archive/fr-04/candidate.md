@@ -57,8 +57,8 @@ live daemon, live pane, credentials or production state was touched.
 
 Every Mix command used explicit installed Elixir 1.20.3/OTP 29 paths, a newly
 `mktemp -d` parent and separate `TMPDIR`; it unset `HERDR_ENV`,
-`COORDINATOR_TICK`, `PRAMANA_RUNTIME_ROOT` and
-`PRAMANA_RUNTIME_ROOT_FRESH`. No command used Herdr or a model.
+`COORDINATOR_TICK`, `FOUNDRY_RUNTIME_ROOT` and
+`FOUNDRY_RUNTIME_ROOT_FRESH`. No command used Herdr or a model.
 
 Toolchain:
 

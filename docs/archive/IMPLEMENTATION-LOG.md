@@ -291,7 +291,7 @@ latest prose here, remains authoritative for status and dependencies.
 - Implementer: `/root/fr02_investigate` (Sol-medium), base HEAD
   `7aecf31c541ab1b1f3de4045ac3c487f6ef0708f`. Ownership remained disjoint from
   dirty CLI/Coordinator files.
-- Exact hashes: `bin/pramana`
+- Exact hashes: `bin/foundry`
   `e836621bc5d92c152f7eed2f3c00a4fb93d30b55460955abdc953704a3383e54`;
   `lib/foundry/cli/rpc.ex`
   `eec9bec3224207dec43df31fcc0620aae2f071572305c6b37f119bf9d7df4c59`;
@@ -330,7 +330,7 @@ latest prose here, remains authoritative for status and dependencies.
 
 ### FR-02 candidate v2 — frozen correction
 
-- Exact hashes: `bin/pramana`
+- Exact hashes: `bin/foundry`
   `c1c92fe1c25402d67e0ce6173e196e640e71b47c528878bb164f0318c83e5250`;
   RPC module `617fb1dc018a70abb9ffd7f97bc7e886db6d217c16ae06ea15ef233d5829b11d`;
   RPC test `083f11bf59e6f3954e168d8f939c0fe9aa8fbb165e59daf66894d7b95d366617`;
@@ -377,7 +377,7 @@ latest prose here, remains authoritative for status and dependencies.
 ### FR-02
 
 - `/root/fr02_investigate` confirmed a disjoint implementation can own only
-  `bin/pramana`, a new inert RPC decoder/dispatcher module, and new wrapper-boundary
+  `bin/foundry`, a new inert RPC decoder/dispatcher module, and new wrapper-boundary
   tests. The current `cli.ex` SHA-256 is
   `27728e8be65d71ba482ed97bb73700546ebafa85caed6a5d5e3fe7a73240beed`;
   its sole pre-existing `ticket unblock` diff remains excluded.

@@ -142,7 +142,7 @@ startup. Fake-runner tests retain their existing fake adapter identities.
 The explicit PATH began with installed Elixir `1.20.3-otp-29/bin` and Erlang `29.0.5/bin`
 under `/Users/raymondluong/.local/share/mise/installs`, followed by
 `/opt/homebrew/bin:/usr/bin:/bin`. Main test runs used `MIX_ENV=test`, explicit private
-operator/active roots and `PRAMANA_RUNTIME_ROOT_FRESH=1`. Tests were invoked with:
+operator/active roots and `FOUNDRY_RUNTIME_ROOT_FRESH=1`. Tests were invoked with:
 
 ```elixir
 Application.load(:foundry)

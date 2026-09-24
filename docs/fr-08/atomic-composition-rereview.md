@@ -111,7 +111,7 @@ Commands, from `foundry/`, were:
 ```sh
 TMPDIR=/private/tmp MIX_ENV=test mix run --no-start docs/fr-08/atomic-composition-review-probes.exs
 TMPDIR=/private/tmp MIX_ENV=test mix run --no-start docs/fr-08/atomic-composition-rereview-probes.exs
-TMPDIR=/private/tmp COORDINATOR_TICK=0 PRAMANA_RUNTIME_ROOT_FRESH=1 PRAMANA_OPERATOR_RUNTIME_ROOT=/private/tmp/fr08a-rereview-operator mix test test/foundry/durable_store test/foundry/repair test/foundry/legacy_persistence_containment_test.exs --seed 92031
+TMPDIR=/private/tmp COORDINATOR_TICK=0 FOUNDRY_RUNTIME_ROOT_FRESH=1 FOUNDRY_OPERATOR_RUNTIME_ROOT=/private/tmp/fr08a-rereview-operator mix test test/foundry/durable_store test/foundry/repair test/foundry/legacy_persistence_containment_test.exs --seed 92031
 ```
 
 Inspected canonical `/private/tmp/fr08a-corrected-ci.mX2sOJ/provenance.json`: clean

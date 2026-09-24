@@ -67,7 +67,7 @@ Context, not requirements:
 
 ## 3. The live path today
 
-**How a human would try it.** Start the release. `bin/pramana ticket create …` runs, then
+**How a human would try it.** Start the release. `bin/foundry ticket create …` runs, then
 `handoff submit`, then `review submit`. The RPC allowlist admits exactly these shapes plus
 `ticket status`, `ticket list` and `ticket integrate` (`lib/foundry/cli/rpc.ex:127-151`).
 
@@ -107,7 +107,7 @@ Context, not requirements:
   `accepted_revision` (`cli.ex:362-363`), so a packet could name a stale base silently.
 - **Reviewer independence on the legacy path is a random ID minted by the controller** (O0 U6, `:244`).
 - **`ticket unblock` exists in the CLI** (`cli.ex:516`) but is not in the RPC allowlist, so
-  `bin/pramana` cannot reach it. On the legacy path it would zero `launch_retries` (O0 C13).
+  `bin/foundry` cannot reach it. On the legacy path it would zero `launch_retries` (O0 C13).
 
 **Stale operator documentation.** The memory note tells each session to read
 `foundry/roles/steerer.md`. That file drives `bin/pramana-supervisor`, `automation/RUNBOOK.md`,

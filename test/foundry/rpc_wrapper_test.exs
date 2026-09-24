@@ -3,7 +3,7 @@ defmodule Foundry.RPCWrapperTest do
 
   alias Foundry.CLI.RPC
 
-  @wrapper Path.expand("../../bin/pramana", __DIR__)
+  @wrapper Path.expand("../../bin/foundry", __DIR__)
   @rpc_pattern ~r/\AFoundry\.CLI\.RPC\.run\("([A-Za-z0-9_-]+)"\)\z/
 
   setup do
@@ -142,7 +142,7 @@ defmodule Foundry.RPCWrapperTest do
                  {"RPC_WRAPPER", @wrapper},
                  {"RPC_STDOUT_CAPTURE", stdout_capture},
                  {"RPC_STDERR_CAPTURE", stderr_capture},
-                 {"PRAMANA_RELEASE", ctx.fake_release},
+                 {"FOUNDRY_RELEASE", ctx.fake_release},
                  {"RPC_CAPTURE", ctx.capture},
                  {"RPC_STDOUT", stdout},
                  {"RPC_STDERR", stderr},
@@ -191,7 +191,7 @@ defmodule Foundry.RPCWrapperTest do
       System.cmd(@wrapper, ["ticket", "list"],
         env: [
           {"PATH", tool_dir},
-          {"PRAMANA_RELEASE", ctx.fake_release},
+          {"FOUNDRY_RELEASE", ctx.fake_release},
           {"RPC_CAPTURE", ctx.capture},
           {"RPC_FORGED_TOKEN", forged_token},
           {"RPC_RECORD_DISPATCH", "1"},
@@ -221,7 +221,7 @@ defmodule Foundry.RPCWrapperTest do
       System.cmd(@wrapper, ["ticket", "list"],
         env: [
           {"PATH", tool_dir},
-          {"PRAMANA_RELEASE", ctx.fake_release},
+          {"FOUNDRY_RELEASE", ctx.fake_release},
           {"RPC_CAPTURE", ctx.capture}
         ],
         stderr_to_stdout: true
@@ -239,7 +239,7 @@ defmodule Foundry.RPCWrapperTest do
       System.cmd(@wrapper, ["ticket", "list"],
         env: [
           {"PATH", tool_dir},
-          {"PRAMANA_RELEASE", ctx.fake_release},
+          {"FOUNDRY_RELEASE", ctx.fake_release},
           {"RPC_CAPTURE", ctx.capture}
         ],
         stderr_to_stdout: true
@@ -253,11 +253,11 @@ defmodule Foundry.RPCWrapperTest do
 
   test "an explicit invalid release override fails instead of falling back", ctx do
     missing = Path.join(ctx.root, "missing-release")
-    expected = "Error: PRAMANA_RELEASE is not executable: #{missing}\n"
+    expected = "Error: FOUNDRY_RELEASE is not executable: #{missing}\n"
 
     assert {^expected, 69} =
              System.cmd(@wrapper, ["ticket", "list"],
-               env: [{"PRAMANA_RELEASE", missing}],
+               env: [{"FOUNDRY_RELEASE", missing}],
                stderr_to_stdout: true
              )
   end
@@ -267,7 +267,7 @@ defmodule Foundry.RPCWrapperTest do
 
     System.cmd(@wrapper, argv,
       env: [
-        {"PRAMANA_RELEASE", ctx.fake_release},
+        {"FOUNDRY_RELEASE", ctx.fake_release},
         {"RPC_CAPTURE", ctx.capture}
         | extra_env
       ],

@@ -180,10 +180,10 @@ ticket attempting admission while a dead execution retains unresolved resources.
 ## Independent verification
 
 Every executable run used a fresh `mktemp -d /tmp/pramana-fr04-v2-*.XXXXXX`
-parent, separate TMPDIR and explicit separate PRAMANA_OPERATOR_RUNTIME_ROOT.
+parent, separate TMPDIR and explicit separate FOUNDRY_OPERATOR_RUNTIME_ROOT.
 PATH was pinned to installed Elixir `1.20.3-otp-29`, Erlang `29.0.5`, `/usr/bin`
-and `/bin`; MIX_ENV=test. HERDR_ENV, COORDINATOR_TICK, PRAMANA_RUNTIME_ROOT and
-PRAMANA_RUNTIME_ROOT_FRESH were unset. No source/test edits or commit were made.
+and `/bin`; MIX_ENV=test. HERDR_ENV, COORDINATOR_TICK, FOUNDRY_RUNTIME_ROOT and
+FOUNDRY_RUNTIME_ROOT_FRESH were unset. No source/test edits or commit were made.
 
 ```text
 git rev-parse HEAD

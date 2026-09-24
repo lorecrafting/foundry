@@ -90,7 +90,7 @@
       "sha256": "645aeb3b40419ac87486a4cdfb456e17304fbfe3712ec85acce70825f5b89d75"
     },
     {
-      "path": "foundry/bin/pramana",
+      "path": "foundry/bin/foundry",
       "category": "executable entry point",
       "inspection": "Source review; production wrapper and live scripts not launched against live work",
       "bytes": 3433,

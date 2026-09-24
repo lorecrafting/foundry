@@ -1734,7 +1734,7 @@ acceptance remains FR-22. Candidate hashes and the review chain are retained in
 [IMPLEMENTATION-LOG.md](archive/IMPLEMENTATION-LOG.md).
 
 2026-09-12, FR-02: Elixir-only candidate v2 received an independent
-[PASS](archive/fr-02/review-v2.md). `bin/pramana` now transports user argv as a bounded,
+[PASS](archive/fr-02/review-v2.md). `bin/foundry` now transports user argv as a bounded,
 versioned JSON envelope inside canonical URL-safe base64 to one fixed RPC expression;
 the daemon-side decoder rejects duplicate keys, malformed/oversized/noncanonical data,
 NUL and unknown command shapes before dispatch. Actual-wrapper tests preserve literal

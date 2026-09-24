@@ -77,8 +77,8 @@ ordinary dispatch after restart without implementing FR-10 reconciliation.
 ## Isolated evidence
 
 All Mix commands used a fresh `mktemp -d` parent, separate `TMPDIR`, explicit
-`PRAMANA_OPERATOR_RUNTIME_ROOT`, unset `HERDR_ENV`, `COORDINATOR_TICK`,
-`PRAMANA_RUNTIME_ROOT` and `PRAMANA_RUNTIME_ROOT_FRESH`, and PATH pinned to Elixir
+`FOUNDRY_OPERATOR_RUNTIME_ROOT`, unset `HERDR_ENV`, `COORDINATOR_TICK`,
+`FOUNDRY_RUNTIME_ROOT` and `FOUNDRY_RUNTIME_ROOT_FRESH`, and PATH pinned to Elixir
 1.20.3 / OTP 29. No real Herdr, provider, daemon, pane, process signal, credentials,
 model or activation was used.
 

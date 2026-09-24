@@ -50,7 +50,7 @@ defmodule Foundry.CITest do
     assert environment["MIX_BUILD_PATH"] == Path.join(first, "build")
     assert environment["MIX_DEPS_PATH"] == Path.join(first, "deps")
     assert environment["TMPDIR"] == Path.join(first, "tmp")
-    assert environment["PRAMANA_RUNTIME_ROOT"] == nil
+    assert environment["FOUNDRY_RUNTIME_ROOT"] == nil
     assert environment["COORDINATOR_TICK"] == nil
     assert environment["HERDR_ENV"] == nil
   end

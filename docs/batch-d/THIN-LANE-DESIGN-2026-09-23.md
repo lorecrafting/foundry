@@ -254,7 +254,7 @@ path, as in `decide_e2e_test.exs:22-37`.
 ## 4. T5: the manual-lane CLI
 
 `Foundry.ManualLane.CLI` is a new file, `manual_lane/cli.ex`, invoked as
-`bin/pramana lane <cmd> …`.
+`bin/foundry lane <cmd> …`.
 
 - **Routing.** `CLI.RPC.run/1` (`cli/rpc.ex:29-34`) routes argv that begins with `"lane"` to
   `ManualLane.CLI.main/1` instead of `CLI.main/1`. `validate_command_shape` (`:127-152`) gains

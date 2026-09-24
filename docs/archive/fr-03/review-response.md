@@ -95,7 +95,7 @@ The original 13-file candidate remains owned. Review correction additionally own
 - `test/foundry/coordinator_test.exs`
 - `docs/fr-03/review-response.md`
 
-The config change permits an explicit `PRAMANA_OPERATOR_RUNTIME_ROOT` for isolated
+The config change permits an explicit `FOUNDRY_OPERATOR_RUNTIME_ROOT` for isolated
 validation while preserving the existing production default. Every executed test
 set both immutable operator and active roots beneath a newly exclusive `/tmp`
 parent, cleared `HERDR_ENV` and `COORDINATOR_TICK`, and used the pinned toolchain

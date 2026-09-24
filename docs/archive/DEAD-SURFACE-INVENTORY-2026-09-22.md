@@ -65,7 +65,7 @@ over every caller surface found the sites listed below. None of them reaches a F
 - The `FR08HandoffGate` provider probe at `fr08_handoff_gate.ex:149`.
 - `String.to_atom` on relocation step kinds, and `Import.read/2` with
   `String.to_existing_atom` in `cli.ex:565`.
-- The release `rpc` in `bin/pramana`. It evaluates only the fixed string
+- The release `rpc` in `bin/foundry`. It evaluates only the fixed string
   `Foundry.CLI.RPC.run("…")`.
 - The escript `main_module` and the application `mod` in `mix.exs`.
 
@@ -87,7 +87,7 @@ defined under `lib/`.
 |---|---|---|---|---|
 | `lib/foundry/assessor/result.ex:89` | `Assessor.Result.statuses/0` | xref edges: none. `rg -nwF statuses lib test bin ci config mix.exs ../bin rel` finds only the `@statuses` attribute (line 12), this def and the `when status in @statuses` guard (line 91). Every other hit is a local variable in `workflow/kernel.ex` or test prose. No `Result.statuses` or `:statuses` appears anywhere | The assessor adapter is chosen dynamically (`assessor.ex:20`), but the dispatch goes to `assess/2`, not to this function | FREE |
 | `lib/foundry/assignments/handoff.ex:96` | `Assignments.Handoff.max_blocked_bytes/0` | xref edges: none. `rg -nwF max_blocked_bytes …` gives 1 hit, the def itself. The attribute `@max_blocked_handoff_bytes` stays in use inside the module | No atom, `apply` or reflection. Note: the file sits on the handoff ingress that FR-08B and FR-11 will touch. Removing the accessor changes no behaviour | FREE |
-| `lib/foundry/board.ex:118` | `Board.inspection/0,1` (one def with a default) | xref edges: none. `rg -nwF inspection …` finds prose, test names and this def. `rg -n 'Board\.inspection'` over the whole repo, docs included, finds nothing | The CLI and `bin/pramana` RPC table don't dispatch it. It is reachable only by a hand-typed remote-shell call, and none is documented. Not a GenServer message | FREE |
+| `lib/foundry/board.ex:118` | `Board.inspection/0,1` (one def with a default) | xref edges: none. `rg -nwF inspection …` finds prose, test names and this def. `rg -n 'Board\.inspection'` over the whole repo, docs included, finds nothing | The CLI and `bin/foundry` RPC table don't dispatch it. It is reachable only by a hand-typed remote-shell call, and none is documented. Not a GenServer message | FREE |
 | `lib/foundry/board.ex:125` | `Board.inspection_status/0,1` | xref edges: none. `rg -nwF inspection_status …` gives 1 hit, the def | Same as the row above | FREE |
 
 **Removed 2026-09-22 (FR-23a).** `Board.inspection/0,1`, `Board.inspection_status/0,1`

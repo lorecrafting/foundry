@@ -72,7 +72,7 @@ owned remote effects and lifecycle recovery remain downstream work.
 Fresh private parent: `/tmp/fr03-integration-attest.pNhJCWoy`, created with
 `mktemp -d`. TMPDIR used that parent; explicit operator and active roots were
 its previously nonexistent `operator` and `runtime` children.
-`PRAMANA_RUNTIME_ROOT_FRESH=1`, `MIX_ENV=test`; `HERDR_ENV` and
+`FOUNDRY_RUNTIME_ROOT_FRESH=1`, `MIX_ENV=test`; `HERDR_ENV` and
 `COORDINATOR_TICK` were removed. PATH began with the installed
 `/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin` and
 `/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin`, followed by

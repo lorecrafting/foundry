@@ -12,8 +12,8 @@ defmodule Foundry.RuntimeRoot do
   @operator_key :operator_runtime_root
   @active_key :active_runtime_root
   @resolved_key :runtime_root_resolved
-  @override "PRAMANA_RUNTIME_ROOT"
-  @fresh "PRAMANA_RUNTIME_ROOT_FRESH"
+  @override "FOUNDRY_RUNTIME_ROOT"
+  @fresh "FOUNDRY_RUNTIME_ROOT_FRESH"
   @random_bytes 16
   @max_symlink_hops 40
 

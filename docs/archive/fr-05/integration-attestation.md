@@ -42,7 +42,7 @@ inspection); no root file was modified. Both detached/candidate worktrees were c
 Ran in integrated `foundry/` with an allowlisted `env -i` environment preserving HOME,
 PATH beginning with the installed Elixir `1.20.3-otp-29/bin` and Erlang `29.0.5/bin`,
 then system binaries. Used `TMPDIR=/tmp/fr05-integration-review.tOEgEw`,
-`PRAMANA_RUNTIME_ROOT=$TMPDIR/runtime`, `PRAMANA_RUNTIME_ROOT_FRESH=1`,
+`FOUNDRY_RUNTIME_ROOT=$TMPDIR/runtime`, `FOUNDRY_RUNTIME_ROOT_FRESH=1`,
 `MIX_BUILD_PATH=$TMPDIR/build`, `MIX_ENV=test`, and
 `MIX_DEPS_PATH=/Users/raymondluong/dev/pramana/foundry/deps` (existing dependency
 sources; fresh compilation). No inherited provider/tick variables were supplied.

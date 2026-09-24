@@ -135,7 +135,7 @@ The nine characterization tests intentionally assert reproduced defects as well 
 - `sync_child.exs`: SHA256 `fd7f1145e0d3e6208d30721ec275e4d7e1b8fd0c3cd096e09d434100bcaf7d37`.
 - `sync_probes.exs`: SHA256 `bedd9dbbf3b123973bce6eb0161bec6e13d46abc590c1b265d63b43d15dbddba`.
 
-Also independently ran the entire suite in a second fresh root, `/private/tmp/fr07-v5-full-review.qnv6H8`, with its own `build` and `TMPDIR`, same pinned PATH/MIX_ENV/tick settings, and `env -u HERDR_ENV -u PRAMANA_OPERATOR_RUNTIME_ROOT ... mix test --seed 7736`. Result: **470/471 passed, exit 2**, 41.0 seconds. Sole failure: `test/foundry/projections/benchmark_test.exs:12`, equality with saved benchmark output. That test is unchanged by this candidate. I have not established the cause of the saved-output difference, so do not certify the author's 471-pass result or attribute this failure to storage. Existing fixture-name and stress-test warnings were printed. Independent formatting was not run.
+Also independently ran the entire suite in a second fresh root, `/private/tmp/fr07-v5-full-review.qnv6H8`, with its own `build` and `TMPDIR`, same pinned PATH/MIX_ENV/tick settings, and `env -u HERDR_ENV -u FOUNDRY_OPERATOR_RUNTIME_ROOT ... mix test --seed 7736`. Result: **470/471 passed, exit 2**, 41.0 seconds. Sole failure: `test/foundry/projections/benchmark_test.exs:12`, equality with saved benchmark output. That test is unchanged by this candidate. I have not established the cause of the saved-output difference, so do not certify the author's 471-pass result or attribute this failure to storage. Existing fixture-name and stress-test warnings were printed. Independent formatting was not run.
 
 ## Bounded WAL xSync proof — credited, not a blocker
 

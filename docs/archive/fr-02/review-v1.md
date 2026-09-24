@@ -15,7 +15,7 @@ SHA-256 values checked before and after verification, relative to `foundry/`:
 
 | File | SHA-256 |
 |---|---|
-| `bin/pramana` | `e836621bc5d92c152f7eed2f3c00a4fb93d30b55460955abdc953704a3383e54` |
+| `bin/foundry` | `e836621bc5d92c152f7eed2f3c00a4fb93d30b55460955abdc953704a3383e54` |
 | `lib/foundry/cli/rpc.ex` | `eec9bec3224207dec43df31fcc0620aae2f071572305c6b37f119bf9d7df4c59` |
 | `test/foundry/cli/rpc_test.exs` | `7bb444196993fa00af64393045b9f22ca3873f17815706c6a9566ba3f94520e5` |
 | `test/foundry/rpc_wrapper_test.exs` | `5b596d76f71764df51526d7418ca1de8c9c173c9e409987f5e81b3afe40ee26f` |
@@ -93,7 +93,7 @@ means it does not introduce an execution bypass.
   remaining nonempty argv tail as reason text, matching the CLI's existing
   variadic grammar; option-looking words there are data, not ignored switches.
   Semantic task-ID/path/artifact checks remain the CLI's responsibility.
-- Actual-wrapper tests run `bin/pramana`; they are not helper-only. Successful
+- Actual-wrapper tests run `bin/foundry`; they are not helper-only. Successful
   transport tests capture its release expression and decode the token; malformed
   command tests execute that expression in an isolated Elixir process. An
   additional independent probe executed captured expressions through the real
@@ -129,10 +129,10 @@ COORDINATOR_TICK=0 HERDR_ENV=0 MIX_ENV=test mise exec -- mix test --no-start \
   test/foundry/cli_test.exs --seed 12092026
 # exit 0; 59 passed, 4.4 seconds
 
-bash -n bin/pramana
+bash -n bin/foundry
 # exit 0
 
-git diff --check -- bin/pramana lib/foundry/cli/rpc.ex \
+git diff --check -- bin/foundry lib/foundry/cli/rpc.ex \
   test/foundry/cli/rpc_test.exs test/foundry/rpc_wrapper_test.exs
 # exit 0; note git diff does not inspect untracked file content
 
@@ -168,7 +168,7 @@ end
 
 For the extra successful-dispatch probe, a separate ephemeral VM replaced
 `CLI.main(argv)` with `Process.put(:review_received_argv, argv)`. It called the
-actual wrapper using `System.cmd/3` with `PRAMANA_RELEASE=/bin/echo`, checked the
+actual wrapper using `System.cmd/3` with `FOUNDRY_RELEASE=/bin/echo`, checked the
 entire output against the fixed `rpc Foundry.CLI.RPC.run("TOKEN")` grammar,
 evaluated that expression, and matched the recorded argv exactly against each
 input listed above. All six cases passed; the process exited 0. This tests actual
@@ -181,7 +181,7 @@ shell transport and expression evaluation, not BEAM distribution or live mutatio
   not claim authorization, credential isolation or network confinement.
 - Source audit of `foundry/bin`, `foundry/lib`, `foundry/rel` and repository `bin`
   found dynamic Elixir construction in `tickets_from_review.sh` and
-  `test_daemon_recovery.sh`. These scripts bypass `bin/pramana`, and the wrapper
+  `test_daemon_recovery.sh`. These scripts bypass `bin/foundry`, and the wrapper
   never delegates to them. Their fixed/derived variables, direct coordinator
   calls, lifecycle/acceptance bypasses and destructive cleanup remain assigned
   to FR-03/04/05 in the implementation log. They were inspected, not executed.

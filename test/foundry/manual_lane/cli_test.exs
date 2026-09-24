@@ -1,6 +1,6 @@
 defmodule Foundry.ManualLane.CLITest do
   @moduledoc """
-  W4 (T5, THIN-LANE-DESIGN-2026-09-23.md §4): `bin/pramana lane …` through the RPC entry
+  W4 (T5, THIN-LANE-DESIGN-2026-09-23.md §4): `bin/foundry lane …` through the RPC entry
   point, against a `ManualLane.Server` started on a temporary store and a temporary Git repo.
   """
   use ExUnit.Case, async: false
@@ -68,7 +68,7 @@ defmodule Foundry.ManualLane.CLITest do
     git!(repo, ["rev-parse", "HEAD"])
   end
 
-  # Runs `bin/pramana lane ARGV --json` through the RPC entry point: {exit_ok?, decoded}.
+  # Runs `bin/foundry lane ARGV --json` through the RPC entry point: {exit_ok?, decoded}.
   defp lane(argv) do
     payload =
       %{"version" => 1, "argv" => ["lane" | argv] ++ ["--json"]}

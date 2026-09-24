@@ -153,13 +153,13 @@ Commands ran from candidate `foundry/` using Elixir 1.20.3 / OTP 29.0.5 through
 `mise exec --`, with this prefix:
 
 ```sh
-env -u HERDR_ENV -u PRAMANA_RUNTIME_ROOT -u PRAMANA_STARTUP_MODE \
+env -u HERDR_ENV -u FOUNDRY_RUNTIME_ROOT -u FOUNDRY_STARTUP_MODE \
   MIX_ENV=test \
   MIX_DEPS_PATH=/private/tmp/pramana-foundry-ci-VAYKRbmQCUqdoK6-TuKHEdj9/deps \
   MIX_BUILD_PATH=/private/tmp/pramana-h0-independent.R4aXMv/build \
   TMPDIR=/private/tmp/pramana-h0-independent.R4aXMv \
-  PRAMANA_OPERATOR_RUNTIME_ROOT=/private/tmp/pramana-h0-independent.R4aXMv/operator \
-  PRAMANA_RUNTIME_ROOT_FRESH=1 COORDINATOR_TICK=0 mise exec --
+  FOUNDRY_OPERATOR_RUNTIME_ROOT=/private/tmp/pramana-h0-independent.R4aXMv/operator \
+  FOUNDRY_RUNTIME_ROOT_FRESH=1 COORDINATOR_TICK=0 mise exec --
 ```
 
 The build and runtime roots were new. Existing dependency sources were reused;

@@ -24,7 +24,7 @@ The four committed candidate blobs hash exactly to the reviewed v2 identities:
 
 | File | Committed SHA-256 |
 |---|---|
-| `bin/pramana` | `c1c92fe1c25402d67e0ce6173e196e640e71b47c528878bb164f0318c83e5250` |
+| `bin/foundry` | `c1c92fe1c25402d67e0ce6173e196e640e71b47c528878bb164f0318c83e5250` |
 | `lib/foundry/cli/rpc.ex` | `617fb1dc018a70abb9ffd7f97bc7e886db6d217c16ae06ea15ef233d5829b11d` |
 | `test/foundry/cli/rpc_test.exs` | `083f11bf59e6f3954e168d8f939c0fe9aa8fbb165e59daf66894d7b95d366617` |
 | `test/foundry/rpc_wrapper_test.exs` | `77ccefd68a73ac180723591fbaf3c0075e7c9f8bcb5716061c05c8259ee6e761` |
@@ -41,7 +41,7 @@ review artifacts, and documentation in `docs/PLAN.md`, `foundry/README.md`,
 only:
 
 ```text
-foundry/bin/pramana
+foundry/bin/foundry
 foundry/lib/foundry/cli/rpc.ex
 foundry/test/foundry/cli/rpc_test.exs
 foundry/test/foundry/rpc_wrapper_test.exs

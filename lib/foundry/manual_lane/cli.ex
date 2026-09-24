@@ -1,7 +1,7 @@
 defmodule Foundry.ManualLane.CLI do
   @moduledoc """
   T5, the manual-lane CLI (`docs/batch-d/THIN-LANE-DESIGN-2026-09-23.md` §4):
-  `bin/pramana lane admit|packet|submit|review|settle|status|log|integrated|recover`,
+  `bin/foundry lane admit|packet|submit|review|settle|status|log|integrated|recover`,
   routed here by `CLI.RPC`.
 
   Every command appends one line to the operator log and logs its start and finish to the
@@ -457,7 +457,7 @@ defmodule Foundry.ManualLane.CLI do
     %{
       "reason" => inspect(reason),
       "next" =>
-        "confirm no other lane process owns the store, then: bin/pramana lane recover " <>
+        "confirm no other lane process owns the store, then: bin/foundry lane recover " <>
           "--evidence \"<what you checked>\""
     }
   end

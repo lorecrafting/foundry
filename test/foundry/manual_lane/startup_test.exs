@@ -11,7 +11,7 @@ defmodule Foundry.ManualLane.StartupTest do
   alias Foundry.ManualLane.Server
 
   @example Path.expand("../../../docs/batch-d/lane-policy.example.json", __DIR__)
-  @env ~w(FOUNDRY_MANUAL_LANE PRAMANA_STARTUP_MODE FOUNDRY_MANUAL_LANE_REPO
+  @env ~w(FOUNDRY_MANUAL_LANE FOUNDRY_STARTUP_MODE FOUNDRY_MANUAL_LANE_REPO
           FOUNDRY_MANUAL_LANE_POLICY FOUNDRY_MANUAL_LANE_STORE)
 
   setup do
@@ -39,7 +39,7 @@ defmodule Foundry.ManualLane.StartupTest do
     assert App.startup_mode() == :client
     assert App.runtime_children(:client) == []
     # The retired daemon switch no longer starts anything.
-    System.put_env("PRAMANA_STARTUP_MODE", "daemon")
+    System.put_env("FOUNDRY_STARTUP_MODE", "daemon")
     assert App.startup_mode() == :client
     System.put_env("FOUNDRY_MANUAL_LANE", "1")
     assert App.startup_mode() == :lane
@@ -77,12 +77,12 @@ defmodule Foundry.ManualLane.StartupTest do
     assert policy["independent_of_roles"] == %{"reviewer" => ["developer"]}
   end
 
-  test "bin/pramana sends lane commands to the lane node, and only lane commands", ctx do
+  test "bin/foundry sends lane commands to the lane node, and only lane commands", ctx do
     fake = Path.join(ctx.root, "fake-release")
     File.write!(fake, "#!/bin/sh\nprintf '%s' \"node=${RELEASE_NODE:-default}\"\n")
     File.chmod!(fake, 0o700)
-    wrapper = Path.expand("../../../bin/pramana", __DIR__)
-    env = [{"PRAMANA_RELEASE", fake}, {"RELEASE_NODE", nil}]
+    wrapper = Path.expand("../../../bin/foundry", __DIR__)
+    env = [{"FOUNDRY_RELEASE", fake}, {"RELEASE_NODE", nil}]
 
     assert {"node=foundry_lane", 0} = System.cmd(wrapper, ["lane", "status"], env: env)
     assert {"node=default", 0} = System.cmd(wrapper, ["ticket", "list"], env: env)

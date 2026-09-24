@@ -89,7 +89,7 @@ effect-free" → manual_lane/startup_test "without it the node is a child-less c
   green without rebind.
 
 ### F7 — info: dangling references
-`git grep -nE 'Coordinator|AgentServer|Herdr|Improver|HardeningPM|Scheduler|COORDINATOR_TICK|PRAMANA_STARTUP_MODE' -- lib test bin ci config mix.exs rel`
+`git grep -nE 'Coordinator|AgentServer|Herdr|Improver|HardeningPM|Scheduler|COORDINATOR_TICK|FOUNDRY_STARTUP_MODE' -- lib test bin ci config mix.exs rel`
 → 14 hits: lib/foundry/ci.ex:78 and 7 tests clear `COORDINATOR_TICK`/`HERDR_ENV` in subprocess
 env (hygiene, could go later); startup_test.exs:14,42 asserts the retired switch is inert; three
 comments. No live module reference.

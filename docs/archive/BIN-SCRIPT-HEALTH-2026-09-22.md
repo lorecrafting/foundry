@@ -38,7 +38,7 @@ Commands were run one at a time. Mix scripts were run from `foundry/` with
 | `live_test.exs` | Nothing. Disabled by FR-05 | — | Nothing | **no self-check.** It raises as intended (exit 1) |
 | `pramana-live.sh` | Nothing. Disabled pending FR-17 | — | `fr05_containment_test.exs` | **no self-check.** It refuses as intended (exit 78) |
 | `tickets_from_review.sh` | Nothing. Disabled by FR-05 | — | Nothing | **no self-check.** `bash bin/tickets_from_review.sh` refuses as intended (exit 78). The file is tracked as mode 644, so `bin/tickets_from_review.sh` exits 126 (permission denied) instead |
-| `pramana` | Not evidence: a CLI that RPCs into the running daemon | — | Nothing | **not run.** It would reach a live daemon |
+| `foundry` | Not evidence: a CLI that RPCs into the running daemon | — | Nothing | **not run.** It would reach a live daemon |
 
 ## Repository root — `bin/`
 
@@ -61,7 +61,7 @@ These are counts of this table's rows, taken once at `6bc015ed`.
 - Foundry (13 files): **pass 5** (`refusal_sites`, `contract_annotation_diff`, `preflight.sh`,
   `test_daemon_recovery.sh`, and `closure_probe` by reading its output only), **fail 1**
   (`assessor_eval` as documented), **no self-check 4** (`closure_cost` and the three disabled
-  scripts), **not run 3** (`freeze-evidence.sh`, `guard_mutation_sweep.exs`, `pramana`).
+  scripts), **not run 3** (`freeze-evidence.sh`, `guard_mutation_sweep.exs`, `foundry`).
 - Root (14 files in 9 rows): **pass 6** (`check_docs`, the three `check_pilot_*` validators,
   `check_local_layout`, `sync_agent_conventions`), **no self-check 3** (the `pilot_*` libraries),
   **not run 5** (`check_pilot_scope` on data, and the four wrappers).

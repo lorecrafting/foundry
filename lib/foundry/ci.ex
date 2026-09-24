@@ -72,9 +72,9 @@ defmodule Foundry.CI do
       {"MIX_BUILD_PATH", Path.join(run_root, "build")},
       {"MIX_DEPS_PATH", Path.join(run_root, "deps")},
       {"TMPDIR", Path.join(run_root, "tmp")},
-      {"PRAMANA_OPERATOR_RUNTIME_ROOT", Path.join(run_root, "operator")},
-      {"PRAMANA_RUNTIME_ROOT", nil},
-      {"PRAMANA_RUNTIME_ROOT_FRESH", "1"},
+      {"FOUNDRY_OPERATOR_RUNTIME_ROOT", Path.join(run_root, "operator")},
+      {"FOUNDRY_RUNTIME_ROOT", nil},
+      {"FOUNDRY_RUNTIME_ROOT_FRESH", "1"},
       {"COORDINATOR_TICK", nil},
       {"HERDR_ENV", nil}
     ]

@@ -1,6 +1,6 @@
 defmodule Foundry.ManualLane.RestartDrillTest do
   @moduledoc """
-  W5 (T7, THIN-LANE-DESIGN-2026-09-23.md §6): the restart drill. The real `bin/pramana lane`
+  W5 (T7, THIN-LANE-DESIGN-2026-09-23.md §6): the restart drill. The real `bin/foundry lane`
   entry point (`CLI.RPC.run/1`) drives a `ManualLane.Server` on a temporary store the Server
   seeds itself, so the seed and the backend must name the same policy and ledgers.
 
@@ -438,7 +438,7 @@ defmodule Foundry.ManualLane.RestartDrillTest do
   defp recover! do
     assert {false, %{"error" => "gateway_recovery", "detail" => detail}} = lane(~w(status))
     assert detail["reason"] =~ "ambiguous_previous_owner"
-    assert detail["next"] =~ "bin/pramana lane recover --evidence"
+    assert detail["next"] =~ "bin/foundry lane recover --evidence"
 
     assert {false, %{"error" => "gateway_recovery"}} =
              lane(~w(packet ML-1 --role developer --principal #{@dev}))
@@ -530,7 +530,7 @@ defmodule Foundry.ManualLane.RestartDrillTest do
 
   # ── The CLI entry point ──────────────────────────────────────────────────────────
 
-  # Runs `bin/pramana lane ARGV --json` through the RPC entry point: {exit_ok?, decoded}.
+  # Runs `bin/foundry lane ARGV --json` through the RPC entry point: {exit_ok?, decoded}.
   defp lane(argv) do
     payload =
       %{"version" => 1, "argv" => ["lane" | argv] ++ ["--json"]}
