@@ -20,7 +20,8 @@ Written 2026-09-23 from one day's integration of about twenty agent candidates.
 
 ## Rules that decide whether the work is right
 
-- Read [the boundary rules](BOUNDARY-RULES.md) before any code change.
+- Read [the boundary rules](BOUNDARY-RULES.md) before any code change, and
+  [the Elixir conventions](ELIXIR-CONVENTIONS.md) before writing Elixir or tests.
 - **Fix the class, not the instance.** Before editing a function, grep every caller, including
   cascades (a function that calls the one you fix on another route). On 2026-09-23 a cancel fix
   placed on the direct caller left `set_control`'s cascade still bricking the store.

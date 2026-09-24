@@ -10,6 +10,7 @@ Pramāṇa's corpus nor its services. These instructions apply to every provider
 |---|---|
 | Anything | [The Foundry index](docs/README.md), then the current [repair plan](docs/REPAIR-PLAN.md) and the ticket's own evidence |
 | Any code change | [Boundary rules](docs/BOUNDARY-RULES.md) first — twelve rules, most enforced by the gate |
+| Writing Elixir or tests | [Elixir conventions](docs/ELIXIR-CONVENTIONS.md) |
 | Adding or changing a guard, transition or refusal test | [Evidence tools](docs/EVIDENCE-TOOLS.md) first |
 | Delegating work to an agent | [Agent brief](docs/AGENT-BRIEF.md): the standing clauses every task prompt inherits |
 | Running a ticket through the manual lane | [Lane runbook](docs/batch-d/LANE-RUNBOOK.md) |

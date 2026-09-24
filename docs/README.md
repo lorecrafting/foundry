@@ -15,7 +15,9 @@ contract still govern implementation.
 | Task | Read |
 |---|---|
 | Change any Foundry code | [Boundary rules](BOUNDARY-RULES.md) first — twelve decoupling rules, each naming the test or review that enforces it |
-| Delegate Foundry work to an agent | [Agent brief](AGENT-BRIEF.md): the standing clauses every task prompt inherits |
+| Write Elixir code or tests | [Elixir conventions](ELIXIR-CONVENTIONS.md): language, Mix and ExUnit rules, including the portable temp-directory idiom |
+| Delegate Foundry work to an agent | [Agent brief](AGENT-BRIEF.md): the standing clauses every task prompt inherits; repository-wide agent rules are in [AGENTS.md](../AGENTS.md) |
+| Run a ticket through the manual lane as operator | [Lane runbook](batch-d/LANE-RUNBOOK.md): start the lane daemon, admit, packet, submit, review, settle, recover |
 | Understand investment priorities or evaluate architecture/tooling | [Foundry strategy brief](STRATEGY.md), then the relevant governing repair contract |
 | Understand Foundry's ecosystem position, what the kernel must own, and what should remain substitutable | [Ecosystem boundary and positioning](ECOSYSTEM-BOUNDARY.md), then [Foundry strategy](STRATEGY.md) and the governing workflow/repair contracts |
 | Understand how Cloudflare/AX/Pi/Claude/Codex or another controller should drive Foundry without becoming authority | [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md), then [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md), [Observability](OBSERVABILITY.md) and the governing workflow contract |
@@ -65,7 +67,7 @@ a competing backlog.
 
 ## Provider and backend boundary
 
-Shared repository instructions live in [AGENTS.md](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/AGENTS.md). They apply to
+Shared repository instructions live in [AGENTS.md](../AGENTS.md). They apply to
 Claude, Gemini, DeepSeek, Codex and other providers. That neutrality does not relax
 Foundry's launch policy, billing authorization, review identity or backend conformance.
 Read the existing README and repair criteria before operating Herdr or any future adapter.
