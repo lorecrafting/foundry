@@ -10,6 +10,56 @@ Roles: operator = an LLM session (Claude Opus 5.5); developer = a worktree agent
 `agent:claude-fable-5-1/review-<ticket>`, never a fork. Integration is manual: cherry-pick
 onto `main`, one gate run per push.
 
+## Handoff: where the campaign stands
+
+Updated at every batch end, so any operator session (Claude, Codex or a human) can resume
+cold from the repository alone. Read this, then [the runbook](LANE-RUNBOOK.md), then
+[the agent brief](../AGENT-BRIEF.md).
+
+**State (2026-09-24, main after batch C1a).** Batches 1, A1, A2, B and C1a are integrated: the legacy daemon stack
+and the Pramāṇa-era names are gone (FR-23b done; the remaining `pramana` matches are the
+allowlist in [the sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)),
+and dated records live at tag `records/2026-09-24` (Q10). The lane runs on store 3 (50/50
+starts, Q9); stores 1 and 2 are archived under `~/.local/state/foundry-lane.store{1,2}-archived-2026-09-24`.
+Batch C1a (fr-08 triage, lane frictions F13/F17/F18, dead store vocabulary) is the last integrated batch; its developers and reviewers ran their own `lane submit` and `lane review` (Q8).
+
+**Next.**
+1. **Batch C1b** (parallel, disjoint): ML-GATE-EVIDENCE-TOOLS (`refusal_sites` and
+   `contract_annotation_diff` as ExUnit, fix its `foundry/<path>` layout assumption);
+   ML-DECOMPOSE-PP-DESIGN and ML-DECOMPOSE-GATEWAY-DESIGN (design notes under `docs/design/`,
+   reviewed before any implementation: protected Core); ML-DEAD-ROUTES (the test-only
+   `transact_verified`/`ProtectedVerifier` route and `Observations` module, per ML-DEAD-VOCAB-2).
+2. **Batch C2:** ML-DECOMPOSE-PP and ML-DECOMPOSE-GATEWAY, to their approved designs.
+3. **Batch C3:** refresh the Quint models' line citations into `protected_primitives.ex`.
+4. A fresh re-sweep of everything changed since the clean-room sweep; its ranked list is the
+   next batch. Repeat until the repo is clean and maintainable.
+
+**Operator loop, per batch.**
+
+1. Admit each ticket on the current `main` (`bin/foundry lane admit`), with a scope disjoint from
+   the other tickets in the batch; issue each developer packet.
+2. Developer agents work in their own worktrees and run `lane submit` themselves (Q8); a fresh
+   reviewer on a different model gets its own detached worktree at the candidate and runs
+   `lane review` itself. `correction` → issue a new developer packet; the correction's
+   reviewer uses a new principal (`…/review-<ticket>-2`).
+3. Integrate on `integ/<batch>` in a separate worktree: cherry-pick each ticket's full
+   `<base>..<candidate>` range and check `lane integrated <ID> --ref integ/<batch>`.
+4. If a pinned Core file changed: rebind FR-08A once on the integration head
+   (`MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs`, then the report command it prints,
+   then the FR-08A test), and commit that as `test: rebind FR-08A …`.
+5. Copy the review notes to `reviews/`, update this log (ticket rows, scorecard, frictions,
+   this handoff), `git add` then `elixir bin/check_docs.exs`, commit.
+6. Push the branch and open a PR (Linux CI runs only on PRs and `main`); run one local gate
+   `TMPDIR=/private/tmp elixir ci/run.exs --output <dir outside the repo>` in the integration
+   worktree (no `deps` symlink there, F16). Both green → `git merge --ff-only` on `main`,
+   push; the PR shows as merged. Never merge from GitHub.
+7. If the batch renamed the release or RPC entry, or makes the store unreadable, follow the
+   runbook's landing and rotation steps instead of a plain fast-forward (F15, F7).
+8. End the batch with a fresh reviewer's re-sweep of everything changed since the last sweep;
+   its ranked list feeds the next batch.
+
+Ask the operator (the human) before any operator-level decision: record it in the Q table.
+
 ## Setup, 2026-09-23
 
 - Lane built and started with `bin/foundry-lane build` / `start` from `main` at `55037db`,
@@ -37,6 +87,10 @@ onto `main`, one gate run per push.
 | ML-RENAME-BIN-ENV | `9c7fe01` | `c73b6ea` | [approved](reviews/ML-RENAME-BIN-ENV.review.md) | batch B2 | FR-23b rename 2/3: the wrapper is `bin/foundry`, five env vars are `FOUNDRY_*`, no aliases. Retired Pramāṇa-only `bin/pramana-*` script names left for the archive drop (Q10). Reviewer: `FOUNDRY_STARTUP_MODE` has no reader (batch C dead vocabulary) |
 | ML-DOCS-ARCHIVE-DROP | `ecdbc84` | `29185be` | [approved](reviews/ML-DOCS-ARCHIVE-DROP.review.md) | batch B3 | Q10: `docs/archive` (138 files) deleted; 67 inbound links are permalinks at tag `records/2026-09-24`, all verified at the tag. `pramana` matches 675 → 197 |
 | ML-RENAME-DOMAIN-TAGS | `6a13b7c` | `1805695` | [approved](reviews/ML-RENAME-DOMAIN-TAGS.review.md) | batch B4 + FR-08A rebind | FR-23b rename 3/3: 12 digest/schema tags `pramana-foundry-*` → `foundry-*`, code prefixes renamed, one golden digest recomputed (reviewer reproduced it), seed 50/50 (Q9). Remaining `pramana` matches outside `docs/fr-08` are a checked-in allowlist ([sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)). Store 2 archived; store 3 seeded fresh |
+| ML-FR08-TRIAGE | `b9d8311` | `7e4621e` | [approved](reviews/ML-FR08-TRIAGE.review.md) | batch C1a | `docs/fr-08`: 58 dated files pinned at `records/2026-09-24` and deleted, 20 kept because code reads or cites them, 1 kept as authority; the `pramana` allowlist now covers the whole repo. First ticket whose developer and reviewer ran their own `submit` and `review` (Q8) |
+| ML-LANE-FRICTIONS-2 | `b9d8311` | `6cf04a5` | [approved](reviews/ML-LANE-FRICTIONS-2.review.md) | batch C1a | F17 refusals exit 1 without a stack trace (the reviewer proved on two nodes the daemon survives), F13 one refusal renderer, F18 `check_docs` reads the working tree, `bin/foundry` fallbacks deleted, runbook steps for F7/F14/F15. The developer's first `submit` passed a short SHA and was refused (`git_evidence`) |
+| ML-DEAD-VOCAB | `b9d8311` | `7a0ebb3` (blocked) | none | carried into -2 | submitted `--blocked`: two acceptance items needed paths outside its scope (F8 again). `blocked` is terminal, so the work was re-admitted |
+| ML-DEAD-VOCAB-2 | `b9d8311` | `ec4b04c` | [approved](reviews/ML-DEAD-VOCAB-2.review.md) | batch C1a + FR-08A rebind | dead FR-08B functions, unused command/intent/event types, legacy import codecs and the test-only v1/v2 migration deleted (about 600 lines of lib); FR-08A's forged command is now `enqueue` and still trips the same guard (red control). Found test-only: the `transact_verified`/`ProtectedVerifier` route and the `Observations` module |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -87,6 +141,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | F16 | operator integration worktree | **Operator error.** A `deps` symlink in the integration worktree made the gate refuse `{:dirty_source, ["?? deps"]}` (`.gitignore`'s `/deps/` does not match a symlink). Cost one gate start | never symlink deps into a gated tree; use `MIX_DEPS_PATH` |
 | F17 | refusals | Every refused lane command also prints an Elixir `RuntimeError` stack trace from `cli.ex:86` on stderr; stdout and the exit code are right | print the refusal and exit non-zero without raising |
 | F18 | `bin/check_docs.exs` | It resolves links against tracked files only, so a link to a newly copied, unstaged review file reads as broken (hit twice) | `git add` before `check_docs`, or check the working tree |
+| F19 | usage limits | A shared API session limit killed both running developers and a reviewer at once. The lane recorded nothing: the tickets sat in `active` and `reviewing`. Resuming the same agent instances after the reset lost no work and kept one principal per instance (compare F9) | the operator checks `lane status` and worktrees after any limit; run fewer agents at once when the budget is tight |
 
 ## Scorecard
 
@@ -112,6 +167,9 @@ F14–F16 in store 2's first two.
 | ML-RENAME-BIN-ENV | 1 | 0 (3 informational notes) | 0 | 0 / 0 |
 | ML-DOCS-ARCHIVE-DROP | 1 | 0 (2 pre-existing stale prose paths) | 0 | 0 / 0 |
 | ML-RENAME-DOMAIN-TAGS | 1 | 0 (2 doc nits) | 0 | 0 / 0 |
+| ML-FR08-TRIAGE | 1 | 0 | 0 | 0 / 0 |
+| ML-LANE-FRICTIONS-2 | 1 | 0 (2 notes) | 0 | 1 / 0 (short-SHA `submit` refused) |
+| ML-DEAD-VOCAB(-2) | 1 | 0 (3 minor notes) | 0 | 0 / 1 (`blocked` terminal; re-admitted, F8) |
 
 **Reading, 2026-09-24 (11 tickets, before ML-RENAME-BIN-ENV).** Independent review pays: 7 defects caught, one of them
 high, against 2 escapes. The lane itself has caught no real error yet and has blocked one
