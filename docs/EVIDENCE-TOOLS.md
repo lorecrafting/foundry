@@ -165,7 +165,7 @@ These are not style preferences. Each was bought with a review round.
   review, reading, and filed as **B3** — which is the cost this gap imposes rather than a
   counterexample to it: every mechanism here was green for the defect's whole life and still is.
   So **a conjunctive precondition needs a refusal test per conjunct, and nothing checks that it
-  has one.** [EV-6](fr-08/fr08b-evidence-reduction-tickets.md) now closes the enumeration half of
+  has one.** [EV-6](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-evidence-reduction-tickets.md) now closes the enumeration half of
   this: all **72** from-cell obligations carry an ID in the contract and must each be classified,
   and the ID set is parsed out at test time so a contract edit fails rather than drifts. How many are
   classified, and the split across dispositions, is in `@from_obligations` and `@from_unclassified`

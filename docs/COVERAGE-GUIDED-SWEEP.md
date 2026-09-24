@@ -6,7 +6,7 @@ implemented" in the next paragraph was true when this note was written and is ke
 status line supersedes it.
 
 Design note. Not implemented. Written after the 2026-09-21 full sweep, whose
-[verdict table](fr-08/fr08b-subcommit1-sweep-2026-09-21.md) is the answer key any
+[verdict table](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-subcommit1-sweep-2026-09-21.md) is the answer key any
 replacement must reproduce.
 
 ## The cost decision this overturns

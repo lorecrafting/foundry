@@ -217,8 +217,8 @@ Target tree: `docs/{README, STRATEGY, REPAIR-PLAN, WORKFLOW-CONTRACT, BOUNDARY-R
 
 ### 5.1 What still says `pramana` after FR-23b (allowlist)
 
-ML-RENAME-DOMAIN-TAGS finished the renames. `git grep -il pramana -- ':!docs/fr-08'` must list
-exactly these files (`docs/fr-08` waits for batch C's triage). Anything else is a missed rename.
+ML-RENAME-DOMAIN-TAGS finished the renames and ML-FR08-TRIAGE removed `docs/fr-08`'s dated
+records. `git grep -il pramana` must list exactly these files. Anything else is a missed rename.
 
 | File | Why it keeps the name |
 |---|---|
@@ -236,6 +236,7 @@ exactly these files (`docs/fr-08` waits for batch C's triage). Anything else is 
 | `docs/batch-d/reviews/ML-RENAME-BIN-ENV.review.md` | rename record quoting retired names |
 | `docs/batch-d/reviews/ML-RENAME-NS.review-1.md` | rename record quoting retired names |
 | `docs/batch-d/reviews/ML-RENAME-NS.review-2.md` | rename record quoting retired names |
+| `docs/batch-d/reviews/ML-RENAME-DOMAIN-TAGS.review.md` | rename record quoting retired names |
 | `docs/design/AX-SUBSTRATE.md` | pinned-commit permalink |
 | `docs/design/CLOUDFLARE-OS.md` | pinned-commit permalink |
 | `docs/design/ECOSYSTEM-BOUNDARY.md` | pinned-commit permalink |
@@ -244,6 +245,7 @@ exactly these files (`docs/fr-08` waits for batch C's triage). Anything else is 
 | `docs/design/PI-HARNESS.md` | pinned-commit permalinks |
 | `docs/design/PLANNING-STRATEGIES.md` | Pramāṇa issue links and a pinned-commit permalink |
 | `docs/design/PROJECT-WORKFLOW-PROFILES.md` | pinned-commit permalink |
+| `docs/fr-08/fr08b-pure-kernel-review.md` | records the review's worktree path, made in the Pramāṇa checkout before the split |
 | `docs/fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md` | this rename inventory quotes the retired names |
 | `docs/fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md` | permalink; the Pramāṇa repository's own `pramana/` app |
 | `docs/fr-23/WORKTREE-INVENTORY-2026-09-23.md` | paths in the Pramāṇa checkout |

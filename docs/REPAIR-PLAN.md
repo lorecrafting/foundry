@@ -407,7 +407,7 @@ the only worked design so far named first:
    collapse states that differ. Not designed.
 
 Items 2–4 are now scoped as work items inside FR-08B's remaining subcommits, in
-[the evidence-reduction tickets](fr-08/fr08b-evidence-reduction-tickets.md): EV-4
+[the evidence-reduction tickets](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-evidence-reduction-tickets.md): EV-4
 (congruence) first and independent, EV-3 (invariant split) before subcommit 2 builds
 `decide/3`, EV-2 (clause IDs) between subcommits and before subcommit 3. They create no FR
 node. The review also declined a guards-as-data design as too much architecture for an

@@ -28,7 +28,7 @@ acceptance, the command-ingress inventory, the integrated FR-08A atomic-bundle b
 and all three changed files. This review changes no implementation, runtime, Gateway,
 Coordinator, daemon, provider, deployment or ticket status.
 
-The [review probes](fr08b-pure-kernel-review-probes.exs) deliberately assert the observed
+The [review probes](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-pure-kernel-review-probes.exs) deliberately assert the observed
 bad behavior. Their green result means all eleven counterexamples reproduced.
 
 ## Blockers

@@ -8,7 +8,7 @@ Status: **specification; first deliverable of subcommit 1. No implementation, no
 
 Author: Claude Opus 5.
 
-The [kernel correction design](fr08b-kernel-correction-design.md) makes this enumeration
+The [kernel correction design](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-kernel-correction-design.md) makes this enumeration
 subcommit 1's first deliverable rather than a later discovery, and names this document's
 owner as the party that decides the vocabulary. It starts from the preserved work in
 progress at `059546b` (`kernel/event.ex`, 27 types), reconciles it against

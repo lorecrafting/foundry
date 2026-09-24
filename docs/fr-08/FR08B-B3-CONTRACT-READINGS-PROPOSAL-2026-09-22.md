@@ -10,7 +10,7 @@ takes effect until the operator accepts a reading. **Taken at commit `bc62a3b4`*
 cited by name, not by line number.
 
 This answers the seven contract-reading questions in the
-[B3 gap inventory](FR08B-B3-GAP-INVENTORY-2026-09-22.md#contract-reading-questions-flagged-not-resolved)
+[B3 gap inventory](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/FR08B-B3-GAP-INVENTORY-2026-09-22.md#contract-reading-questions-flagged-not-resolved)
 (taken at `3727f2e8`). Cell verdicts (ABSENT, PARTIAL, NOT-KERNEL, IMPLEMENTED) and the
 letters (P), (D), (C), (G) and (O) are that document's. It is subject to the operator's standing
 direction of 2026-09-22: do not grow the reference kernel beyond correctness fixes until the
@@ -347,7 +347,7 @@ fact with its own state?
 
 **First, a correction of attribution.** "The kernel must bind the settlement to the execution
 it settles ... the adapter must not be left to invent the check" is the
-[design's](fr08b-kernel-correction-design.md#b3--r4a-control-crossing-at-the-specified-ordering-point)
+[design's](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-kernel-correction-design.md#b3--r4a-control-crossing-at-the-specified-ordering-point)
 sentence, not the contract's. The contract does not contain it.
 
 **Competing readings.**

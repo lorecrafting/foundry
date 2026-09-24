@@ -34,7 +34,7 @@ effect of the attempt was created under a pairing, the pairing binds the rest of
 Dropping it from the policy later, or naming a second `policy_id`, does not release it. A
 missing history row or a malformed pairing at any pinned revision is refused. The first
 version read only the new operation's policy at its current revision. The
-[batch review](subcommit3-batch-review-findings-2026-09-23.md) found this as I1.
+[batch review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/subcommit3-batch-review-findings-2026-09-23.md) found this as I1.
 
 **(c) Authority lineage, concretely.** A side's principal set is the `issuer` of every
 effect in the attempt that holds one of that side's roles, plus the inbox `actor_id` of each

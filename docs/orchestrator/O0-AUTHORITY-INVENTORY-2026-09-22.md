@@ -195,7 +195,7 @@ after the repair.
 
 ## 4. Is PM planning lifecycle a Core or Controller concern?
 
-**Input:** the [R4a.03.f2 review](../fr-08/fr08b-r4a03f2-review-2026-09-22.md) blocked a
+**Input:** the [R4a.03.f2 review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-r4a03f2-review-2026-09-22.md) blocked a
 candidate because a PM execution has no success-path close. The only objective-execution
 closer is `pm_launch_settled`, which is R4a's proved-non-start row, and it cannot name the
 execution it settles.

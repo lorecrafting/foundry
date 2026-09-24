@@ -8,7 +8,7 @@ Status: **implementation specification; no acceptance, no integrated behavior**
 
 Author: Claude Opus 5, implementation owner for this correction.
 
-Governing design: [the root-fact composition diagnosis](fr08b-root-fact-composition-diagnosis.md),
+Governing design: [the root-fact composition diagnosis](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/fr08b-root-fact-composition-diagnosis.md),
 whose recommended closed transition-plan contract this specification implements without
 widening. Governing acceptance stays with [FR-08A](../REPAIR-PLAN.md) and the
 [workflow contract's](../WORKFLOW-CONTRACT.md) R3 authority split, atomic command

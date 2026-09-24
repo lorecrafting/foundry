@@ -21,7 +21,7 @@ No production code, running daemon, credentials or host permissions changed here
 > primitives and substantive revision-bound handoff proof; FR-08B then migrates all
 > command ingress and replay. See the independent read-only
 > [alignment audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/ALIGNMENT-AUDIT-2026-09-19.md) and the historical
-> [FR-08 investigation](fr-08/investigation.md). This route changes no R1–R5 decision,
+> [FR-08 investigation](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/investigation.md). This route changes no R1–R5 decision,
 > runtime, policy, provider or activation permission.
 >
 > **Enforcement matrix (2026-09-23):** the [enforcement matrix](#enforcement-matrix) was added

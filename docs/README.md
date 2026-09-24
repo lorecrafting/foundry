@@ -26,7 +26,7 @@ comes next.
 | Design ahead of the code | [design/](design/ECOSYSTEM-BOUNDARY.md): ecosystem and [orchestrator](design/ORCHESTRATOR-BOUNDARY.md) boundaries, [workflow profiles](design/PROJECT-WORKFLOW-PROFILES.md), [planning strategies](design/PLANNING-STRATEGIES.md), [Pi](design/PI-HARNESS.md) and [Jido](design/JIDO-HARNESS.md) harnesses, [AX](design/AX-SUBSTRATE.md) and [Cloudflare](design/CLOUDFLARE-OS.md) substrates, [bounded effect query](design/bounded-effect-query-design.md); plus [FR-10](fr-10/FR10-DESIGN-2026-09-23.md) and orchestrator steps [O0](orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) and [O1](orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md) |
 | Rebuild a capability the deleted daemon had | [Moved knowledge](design/MOVED-KNOWLEDGE-2026-09-23.md): each edge case the deleted tests encoded and which of FR-09–FR-13 owns it |
 | Current clean-up plan | [Clean-room sweep](fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md) |
-| FR-08 design and review record (awaiting per-file triage) | [`fr-08/`](fr-08/investigation.md); some files there are read by tests |
+| FR-08 designs and specs that code or live docs cite, and fixtures tests read | [`fr-08/`](fr-08/README.md); the rest of the record is at tag `records/2026-09-24` |
 | Anything dated: audits, candidates, reviews, attestations, retired mechanisms, the implementation log | Not in the tree: tag `records/2026-09-24` ([docs/archive at the tag](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/archive)) |
 
 A review's approval applies to its named candidate only; it does not endorse later revisions

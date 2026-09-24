@@ -23,7 +23,7 @@
 > citations). **Deviation:** the command states no `policy/`, `control/` or `ledger/` key.
 > At command level those keys read the legacy authority tables, not the root rows, so policy
 > and control are CAS-checked only through each staged operation's own `expected_revisions`.
-> **Built subcommit review** ([findings](subcommit2-review-findings-2026-09-23.md), Fable 5.1,
+> **Built subcommit review** ([findings](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/fr-08/subcommit2-review-findings-2026-09-23.md), Fable 5.1,
 > PASS WITH CHANGES): F1 found that the exhaustion plan's allocation read was not CAS-bound.
 > It now states `root_ledger/<base64url id>/<generation>`, a new Core key that reads
 > `root_ledgers`, so O2's "CAS-bound prestate read" holds for it.
