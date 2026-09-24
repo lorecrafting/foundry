@@ -3,7 +3,7 @@
 > Moved from Pramāṇa on 2026-09-24 ([`pramana/docs/harness/04-10-parallel-track-the-self-improving-supervisor-foundry-s-own-met.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/pramana/docs/harness/04-10-parallel-track-the-self-improving-supervisor-foundry-s-own-met.md)); the pre-move text is pinned there.
 
 > Design/research note. Proposed commands and guarantees are not shipped capabilities unless current source and acceptance evidence establish them.
-> [Contents](https://github.com/lorecrafting/pramana/blob/main/pramana/docs/HARNESS.md) · [Documentation](https://github.com/lorecrafting/pramana/blob/main/docs/README.md) · [Current architecture](https://github.com/lorecrafting/pramana/blob/main/pramana/docs/ARCHITECTURE.md)
+> [Contents](https://github.com/lorecrafting/pramana/blob/main/docs/HARNESS.md) · [Documentation](https://github.com/lorecrafting/pramana/blob/main/docs/README.md) · [Current architecture](https://github.com/lorecrafting/pramana/blob/main/docs/ARCHITECTURE.md)
 
 ## 10. Parallel Track: the Self-Improving Supervisor (Foundry's Own Meta-Harness)
 
