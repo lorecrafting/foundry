@@ -13,8 +13,8 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
   alias Foundry.DurableStore.Gateway
   alias Foundry.Repair.FR08HandoffGate
 
-  @subject_revision "b1a820e888f228b14be8d6d8843b8b88287ff8be"
-  @subject_tree "88b07e68bad0a5638528c229bb087881e58f40f1"
+  @subject_revision "49596eee6127937094cad3e3d97d252f563b1a3c"
+  @subject_tree "db28deaf1f637450266f5cd4edb89f1036244b3e"
   @api_identity [
     {Foundry.DurableStore.Authority, "lib/foundry/durable_store/authority.ex",
      "20e56e90974613f20f16d45342cbae4d215304f1a8f06cd2563d101ae2dc587b",
@@ -23,8 +23,8 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
      "53c21790997aa653e1ee6ec4b8d6a1fd4b74514219b09a67b0ed85aa99861e2d",
      "693b9323215444f71102e1f18d7d2589"},
     {Foundry.DurableStore.Gateway, "lib/foundry/durable_store/gateway.ex",
-     "eee5450923cf00b8dc3bddd462ca474efe25de91b55b9b2f0ed463f5984dd8f1",
-     "ee302f23f9e793519c7b4745c8b5af10"},
+     "a360c2052f7ece8f44a46bb4a119459e21e25dd67b031622f75f0725f053f1c5",
+     "2fe09847642d38aad227de5c9b52a916"},
     {Foundry.DurableStore.ProtectedPrimitives,
      "lib/foundry/durable_store/protected_primitives.ex",
      "945f0234bb35a5ddd10f1f7ce568ce85d06cd5466722d5840b7d6985019e32f4",
@@ -33,8 +33,8 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
      "d205857d23b4de281de50a9c045413ebeb601e1b279e50a179197617e01b5b26",
      "0bdbbd459b78cb97b9ae8281edacb2d3"},
     {Foundry.DurableStore.RecordCodec, "lib/foundry/durable_store/record_codec.ex",
-     "44a1845fbe6d02e679ad1dc21dcd4b00343d60f49b8fc5b58559c0b7781ae6c5",
-     "037501c5b76e9cf873b7c6e10438128e"},
+     "27a00ad7fc0b7a95521b10662fd251556c3157cb48219192bfdcff2a610f8076",
+     "1f616c229d3e9495a2642066ad1e2069"},
     {Foundry.DurableStore.Encoding, "lib/foundry/durable_store/encoding.ex",
      "866ab0cae52f503c851926409e67808aa4b5f20807088da3da28126be74e0e22",
      "3467586c7829be7995aa1dc3cdd50047"},
