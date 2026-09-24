@@ -141,6 +141,24 @@ remains the only one that can close the backlog.
   reviewer-independence check over recorded principals (FR-08B, 2026-09-23).
 - **M5.** Dogfooding Foundry on Foundry is not a ROADMAP G0 product build.
 
+<a id="clean-room-amendment"></a>
+**Amended 2026-09-23 (operator, on the [clean-room sweep](fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#7-operator-questions)).**
+Foundry is not in production, so there is no backward compatibility to keep:
+- **C1.** The legacy daemon stack (Coordinator, AgentServer, Herdr, launch effects, JSONL
+  persistence, Board/Status/Telemetry, Improver, HardeningPM, PM, Scheduler, Assignments,
+  Reviews, Integration, runtime ownership, the legacy CLI) is **deleted, not migrated**. The
+  manual lane over Core is the only ingress. FR-08B subcommit 5's four ingress migrations are
+  replaced by the deletion. FR-10, FR-11 and FR-12 are built on Core rather than rewritten from
+  the Coordinator, and FR-23b no longer waits for FR-12 or FR-19B. Pure-policy leaves stay
+  (`LaunchEligibility`, `Quota`, `Effects.ProcessGroup`). Edge-case knowledge in deleted code
+  moves as the sweep's §2 lists.
+- **C2.** FR-15aA's manifest, validator and test are archived as dated evidence and leave the
+  gate: its pins name files C1 deletes.
+- **C3.** H0 and the legacy import, Relocation (FR-19B's offline relocation is retired), the
+  FR-19A sync-EIO workflow and the Assessor are retired.
+- **C4.** FR-23b renames follow the deletions. The `pramana-foundry-*` digest domain tags are
+  renamed outright and existing stores discarded (the lane store is archived first).
+
 Use coherent batches to reach those milestones without creating one unreviewable
 FR-08–FR-22 change:
 
@@ -514,11 +532,11 @@ not mean a repair has been made. **Blocked** means wait for listed dependencies.
 | FR-18A | Supply minimal canonical observations, identities, unknowns and failure visibility | FR-08A | **In progress: bounded protected effect query independently reviewed and integrated; the recorded execution-summary coverage gap is closed; remaining completion obligations are unchanged** | F17, F18 |
 | FR-18B | Complete producer→store→board/classifier/usage chain | FR-18A, FR-10, FR-11 | Blocked | F17, F18 |
 | FR-19A | Establish operational storage/backup/recovery and maintenance containment | FR-07 | **Complete: physical ENOSPC/kernel-sync and bounded maintenance recovery independently reviewed and integrated** | F20, F21 |
-| FR-19B | Bound diagnostics and repair or retire offline relocation | FR-19A, FR-18B | Blocked | F20, F21 |
+| FR-19B | Bound diagnostics and repair or retire offline relocation | FR-19A, FR-18B | Blocked; relocation **retired** by the [clean-room amendment](#clean-room-amendment) C3, diagnostics remain | F20, F21 |
 | FR-20 | Reconnect constrained improvement proposals | FR-15, FR-18B, FR-17 | Blocked | F19 |
 | FR-21 | Establish independent Foundry CI and build provenance | FR-01, FR-04, FR-05 | **Complete: reviewed and integration-attested** | F23, F24 |
 | FR-23a | Hygiene that no other ticket rewrites: docs, bin scripts, tests, formatter baseline, Git refs, gate | — (file rule: touches no file FR-08B/10/11/12/19B rewrites and no attestation-pinned file; see the [split proposal](fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md)) | **In progress, split approved 2026-09-22.** Done: formatter baseline, doc and dead-surface inventories, bin script health, closure probe exit code, design status notes. The `SystemMetrics` defect was already fixed at `63ee6cb6`; the Improver proposal path it reopened is closed by `propose: false` until FR-20 (`91dc324c`) | F23, F24 |
-| FR-23b | Decompose god modules, retire legacy surfaces and rename the `PramanaFoundry` namespace to `Foundry` | FR-08B, FR-12, FR-19B | Blocked | F23, F24 |
+| FR-23b | Decompose god modules, retire legacy surfaces and rename the `PramanaFoundry` namespace to `Foundry` | — ([clean-room amendment](#clean-room-amendment) C1: deletion replaces the FR-08B/FR-12/FR-19B dependency) | **In progress through the manual lane** ([dogfood log](batch-d/DOGFOOD-LOG.md)) | F23, F24 |
 | FR-22 | Prove full lifecycle and reconcile operating docs | FR-11, FR-12, FR-13, FR-14, FR-15aA, FR-15aB, FR-15, FR-16, FR-17, FR-18A, FR-18B, FR-19A, FR-19B, FR-20, FR-21, FR-23a, FR-23b | Blocked | F01–F24 |
 
 There are **24 ticket nodes: FR-01 through FR-23, plus child ticket FR-15a**. H0 and F
