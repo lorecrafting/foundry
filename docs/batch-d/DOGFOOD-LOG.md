@@ -35,6 +35,11 @@ onto `main`, one gate run per push.
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
+**Store rotation, 2026-09-24.** Store 1 is exhausted (F7), so it was stopped cleanly and archived at
+`~/.local/state/foundry-lane.store1-archived-2026-09-24`. Its trail holds all nine tickets
+above. The lane was rebuilt from `ff0e366` and started on a fresh store; `lane status`
+prints only its result (F1 verified live).
+
 Batch A1 (the two deletion tickets) was integrated the same way, plus one operator fixup commit for links in docs neither ticket could edit.
 
 Batch 1 (the three tickets above) was cherry-picked onto `integ/lane-batch-1`, then run
@@ -66,4 +71,5 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | F10 | integration | **Operator error.** The ML-DEL-DAEMON correction had two commits; I cherry-picked only the candidate SHA's own commit (`742a60d`), so the reviewed `:stale_identity` tests and knowledge additions (`12aff6c`) missed batch A1 and its gate. Caught by `git cherry main <dev branch>` during worktree cleanup; landed afterwards with its own gate | integrate the range `<previous candidate or base>..<candidate>`, and check `git cherry` is empty before calling a ticket integrated; `lane integrate` (F6) could check candidate ancestry in main |
 | F11 | test hygiene | A peer Pramāṇa session reported that `process_group_test`'s zombie fixture leaks an orphaned Python helper on every run (98 found on the operator's Mac); confirmed, 3 from this session's gate | ticket ML-PROCESS-GROUP-TESTS, with the flake the ML-DEL-DAEMON rereview found |
 | F12 | expected-red tests and unrun pins | While a protected change awaits the operator's FR-08A rebind, `fr08a_protected_boundary_test` is expected red, and that masked a real failure in the same file: the identity-negative fixture still asserted 7 capabilities. Neither the developer nor the reviewer could tell the two apart. The batch gate then caught a second miss from the same ticket: `ci_test.exs:65` pinned the `fetch-depth: 0` the ticket removed, and nobody ran `ci_test`. Both were fixed in operator integration commits | developer briefs: run the FR-08A test after a scratch rebind in a throwaway worktree, so only real failures remain red; and grep `test/` for every string a ticket deletes from config or workflows |
+| F13 | `lane integrated` refusal | An unknown ticket prints `refused` / `detail: -` without the refusal atom the runbook promises (`error: <atom>`) | print the atom like every other refusal |
 
