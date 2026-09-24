@@ -16,23 +16,52 @@ Updated at every batch end, so any operator session (Claude, Codex or a human) c
 cold from the repository alone. Read this, then [the runbook](LANE-RUNBOOK.md), then
 [the agent brief](../AGENT-BRIEF.md).
 
-**State (2026-09-24, main after batch C1a).** Batches 1, A1, A2, B and C1a are integrated: the legacy daemon stack
+**State (2026-09-24, main after batch C1b).** Batches 1, A1, A2, B, C1a and C1b are integrated: the legacy daemon stack
 and the Pramāṇa-era names are gone (FR-23b done; the remaining `pramana` matches are the
 allowlist in [the sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)),
 and dated records live at tag `records/2026-09-24` (Q10). The lane runs on store 3 (50/50
 starts, Q9); stores 1 and 2 are archived under `~/.local/state/foundry-lane.store{1,2}-archived-2026-09-24`.
-Batch C1a (fr-08 triage, lane frictions F13/F17/F18, dead store vocabulary) is the last integrated batch; its developers and reviewers ran their own `lane submit` and `lane review` (Q8).
+Batch C1b (evidence tools in the gate, the dead verified-transaction route, and the two approved decomposition designs) is the last integrated batch. Developers and reviewers run their own `lane submit` and `lane review` (Q8). No ticket is in flight; `lane status` still lists ML-DEAD-VOCAB as `blocked` (superseded by ML-DEAD-VOCAB-2) and ML-DRILL-1 as `rejected` (drills), both by design.
 
 **Next.**
-1. **Batch C1b** (parallel, disjoint): ML-GATE-EVIDENCE-TOOLS (`refusal_sites` and
-   `contract_annotation_diff` as ExUnit, fix its `foundry/<path>` layout assumption);
-   ML-DECOMPOSE-PP-DESIGN and ML-DECOMPOSE-GATEWAY-DESIGN (design notes under `docs/design/`,
-   reviewed before any implementation: protected Core); ML-DEAD-ROUTES (the test-only
-   `transact_verified`/`ProtectedVerifier` route and `Observations` module, per ML-DEAD-VOCAB-2).
-2. **Batch C2:** ML-DECOMPOSE-PP and ML-DECOMPOSE-GATEWAY, to their approved designs.
-3. **Batch C3:** refresh the Quint models' line citations into `protected_primitives.ex`.
-4. A fresh re-sweep of everything changed since the clean-room sweep; its ranked list is the
-   next batch. Repeat until the repo is clean and maintainable.
+
+1. **Batch C2, first: ML-PRECISION-TOOLING** (decided 2026-09-24, Q12): tools that make
+   agent work precise and cheap, landing before either split so both use them.
+   - `boundary` (Hex, locked): declare the module groups of [the boundary rules](../BOUNDARY-RULES.md)
+     (DurableStore Core, ManualLane, Workflow.Kernel, Repair, CLI) so an illegal dependency is
+     a compile error; keep `architecture_boundary_test` as the spec.
+   - `sourceror` (Hex, `only: [:dev, :test]`): a `mix foundry.move` task that moves named
+     functions to a new module and fixes aliases, so an agent names functions instead of
+     retyping thousands of lines.
+   - The shared move checker from both designs: compiled `debug_info` definitions via
+     `:beam_lib`, proving each moved function unchanged.
+   - `mix xref` tests: the cycle count (2 today) and compile-dependency edges (12 today) may
+     only fall; a split's allowed-edge list is compared with `mix xref graph` for its modules.
+     Measure these numbers at the ticket's base; don't trust the ones written here.
+   - `bin/outline.exs`: an Elixir outline (`ast-grep outline` does not parse Elixir):
+     `Code.string_to_quoted` → every `defmodule`/`def`/`defp`/`defmacro` with arity and
+     start–end lines, so an agent reads a few KB of map before opening a range of an
+     80 KB file. A test pins its output shape on a fixture.
+   - Optional, decide in the ticket: convention lints as `ast-grep` rules (`sgconfig.yml`,
+     `ast-grep test`), e.g. no hardcoded `/private/tmp` or `/bin/zsh` in tests (F3). Only if
+     CI installs a pinned `ast-grep`; otherwise keep them as ExUnit tests.
+   Each with a red control (an illegal call fails compilation; a changed moved body fails the
+   checker; a new cycle fails the ratchet). The gate's dependency policy accepts Hex packages
+   locked in `mix.lock` (`ci.ex` `validate_dependency_inventory/1`).
+2. **Batch C2, then:** ML-DECOMPOSE-GATEWAY, then ML-DECOMPOSE-PP, each to its approved design
+   ([gateway](../design/DECOMPOSE-GATEWAY.md), [protected primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md)),
+   serial (both touch FR-08A pins; one rebind each, following the design's §3 procedure). The
+   designs' open operator questions are listed in each note; ask the human before deciding them.
+3. **Batch C3:** Quint `spec/ledger/ledger.qnt` citations become `Module.function/arity`
+   (they cite line numbers into `protected_primitives.ex` that the split moves).
+4. **Candidates found in C1b, not yet admitted:** retire the `ledger_generations`, `claims`,
+   `reservations` tables, `:legacy` authority mode and Observations' `:legacy` branch (needs a
+   WORKFLOW-CONTRACT:178 edit; see [the ML-DEAD-ROUTES review](reviews/ML-DEAD-ROUTES.review.md));
+   `Gateway.transact/4` has no committing caller in `lib/`; `RPC.run` still raises on an
+   invalid payload; 20 backticked citations of deleted fr-08 files.
+5. A fresh re-sweep of everything changed since the clean-room sweep (use `mix xref graph
+   --format stats` and a no-callers report as its starting data); its ranked list is the next
+   batch. Repeat until the repo is clean and maintainable.
 
 **Operator loop, per batch.**
 
@@ -59,6 +88,45 @@ Batch C1a (fr-08 triage, lane frictions F13/F17/F18, dead store vocabulary) is t
    its ranked list feeds the next batch.
 
 Ask the operator (the human) before any operator-level decision: record it in the Q table.
+
+**Operator gotchas (learned the hard way; each cost a gate, a review round or work).**
+
+- **Exit codes, not output.** Join shell steps with `&&` and never pipe a check through
+  `tail`/`head` when its status matters: a red gate once read as green. The shell here is zsh.
+- **Gate result.** `ci/run.exs` writes `<output>/provenance.json`; the verdict is `result`
+  and the gated commit is `source.commit`. The gate takes about 6 minutes; wait on the
+  process, not on a guess. It refuses a dirty tree, including a `deps` symlink (F16): set
+  `MIX_DEPS_PATH=<main checkout>/deps` instead.
+- **Never undo with `git checkout` or `git stash`.** Reverse the exact string; checkout has
+  destroyed uncommitted work twice, and the stash stack is shared by every worktree.
+- **Never commit on the main checkout's `main` by hand.** Integrate on `integ/<batch>` in a
+  separate worktree and fast-forward.
+- **Worktrees can start on the wrong base.** After creating a developer worktree, confirm
+  `git -C <worktree> log -1` is the admitted base before the agent starts.
+- **Integrate the whole range** `<base>..<candidate>` (F10), then `lane integrated`.
+- **After a protected change,** the developer's FR-08A red is expected; only a scratch
+  rebind tells a real failure from the pin (F12). Grep `test/` for every string a ticket
+  deletes from config or workflows.
+- **A usage limit or crash kills agents silently** (F19): the lane shows `active` or
+  `reviewing` forever. Check `lane status` and each worktree's `git status`, and resume the
+  same agent if you can; a replacement agent under the same principal breaks one-principal-
+  per-instance (F9), so give a replacement a new principal via a new ticket if needed.
+- **`blocked` is terminal.** A developer who needs a path outside the admitted scope submits
+  `--blocked`; re-admit as `<ticket>-2` with the wider scope and carry the commits (F8).
+- **Parallel sessions sweep uncommitted files.** Another session's `commit -a` takes your
+  working-tree edits; commit early, and re-read shared docs before editing them.
+- **Claims go stale, code rarely does.** Don't copy a count into prose or pin it to a commit
+  it wasn't measured at; a measurement ships with the command that produced it.
+
+**Running this without Claude Code's subagents.** The lane doesn't care which tool drives it.
+A developer is any agent session in its own worktree
+(`git worktree add -b dev/<ticket> <path> <base>`) given the packet file, `AGENTS.md` and
+`docs/AGENT-BRIEF.md`; it runs `bin/foundry lane submit` itself (Q8). A reviewer is a fresh
+session on a different model in `git worktree add --detach <path> <candidate>`; it runs
+`bin/foundry lane review` itself. Name principals by vendor and model:
+`agent:codex-<model>/dev-<ticket>`, `agent:claude-fable-5-1/review-<ticket>`; a correction's
+reviewer takes a new principal (`…/review-<ticket>-2`). Cross-vendor review (one vendor
+develops, another reviews) is the strongest independence the lane can record (A3).
 
 ## Setup, 2026-09-23
 
@@ -91,6 +159,10 @@ Ask the operator (the human) before any operator-level decision: record it in th
 | ML-LANE-FRICTIONS-2 | `b9d8311` | `6cf04a5` | [approved](reviews/ML-LANE-FRICTIONS-2.review.md) | batch C1a | F17 refusals exit 1 without a stack trace (the reviewer proved on two nodes the daemon survives), F13 one refusal renderer, F18 `check_docs` reads the working tree, `bin/foundry` fallbacks deleted, runbook steps for F7/F14/F15. The developer's first `submit` passed a short SHA and was refused (`git_evidence`) |
 | ML-DEAD-VOCAB | `b9d8311` | `7a0ebb3` (blocked) | none | carried into -2 | submitted `--blocked`: two acceptance items needed paths outside its scope (F8 again). `blocked` is terminal, so the work was re-admitted |
 | ML-DEAD-VOCAB-2 | `b9d8311` | `ec4b04c` | [approved](reviews/ML-DEAD-VOCAB-2.review.md) | batch C1a + FR-08A rebind | dead FR-08B functions, unused command/intent/event types, legacy import codecs and the test-only v1/v2 migration deleted (about 600 lines of lib); FR-08A's forged command is now `enqueue` and still trips the same guard (red control). Found test-only: the `transact_verified`/`ProtectedVerifier` route and the `Observations` module |
+| ML-GATE-EVIDENCE-TOOLS | `e74fb88` | `e11f669` | [approved](reviews/ML-GATE-EVIDENCE-TOOLS.review.md) | batch C1b | `refusal_sites` and `contract_annotation_diff` run in the gate as ExUnit (pinned table of 30 sweep-unreachable refusal sites); the diff tool had crashed on every run since the split (`foundry/<path>`) |
+| ML-DEAD-ROUTES | `e74fb88` | `1414280` | [approved](reviews/ML-DEAD-ROUTES.review.md) | batch C1b + FR-08A rebind | the test-only `transact_verified` route and `ProtectedVerifier` deleted (FR-08A now pins 9); `Observations` kept because FR-18A is in progress (Q11) |
+| ML-DECOMPOSE-GATEWAY-DESIGN | `e74fb88` | `9e4a710`, then `1f50910` | [correction](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-1.md) (the rebind placeholders would have left FR-08A red; a source-AST move check cannot see alias shadowing), then [approved](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-2.md) | batch C1b + operator fixup | [design](../design/DECOMPOSE-GATEWAY.md): Gateway facade + DomainCommit + AtomicBundle + Maintenance. The operator aligned its rebind steps with ML-DEAD-ROUTES and the sibling review |
+| ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -118,6 +190,8 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q8 | Should agents run their own lane commands? | **Decided 2026-09-24: from batch C**, developer and reviewer agents run `lane submit` / `lane review` under their packet's principal; the operator still admits, issues packets and integrates |
 | Q9 | Start budget for the store seeded at the ML-RENAME-DOMAIN-TAGS rotation | **Decided 2026-09-24: 50 developer / 50 reviewer starts** (`lane-policy.example.json`), so batch C can run about four developers in parallel; a policy-revision command stays deferred until that runs out |
 | Q10 | Keep dated records (`docs/archive`, fr-08 evidence) in the tree? | **Decided 2026-09-24: no.** Tag `records/2026-09-24` at `b30d0a2` (the last commit before the renames, so the records keep their original names), delete `docs/archive`, and turn inbound links into permalinks at the tag. `docs/fr-08` gets the same treatment in batch C's triage; reviews and this log stay. Supersedes Q6 for those records |
+| Q11 | Is FR-18A (bounded effect queries, the `Observations` module) still live? | **Decided 2026-09-24 (operator deferred to the recommendation): keep.** The plan lists it in progress; its `:legacy` branch goes with the legacy-tables ticket |
+| Q12 | Tools for precise, cheaper agent work | **Decided 2026-09-24:** add `boundary` and `sourceror` (Hex, locked), use `mix xref` / `mix xref graph` and compiled `debug_info` checks, and an Elixir outline script; ticket ML-PRECISION-TOOLING opens batch C2. `AGENTS.md` now says how to search code |
 
 ## Frictions
 
@@ -170,6 +244,10 @@ F14–F16 in store 2's first two.
 | ML-FR08-TRIAGE | 1 | 0 | 0 | 0 / 0 |
 | ML-LANE-FRICTIONS-2 | 1 | 0 (2 notes) | 0 | 1 / 0 (short-SHA `submit` refused) |
 | ML-DEAD-VOCAB(-2) | 1 | 0 (3 minor notes) | 0 | 0 / 1 (`blocked` terminal; re-admitted, F8) |
+| ML-GATE-EVIDENCE-TOOLS | 1 | 0 (3 low notes) | 0 | 0 / 0 |
+| ML-DEAD-ROUTES | 1 | 0 (1 follow-up) | 0 | 0 / 0 |
+| ML-DECOMPOSE-GATEWAY-DESIGN | 2 | 2 H (rebind leaves FR-08A red; move check blind to aliases), 4 L | 0 | 0 / 0 |
+| ML-DECOMPOSE-PP-DESIGN | 3 | 3 H (unfenced write primitives; alias collisions; rule 13 vs pins), 2 M | 0 | 0 / 0 |
 
 **Reading, 2026-09-24 (11 tickets, before ML-RENAME-BIN-ENV).** Independent review pays: 7 defects caught, one of them
 high, against 2 escapes. The lane itself has caught no real error yet and has blocked one
