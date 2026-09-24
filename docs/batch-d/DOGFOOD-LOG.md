@@ -36,6 +36,7 @@ onto `main`, one gate run per push.
 | ML-RENAME-NS | `b30d0a2` | `ff0b5d5`, then `f4ca196` | [correction](reviews/ML-RENAME-NS.review-1.md) (the regex made the rename's own descriptions tautological), then [approved](reviews/ML-RENAME-NS.review-2.md) | batch B1 + FR-08A rebind | FR-23b rename 1/3, 314 files. Operator exception: pinned-commit permalinks in `archive/AUDIT-2026-09-12.md` keep their old paths (rewriting them 404s). The developer opened a copy of store 2 with the renamed build: `mode: :ready`, so no rotation here |
 | ML-RENAME-BIN-ENV | `9c7fe01` | `c73b6ea` | [approved](reviews/ML-RENAME-BIN-ENV.review.md) | batch B2 | FR-23b rename 2/3: the wrapper is `bin/foundry`, five env vars are `FOUNDRY_*`, no aliases. Retired Pramāṇa-only `bin/pramana-*` script names left for the archive drop (Q10). Reviewer: `FOUNDRY_STARTUP_MODE` has no reader (batch C dead vocabulary) |
 | ML-DOCS-ARCHIVE-DROP | `ecdbc84` | `29185be` | [approved](reviews/ML-DOCS-ARCHIVE-DROP.review.md) | batch B3 | Q10: `docs/archive` (138 files) deleted; 67 inbound links are permalinks at tag `records/2026-09-24`, all verified at the tag. `pramana` matches 675 → 197 |
+| ML-RENAME-DOMAIN-TAGS | `6a13b7c` | `1805695` | [approved](reviews/ML-RENAME-DOMAIN-TAGS.review.md) | batch B4 + FR-08A rebind | FR-23b rename 3/3: 12 digest/schema tags `pramana-foundry-*` → `foundry-*`, code prefixes renamed, one golden digest recomputed (reviewer reproduced it), seed 50/50 (Q9). Remaining `pramana` matches outside `docs/fr-08` are a checked-in allowlist ([sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)). Store 2 archived; store 3 seeded fresh |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -85,6 +86,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | F15 | renaming the release | After the release rename, `bin/foundry-lane` and `bin/…` look for `rel/foundry` and cannot reach or stop the running daemon built as the old release. Order: `lane integrated`, stop the daemon with the old scripts, fast-forward `main`, rebuild, start | runbook step for tickets that change the release or RPC entry |
 | F16 | operator integration worktree | **Operator error.** A `deps` symlink in the integration worktree made the gate refuse `{:dirty_source, ["?? deps"]}` (`.gitignore`'s `/deps/` does not match a symlink). Cost one gate start | never symlink deps into a gated tree; use `MIX_DEPS_PATH` |
 | F17 | refusals | Every refused lane command also prints an Elixir `RuntimeError` stack trace from `cli.ex:86` on stderr; stdout and the exit code are right | print the refusal and exit non-zero without raising |
+| F18 | `bin/check_docs.exs` | It resolves links against tracked files only, so a link to a newly copied, unstaged review file reads as broken (hit twice) | `git add` before `check_docs`, or check the working tree |
 
 ## Scorecard
 
@@ -109,6 +111,7 @@ F14–F16 in store 2's first two.
 | ML-RENAME-NS | 2 | 1 L (tautologies) | 0 | 0 / 0 |
 | ML-RENAME-BIN-ENV | 1 | 0 (3 informational notes) | 0 | 0 / 0 |
 | ML-DOCS-ARCHIVE-DROP | 1 | 0 (2 pre-existing stale prose paths) | 0 | 0 / 0 |
+| ML-RENAME-DOMAIN-TAGS | 1 | 0 (2 doc nits) | 0 | 0 / 0 |
 
 **Reading, 2026-09-24 (11 tickets, before ML-RENAME-BIN-ENV).** Independent review pays: 7 defects caught, one of them
 high, against 2 escapes. The lane itself has caught no real error yet and has blocked one
