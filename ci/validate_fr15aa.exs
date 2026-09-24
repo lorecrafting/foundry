@@ -303,7 +303,7 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
     "assignment-schema" => "3042a56aa668c2852a4fdcf21c35eb70bd36d350e210e05f151177b60449ba8f",
     "current-coordinator" => "925c54dba022a06213f0d33eb26c6b352fbde53c713796e3587d96640e9db7e6",
     "current-tick" => "8df097027896c88bb55f03f50a6cb6f5592c64a8c201f41aa1bf186754143ee0",
-    "current-agent-server" => "ec7e1ea88b26afc0f5b6ef3912479828334c32b16030ba6113aec1639aa360de",
+    "current-agent-server" => "cc62233d87f17dfa17bae9858e1f1b1d20dacfdadd924beb980a4b48e999cb1f",
     "current-herdr-adapter" => "404406087170a1e37fcaaa3a6bc0ea9528cc659a689260ac2664bf1e5e846189",
     "current-herdr-argv" => "e58e0d7c6f9701388ed1ce3c7d78e7984836677a027883f181a717bbbf303bfc",
     "current-herdr-runner" => "1df506bc0444df2326de7fd9328e72038d990e2bbc36f5c9e038abbbc0fa2650",

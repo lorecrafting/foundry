@@ -167,10 +167,11 @@ defmodule PramanaFoundry.HardeningPM do
 
   defp elaborate_ticket(_ticket), do: []
 
-  defp build_amendments(ticket) do
+  @doc false
+  def build_amendments(ticket) do
     []
-    |> maybe_add_field(ticket, "scope", ["workflow/lib/pramana_foundry/**"])
-    |> maybe_add_field(ticket, "exclusions", ["No changes outside workflow/"])
+    |> maybe_add_field(ticket, "scope", ["lib/pramana_foundry/**"])
+    |> maybe_add_field(ticket, "exclusions", ["No changes outside lib/pramana_foundry/"])
     |> maybe_add_field(ticket, "work_class", "p0_high_risk")
     |> maybe_add_field(ticket, "risk", "workflow_recovery")
     |> maybe_add_field(ticket, "profile", "omp_gemini_developer")
@@ -178,9 +179,9 @@ defmodule PramanaFoundry.HardeningPM do
     |> maybe_add_field(ticket, "reasoning", "medium")
     |> maybe_add_field(ticket, "workload", "lightweight")
     |> maybe_add_field(ticket, "required_checks", [
-      ["sh", "-c", "cd workflow && exec mise exec -- mix format --check-formatted"],
-      ["sh", "-c", "cd workflow && exec mise exec -- mix compile --warnings-as-errors"],
-      ["sh", "-c", "cd workflow && exec mise exec -- mix test"]
+      ["sh", "-c", "exec mise exec -- mix format --check-formatted"],
+      ["sh", "-c", "exec mise exec -- mix compile --warnings-as-errors"],
+      ["sh", "-c", "exec mise exec -- mix test"]
     ])
     |> maybe_add_field(ticket, "integration_only_checks", [
       ["mise", "exec", "--", "mix", "precommit"]
@@ -226,16 +227,18 @@ defmodule PramanaFoundry.HardeningPM do
 
   # ── Validation ──
 
-  defp validate_no_scope_leak(elaborated) do
+  @doc false
+  def validate_no_scope_leak(elaborated) do
     leaks =
       elaborated
       |> Enum.flat_map(fn e -> Map.get(e["ticket"], "scope", []) end)
-      |> Enum.reject(fn s -> String.starts_with?(s, "workflow/") end)
+      |> Enum.reject(fn s -> String.starts_with?(s, "lib/pramana_foundry/") end)
 
     if leaks == [] do
       :ok
     else
-      {:error, "scope leak: tickets reference paths outside workflow/: #{inspect(leaks)}"}
+      {:error,
+       "scope leak: tickets reference paths outside lib/pramana_foundry/: #{inspect(leaks)}"}
     end
   end
 

@@ -414,59 +414,7 @@ defmodule PramanaFoundry.Improver do
       findings
       |> Enum.take(3)
       |> Enum.with_index()
-      |> Enum.map(fn {finding, idx} ->
-        task_id = "IMPRV-#{pad_idx(idx)}"
-
-        %{
-          "operation" => "create",
-          "ticket" => %{
-            "task_id" => task_id,
-            "base_revision" => accepted_rev,
-            "priority" => "P1",
-            "work_class" => "p0_high_risk",
-            "risk" => "workflow_recovery",
-            "role" => "developer",
-            "profile" => "omp_gemini_developer",
-            "model" => "omp-google-gemini-3.8-flash-developer",
-            "reasoning" => "medium",
-            "workload" => "lightweight",
-            "work_timeout_seconds" => 14_400,
-            "check_timeout_seconds" => 7_200,
-            "scope" => ["workflow/lib/pramana_foundry/**"],
-            "exclusions" => ["No changes outside workflow/"],
-            "outcome" => "Self-healing: #{finding.summary}",
-            "acceptance_criteria" => [
-              "Investigate and resolve #{finding.category}: #{finding.summary}",
-              "Add regression detection to Improver classifiers",
-              "Update telemetry with resolution evidence"
-            ],
-            "dependencies" => [],
-            "evidence" => [finding.details],
-            "environment" => %{
-              "MIX_ENV" => "test",
-              "MIX_BUILD_PATH" => "/private/tmp/pramana-build-#{task_id}",
-              "MIX_TEST_PARTITION" => "#{rem(idx + 1, 16)}",
-              "PORT" => "#{4200 + idx}"
-            },
-            "required_checks" => [
-              ["sh", "-c", "cd workflow && exec mise exec -- mix format --check-formatted"],
-              ["sh", "-c", "cd workflow && exec mise exec -- mix compile --warnings-as-errors"],
-              ["sh", "-c", "cd workflow && exec mise exec -- mix test"]
-            ],
-            "integration_only_checks" => [
-              ["mise", "exec", "--", "mix", "precommit"]
-            ],
-            "shared_resources" => %{
-              "corpus" => [],
-              "database" => [],
-              "gpu" => [],
-              "other" => ["workflow-improver"],
-              "service_ports" => ["#{4200 + idx}"]
-            }
-          },
-          "reason" => "Self-healing: #{finding.category} - #{finding.summary}"
-        }
-      end)
+      |> Enum.map(fn {finding, idx} -> proposal(finding, idx, accepted_rev) end)
 
     case Coordinator.apply_pm_proposals(proposals) do
       {:ok, _new_state} ->
@@ -479,6 +427,62 @@ defmodule PramanaFoundry.Improver do
       {:error, reason} ->
         IO.puts("  PM proposal rejected: #{inspect(reason)}")
     end
+  end
+
+  @doc false
+  # The create proposal one finding becomes; public so tests can read its scope directly.
+  def proposal(finding, idx, accepted_rev) do
+    task_id = "IMPRV-#{pad_idx(idx)}"
+
+    %{
+      "operation" => "create",
+      "ticket" => %{
+        "task_id" => task_id,
+        "base_revision" => accepted_rev,
+        "priority" => "P1",
+        "work_class" => "p0_high_risk",
+        "risk" => "workflow_recovery",
+        "role" => "developer",
+        "profile" => "omp_gemini_developer",
+        "model" => "omp-google-gemini-3.8-flash-developer",
+        "reasoning" => "medium",
+        "workload" => "lightweight",
+        "work_timeout_seconds" => 14_400,
+        "check_timeout_seconds" => 7_200,
+        "scope" => ["lib/pramana_foundry/**"],
+        "exclusions" => ["No changes outside lib/pramana_foundry/"],
+        "outcome" => "Self-healing: #{finding.summary}",
+        "acceptance_criteria" => [
+          "Investigate and resolve #{finding.category}: #{finding.summary}",
+          "Add regression detection to Improver classifiers",
+          "Update telemetry with resolution evidence"
+        ],
+        "dependencies" => [],
+        "evidence" => [finding.details],
+        "environment" => %{
+          "MIX_ENV" => "test",
+          "MIX_BUILD_PATH" => "/private/tmp/pramana-build-#{task_id}",
+          "MIX_TEST_PARTITION" => "#{rem(idx + 1, 16)}",
+          "PORT" => "#{4200 + idx}"
+        },
+        "required_checks" => [
+          ["sh", "-c", "exec mise exec -- mix format --check-formatted"],
+          ["sh", "-c", "exec mise exec -- mix compile --warnings-as-errors"],
+          ["sh", "-c", "exec mise exec -- mix test"]
+        ],
+        "integration_only_checks" => [
+          ["mise", "exec", "--", "mix", "precommit"]
+        ],
+        "shared_resources" => %{
+          "corpus" => [],
+          "database" => [],
+          "gpu" => [],
+          "other" => ["workflow-improver"],
+          "service_ports" => ["#{4200 + idx}"]
+        }
+      },
+      "reason" => "Self-healing: #{finding.category} - #{finding.summary}"
+    }
   end
 
   # ── Helpers ──

@@ -141,7 +141,9 @@
       kind: "source_route",
       version: "base-f5067d9",
       path: "lib/pramana_foundry/agent_server.ex",
-      sha256: "ec7e1ea88b26afc0f5b6ef3912479828334c32b16030ba6113aec1639aa360de",
+      # Re-pinned 2026-09-23: after the repository split the agent prompts name role files as
+      # roles/… relative to the checkout root, not foundry/roles/…. Prompt text only.
+      sha256: "cc62233d87f17dfa17bae9858e1f1b1d20dacfdadd924beb980a4b48e999cb1f",
       status: "legacy_blocked_route"
     },
     %{

@@ -645,7 +645,7 @@ defmodule PramanaFoundry.AgentServer do
               else: ""
 
           """
-          Read and follow foundry/roles/reviewer.md (role file).
+          Read and follow roles/reviewer.md (role file).
           Review the completed assignment #{task_id}.
           RUN_ID: #{run_id}
           Checkout: #{checkout}
@@ -667,7 +667,7 @@ defmodule PramanaFoundry.AgentServer do
               else: ""
 
           """
-          Read and follow foundry/roles/#{role_file} (role file).
+          Read and follow roles/#{role_file} (role file).
           Execute assignment #{task_id}.
           RUN_ID: #{run_id}
           Work in checkout #{checkout}.

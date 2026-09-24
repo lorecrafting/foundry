@@ -174,6 +174,57 @@ defmodule PramanaFoundry.AgentServerTest do
       assert_receive {:DOWN, ^ref, :process, ^pid, _}, 2_000
     end
 
+    for {role, agent_name} <- [
+          developer: "pramana-dev-runtest",
+          reviewer: "pramana-review-runtest"
+        ] do
+      test "#{role} prompt names its role file relative to the checkout root", ctx do
+        role = unquote(role)
+        agent = %{@ready_agent | "name" => unquote(agent_name)}
+
+        PramanaFoundry.AgentServerTest.FakeRunner.install(ctx.table, fn
+          ["herdr", "pane", "split" | _] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(@pane_split_result)
+
+          ["herdr", "agent", "start" | _] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(%{"result" => %{"agent" => agent}})
+
+          ["herdr", "pane", "get", "pane-1"] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(@pane_get_result)
+
+          ["herdr", "pane", "process-info", "--pane", "pane-1"] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(@process_info_result)
+
+          ["herdr", "agent", "get", _] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(%{"agent" => agent})
+
+          ["herdr", "agent", "prompt" | _] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(%{"ok" => true})
+
+          ["herdr", "pane", "close", "pane-1"] ->
+            PramanaFoundry.AgentServerTest.FakeRunner.json(%{"ok" => true})
+        end)
+
+        {:ok, pid} =
+          start_agent(ctx |> Map.put(:task_id, "T-PROMPT-#{role}") |> Map.put(:role, role))
+
+        assert_receive {:agent_launched, _task_id, :ok, _info}, 2000
+
+        [prompt] =
+          for ["herdr", "agent", "prompt" | args] <-
+                PramanaFoundry.AgentServerTest.FakeRunner.calls(ctx.table),
+              text <- args,
+              String.starts_with?(text, "Read and follow"),
+              do: text
+
+        assert prompt =~ "Read and follow roles/#{role}.md (role file)."
+
+        ref = Process.monitor(pid)
+        DynamicSupervisor.terminate_child(ctx.sup_pid, pid)
+        assert_receive {:DOWN, ^ref, :process, ^pid, _}, 2_000
+      end
+    end
+
     test "failed pane split sends {:agent_launched, task_id, {:error, ...}} and stops", ctx do
       PramanaFoundry.AgentServerTest.FakeRunner.install(ctx.table, fn
         ["herdr", "pane", "split" | _] -> {:error, :split_failed}
