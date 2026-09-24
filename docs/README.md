@@ -25,7 +25,7 @@ contract still govern implementation.
 | Start or check orchestrator-boundary step O0 (which workflow calls cross protected authority, and what could move above Core) | [O0 authority inventory](orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md). It is an inventory taken at `6bc015ed` and changes no behaviour; read it after [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) |
 | Evaluate or implement the Pi replacement candidate and Claude-like ergonomics | [Pi harness design](PI-HARNESS.md), then the [checkpoint F feasibility record](fr-09/checkpoint-f-feasibility.md), its [independent blocker review](fr-09/checkpoint-f-review.md) and [independent correction PASS](fr-09/checkpoint-f-rereview.md), repair plan/workflow contract and affected FR-09/15a/18 requirements before implementation |
 | Evaluate Jido/Jido.Harness/ACP before building a custom harness bridge | [Jido / Jido.Harness evaluation](JIDO-HARNESS.md), then [Pi harness design](PI-HARNESS.md), [Observability](OBSERVABILITY.md) and the same FR-09/15a/18 gates |
-| Inspect the FR-15aA host/provisioning specification and executable inventory | [FR-15aA provisioning specification](fr-15a/provisioning-specification.md), its [machine-readable manifest](fr-15a/provisioning-manifest.exs), then the governing FR-15aB/FR-09 criteria; the specification enables no execution |
+| Inspect the FR-15aA host/provisioning specification and executable inventory | [FR-15aA provisioning specification](fr-15a/provisioning-specification.md) and its [machine-readable manifest](archive/fr-15a/provisioning-manifest.exs), archived with its validator and test on 2026-09-23 when they left the gate ([why](archive/fr-15a/README.md)); then the governing FR-15aB/FR-09 criteria. The specification enables no execution |
 | Inspect the frozen FR-18A observation/query candidate | [FR-18A candidate and evidence](fr-18a/candidate.md), its [independent BLOCKER review](fr-18a/independent-review.md), [narrow correction rereview](fr-18a/correction-rereview.md), [final residual-B1 PASS](fr-18a/final-b1-rereview.md), the [bounded effect-query design](fr-18a/bounded-effect-query-design.md), [B5 implementation candidate](fr-18a/bounded-effect-query-candidate.md) [independent B5 BLOCKER review](fr-18a/b5-review.md) and the [B5 correction rereview PASS](fr-18a/b5-correction-rereview.md), then the governing FR-18A criteria and accepted FR-08A combined review; FR-18A remains blocked and this candidate enables no producer, activation or deployment |
 | Resume active repairs | [Repair plan](REPAIR-PLAN.md), the current ticket's acceptance criteria and its referenced evidence |
 | Judge how far the supervised dogfood alpha is, or pick parallel work that shortens it | [Dogfood readiness](DOGFOOD-READINESS-2026-09-23.md) — requirements, live path, a thin manual lane and its accepted risks, ranked parallel work; proposal at `33395c92`, not approved |
@@ -56,7 +56,8 @@ contract still govern implementation.
 | Plan FR-23 dead-surface removal, or check whether a `lib/` identifier still dispatches | [Dead surface inventory](DEAD-SURFACE-INVENTORY-2026-09-22.md) — unused functions, list-literal members and modules at `6bc015ed`, each with its recorded search and owner; it removed nothing |
 | Decide whether to split FR-23, or pick up FR-23 hygiene before FR-10/11/12/19B land | [FR-23 split proposal](fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md) — a proposal at `b46d3825`, not yet approved: FR-23a (hygiene, gated by which files it may touch) and FR-23b (decomposition and retirement, keeping FR-23's dependencies); the repair plan still governs |
 | Inspect implementation history | [Implementation log](IMPLEMENTATION-LOG.md); use its reading route and active-ticket headings rather than preloading the append-only history |
-| Review an agent assignment | The applicable [role documents](../roles) and current workflow contract |
+| Review an agent assignment | The lane's [work packet and review steps](batch-d/LANE-RUNBOOK.md), the [agent brief](AGENT-BRIEF.md) and the current workflow contract; the legacy `roles/` prompt templates were deleted with the daemon on 2026-09-23 |
+| Rebuild a capability the legacy daemon had (launch, prompt delivery, checks, cleanup, scheduling, correction budgets) | [Moved knowledge](design/MOVED-KNOWLEDGE-2026-09-23.md): each edge case the deleted tests encoded, the test name and which of FR-09–FR-13 owns it |
 
 **The active repair plan, not the original eight-ticket migration sequence, owns
 repair ordering.** A design-review approval applies to its named candidate; it is not
@@ -71,10 +72,9 @@ a competing backlog.
 Shared repository instructions live in [AGENTS.md](../AGENTS.md). They apply to
 Claude, Gemini, DeepSeek, Codex and other providers. That neutrality does not relax
 Foundry's launch policy, billing authorization, review identity or backend conformance.
-Read the existing README and repair criteria before operating Herdr or any future adapter.
-
-This documentation reorganization does not replace Herdr, enable automatic dispatch,
-change launch profiles, promote an artifact or alter any repair ticket.
+Foundry launches no agent: the Herdr adapter and the daemon that drove it were deleted on
+2026-09-23 ([plan amendment C1](REPAIR-PLAN.md#clean-room-amendment)), and the manual lane is
+the only ingress. Any future harness adapter passes FR-09 before it runs anything.
 
 ## Evidence and navigation
 

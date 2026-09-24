@@ -13,10 +13,10 @@ and exits non-zero.
 ## 1. Prerequisites
 
 - Elixir/Erlang as pinned for Foundry, `python3` and `git` on `PATH`.
-- Check no other `pramana_foundry` daemon is running: `pgrep -fl 'sname pramana_foundry'`.
-  The lane uses its own node name and runtime root regardless.
-- The lane daemon runs `ManualLane.Server` alone: no Coordinator, Improver, HardeningPM or
-  agent launches. Never set `COORDINATOR_TICK`, `auto_approve` or a paid profile for it.
+- The lane daemon is the only daemon: it runs `ManualLane.Server` alone and launches no
+  agent. The legacy daemon stack was deleted on 2026-09-23
+  ([plan amendment C1](../REPAIR-PLAN.md#clean-room-amendment)); `bin/pramana` commands other
+  than `lane …` are refused.
 
 ## 2. Start and stop
 
