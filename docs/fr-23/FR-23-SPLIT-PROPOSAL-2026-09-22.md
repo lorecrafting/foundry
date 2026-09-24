@@ -158,7 +158,7 @@ FR-23's rules apply unchanged:
   REPAIR-PLAN's FR-08B section is FR-08B's own item, not this ticket's.
 - *Dead surface removal* in the rewrite set.
 - The retirement inventory's RETIRE sections, which are file splits of
-  [MIGRATION.md](../MIGRATION.md) and [MIGRATION-TICKETS.md](../MIGRATION-TICKETS.md).
+  [MIGRATION.md](../archive/MIGRATION.md) and [MIGRATION-TICKETS.md](../archive/MIGRATION-TICKETS.md).
 - The OWNED-ELSEWHERE rows, once their owners finish.
 - **Rename the namespace away from Pramāṇa** (operator request, 2026-09-23): OTP app
   `:pramana_foundry` → `:foundry`, modules `PramanaFoundry.*` → `Foundry.*`,

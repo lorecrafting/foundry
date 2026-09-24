@@ -41,8 +41,8 @@ done in place now.
 
 | Section | Mechanism described | Evidence the code is gone (run from repo root at `e374322b`) |
 |---|---|---|
-| [MIGRATION.md](../MIGRATION.md) §"Cutover and cutover interfaces" and §"Cutover-to-retirement checklist" | `PramanaWorkflow.Cutover.{SupervisorControl,Import,Release,Rollback,Soak,Retire}`, Python wrappers, `automation/` scripts | `git grep -n -e "Cutover\." -e "SupervisorControl" -e "defmodule .*Cutover" -- foundry/lib foundry/test foundry/bin bin foundry/ci` → **empty, exit 1**. `git grep -n -e "bin/pramana-supervisor" -e "bin/pramana-board" -e "bin/pramana-retire-smoke" -- ':!*.md'` → **empty, exit 1**. `ls bin/pramana-supervisor bin/pramana-board bin/pramana-retire-smoke automation` → all four absent |
-| [MIGRATION-TICKETS.md](../MIGRATION-TICKETS.md) §"Cutover contract: WF-ELIXIR-CUTOVER-02", §"Retirement boundary" | Same `Cutover.*` modules and `test/pramana_workflow/cutover*` tests | Same greps. No `test/pramana_foundry/cutover*` exists (`ls foundry/test/pramana_foundry`) |
+| [MIGRATION.md](MIGRATION.md) §"Cutover and cutover interfaces" and §"Cutover-to-retirement checklist" | `PramanaWorkflow.Cutover.{SupervisorControl,Import,Release,Rollback,Soak,Retire}`, Python wrappers, `automation/` scripts | `git grep -n -e "Cutover\." -e "SupervisorControl" -e "defmodule .*Cutover" -- foundry/lib foundry/test foundry/bin bin foundry/ci` → **empty, exit 1**. `git grep -n -e "bin/pramana-supervisor" -e "bin/pramana-board" -e "bin/pramana-retire-smoke" -- ':!*.md'` → **empty, exit 1**. `ls bin/pramana-supervisor bin/pramana-board bin/pramana-retire-smoke automation` → all four absent |
+| [MIGRATION-TICKETS.md](MIGRATION-TICKETS.md) §"Cutover contract: WF-ELIXIR-CUTOVER-02", §"Retirement boundary" | Same `Cutover.*` modules and `test/pramana_workflow/cutover*` tests | Same greps. No `test/pramana_foundry/cutover*` exists (`ls foundry/test/pramana_foundry`) |
 
 The parity matrix in MIGRATION.md is labelled "Historical executable parity matrix (dated
 2026-09-08)". It records what was checked on that date, so it is **evidence** and survives
@@ -75,9 +75,9 @@ revision 1 got wrong", and revision 2's mechanism is live, so it is KEEP-CURRENT
 
 | File | Owner | Why not FR-23's to retire yet |
 |---|---|---|
-| [EVENT_SOURCING.md](../EVENT_SOURCING.md) | FR-08B | Describes the live legacy JSONL path: `events.jsonl`, `Transition.rebuild/2` and `Checkpoint.append/6`. `Transition.rebuild` is defined at `foundry/lib/pramana_foundry/transition.ex:58`. `Checkpoint.append` is called from `coordinator.ex:1336`, `coordinator/tick.ex:32` and `effects/prompt_delivery.ex:53`. `git grep -l events.jsonl -- foundry/lib` → `application.ex`, `board.ex`, `consolidated_log.ex`, `coordinator.ex`. No banner; its replacement (the FR-08B kernel) has not finished migrating ingress, so any banner would pre-empt FR-08B |
-| [MIGRATION.md](../MIGRATION.md) | FR-08B (migration-era, JSONL), FR-19B (§"Workspace relocation and rollback") | FR-23 retires migration-era material only "once FR-08B has retired legacy JSONL". Relocation is live in `foundry/lib/pramana_foundry/relocation/` (six modules) and `relocation.ex`. The file already has a historical-status banner and naming note. Its cutover sections are listed under RETIRE |
-| [MIGRATION-TICKETS.md](../MIGRATION-TICKETS.md) | FR-08B (migration-era), FR-19B (WF-WORKSPACE-MOVE-01) | Same gate. Historical-status banner already present |
+| [EVENT_SOURCING.md](EVENT_SOURCING.md) | FR-08B | Describes the live legacy JSONL path: `events.jsonl`, `Transition.rebuild/2` and `Checkpoint.append/6`. `Transition.rebuild` is defined at `foundry/lib/pramana_foundry/transition.ex:58`. `Checkpoint.append` is called from `coordinator.ex:1336`, `coordinator/tick.ex:32` and `effects/prompt_delivery.ex:53`. `git grep -l events.jsonl -- foundry/lib` → `application.ex`, `board.ex`, `consolidated_log.ex`, `coordinator.ex`. No banner; its replacement (the FR-08B kernel) has not finished migrating ingress, so any banner would pre-empt FR-08B |
+| [MIGRATION.md](MIGRATION.md) | FR-08B (migration-era, JSONL), FR-19B (§"Workspace relocation and rollback") | FR-23 retires migration-era material only "once FR-08B has retired legacy JSONL". Relocation is live in `foundry/lib/pramana_foundry/relocation/` (six modules) and `relocation.ex`. The file already has a historical-status banner and naming note. Its cutover sections are listed under RETIRE |
+| [MIGRATION-TICKETS.md](MIGRATION-TICKETS.md) | FR-08B (migration-era), FR-19B (WF-WORKSPACE-MOVE-01) | Same gate. Historical-status banner already present |
 
 ## KEEP-CURRENT
 
@@ -94,7 +94,7 @@ they describe running code.
 | [EVIDENCE-TOOLS.md](../EVIDENCE-TOOLS.md) | `foundry/bin/{refusal_sites,guard_mutation_sweep,contract_annotation_diff,closure_probe}.exs`, `preflight.sh` present |
 | [COVERAGE-GUIDED-SWEEP.md](../COVERAGE-GUIDED-SWEEP.md) | "Design note. Not implemented"; still the open proposal referenced by the evidence-reduction tickets |
 | [ASSESSOR.md](ASSESSOR.md) | `foundry/lib/pramana_foundry/assessor/` present |
-| [OBSERVABILITY.md](../OBSERVABILITY.md) | Live inventory plus target; every backticked reference resolves |
+| [OBSERVABILITY.md](OBSERVABILITY.md) | Live inventory plus target; every backticked reference resolves |
 | [STRATEGY.md](../STRATEGY.md), [ECOSYSTEM-BOUNDARY.md](../design/ECOSYSTEM-BOUNDARY.md), [ORCHESTRATOR-BOUNDARY.md](../design/ORCHESTRATOR-BOUNDARY.md), [PROJECT-WORKFLOW-PROFILES.md](../design/PROJECT-WORKFLOW-PROFILES.md), [PLANNING-STRATEGIES.md](../design/PLANNING-STRATEGIES.md), [AX-SUBSTRATE.md](../design/AX-SUBSTRATE.md), [CLOUDFLARE-OS.md](../design/CLOUDFLARE-OS.md) | Dated research or design guidance; nothing supersedes them |
 | [PI-HARNESS.md](../design/PI-HARNESS.md), [JIDO-HARNESS.md](../design/JIDO-HARNESS.md) | Two live candidates. JIDO-HARNESS says to compare both, so neither replaces the other |
 | [fr-15a/provisioning-specification.md](fr-15a/provisioning-specification.md) | FR-15aA specification with machine-readable manifest; still governing |

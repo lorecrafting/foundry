@@ -5726,7 +5726,7 @@ test supports the same direction and keeps composition post-repair.
 
 *Status: APPROVED by the operator 2026-09-23.* Documentation only. Proposal
 blocks were added to the FR-18B and FR-20 sections of [the repair plan](../REPAIR-PLAN.md)
-and to the staged convergence route in [OBSERVABILITY.md](../OBSERVABILITY.md). Board/status
+and to the staged convergence route in [OBSERVABILITY.md](OBSERVABILITY.md). Board/status
 consumption moves to FR-18B, because FR-18B's acceptance already requires board/status
 agreement. The Improver's canonical consumption and step 7 efficiency validation go to
 FR-20. FR-19B keeps retention, and export stays optional. The 2026-09-20 assignment in

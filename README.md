@@ -72,12 +72,12 @@ evaluation credential.
   initialization/recovery and current limitations.
 - [`docs/ALIGNMENT-AUDIT-2026-09-19.md`](docs/archive/ALIGNMENT-AUDIT-2026-09-19.md) — independent
   read-only source alignment audit and exact limitations (before the deletion).
-- [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — describes the deleted legacy telemetry;
+- [`docs/OBSERVABILITY.md`](docs/archive/OBSERVABILITY.md) — describes the deleted legacy telemetry;
   its rewrite around `Observations` and the lane log is pending.
 - [`docs/AX-SUBSTRATE.md`](docs/design/AX-SUBSTRATE.md) and [`docs/CLOUDFLARE-OS.md`](docs/design/CLOUDFLARE-OS.md)
   — 2026-09-21 research on alternate execution substrates beneath Foundry's
   authority/evidence boundary.
-- [`docs/MIGRATION.md`](docs/MIGRATION.md) and [`docs/MIGRATION-TICKETS.md`](docs/MIGRATION-TICKETS.md)
+- [`docs/MIGRATION.md`](docs/archive/MIGRATION.md) and [`docs/MIGRATION-TICKETS.md`](docs/archive/MIGRATION-TICKETS.md)
   — historical migration design; evidence, not current repair authority.
 
 ## Tracked layout
