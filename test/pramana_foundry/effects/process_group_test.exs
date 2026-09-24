@@ -5,6 +5,13 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
 
   @moduletag :process_group
 
+  # Resolved once: macOS's /usr/bin/python3 is a shim that re-execs the CommandLineTools
+  # Python.app, so a helper started through it changes its `command` after the test
+  # has bound its identity, and `signal/4` then correctly refuses it as stale.
+  setup_all do
+    %{python: real_python!()}
+  end
+
   @doc false
   # Real termination and descendant-cleanup behaviour was exercised in the deleted
   # `PramanaFoundry.Checks.RunnerTest` (2026-09-23; FR-10 owns it now, see
@@ -48,9 +55,8 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     refute ProcessGroup.same_process?(%{pid: 1}, nil)
   end
 
-  test "a live process whose argv contains defunct is not gone" do
-    {port, identity} = marker_process("defunct-live-argv")
-    on_exit(fn -> close_port(port) end)
+  test "a live process whose argv contains defunct is not gone", %{python: python} do
+    {_port, identity} = marker_process(python, "defunct-live-argv")
 
     assert identity.command =~ "defunct-live-argv"
     refute String.starts_with?(identity.state, "Z")
@@ -58,7 +64,8 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     refute ProcessGroup.gone?(identity)
   end
 
-  test "a bound process observed in real zombie state is gone where fork is supported" do
+  test "a bound process observed in real zombie state is gone where fork is supported",
+       %{python: python} do
     root =
       Path.join(System.tmp_dir!(), "process-group-zombie-#{System.unique_integer([:positive])}")
 
@@ -70,26 +77,29 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     import os, sys, time
     child = os.fork()
     if child == 0:
-        while not os.path.exists(sys.argv[1]):
+        while not os.path.exists(sys.argv[1]) and os.path.isdir(os.path.dirname(sys.argv[1])):
             time.sleep(0.01)
         os._exit(0)
     print(child, flush=True)
-    while not os.path.exists(sys.argv[2]):
+    while not os.path.exists(sys.argv[2]) and os.path.isdir(os.path.dirname(sys.argv[2])):
         time.sleep(0.01)
     os.waitpid(child, 0)
     """
 
     port =
-      Port.open({:spawn_executable, python_executable!()}, [
+      Port.open({:spawn_executable, python}, [
         :binary,
         :exit_status,
         :stderr_to_stdout,
         args: ["-c", script, exit_path, reap_path]
       ])
 
+    parent = port_identity(port)
+
     on_exit(fn ->
+      File.touch(exit_path)
       File.touch(reap_path)
-      close_port(port)
+      stop_helper(parent, 2_000)
       File.rm_rf!(root)
     end)
 
@@ -126,9 +136,9 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
 
   # The refusal precedes `kill`, so these send no real signal: the runner flunks if called.
   # Formerly covered only by the deleted checks/runner_test (2026-09-23 review F1).
-  test "a replacement owner (same pid, different start time) is refused, never signalled" do
-    {port, identity} = marker_process("stale-replacement-owner")
-    on_exit(fn -> close_port(port) end)
+  test "a replacement owner (same pid, different start time) is refused, never signalled",
+       %{python: python} do
+    {_port, identity} = marker_process(python, "stale-replacement-owner")
     forged = %{identity | started_at: "not-" <> identity.started_at}
 
     assert {:error, :stale_identity} =
@@ -137,8 +147,8 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     assert {:ok, _still_alive} = ProcessGroup.identity(identity.pid)
   end
 
-  test "an already-exited pid is refused, never signalled" do
-    {port, identity} = marker_process("stale-exited", 0.2)
+  test "an already-exited pid is refused, never signalled", %{python: python} do
+    {port, identity} = marker_process(python, "stale-exited", 0.2)
     assert_receive {^port, {:exit_status, 0}}, 5_000
     assert await_gone(identity, 2_000)
 
@@ -146,9 +156,8 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
              ProcessGroup.signal(identity, :sigkill, &ProcessGroup.identity/1, &no_kill/3)
   end
 
-  test "a failed signal against a live marker process remains a failure" do
-    {port, identity} = marker_process("defunct-failed-signal")
-    on_exit(fn -> close_port(port) end)
+  test "a failed signal against a live marker process remains a failure", %{python: python} do
+    {_port, identity} = marker_process(python, "defunct-failed-signal")
 
     command_runner = fn "kill", _args, _opts -> {"permission denied", 1} end
 
@@ -174,18 +183,35 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     }
   end
 
-  defp marker_process(marker, seconds \\ 30) do
+  # Closing a port does not stop a helper that never reads stdin, so every helper this
+  # file spawns is killed on exit, and the test fails if one survives.
+  defp marker_process(python, marker, seconds \\ 30) do
     port =
-      Port.open({:spawn_executable, python_executable!()}, [
+      Port.open({:spawn_executable, python}, [
         :binary,
         :exit_status,
         :stderr_to_stdout,
         args: ["-c", "import time; time.sleep(#{seconds})", marker]
       ])
 
-    {:os_pid, pid} = Port.info(port, :os_pid)
-    identity = stable_identity(pid, 2_000)
+    identity = port_identity(port)
+    on_exit(fn -> stop_helper(identity, 0) end)
     {port, identity}
+  end
+
+  defp port_identity(port) do
+    {:os_pid, pid} = Port.info(port, :os_pid)
+    stable_identity(pid, 2_000)
+  end
+
+  # Waits `grace_ms` for the helper to exit by itself, SIGKILLs it (only while its bound
+  # identity still holds, so a recycled pid is never hit), then requires it gone.
+  defp stop_helper(identity, grace_ms) do
+    if not await_gone(identity, grace_ms) and ProcessGroup.presence(identity) == :present do
+      System.cmd("kill", ["-KILL", Integer.to_string(identity.pid)], stderr_to_stdout: true)
+    end
+
+    assert await_gone(identity, 2_000), "helper #{identity.pid} survived: #{identity.command}"
   end
 
   defp stable_identity(pid, timeout_ms) do
@@ -238,10 +264,20 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
 
   defp no_kill(command, args, _opts), do: flunk("unexpected #{command} #{inspect(args)}")
 
-  defp python_executable!, do: System.find_executable("python3") || flunk("python3 unavailable")
+  # The binary python3 finally runs as: on macOS `ps` names the re-exec target; elsewhere
+  # `comm` is a bare name and python3 runs as itself.
+  defp real_python! do
+    python = System.find_executable("python3") || flunk("python3 unavailable")
 
-  defp close_port(port) do
-    if Port.info(port), do: Port.close(port)
+    script = """
+    import os, subprocess, sys
+    comm = subprocess.run(["ps", "-o", "comm=", "-p", str(os.getpid())],
+                          capture_output=True, text=True).stdout.strip()
+    print(comm if os.path.isabs(comm) and os.access(comm, os.X_OK) else sys.executable)
+    """
+
+    {out, 0} = System.cmd(python, ["-c", script])
+    String.trim(out)
   end
 
   defp unused_pid do
