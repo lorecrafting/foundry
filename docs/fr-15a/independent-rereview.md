@@ -37,7 +37,7 @@ of B2's required source binding and authority relationships, not new host-proof 
 their path, kind or version. Repository-byte validation at line 355 is selected by the
 manifest-supplied `foundry/` path prefix; the catch-all at line 369 accepts other cases.
 
-The [independent reproduction](independent-rereview-probes.exs) invokes the real validator
+The [independent reproduction](../archive/fr-15a/independent-rereview-probes.exs) invokes the real validator
 and observes `:ok` for each of these mutations:
 
 - Delete `path`, `kind` and `version` from every pin, keeping only IDs/digests/status.
@@ -163,7 +163,7 @@ The repository root is anchored to the validator location. Removing or redirecti
 manifest path therefore cannot select or suppress a required repository-byte check.
 Explicit unresolved/blocked artifacts remain supported as blocked specifications.
 
-The [new independent probes](independent-final-review-probes.exs) reject individual
+The [new independent probes](../archive/fr-15a/independent-final-review-probes.exs) reject individual
 erasure and alteration of all six identity fields (`id`, `kind`, `version`, `path`,
 `status`, `sha256`) for every pin. They also rerun the precise prior whole-inventory
 metadata-erasure and redirected `foundry-config` mutations: both now return errors.

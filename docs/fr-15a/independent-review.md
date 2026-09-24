@@ -17,7 +17,7 @@ focused test, evidence record and Foundry index link. The evidence tip changes o
 `evidence.md` relative to the substantive candidate. I independently checked the
 recorded SHA-256 values of the validator, manifest, specification and focused test.
 No runtime implementation changed. This review adds only this record and the
-[reproduction script](independent-review-probes.exs).
+[reproduction script](../archive/fr-15a/independent-review-probes.exs).
 
 ## Verdict and boundary
 
