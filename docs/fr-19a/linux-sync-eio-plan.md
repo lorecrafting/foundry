@@ -1,5 +1,12 @@
 # FR-19A Linux physical kernel-sync fault acceptance plan
 
+> Retired 2026-09-23 under [repair-plan amendment C3](../REPAIR-PLAN.md#clean-room-amendment):
+> the workflow, `ci/fr19a_*`, `test/fr19a_*` and `test/support/fr19a_linux_sync_eio_fixture.exs`
+> were deleted because the workflow was gated on `repair/fr19a-correction`, a branch this
+> remote does not have, so it never ran here. The operational storage tests that stay in the
+> gate (`sync_fault_test`, `operational_storage_test`, `fr08a_fr19a_integration_test`) are
+> unchanged. What follows is the historical plan.
+
 Recorded 2026-09-19, Hawaii. This is a branch-only execution plan, not acceptance
 evidence. It does not change the blocked disposition in
 [correction-checkpoint.md](correction-checkpoint.md). The workflow must run against its
@@ -63,7 +70,7 @@ the precise evidence and limitations; independent critical rereview remains requ
 
 ## Boundary
 
-The branch-only [workflow](../../.github/workflows/fr19a-sync-eio.yml) uses an ephemeral
+The branch-only workflow (`.github/workflows/fr19a-sync-eio.yml`, since deleted) uses an ephemeral
 GitHub-hosted Ubuntu runner and `contents: read` permission. It performs no provider call,
 Foundry dispatch, live-daemon operation, deployment or activation. It does not install
 packages. The first stage inventories the preinstalled commands, noninteractive sudo,
