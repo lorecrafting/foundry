@@ -507,14 +507,14 @@ defmodule PramanaFoundry.AgentServerTest do
     test "accepted submit_review records pending and result before reviewer stops", ctx do
       base_revision = "d83f8f0cedc34780d25cba452545ce9883d416a5"
       commit = "2222333344445555666677778888999900001111"
-      check = ["sh", "-c", "cd foundry && mix test"]
+      check = ["sh", "-c", "mix test"]
       task_id = "T-REVIEW-CLEANUP-ACCEPTED"
       :ok = Coordinator.reset(accepted_revision: base_revision)
 
       ticket = %{
         "task_id" => task_id,
         "base_revision" => base_revision,
-        "scope" => ["foundry/lib/**"],
+        "scope" => ["lib/**"],
         "exclusions" => [],
         "required_checks" => [check],
         "review_required_checks" => [check],
@@ -530,7 +530,7 @@ defmodule PramanaFoundry.AgentServerTest do
         "run_id" => "RUNTEST",
         "assigned_base" => base_revision,
         "commit" => commit,
-        "changed_files" => ["foundry/lib/pramana_foundry/agent_server.ex"],
+        "changed_files" => ["lib/pramana_foundry/agent_server.ex"],
         "reproduction_evidence" => %{"before" => "fail", "after" => "pass"},
         "checks" => [%{"command" => check, "exit_code" => 0}],
         "remaining_risks" => [],
@@ -660,7 +660,7 @@ defmodule PramanaFoundry.AgentServerTest do
         ticket = %{
           "task_id" => task_id,
           "base_revision" => String.duplicate("a", 40),
-          "scope" => ["foundry/lib/**"],
+          "scope" => ["lib/**"],
           "exclusions" => [],
           "required_checks" => [["mix", "test"]],
           "review_required_checks" => [["mix", "test"]],

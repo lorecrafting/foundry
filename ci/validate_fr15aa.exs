@@ -299,7 +299,7 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
     "elixir-ci" => "06d9fbb6ea92206dff68d705b2cae885b44a08b21495c1c5db620b456aecacc1",
     "otp-ci" => "06d9fbb6ea92206dff68d705b2cae885b44a08b21495c1c5db620b456aecacc1",
     "foundry-lock" => "bf2a61f815533a96b2abec87b1690ae49145bec56e60703a22b4db178c56e954",
-    "foundry-config" => "d38fca63c3463b4bbbb5c56afcd66a900d4f6e4d5c5434bf3ec0157f372a7b16",
+    "foundry-config" => "152b034bf5a3e4caec3ecb556a4bfb2129ca4a74362f341668323dca04bcf80c",
     "assignment-schema" => "3042a56aa668c2852a4fdcf21c35eb70bd36d350e210e05f151177b60449ba8f",
     "current-coordinator" => "925c54dba022a06213f0d33eb26c6b352fbde53c713796e3587d96640e9db7e6",
     "current-tick" => "8df097027896c88bb55f03f50a6cb6f5592c64a8c201f41aa1bf186754143ee0",

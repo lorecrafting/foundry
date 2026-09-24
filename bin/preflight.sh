@@ -8,7 +8,7 @@
 # It is NOT a substitute for `elixir ci/run.exs`, which remains the only acceptance
 # evidence. It is a way to stop discovering these at the gate.
 #
-#   cd foundry && bin/preflight.sh
+#   bin/preflight.sh
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
 fail=0

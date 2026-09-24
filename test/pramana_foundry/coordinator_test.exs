@@ -77,7 +77,7 @@ defmodule PramanaFoundry.CoordinatorTest do
     ticket = %{
       "task_id" => "T-CLEANUP-UNRESOLVED",
       "base_revision" => @base_rev,
-      "scope" => ["foundry/lib/**"],
+      "scope" => ["lib/**"],
       "exclusions" => [],
       "required_checks" => [@check],
       "review_required_checks" => [@check],
@@ -148,7 +148,7 @@ defmodule PramanaFoundry.CoordinatorTest do
     ticket = %{
       "task_id" => "T-CLEANUP-APPEND-FAIL",
       "base_revision" => @base_rev,
-      "scope" => ["foundry/lib/**"],
+      "scope" => ["lib/**"],
       "exclusions" => [],
       "required_checks" => [@check],
       "review_required_checks" => [@check],
@@ -266,7 +266,7 @@ defmodule PramanaFoundry.CoordinatorTest do
       ticket = %{
         "task_id" => task_id,
         "base_revision" => @base_rev,
-        "scope" => ["foundry/lib/**"],
+        "scope" => ["lib/**"],
         "exclusions" => [],
         "required_checks" => [@check],
         "review_required_checks" => [@check],
@@ -428,7 +428,7 @@ defmodule PramanaFoundry.CoordinatorTest do
     ticket = %{
       "task_id" => task_id,
       "base_revision" => @base_rev,
-      "scope" => ["foundry/lib/**"],
+      "scope" => ["lib/**"],
       "exclusions" => [],
       "required_checks" => [@check],
       "review_required_checks" => [@check],
@@ -728,7 +728,7 @@ defmodule PramanaFoundry.CoordinatorTest do
     ticket = %{
       "task_id" => task_id,
       "base_revision" => @base_rev,
-      "scope" => ["foundry/lib/**"],
+      "scope" => ["lib/**"],
       "exclusions" => [],
       "required_checks" => [@check],
       "review_required_checks" => [@check],

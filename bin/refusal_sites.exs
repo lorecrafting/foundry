@@ -6,7 +6,6 @@
 # handlers" counted only the sites inside `do_transition` clauses and missed everything in
 # the envelope pipeline and the state builders. Counting by eye is how that happens.
 #
-#   cd foundry
 #   elixir bin/refusal_sites.exs
 #
 # Every `{:error, :atom}` in the reducer (`kernel.ex` and its event-family modules) is

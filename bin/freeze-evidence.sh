@@ -8,7 +8,7 @@
 # emits the evidence block, so the log records what was measured rather than what was
 # remembered.
 #
-#   cd foundry && bin/freeze-evidence.sh [previous_passed_count]
+#   bin/freeze-evidence.sh [previous_passed_count]
 #
 # With a previous count it also checks the delta: a freeze that adds N tests must move the
 # total by N. A silent drop - a suite that stopped being loaded, a test renamed into
@@ -69,7 +69,7 @@ fi
 echo
 echo "--- evidence block for IMPLEMENTATION-LOG.md ---"
 echo "- Suites at freeze: full model-free suite **${passed:-?} passed, ${skipped:-0} skipped at"
-echo "  seed 0**, run serially with a fresh \`MIX_BUILD_PATH\`. \`foundry/bin/preflight.sh\`"
+echo "  seed 0**, run serially with a fresh \`MIX_BUILD_PATH\`. \`bin/preflight.sh\`"
 echo "  passes. Candidate \`$(git rev-parse --short HEAD)\` on \`$(git rev-parse --abbrev-ref HEAD)\`."
 echo
 

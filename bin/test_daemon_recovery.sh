@@ -5,16 +5,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-ELIXIR_BIN="/Users/raymondluong/.local/share/mise/installs/elixir/1.20.3-otp-29/bin"
-ERLANG_BIN="/Users/raymondluong/.local/share/mise/installs/erlang/29.0.5/bin"
-FIXTURE_PARENT="$(mktemp -d /tmp/pramana-fr04-recovery.XXXXXX)"
+# The toolchain's own bin directories, so the restricted PATH below keeps elixir and erl.
+TOOL_PATH="$(elixir -e 'IO.puts(Path.dirname(System.find_executable("elixir")) <> ":" <> Path.join(:code.root_dir(), "bin"))')"
+FIXTURE_PARENT="$(mktemp -d /tmp/foundry-fr04-recovery.XXXXXX)"
 
 cleanup() {
   rm -rf -- "$FIXTURE_PARENT"
 }
 trap cleanup EXIT
 
-export PATH="$ELIXIR_BIN:$ERLANG_BIN:/usr/bin:/bin"
+export PATH="$TOOL_PATH:/usr/bin:/bin"
 export TMPDIR="$FIXTURE_PARENT/tmp"
 export MIX_ENV=test
 mkdir -p "$TMPDIR"

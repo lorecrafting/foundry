@@ -1,7 +1,7 @@
 # Probe for finding F1 in README.md: a plan-bearing bundle that stages a non-start
 # settle_claim but declares NO binding passes TransitionPlan.validate/1 and bind/3 under
 # unconditional_v1, committing a caller-written (forged) settlement for another execution.
-# Before the fix this printed GAP REPRODUCED. Run from foundry/: MIX_ENV=test mix run --no-start spec/core_boundary/unbound_nonstart_probe.exs
+# Before the fix this printed GAP REPRODUCED. Run from the repository root: MIX_ENV=test mix run --no-start spec/core_boundary/unbound_nonstart_probe.exs
 alias PramanaFoundry.DurableStore.TransitionPlan
 
 forged = %{

@@ -9,7 +9,6 @@
 # This strips the ID markers back out of the working tree's contract and compares the
 # result to the same file at a git revision. An empty diff is the proof.
 #
-#   cd foundry
 #   elixir bin/contract_annotation_diff.exs                  # against HEAD
 #   elixir bin/contract_annotation_diff.exs <rev>            # against a named revision
 #

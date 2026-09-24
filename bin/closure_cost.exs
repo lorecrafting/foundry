@@ -16,7 +16,6 @@
 # Re-measured 2026-09-23 (this tree, `mix run bin/closure_cost.exs`): 498 / 3,322 ms, 15.0%.
 # Both figures are dated readings under load, not a pinned constant; re-run rather than quote.
 #
-#   cd foundry
 #   TMPDIR=/private/tmp mix run bin/closure_cost.exs
 Code.require_file("test/support/kernel_harness.ex")
 Code.require_file("test/support/kernel_walk.ex")

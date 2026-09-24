@@ -13,7 +13,6 @@ defmodule PramanaFoundry.SchemaReferenceTest do
 
     Regenerate it rather than editing by hand:
 
-        cd foundry
         mix run --no-start -e 'File.write!(PramanaFoundry.SchemaReference.doc_path(), PramanaFoundry.SchemaReference.render())'
     """
   end

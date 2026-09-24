@@ -107,7 +107,9 @@
       kind: "config",
       version: "base-f5067d9",
       path: "config/config.exs",
-      sha256: "d38fca63c3463b4bbbb5c56afcd66a900d4f6e4d5c5434bf3ec0157f372a7b16",
+      # Re-pinned 2026-09-23: after the repository split the operator runtime root defaults
+      # to the checkout's own ignored local/ instead of a hardcoded path in the old layout.
+      sha256: "152b034bf5a3e4caec3ecb556a4bfb2129ca4a74362f341668323dca04bcf80c",
       status: "legacy_not_provisioning"
     },
     %{

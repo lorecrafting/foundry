@@ -1,7 +1,7 @@
 // Quint model of Foundry's R5 budget ledger, as the CODE implements it.
 //
-// Source: foundry/lib/pramana_foundry/durable_store/protected_primitives.ex at df1ac5f8
-// (cited below as PP:<line>). Contract: foundry/docs/WORKFLOW-CONTRACT.md "Budget ledger — R5".
+// Source: lib/pramana_foundry/durable_store/protected_primitives.ex at Pramāṇa df1ac5f8
+// (cited below as PP:<line>). Contract: docs/WORKFLOW-CONTRACT.md "Budget ledger — R5".
 // Where the two disagree the code is modelled and the disagreement is marked DISAGREE.
 //
 // Bounds: fixed tree root -> obj -> tkt, generations 0..1, one dimension, units 1..2,

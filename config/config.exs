@@ -5,7 +5,7 @@ operator_runtime_root =
     if config_env() == :test do
       Path.join(System.tmp_dir!(), "pramana-foundry-test-operator")
     else
-      "/Users/raymondluong/dev/pramana/foundry/local/"
+      Path.expand("../local", __DIR__)
     end
 
 config :pramana_foundry,

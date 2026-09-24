@@ -21,7 +21,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FOUNDRY_DIR="$(dirname "$SCRIPT_DIR")"
-PROJECT_ROOT="$(dirname "$FOUNDRY_DIR")"
 
 # `lane` commands go to the lane daemon that bin/foundry-lane starts (its own release and
 # node name), never to a legacy daemon. Explicit PRAMANA_RELEASE and RELEASE_NODE still win.
@@ -45,14 +44,14 @@ fi
 
 # 3. Worktree detection via .git file
 if [ ! -x "$RELEASE_BIN" ]; then
-  GIT_FILE="$PROJECT_ROOT/.git"
+  GIT_FILE="$FOUNDRY_DIR/.git"
   if [ -f "$GIT_FILE" ]; then
     GITDIR_LINE=$(head -1 "$GIT_FILE" 2>/dev/null || echo "")
     case "$GITDIR_LINE" in
       gitdir:*)
         MAIN_DIR="${GITDIR_LINE#gitdir: }"
         MAIN_DIR="${MAIN_DIR%/.git*}"
-        RELEASE_BIN="$MAIN_DIR/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry"
+        RELEASE_BIN="$MAIN_DIR/_build/prod/rel/pramana_foundry/bin/pramana_foundry"
         ;;
     esac
   fi
@@ -61,8 +60,8 @@ fi
 # 4. Last resort: common user paths
 if [ ! -x "$RELEASE_BIN" ]; then
   for candidate in \
-    "$HOME/dev/pramana/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" \
-    "$HOME/pramana/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry"; do
+    "$HOME/dev/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" \
+    "$HOME/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry"; do
     if [ -x "$candidate" ]; then
       RELEASE_BIN="$candidate"
       break
@@ -73,12 +72,12 @@ fi
 if [ ! -x "$RELEASE_BIN" ]; then
   echo "Error: cannot find pramana_foundry release binary" >&2
   echo "" >&2
-  echo "The release binary is at foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" >&2
-  echo "Build it from the main repo:" >&2
-  echo "  cd foundry && MIX_ENV=prod mix release" >&2
+  echo "The release binary is at _build/prod/rel/pramana_foundry/bin/pramana_foundry" >&2
+  echo "Build it from the root of the main checkout:" >&2
+  echo "  MIX_ENV=prod mix release" >&2
   echo "" >&2
   echo "Or set PRAMANA_RELEASE env var:" >&2
-  echo "  export PRAMANA_RELEASE=/path/to/pramana/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" >&2
+  echo "  export PRAMANA_RELEASE=/path/to/foundry/_build/prod/rel/pramana_foundry/bin/pramana_foundry" >&2
   exit 1
 fi
 

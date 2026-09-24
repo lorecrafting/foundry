@@ -43,7 +43,7 @@ It also chooses the settlement's content and the execution it names. The trace:
 `settle_claim(1, non_started)` and commits `launch_settled{execution: 2, settlement: <literal
 for effect 2>}` (`run unboundBypassTest`). **Reproduced in code:**
 `MIX_ENV=test mix run --no-start spec/core_boundary/unbound_nonstart_probe.exs` from
-`foundry/` (in a worktree, point `MIX_DEPS_PATH` at the main checkout's `deps`). It prints
+the repository root (in a worktree, point `MIX_DEPS_PATH` at the main checkout's `deps`). It prints
 `GAP REPRODUCED`: `validate/1` and `bind/3` accept a plan that settles execution-A's effect
 while committing a forged settlement for execution-B.
 

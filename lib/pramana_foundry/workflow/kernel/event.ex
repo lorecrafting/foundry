@@ -3,7 +3,7 @@ defmodule PramanaFoundry.Workflow.Kernel.Event do
   The closed semantic event vocabulary of the FR-08B domain kernel.
 
   Every type is justified by a row or entity state of
-  [R4/R4a](../../../docs/WORKFLOW-CONTRACT.md#r4); the justification per name is recorded
+  [R4/R4a](../../../../docs/WORKFLOW-CONTRACT.md#r4); the justification per name is recorded
   in `docs/fr-08/fr08b-event-vocabulary-enumeration.md`, which this module implements.
 
   Two properties make this a vocabulary rather than a shape check. The type list is

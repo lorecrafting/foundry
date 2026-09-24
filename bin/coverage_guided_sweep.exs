@@ -36,7 +36,7 @@
 # 2026-09-21 answer key, and re-judges each disagreement against the whole workflow set
 # (the old sweep's judgement). Nothing below writes to the repository.
 #
-#   cd foundry && TMPDIR=/private/tmp elixir bin/coverage_guided_sweep.exs
+#   TMPDIR=/private/tmp elixir bin/coverage_guided_sweep.exs
 #   EV1_WORKERS=<n>     parallel trial workers (default 2)
 #   EV1_SITES=<file>    only these sites, one per line: a call text (same key as SWEEP_SITES)
 #                       selects every site with that text; a full label, `<text> <file>:<line>`,

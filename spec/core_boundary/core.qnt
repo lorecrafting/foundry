@@ -7,7 +7,7 @@
 // branch label, any expected revision). Core's checks are the only guards. SQL is
 // abstracted away: one step is one committed Gateway transaction.
 //
-// Line citations are foundry/lib/pramana_foundry/durable_store/<file>:<line> at df1ac5f8.
+// Line citations are lib/pramana_foundry/durable_store/<file>:<line> at Pramāṇa df1ac5f8.
 // PP = protected_primitives.ex, TP = transition_plan.ex, GW = gateway.ex.
 //
 // Two step relations:

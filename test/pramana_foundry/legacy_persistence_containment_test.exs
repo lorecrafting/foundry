@@ -334,7 +334,7 @@ defmodule PramanaFoundry.LegacyPersistenceContainmentTest do
     %{
       "task_id" => task_id,
       "base_revision" => @base,
-      "scope" => ["foundry/lib/**"],
+      "scope" => ["lib/**"],
       "exclusions" => [],
       "required_checks" => [["sh", "-c", "true"]],
       "review_required_checks" => [["sh", "-c", "true"]],
@@ -363,7 +363,7 @@ defmodule PramanaFoundry.LegacyPersistenceContainmentTest do
       "run_id" => "run-fr03",
       "assigned_base" => @base,
       "commit" => "2222333344445555666677778888999900001111",
-      "changed_files" => ["foundry/lib/pramana_foundry/coordinator.ex"],
+      "changed_files" => ["lib/pramana_foundry/coordinator.ex"],
       "reproduction_evidence" => %{"before" => "fail", "after" => "pass"},
       "checks" => [%{"command" => ["sh", "-c", "true"], "exit_code" => 0}],
       "remaining_risks" => [],

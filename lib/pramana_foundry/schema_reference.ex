@@ -46,7 +46,6 @@ defmodule PramanaFoundry.SchemaReference do
     Regenerate with:
 
     ```sh
-    cd foundry
     mix run --no-start -e 'File.write!(PramanaFoundry.SchemaReference.doc_path(), PramanaFoundry.SchemaReference.render())'
     ```
 

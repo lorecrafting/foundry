@@ -1091,7 +1091,7 @@ defmodule PramanaFoundry.AutonomousLaunchTest do
     %{
       "task_id" => task_id,
       "base_revision" => @base_rev,
-      "scope" => ["foundry/lib/**"],
+      "scope" => ["lib/**"],
       "exclusions" => [],
       "required_checks" => [@check],
       "review_required_checks" => [@check],
@@ -1108,7 +1108,7 @@ defmodule PramanaFoundry.AutonomousLaunchTest do
       "run_id" => "developer-run",
       "assigned_base" => @base_rev,
       "commit" => @commit,
-      "changed_files" => ["foundry/lib/pramana_foundry/example.ex"],
+      "changed_files" => ["lib/pramana_foundry/example.ex"],
       "reproduction_evidence" => %{"before" => "fail", "after" => "pass"},
       "checks" => [%{"command" => @check, "exit_code" => 0}],
       "remaining_risks" => [],
