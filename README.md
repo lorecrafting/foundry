@@ -9,15 +9,14 @@ found that the live execution path bypasses several safeguards described below.
 Treat the following capability list as an implementation inventory, not verified
 end-to-end guarantees. The audit includes reproductions and an ordered repair plan.
 
-**Recorded historical runtime status, not a current deployment attestation:** the Elixir
-OTP release was described as the sole local dispatcher, with the Python supervisor retired,
-state archived and the self-healing Improver active. The source tree contains a release/CLI
-shell, schemas, fencing, Herdr and process-lifecycle adapters, scheduling/planning,
-review/integration containment, board, relocation, telemetry and observability components.
-The 2026-09-19 [independent alignment audit](docs/ALIGNMENT-AUDIT-2026-09-19.md) inspected
-source at `2f603675e3feb1a65f0ce57a3bd69aa93deec29d`; it did **not** inspect the loaded
-release and therefore records live/deployed truth as unknown. Source presence, historical
-status and model-free checks do not prove current deployment, wiring or activation.
+**Current shape, 2026-09-23:** Foundry is not in production. The legacy daemon stack
+(Coordinator, AgentServer, the Herdr adapter, launch effects, JSONL persistence, Board,
+telemetry, Improver, PM, Scheduler and the legacy CLI) was deleted rather than migrated
+([plan amendment C1](docs/REPAIR-PLAN.md#clean-room-amendment)). The
+[manual lane](docs/batch-d/LANE-RUNBOOK.md) over the durable store and the workflow kernel is
+the only ingress, and it launches nothing: the operator hands each work packet to an agent.
+Edge cases the deleted tests encoded are listed, with their owners, in
+[moved knowledge](docs/design/MOVED-KNOWLEDGE-2026-09-23.md).
 
 The project remains independent of the Phoenix umbrella, Postgres, the research corpus, and
 `priv/embed/`.
@@ -27,62 +26,39 @@ The project remains independent of the Phoenix umbrella, Postgres, the research 
 The [Foundry-only CI job](docs/CI.md) runs from this directory with fresh dependency, build,
 temporary and runtime roots. It compiles with warnings as errors, enforces all new formatting,
 runs the model-free suite and emits source/tool/dependency/escript provenance. It starts no
-corpus service, live daemon, Herdr pane or provider session. Real-provider and activation
-evidence remain explicit downstream acceptance, not implied by a green CI job.
+corpus service, live daemon or provider session. Real-provider and activation evidence remain
+explicit downstream acceptance, not implied by a green CI job.
 
-## Acceptance and activation containment
+## Acceptance and launch containment
 
-FR-05 disables legacy promotion and mutable-source activation. Public handoff and review
-commands preserve the submitted artifact identities verbatim, require an existing Git
-checkout, and cannot request the production Git-check bypass. `auto_approve` is rejected
-at admission, runtime, PM and replay boundaries; reviews require a separately issued
-reviewer run identity. The legacy integration command stops before intent, check, Git or
-state effects. Historical `integration_completed/succeeded` records are retained only as
-explicit `legacy_unverified` claims and cannot advance `accepted_revision`.
+Nothing in the tree promotes a candidate, activates a release or launches an agent. The lane
+records a candidate only when it is the checkout's HEAD with the admitted base as an
+ancestor, binds each receipt to its claimed effect, and Core refuses a reviewer who is not
+independent of the developer. FR-13 restores controller-verified artifact and check evidence,
+FR-14 protected Git promotion, and FR-17 immutable accepted-build activation.
 
-`bin/pramana-live.sh`, `bin/tickets_from_review.sh` and `bin/live_test.exs` are disabled.
-FR-13 restores controller-verified artifact/check evidence, FR-14 restores protected Git
-promotion, and FR-17 restores immutable accepted-build activation and rollback. Status
-revision values remain presentation-only labels, not acceptance or activation evidence.
+The FR-01 launch policy survives as a pure leaf, `LaunchEligibility` with `Quota`, called by
+nothing: subscription-only eligibility per role, no paid fallback, and a stable refusal for
+any malformed policy. FR-09 decides what harness calls it; do not treat a model name,
+available credential or this policy as entitlement.
 
-## Automatic execution containment
-
-FR-01 is implemented as fail-closed static containment. Automatic developer, reviewer and
-PM eligibility requires an explicit plain-map policy naming the OMP profile, provider,
-account, subscription billing authorization, exact allowed model, reasoning and approval
-mode, authorized roles, quota state and any provider cooldown. Missing, malformed, paid,
-exhausted, unknown or cooled-down policy blocks before pane creation. The temporary inputs
-are the `:pramana_foundry` application keys `:launch_profiles` and
-`:launch_role_profiles`; Coordinator options of the same names exist for isolated tests.
-
-Configuration alone cannot enable a real launch. The production Herdr System runner
-deliberately reports subscription-route enforcement as unsupported, because installed OMP
-profile selection does not itself prove account/billing isolation or exclude API-key
-fallback. FR-09 and FR-15a own that protected conformance boundary and may restore real
-automatic execution only with exact backend evidence. FR-16 owns durable quota observation
-and bounded switching. Do not treat a model name, available credential or this temporary
-policy as entitlement, and do not change the System capability as an operator workaround.
-
-This section describes the **current implementation**, not a permanent harness decision.
 The [Foundry strategy](docs/STRATEGY.md#pi-explicit-session-contracts-and-replaceable-execution)
-now prefers a bounded pinned-Pi-RPC replacement evaluation before deeper OMP-specific
-investment. No production harness, FR-06 authority contract or automatic-launch permission
-changes until that candidate passes FR-09/15a and any affected contract text is explicitly
-revised and re-reviewed.
+prefers a bounded pinned-Pi-RPC evaluation for that harness. No production harness, FR-06
+authority contract or automatic-launch permission changes until a candidate passes FR-09/15a
+and any affected contract text is explicitly revised and re-reviewed.
 
-## Agent command transport
+## Command transport
 
 `bin/pramana` treats every user argument as inert data. It invokes Elixir with those values
 only in `System.argv/0`, encodes a bounded versioned JSON envelope as canonical URL-safe
 base64, and sends one fixed `PramanaFoundry.CLI.RPC.run/1` expression to the release.
-The daemon rejects malformed, duplicate-key, oversized, non-UTF-8, NUL-containing and
-unknown command shapes before calling the CLI. The wrapper preserves remote stdout,
-stderr and exit status.
+The daemon rejects malformed, duplicate-key, oversized, non-UTF-8 and NUL-containing
+payloads, and every command that is not a `lane` command its parser accepts. The wrapper
+preserves remote stdout, stderr and exit status.
 
 This is FR-02 containment, not a claim that the release's general `rpc` evaluator is a
 safe public authority boundary. Keep access local/protected; FR-15a replaces that general
-evaluation credential. The older maintenance scripts named in the repair plan remain
-disabled/routed to their containment owners until rewritten.
+evaluation credential.
 
 ## Read first
 
@@ -90,128 +66,57 @@ disabled/routed to their containment owners until rewritten.
   current status, dependencies and acceptance obligations.
 - [`docs/WORKFLOW-CONTRACT.md`](docs/WORKFLOW-CONTRACT.md) — accepted FR-06 authority,
   lifecycle and budget contract, with a route to current sequencing.
-- [`docs/ALIGNMENT-AUDIT-2026-09-19.md`](docs/ALIGNMENT-AUDIT-2026-09-19.md) — independent
-  read-only current-source alignment audit and exact limitations.
-- [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — telemetry records, health probe,
-  system metrics, CLI diagnostics, self-healing classifiers.
-- [`docs/AX-SUBSTRATE.md`](docs/AX-SUBSTRATE.md) — 2026-09-21 research on Google AX and
-  Agent Substrate as a replaceable distributed execution backend beneath Foundry's
-  authority/evidence boundary.
-- [`docs/CLOUDFLARE-OS.md`](docs/CLOUDFLARE-OS.md) — 2026-09-21 research on Cloudflare
-  OS Gatekeepers, observation provenance and Cloudflare execution primitives as capability
-  and alternate execution-substrate design pressure.
-- [`docs/MIGRATION.md`](docs/MIGRATION.md) — historical destination architecture, runtime
-  and storage boundaries, parity matrix, cutover and rollback design.
-- [`docs/MIGRATION-TICKETS.md`](docs/MIGRATION-TICKETS.md) — historical eight-ticket
-  migration sequence; it is evidence, not current repair authority.
+- [`docs/batch-d/LANE-RUNBOOK.md`](docs/batch-d/LANE-RUNBOOK.md) — start the lane daemon and
+  run a ticket through it.
 - [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — FR-07 SQLite authority boundary,
-  initialization/recovery, offline import and current limitations.
-- [`../docs/PLAN.md`](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/PLAN.md) — project roadmap and Foundry audit follow-up.
+  initialization/recovery and current limitations.
+- [`docs/ALIGNMENT-AUDIT-2026-09-19.md`](docs/ALIGNMENT-AUDIT-2026-09-19.md) — independent
+  read-only source alignment audit and exact limitations (before the deletion).
+- [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — describes the deleted legacy telemetry;
+  its rewrite around `Observations` and the lane log is pending.
+- [`docs/AX-SUBSTRATE.md`](docs/AX-SUBSTRATE.md) and [`docs/CLOUDFLARE-OS.md`](docs/CLOUDFLARE-OS.md)
+  — 2026-09-21 research on alternate execution substrates beneath Foundry's
+  authority/evidence boundary.
+- [`docs/MIGRATION.md`](docs/MIGRATION.md) and [`docs/MIGRATION-TICKETS.md`](docs/MIGRATION-TICKETS.md)
+  — historical migration design; evidence, not current repair authority.
 
 ## Tracked layout
 
 ```text
 ./
-  .formatter.exs
-  mix.exs
-  mix.lock
-  config/
+  mix.exs, mix.lock, .formatter.exs
+  config/config.exs           — operator runtime root only
   lib/pramana_foundry/
-    agent_server.ex          — GenServer per agent (launch, timeout, handoff lifecycle)
-    coordinator.ex           — central GenServer (state, queue, agent registry, health)
-    coordinator/tick.ex      — tick loop (enqueue -> AgentServer start via DynamicSupervisor)
-    improver.ex              — self-healing loop (classifiers, proposals, metrics)
-    hardening_pm.ex          — PM for IMPRV-* hardening tickets
-    system_metrics.ex        — VM and per-process metrics collection
-    consolidated_log.ex      — merged view of all three structured logs
-    log_store.ex             — fast append-only JSONL writer
-    schema.ex                — strict versioned schema validation
-    telemetry/telemetry.ex   — structured record validation
-    telemetry/store.ex       — deduplicating telemetry append with compaction
-    telemetry/observation.ex — duration derivations from phase events
-    telemetry/forecast.ex    — confidence-rated duration forecasts
-    herdr/                   — typed adapter for the Herdr agent CLI
-    effects/                 — checkpointed launch, prompt, and process lifecycle
-    board/                   — terminal kanban dashboard
-    relocation/              — historical move code; mutation disabled pending FR-19B
+    application.ex            — starts ManualLane.Server when FOUNDRY_MANUAL_LANE=1, else nothing
+    manual_lane/              — the lane: CLI, backend, server, log, replay
+    workflow/                 — the pure workflow kernel (Workflow.Kernel*)
+    durable_store/            — Core: the SQLite authority store and its gateway
+    observations/             — bounded read queries over the store
+    repair/                   — FR-08A/FR-08 attestation modules
+    cli/rpc.ex                — FR-02 inert transport; dispatches lane commands only
+    work_packet.ex, git_evidence.ex, runtime_root.ex, schema_reference.ex, ci.ex
+    launch_eligibility.ex, quota/, effects/process_group.ex — policy and process leaves kept for FR-09/FR-10
   test/
-  roles/
+  bin/                         — pramana (RPC wrapper), foundry-lane, evidence tools
+  ci/run.exs                   — the gate
+  spec/                        — Quint models
   docs/
-    OBSERVABILITY.md
-    MIGRATION.md
-    MIGRATION-TICKETS.md     — historical migration sequence
   README.md
 ```
 
-Source, tests, role templates, schemas, migration design, sanitized milestone records, and
-the dependency lockfile belong in Git. Hex dependency sources and generated executables are
-restored from the lockfile/source and identified by the CI provenance manifest; they do not
-belong in Git. Live state, transcripts, config, caches, logs, releases, temporary files,
-worktrees, and provider authentication do not.
+Source, tests, specs, sanitized milestone records and the dependency lockfile belong in Git.
+Hex dependency sources and generated executables are restored from the lockfile/source and
+identified by the CI provenance manifest; they do not belong in Git. Live state,
+transcripts, caches, logs, releases, temporary files, worktrees and provider authentication
+do not.
 
 The operator runtime root defaults to `local/` in the main checkout (`config/config.exs`;
 `PRAMANA_OPERATOR_RUNTIME_ROOT` overrides it). It is ignored by Git and is fixed when the
-release is built from the main checkout; it must never be derived from a task worktree. Provider credentials stay in provider-owned locations outside that root.
+release is built from the main checkout; it must never be derived from a task worktree.
+Provider credentials stay in provider-owned locations outside that root.
 
-## Runtime dependencies
+## Running
 
-The coordinator runs a tick/dispatch loop every N seconds. Enable it by setting the
-`COORDINATOR_TICK=1` environment variable in the daemon's runtime environment:
-
-```bash
-COORDINATOR_TICK=1 _build/prod/rel/pramana_foundry/bin/pramana_foundry daemon
-```
-
-Without it, the coordinator starts idle — it serves health probes and admin commands,
-but will not dequeue tickets, launch agents, or advance dispatched work. The tick
-interval defaults to 15 seconds; configure via `config :pramana_foundry,
-poll_seconds: N` before building the release.
-
-Agents run as supervised `AgentServer` GenServers under `PramanaFoundry.AssignmentSupervisor`
-(a `DynamicSupervisor` with `:temporary` restart — crashed agents are never automatically
-restarted). Each AgentServer manages its own lifecycle: split pane → start agent → prompt
-→ await handoff or timeout → cleanup pane. Task crashes are observed via
-`DynamicSupervisor` child exit; orphaned Herdr panes are cleaned up in `terminate/2`.
-The release does not require Herdr at build time — it resolves the CLI binary at runtime
-via PATH or the configured `herdr_command`.
-
-## Configuration
-
-See `config/config.exs`. Key values:
-
-| Key | Default | Notes |
-|---|---|---|
-| `herdr_command` | `"herdr"` | Path or name of the Herdr CLI |
-| `herdr_timeout_ms` | `30_000` | Per-operation timeout for Herdr calls |
-| `poll_seconds` | `15` | Tick interval (ignored unless `COORDINATOR_TICK=1`) |
-| `max_assignments` | `3` | Max concurrent AgentServer children |
-| `max_tasks` | `8` | Max concurrent async tasks (for Improver classifiers) |
-
-## CLI commands
-
-```bash
-pramana_foundry validate KIND PATH    # Validate a schema
-pramana_foundry runtime-root           # Print runtime root path
-pramana_foundry health                 # Structured health report (JSON)
-pramana_foundry agents                 # List running agents with metrics
-pramana_foundry metrics                # System metrics overview
-pramana_foundry logs tail N            # Tail consolidated logs
-pramana_foundry logs summary           # Log record counts per source
-pramana_foundry board                  # Terminal kanban dashboard
-pramana_foundry telemetry-status PATH  # Telemetry status projection
-pramana_foundry telemetry-export ...   # Export telemetry as JSONL/CSV
-```
-
-The former `shadow` Python-migration parity route is retired and fails closed. Sanitized
-legacy fixtures test import compatibility only; they do not prove current runtime parity.
-
-## Observability
-
-See [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) for the full reference.
-
-- **Three structured JSONL logs**: coordinator lifecycle, telemetry records, durable events.
-- **ConsolidatedLog** merges all three into one time-sorted view.
-- **SystemMetrics** captures VM stats, per-process memory/mailbox/reductions, agent child list.
-- **Health probe** at `Coordinator.health/0` returns status, queue depth, system metrics.
-- **Self-healing Improver** runs every 5 minutes, classifies 14 categories of issues, creates PM proposals for hardening tickets.
-- **Token metrics schema exists**, but live harness usage, full request/candidate correlation and numeric-token retention through compaction are not yet end-to-end; see [Observability](docs/OBSERVABILITY.md).
+`bin/foundry-lane build|start|stop|status` builds and drives the lane daemon's release; the
+[runbook](docs/batch-d/LANE-RUNBOOK.md) covers its settings, every `bin/pramana lane …`
+command and recovery. A node started without `FOUNDRY_MANUAL_LANE=1` starts no children.
