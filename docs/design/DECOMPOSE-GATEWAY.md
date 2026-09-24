@@ -128,13 +128,14 @@ per tuple would be overwritten twice with the sha256, and the binding would stay
    the provider or test: `"pin-sha256-domaincommit"`/`"pin-md5-domaincommit"`,
    `"pin-sha256-atomicbundle"`/`"pin-md5-atomicbundle"`,
    `"pin-sha256-maintenance"`/`"pin-md5-maintenance"`. In
-   `test/foundry/repair/fr08a_protected_boundary_test.exs:12`, change `== 10` to `== 13`
-   (`== 12` without `ProtectedVerifier`). The test's per-file source lines (45-49) cover
+   `test/foundry/repair/fr08a_protected_boundary_test.exs:12`, change `== 9` to `== 12`
+   (ML-DEAD-ROUTES retired `ProtectedVerifier`, leaving 9 pins). The test's per-file source lines (45-49) cover
    only `gateway.ex` and `protected_primitives.ex`, so the new modules need none.
-2. **Commit** those two files. The script raises on a dirty tree (16-17) and binds the
+2. **Commit** those two files. The script raises on a dirty tree (17-18) and binds the
    subject to `HEAD`.
 3. `MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs`. It prints `old -> new` for every
-   changed value; check that all six placeholders appear.
+   changed value, but only 8 characters of each; check instead that
+   `grep -c 'pin-'` on the provider and the test prints 0 for both.
 4. Regenerate the frozen report **in a fresh VM**, with the command the script prints
    (52-56): `MIX_ENV=test mix run --no-start -e 'File.write!("docs/fr-08/fr08a-protected-report.txt", Foundry.Repair.FR08AProtectedBoundary.report_artifact())'`.
    The test asserts byte-equality with this file (test line 41).
