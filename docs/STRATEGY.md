@@ -11,7 +11,7 @@ operator's machine.
 [Workflow contract](WORKFLOW-CONTRACT.md) · [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) ·
 [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) · [AX/Substrate backend](AX-SUBSTRATE.md) ·
 [Cloudflare OS lessons](CLOUDFLARE-OS.md) ·
-[Broader product strategy](../../docs/strategy/FOUNDRY.md)
+[Broader product strategy](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md)
 
 ## Working summary
 
@@ -113,7 +113,7 @@ no parallel backlog. Investigations may inform blocked work; production implemen
 and activation still require the owning prerequisites and evidence.
 
 This brief owns the Foundry-first investment rationale and cross-project lessons.
-The [broader Foundry chapter](../../docs/strategy/FOUNDRY.md) retains post-repair product
+The [broader Foundry chapter](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md) retains post-repair product
 initiatives and portfolio sequencing. Funding the repair foundations first does not
 silently waive its post-repair evaluation gates. One operator, one machine and Pramāṇa
 remain the present scope; a second repository requires separately approved scope.
@@ -774,7 +774,7 @@ Postpone multi-machine fleets, deep agent hierarchies, broad plugin marketplaces
 automatic policy learning, custom terminals/harnesses, generalized memory platforms and
 custom replacements for mature external infrastructure that has not failed a Foundry
 conformance evaluation.
-The [broader strategy](../../docs/strategy/FOUNDRY.md) owns later repository portability,
+The [broader strategy](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md) owns later repository portability,
 context/tool experiments and Superlogical evaluation. Do not put an unverified future
 presentation backend on the repair critical path.
 

@@ -1,17 +1,17 @@
 # Foundry agent brief: the standing clauses
 
 Every delegated Foundry task inherits these. A task prompt names only its base commit, its
-goal, its file ownership and its report shape, then says "follow `foundry/docs/AGENT-BRIEF.md`".
+goal, its file ownership and its report shape, then says "follow `docs/AGENT-BRIEF.md`".
 Written 2026-09-23 from one day's integration of about twenty agent candidates.
 
 ## Setup
 
 - Reset your worktree to the base commit the prompt names, and confirm `git log -1` before
   editing. Worktree agents have started on the wrong base
-  ([worktree bases](../../docs/agents/WORKFLOW.md)).
+  ([worktree bases](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/WORKFLOW.md)).
 - Never `git stash` or `git checkout` to undo an edit. Reverse the exact string.
-- From `foundry/`: `TMPDIR=/private/tmp MIX_ENV=test mix test <files>`. If deps are missing,
-  set `MIX_DEPS_PATH` to the main checkout's `foundry/deps`.
+- From the repository root: `TMPDIR=/private/tmp MIX_ENV=test mix test <files>`. If deps are
+  missing, set `MIX_DEPS_PATH` to the main checkout's `deps`.
 - Run focused files only. Never run `ci/run.exs` or the full suite: the lead runs one gate per
   push, and concurrent suites produce false failures in the fault tests.
 - Never run `bin/rebind_fr08a.exs`. The lead rebinds once after integration; a red

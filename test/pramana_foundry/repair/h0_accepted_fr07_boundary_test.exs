@@ -57,20 +57,18 @@ defmodule PramanaFoundry.Repair.H0AcceptedFR07BoundaryTest do
     [_line, adapter_revision] =
       Regex.run(~r/^adapter_probe_revision=([0-9a-f]{40})$/m, expected)
 
-    repository_root = Path.expand("..", foundry_root)
-
     for path <- [
-          "foundry/lib/pramana_foundry/repair/h0_accepted_fr07_boundary.ex",
-          "foundry/test/support/h0_report_fixture.exs",
-          "foundry/test/support/h0_identity_negative_fixture.exs"
+          "lib/pramana_foundry/repair/h0_accepted_fr07_boundary.ex",
+          "test/support/h0_report_fixture.exs",
+          "test/support/h0_identity_negative_fixture.exs"
         ] do
       {bytes, 0} =
-        System.cmd("git", ["show", "#{adapter_revision}:#{path}"],
-          cd: repository_root,
+        System.cmd("git", ["show", "#{pramana_tag(adapter_revision)}:#{path}"],
+          cd: foundry_root,
           stderr_to_stdout: true
         )
 
-      assert bytes == File.read!(Path.join(repository_root, path))
+      assert bytes == File.read!(Path.join(foundry_root, path))
     end
 
     assert expected =~ "implementation_binding=verified|source-sha256+beam-md5/v1\n"
@@ -105,14 +103,11 @@ defmodule PramanaFoundry.Repair.H0AcceptedFR07BoundaryTest do
 
   test "accepted API identity matches its exact historical revision" do
     foundry_root = Path.expand("../../..", __DIR__)
-    repository_root = Path.expand("..", foundry_root)
 
     Enum.each(H0AcceptedFR07Boundary.identity().public_api, fn entry ->
-      repository_path = "foundry/" <> entry.path
-
       {bytes, 0} =
-        System.cmd("git", ["show", "#{@accepted_revision}:#{repository_path}"],
-          cd: repository_root,
+        System.cmd("git", ["show", "#{pramana_tag(@accepted_revision)}:#{entry.path}"],
+          cd: foundry_root,
           stderr_to_stdout: true
         )
 
@@ -124,6 +119,11 @@ defmodule PramanaFoundry.Repair.H0AcceptedFR07BoundaryTest do
       end
     end)
   end
+
+  # The accepted revisions are Pramāṇa-repository commits, recorded before Foundry was
+  # split out. The split rewrote every SHA, so each one survives as the tag
+  # `pramana/<original sha>` on its rewritten commit.
+  defp pramana_tag(revision), do: "pramana/#{revision}"
 
   defp run_fixture(foundry_root, fixture, adapter_revision, load_order) do
     fixture_path = Path.join([foundry_root, "test", "support", fixture])

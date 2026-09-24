@@ -60,7 +60,7 @@ explicit file/interface ownership; this plan does not itself launch agents.
 
 Each implementation must include its relevant executable acceptance evidence,
 updated operator/developer documentation, and a status entry here and in
-[`docs/PLAN.md`](../../docs/PLAN.md). Record the candidate revision, test commands,
+[`docs/PLAN.md`](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/PLAN.md). Record the candidate revision, test commands,
 results and remaining limitations. Required review evaluates the exact candidate.
 Changing it after review requires renewed validation appropriate to the change.
 
@@ -1624,7 +1624,7 @@ identity at once. FR-22 therefore depends on FR-23.
 suite passes before and after with no test deleted or weakened to accommodate a move, and
 every revision-bound attestation is rebound in the same commit that changes its subject,
 never in a follow-up. Decomposition preserves public interfaces or migrates every caller
-in the same change, using the [dependency review runbook](../../docs/agents/DEPENDENCY_REVIEW.md).
+in the same change, using the [dependency review runbook](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/DEPENDENCY_REVIEW.md).
 Removal of any identifier is justified by a recorded search showing no dispatch, not by
 inspection alone. Documentation routes and the catalog resolve after the sweep.
 

@@ -153,7 +153,7 @@ recorded link exception.
 Every repo `docs/` file that routes into Foundry points only at KEEP-CURRENT or
 KEEP-EVIDENCE files. Most routes go to REPAIR-PLAN, WORKFLOW-CONTRACT, the design guidance
 and CI. None points at the OWNED-ELSEWHERE or RETIRE material, except
-[the catalog](../../docs/CATALOG.md), which lists every file by design. The files are:
+[the catalog](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/CATALOG.md), which lists every file by design. The files are:
 `docs/agents/WORKFLOW.md`, `docs/README.md`, `docs/REPO_MAP.md`,
 `docs/REPOSITORY_STRUCTURE.md`, `docs/MAINTAINING_DOCS.md`, `docs/PLAN.md`,
 `docs/PLAN_INDEX.md`, `docs/PRODUCT_STRATEGY.md`, `docs/TESTING.md`, `docs/TEST_AUDIT.md`,

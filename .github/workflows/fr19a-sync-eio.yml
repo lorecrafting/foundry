@@ -7,17 +7,17 @@ on:
       - repair/fr19a-correction
     paths:
       - ".github/workflows/fr19a-sync-eio.yml"
-      - "foundry/ci/fr19a_raw_sync_eio.exs"
-      - "foundry/ci/fr19a_sync_eio_orchestration.exs"
-      - "foundry/ci/fr19a_sync_eio_host.sh"
-      - "foundry/ci/fr19a_sync_eio_host_test.sh"
-      - "foundry/ci/fr19a_sync_eio_parse.exs"
-      - "foundry/test/fr19a_sync_eio_orchestration_test.exs"
-      - "foundry/test/fr19a_sync_eio_workflow_test.exs"
-      - "foundry/test/support/fr19a_linux_sync_eio_fixture.exs"
-      - "foundry/lib/pramana_foundry/durable_store/**"
-      - "foundry/mix.exs"
-      - "foundry/mix.lock"
+      - "ci/fr19a_raw_sync_eio.exs"
+      - "ci/fr19a_sync_eio_orchestration.exs"
+      - "ci/fr19a_sync_eio_host.sh"
+      - "ci/fr19a_sync_eio_host_test.sh"
+      - "ci/fr19a_sync_eio_parse.exs"
+      - "test/fr19a_sync_eio_orchestration_test.exs"
+      - "test/fr19a_sync_eio_workflow_test.exs"
+      - "test/support/fr19a_linux_sync_eio_fixture.exs"
+      - "lib/pramana_foundry/durable_store/**"
+      - "mix.exs"
+      - "mix.lock"
       - "mise.toml"
 
 permissions:
@@ -32,10 +32,6 @@ jobs:
     if: github.ref == 'refs/heads/repair/fr19a-correction'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
-    defaults:
-      run:
-        working-directory: foundry
 
     env:
       MIX_ENV: test
@@ -199,7 +195,7 @@ jobs:
               "$source_root/baseline.sqlite3" \
               "$destination" \
               "$source_root/recovered.sqlite3" \
-              "$GITHUB_WORKSPACE/foundry/ci/fr19a_sync_eio_host.sh" \
+              "$GITHUB_WORKSPACE/ci/fr19a_sync_eio_host.sh" \
               "$FR19A_PROBE_STATE" \
               "$FR19A_ARTIFACT_DIR/gateway-host" \
               >"$fixture_log" 2>&1; then

@@ -56,13 +56,13 @@ defmodule PramanaFoundry.CITest do
   end
 
   test "workflow uses immutable official action revisions and no corpus service" do
-    workflow = File.read!(Path.expand("../../../.github/workflows/foundry-ci.yml", __DIR__))
+    workflow = File.read!(Path.expand("../../.github/workflows/foundry-ci.yml", __DIR__))
     {toolchain, _binding} = Code.eval_file(Path.expand("../../ci/toolchain.exs", __DIR__))
     refs = Regex.scan(~r/uses:\s+[^@\s]+@([^\s]+)/, workflow, capture: :all_but_first)
 
     assert length(refs) == 3
     assert Enum.all?(refs, fn [revision] -> String.match?(revision, ~r/\A[0-9a-f]{40}\z/) end)
-    assert workflow =~ "working-directory: foundry"
+    assert workflow =~ "fetch-depth: 0"
     assert workflow =~ ~s(otp-version: "#{toolchain.otp}")
     assert workflow =~ ~s(elixir-version: "#{toolchain.elixir_distribution}")
     refute workflow =~ "postgres"

@@ -1,4 +1,8 @@
-# Pramāṇa foundry
+# Foundry
+
+Split from [lorecrafting/pramana](https://github.com/lorecrafting/pramana) on 2026-09-23 with
+its full history. Commit SHAs recorded before the split name Pramāṇa commits; the two that
+tests resolve survive here as `pramana/<sha>` tags.
 
 **Audit, 2026-09-12:** The [architecture and lifecycle audit](docs/AUDIT-2026-09-12.md)
 found that the live execution path bypasses several safeguards described below.
@@ -102,7 +106,7 @@ disabled/routed to their containment owners until rewritten.
   migration sequence; it is evidence, not current repair authority.
 - [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — FR-07 SQLite authority boundary,
   initialization/recovery, offline import and current limitations.
-- [`../docs/PLAN.md`](../docs/PLAN.md) — project roadmap and Foundry audit follow-up.
+- [`../docs/PLAN.md`](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/PLAN.md) — project roadmap and Foundry audit follow-up.
 
 ## Tracked layout
 

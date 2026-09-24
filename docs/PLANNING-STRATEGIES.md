@@ -511,7 +511,7 @@ Their detailed acceptance checklists are in the issues, not duplicated here. Bot
 open when this planning change merges; no feature is implemented by this document.
 
 Both runtime tracks require G0/FR-22, the I-F3 software baseline and their accepted
-interfaces, under [I-F3/I-F5](../../docs/strategy/ROADMAP.md). One bounded improvement runs
+interfaces, under [I-F3/I-F5](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/ROADMAP.md). One bounded improvement runs
 at a time. No active FR ticket depends on these post-repair implementations.
 
 Issue #48's documentation-only A0 slice tracks the outstanding coordinated ownership

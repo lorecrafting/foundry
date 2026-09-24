@@ -7,7 +7,7 @@ Cloudflare OS satisfies Foundry conformance.
 [Foundry strategy](STRATEGY.md) · [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) ·
 [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) · [AX/Substrate backend](AX-SUBSTRATE.md) ·
 [Workflow contract](WORKFLOW-CONTRACT.md) ·
-[Broader research register](../../docs/strategy/RESEARCH.md)
+[Broader research register](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
 
 ## Source snapshot
 

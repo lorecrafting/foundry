@@ -124,7 +124,7 @@ code lives. Paths are under `foundry/lib/pramana_foundry/`.
 | FR-19B | Diagnostic retention; repair or retire relocation | `relocation.ex`, `relocation/`, and the diagnostic log writers (`telemetry/`, `event_log.ex`, `consolidated_log.ex`) |
 
 The rows are inferred from scope prose and O0's `file:line` citations. They are not a
-dependency-graph run, and the [dependency review runbook](../../../docs/agents/DEPENDENCY_REVIEW.md)
+dependency-graph run, and the [dependency review runbook](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/DEPENDENCY_REVIEW.md)
 still applies to each FR-23a change.
 
 FR-23a's contents are `ci/format_debt.exs` (done), `docs/`, `bin/` scripts and their

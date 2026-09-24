@@ -63,7 +63,7 @@ the precise evidence and limitations; independent critical rereview remains requ
 
 ## Boundary
 
-The branch-only [workflow](../../../.github/workflows/fr19a-sync-eio.yml) uses an ephemeral
+The branch-only [workflow](../../.github/workflows/fr19a-sync-eio.yml) uses an ephemeral
 GitHub-hosted Ubuntu runner and `contents: read` permission. It performs no provider call,
 Foundry dispatch, live-daemon operation, deployment or activation. It does not install
 packages. The first stage inventories the preinstalled commands, noninteractive sudo,

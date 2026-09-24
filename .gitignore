@@ -1,0 +1,10 @@
+/_build/
+/deps/
+/cover/
+/doc/
+/ci-artifacts/
+/local/
+/handoffs/
+/pramana_foundry
+erl_crash.dump
+*.ez

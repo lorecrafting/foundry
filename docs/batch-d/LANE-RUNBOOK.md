@@ -6,7 +6,7 @@ replays all of it after a restart. It launches nothing: you hand each packet to 
 yourself. Design: [THIN-LANE-DESIGN](THIN-LANE-DESIGN-2026-09-23.md); risks A1–A6 and what
 stays disabled: [DOGFOOD-READINESS §4](../DOGFOOD-READINESS-2026-09-23.md#4-the-thin-dogfood-option).
 
-All commands run from `foundry/` in the main checkout. Every `bin/pramana lane …` command
+All commands run from the root of the main checkout. Every `bin/pramana lane …` command
 prints one result; add `--json` for a single JSON object. A refusal prints `error: <atom>`
 and exits non-zero.
 
@@ -51,7 +51,7 @@ Ticket ids match `ML-[A-Za-z0-9-]+`. Take the base from git, never from memory.
 
 ```sh
 bin/pramana lane admit ML-42 --base-ref "$(git rev-parse HEAD)" --title "Short title" \
-  --scope foundry/lib/x.ex,foundry/test/x_test.exs --acceptance "criterion 1" --acceptance "criterion 2"
+  --scope lib/x.ex,test/x_test.exs --acceptance "criterion 1" --acceptance "criterion 2"
 ```
 
 **Developer packet.** Writes the packet to `--out` and prints it.

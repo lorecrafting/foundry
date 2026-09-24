@@ -6,7 +6,7 @@ adapter; it does not replace the active repair plan, workflow contract, FR-09/15
 isolation/billing requirements or the existing production fail-closed posture.
 
 [Foundry strategy](STRATEGY.md) · [Pi harness design](PI-HARNESS.md) ·
-[Observability](OBSERVABILITY.md) · [Research register](../../docs/strategy/RESEARCH.md)
+[Observability](OBSERVABILITY.md) · [Research register](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
 
 ## Decision summary
 

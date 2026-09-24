@@ -53,7 +53,7 @@ contract still govern implementation.
 | Plan FR-23 dead-surface removal, or check whether a `lib/` identifier still dispatches | [Dead surface inventory](DEAD-SURFACE-INVENTORY-2026-09-22.md) — unused functions, list-literal members and modules at `6bc015ed`, each with its recorded search and owner; it removed nothing |
 | Decide whether to split FR-23, or pick up FR-23 hygiene before FR-10/11/12/19B land | [FR-23 split proposal](fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md) — a proposal at `b46d3825`, not yet approved: FR-23a (hygiene, gated by which files it may touch) and FR-23b (decomposition and retirement, keeping FR-23's dependencies); the repair plan still governs |
 | Inspect implementation history | [Implementation log](IMPLEMENTATION-LOG.md); use its reading route and active-ticket headings rather than preloading the append-only history |
-| Review an agent assignment | The applicable [role documents](../../docs/README.md#foundry-role-contracts) and current workflow contract |
+| Review an agent assignment | The applicable [role documents](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/README.md#foundry-role-contracts) and current workflow contract |
 
 **The active repair plan, not the original eight-ticket migration sequence, owns
 repair ordering.** A design-review approval applies to its named candidate; it is not
@@ -65,7 +65,7 @@ a competing backlog.
 
 ## Provider and backend boundary
 
-Shared repository instructions live in [AGENTS.md](../../AGENTS.md). They apply to
+Shared repository instructions live in [AGENTS.md](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/AGENTS.md). They apply to
 Claude, Gemini, DeepSeek, Codex and other providers. That neutrality does not relax
 Foundry's launch policy, billing authorization, review identity or backend conformance.
 Read the existing README and repair criteria before operating Herdr or any future adapter.
@@ -76,9 +76,9 @@ change launch profiles, promote an artifact or alter any repair ticket.
 ## Evidence and navigation
 
 Dated audit, review, integration and attestation files are preserved as evidence, not
-rewritten into one current narrative. Use [the complete documentation catalog](../../docs/CATALOG.md)
+rewritten into one current narrative. Use [the complete documentation catalog](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/CATALOG.md)
 to find an individual record. One historical audit link points to a now-removed legacy
-Python diagnostic; [the documentation audit](../../docs/audits/2026-09-15/README.md)
+Python diagnostic; [the documentation audit](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/audits/2026-09-15/README.md)
 records that exception without rewriting the original evidence.
 
 For current status, distinguish inspected source/containment from deployment truth. The
@@ -87,4 +87,4 @@ component inventories therefore do not establish current wiring, activation or p
 execution. The [workflow contract's current-status route](WORKFLOW-CONTRACT.md) preserves
 its dated design evidence while directing implementation to H0 and FR-08A/B.
 
-[Repository map](../../docs/REPO_MAP.md) · [Shared workflow](../../docs/agents/WORKFLOW.md)
+[Repository map](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/REPO_MAP.md) · [Shared workflow](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/WORKFLOW.md)

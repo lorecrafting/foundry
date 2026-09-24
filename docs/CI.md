@@ -1,6 +1,6 @@
 # Foundry continuous integration
 
-Foundry has a standalone, model-free CI gate. It runs from `foundry/` without the
+Foundry has a standalone, model-free CI gate. It runs from the repository root without the
 umbrella, corpus, Postgres, Rust or Python model sidecar:
 
 ```bash
@@ -35,11 +35,11 @@ lifecycle conformance.
 
 Hex plus the committed lockfile is authoritative for third-party source. CI resolves OWL
 0.13.1 into a fresh untracked directory and records both Hex checksums. The previously
-tracked `foundry/deps/owl/` copy was removed because it duplicated that authority without a
+tracked `deps/owl/` copy was removed because it duplicated that authority without a
 verification step. Restore dependencies with the runner or `mix deps.get --check-locked`.
 
 Generated executables are never source inputs. The previously tracked escript was removed;
-`foundry/pramana_foundry` and `foundry/ci-artifacts/` are ignored and reproduced by the
+`pramana_foundry` and `ci-artifacts/` are ignored and reproduced by the
 runner. A consumer must match an artifact's recorded SHA-256 and source commit rather than
 assuming a file named `pramana_foundry` represents the checkout.
 

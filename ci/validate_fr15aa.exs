@@ -68,7 +68,7 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
     checkpoint_f_candidate: "148476c93497653abbbc52fb040cf76927478d3f",
     checkpoint_f_review: "ca8c6d0b5edc9a5cfb9c265e710b29f3210f5cbe",
     specification_profile: "fr15aa-provisioning-v2",
-    validator_path: "foundry/ci/validate_fr15aa.exs"
+    validator_path: "ci/validate_fr15aa.exs"
   }
   @host_profile %{
     id: "macos-dedicated-local-principals-v1",
@@ -199,51 +199,51 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
     "node" => {"executable", "26.8.2", "/opt/homebrew/bin/node", "candidate_runtime"},
     "npm" => {"executable", "11.19.1", "resolved-with-node-installation", "blocked"},
     "herdr" => {"executable", "0.9.0", "/opt/homebrew/bin/herdr", "presentation_unproved"},
-    "elixir-ci" => {"toolchain", "1.20.3", "foundry/ci/toolchain.exs", "policy_pin"},
-    "otp-ci" => {"toolchain", "29.0.5/ERTS-17.0.5", "foundry/ci/toolchain.exs", "policy_pin"},
-    "foundry-lock" => {"package_lock", "base-f5067d9", "foundry/mix.lock", "repository_pin"},
+    "elixir-ci" => {"toolchain", "1.20.3", "ci/toolchain.exs", "policy_pin"},
+    "otp-ci" => {"toolchain", "29.0.5/ERTS-17.0.5", "ci/toolchain.exs", "policy_pin"},
+    "foundry-lock" => {"package_lock", "base-f5067d9", "mix.lock", "repository_pin"},
     "foundry-config" =>
-      {"config", "base-f5067d9", "foundry/config/config.exs", "legacy_not_provisioning"},
+      {"config", "base-f5067d9", "config/config.exs", "legacy_not_provisioning"},
     "assignment-schema" =>
-      {"config", "v1-base-f5067d9", "foundry/config/schemas/assignment-v1.json", "repository_pin"},
+      {"config", "v1-base-f5067d9", "config/schemas/assignment-v1.json", "repository_pin"},
     "current-coordinator" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/coordinator.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/coordinator.ex",
        "legacy_blocked_route"},
     "current-tick" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/coordinator/tick.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/coordinator/tick.ex",
        "legacy_blocked_route"},
     "current-agent-server" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/agent_server.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/agent_server.ex",
        "legacy_blocked_route"},
     "current-herdr-adapter" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/herdr/adapter.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/herdr/adapter.ex",
        "legacy_blocked_route"},
     "current-herdr-argv" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/herdr/argv.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/herdr/argv.ex",
        "legacy_blocked_route"},
     "current-herdr-runner" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/herdr/runner.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/herdr/runner.ex",
        "legacy_blocked_route"},
     "current-launch-effect" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/effects/launch.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/effects/launch.ex",
        "legacy_blocked_route"},
     "current-prompt-effect" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/effects/prompt_delivery.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/effects/prompt_delivery.ex",
        "legacy_blocked_route"},
     "current-check-runner" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/checks/runner.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/checks/runner.ex",
        "legacy_blocked_route"},
     "current-process-group" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/effects/process_group.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/effects/process_group.ex",
        "legacy_blocked_route"},
     "current-cli-rpc" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/cli/rpc.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/cli/rpc.ex",
        "temporary_inert_transport_not_authority"},
     "current-git-evidence" =>
-      {"source_route", "base-f5067d9", "foundry/lib/pramana_foundry/git_evidence.ex",
+      {"source_route", "base-f5067d9", "lib/pramana_foundry/git_evidence.ex",
        "legacy_blocked_route"},
     "checkpoint-f-probe" =>
-      {"evidence_fixture", "candidate-148476c", "foundry/docs/fr-09/pi_rpc_probe.exs",
+      {"evidence_fixture", "candidate-148476c", "docs/fr-09/pi_rpc_probe.exs",
        "accepted_provider_free_evidence"},
     "workflow-kernel" =>
       {"required_adapter", "fr06-r3-bundle-v1",
@@ -508,11 +508,11 @@ defmodule PramanaFoundry.CI.FR15aAValidator do
 
   defp validate_repository_pin(errors, id, path, expected) do
     if MapSet.member?(@repository_pin_ids, id) do
-      repository_root = Path.expand("../..", __DIR__)
+      repository_root = Path.expand("..", __DIR__)
       absolute_path = Path.expand(path, repository_root)
       relative_path = Path.relative_to(absolute_path, repository_root)
 
-      if String.starts_with?(path, "foundry/") and
+      if Path.type(path) == :relative and
            relative_path == path and not String.starts_with?(relative_path, "../") do
         case File.read(absolute_path) do
           {:ok, bytes} ->

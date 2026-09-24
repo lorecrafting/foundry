@@ -2,8 +2,8 @@
 
 Read before any Foundry code change. Core is `lib/pramana_foundry/durable_store/`; the
 kernel is `lib/pramana_foundry/workflow/`; `kernel/software/` is the reference controller.
-"Gate" means `test/pramana_foundry/architecture_boundary_test.exs` (paths below are under
-`foundry/`); each rule names the test that fails, with the file and line of the offence.
+"Gate" means `test/pramana_foundry/architecture_boundary_test.exs`; each rule names the test
+that fails, with the file and line of the offence.
 
 1. **Core never references Workflow.** Gate: `rule 1 Core references no Workflow module`.
 2. **The kernel never calls DurableStore; plans are data.** Gate: `rule 2 the workflow

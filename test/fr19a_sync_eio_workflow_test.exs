@@ -4,7 +4,7 @@ defmodule PramanaFoundry.CI.FR19ASyncEIOWorkflowTest do
   test "Gateway fixture receives its seven arguments without a literal separator" do
     workflow =
       __DIR__
-      |> Path.join("../../.github/workflows/fr19a-sync-eio.yml")
+      |> Path.join("../.github/workflows/fr19a-sync-eio.yml")
       |> Path.expand()
       |> File.read!()
 
@@ -18,7 +18,7 @@ defmodule PramanaFoundry.CI.FR19ASyncEIOWorkflowTest do
   test "privileged tracer drops the tracee to the validated runner identity" do
     workflow =
       __DIR__
-      |> Path.join("../../.github/workflows/fr19a-sync-eio.yml")
+      |> Path.join("../.github/workflows/fr19a-sync-eio.yml")
       |> Path.expand()
       |> File.read!()
 

@@ -5,7 +5,7 @@ change the active repair plan, workflow contract, launch policy, provider entitl
 or current runtime behavior.
 
 [Foundry strategy](STRATEGY.md) · [Workflow contract](WORKFLOW-CONTRACT.md) ·
-[Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) · [Validation](../../docs/strategy/VALIDATION.md)
+[Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) · [Validation](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/VALIDATION.md)
 
 ## 1. Purpose
 

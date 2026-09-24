@@ -6,7 +6,7 @@ AX/Agent Substrate satisfy Foundry conformance.
 
 [Foundry strategy](STRATEGY.md) · [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) ·
 [Workflow contract](WORKFLOW-CONTRACT.md) · [Observability](OBSERVABILITY.md) ·
-[Broader research register](../../docs/strategy/RESEARCH.md)
+[Broader research register](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
 
 ## Source snapshot
 

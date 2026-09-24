@@ -10,7 +10,7 @@ are explicitly revised and re-reviewed.
 [Observability](OBSERVABILITY.md) ·
 [Jido / Jido.Harness evaluation](JIDO-HARNESS.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
-[Research sources](../../docs/strategy/RESEARCH.md)
+[Research sources](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
 
 ### Use this document by task
 
@@ -1201,7 +1201,7 @@ Primary references checked for this design:
   https://code.claude.com/docs/en/checkpointing
 
 The repository's source-quality summary for Pi is
-[research entry E30](../../docs/strategy/RESEARCH.md). External examples establish
+[research entry E30](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md). External examples establish
 available mechanisms and design inspiration, not Foundry acceptance evidence.
 
 ## 19. Open decisions intentionally deferred

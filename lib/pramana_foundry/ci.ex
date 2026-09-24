@@ -486,7 +486,7 @@ defmodule PramanaFoundry.CI do
           dirty_status_sha256: sha256(dirty),
           runner_sha256: safe_value(fn -> file_sha(root, "lib/pramana_foundry/ci.ex") end),
           workflow_sha256:
-            safe_value(fn -> file_sha(root, "../.github/workflows/foundry-ci.yml") end)
+            safe_value(fn -> file_sha(root, ".github/workflows/foundry-ci.yml") end)
         }
 
       {:error, reason} ->

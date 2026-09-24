@@ -1,6 +1,6 @@
 # Rebinds the FR-08A protected-boundary evidence to HEAD after a protected-code change.
 #
-#   (cd foundry && MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs)
+#   MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs
 #
 # Run on a clean tree whose HEAD is the subject commit (the protected change itself), then
 # commit the three files it rewrites as a separate "rebind" commit, as every earlier rebind

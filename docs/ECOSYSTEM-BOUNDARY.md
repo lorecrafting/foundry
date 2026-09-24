@@ -9,7 +9,7 @@ to activate execution.
 [Planning strategies](PLANNING-STRATEGIES.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
 [AX/Substrate backend](AX-SUBSTRATE.md) · [Cloudflare OS lessons](CLOUDFLARE-OS.md) ·
-[Broader research record](../../docs/strategy/RESEARCH.md)
+[Broader research record](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
 
 ## Executive conclusion
 

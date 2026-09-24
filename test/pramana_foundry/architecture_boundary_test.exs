@@ -14,7 +14,7 @@ defmodule PramanaFoundry.ArchitectureBoundaryTest do
 
   alias PramanaFoundry.Test.AstModules, as: Ast
 
-  @rules "foundry/docs/BOUNDARY-RULES.md"
+  @rules "docs/BOUNDARY-RULES.md"
   @core "lib/pramana_foundry/durable_store/**/*.ex"
   @workflow "lib/pramana_foundry/workflow/**/*.ex"
   @generic_kernel [
