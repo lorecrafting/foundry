@@ -4,11 +4,6 @@ Split from [lorecrafting/pramana](https://github.com/lorecrafting/pramana) on 20
 its full history. Commit SHAs recorded before the split name Pramāṇa commits; the two that
 tests resolve survive here as `pramana/<sha>` tags.
 
-**Audit, 2026-09-12:** The [architecture and lifecycle audit](docs/archive/AUDIT-2026-09-12.md)
-found that the live execution path bypasses several safeguards described below.
-Treat the following capability list as an implementation inventory, not verified
-end-to-end guarantees. The audit includes reproductions and an ordered repair plan.
-
 **Current shape, 2026-09-23:** Foundry is not in production. The legacy daemon stack
 (Coordinator, AgentServer, the Herdr adapter, launch effects, JSONL persistence, Board,
 telemetry, Improver, PM, Scheduler and the legacy CLI) was deleted rather than migrated
@@ -62,23 +57,20 @@ evaluation credential.
 
 ## Read first
 
+- [`docs/README.md`](docs/README.md) — the documentation index, by task.
+- [`docs/batch-d/LANE-RUNBOOK.md`](docs/batch-d/LANE-RUNBOOK.md) — start the lane daemon and
+  run a ticket through it.
 - [`docs/REPAIR-PLAN.md`](docs/REPAIR-PLAN.md) — sole authoritative repair backlog,
   current status, dependencies and acceptance obligations.
 - [`docs/WORKFLOW-CONTRACT.md`](docs/WORKFLOW-CONTRACT.md) — accepted FR-06 authority,
-  lifecycle and budget contract, with a route to current sequencing.
-- [`docs/batch-d/LANE-RUNBOOK.md`](docs/batch-d/LANE-RUNBOOK.md) — start the lane daemon and
-  run a ticket through it.
-- [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — FR-07 SQLite authority boundary,
-  initialization/recovery and current limitations.
-- [`docs/ALIGNMENT-AUDIT-2026-09-19.md`](docs/archive/ALIGNMENT-AUDIT-2026-09-19.md) — independent
-  read-only source alignment audit and exact limitations (before the deletion).
-- [`docs/OBSERVABILITY.md`](docs/archive/OBSERVABILITY.md) — describes the deleted legacy telemetry;
-  its rewrite around `Observations` and the lane log is pending.
-- [`docs/AX-SUBSTRATE.md`](docs/design/AX-SUBSTRATE.md) and [`docs/CLOUDFLARE-OS.md`](docs/design/CLOUDFLARE-OS.md)
-  — 2026-09-21 research on alternate execution substrates beneath Foundry's
-  authority/evidence boundary.
-- [`docs/MIGRATION.md`](docs/archive/MIGRATION.md) and [`docs/MIGRATION-TICKETS.md`](docs/archive/MIGRATION-TICKETS.md)
-  — historical migration design; evidence, not current repair authority.
+  lifecycle and budget contract.
+- [`docs/BOUNDARY-RULES.md`](docs/BOUNDARY-RULES.md) — the decoupling rules every code change
+  keeps.
+- [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — the SQLite authority store,
+  initialization and recovery.
+
+Why the repairs exist (the [2026-09-12 audit](docs/archive/AUDIT-2026-09-12.md) and later
+audits) and every other dated record are in the [archive](docs/archive/README.md).
 
 ## Tracked layout
 
