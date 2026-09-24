@@ -7,8 +7,8 @@ defmodule Foundry.Repair.FR08AProtectedBoundaryTest do
     report = FR08AProtectedBoundary.report()
 
     assert report.identity.implementation_binding == "verified:source-sha256+beam-md5/v1"
-    assert report.identity.subject_revision == "180569531ed33d59e04ca57333d0d4de4c58fa5f"
-    assert report.identity.subject_tree == "fc2e56d49dedfb0a7bc3214911b5cf207e56bc62"
+    assert report.identity.subject_revision == "b1a820e888f228b14be8d6d8843b8b88287ff8be"
+    assert report.identity.subject_tree == "88b07e68bad0a5638528c229bb087881e58f40f1"
     assert length(report.identity.exercised_api) == 10
     assert FR08HandoffGate.ready?(report.gate)
     assert report.gate.passed_count == 6
@@ -46,7 +46,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundaryTest do
              "protected_primitives.ex|sha256:945f0234bb35a5ddd10f1f7ce568ce85d06cd5466722d5840b7d6985019e32f4|beam_md5:4c19d74f30d5d0a235de52f52bdd279a"
 
     assert first =~
-             "gateway.ex|sha256:c78a0e6bc96ad5ac5651c2ddaafe4f687ed9361dcbbab7822ab71eaa811eeecc|beam_md5:894c7cfe78dbf48ffb095f3b67d9b52f"
+             "gateway.ex|sha256:eee5450923cf00b8dc3bddd462ca474efe25de91b55b9b2f0ed463f5984dd8f1|beam_md5:ee302f23f9e793519c7b4745c8b5af10"
   end
 
   test "changed loaded Gateway implementation refuses all positive evidence" do
