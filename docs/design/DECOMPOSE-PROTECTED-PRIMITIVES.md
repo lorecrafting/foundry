@@ -80,17 +80,25 @@ depends on `Guards` and `Rows`. The reopen-ready pair (§3) becomes `Operations`
 gateway's writer is still named: it is the contiguous run 5498–6282 inside `RestartCheck`.
 `TransitionReplay` stays separate because it is an algorithm of its own.
 
-**Dependency direction.** These edges were measured from the call graph after assignment.
-Arrows point from caller to callee. There are no cycles.
+**Allowed edges.** These were measured from the call graph after assignment. The list is
+closed: any edge not listed is a defect, and that includes a compile-time edge from an
+`@x Owner.x()` attribute. There are no cycles. This is the list an xref-graph test
+compares against.
 
-```
-Guards, ReadSet, Reads, TransitionReplay  ->  Rows
-Operations                                ->  Guards, Rows
-RestartCheck                              ->  TransitionReplay, Guards, Rows
-                                              (+ Gateway.atomic_domain_request/1, 6048)
-Facade  ->  Rows, ReadSet, Operations        (calls)
-Facade  ->  Guards, Reads, RestartCheck      (defdelegate only)
-```
+| From | May depend on (split set) | May depend on (outside the split) |
+|---|---|---|
+| `Protected.Rows` | — | `Database`, `Encoding` |
+| `Protected.Guards` | `Rows` | `Database`, `Encoding` |
+| `Protected.ReadSet` | `Rows` | `Database`, `Encoding` |
+| `Protected.Reads` | `Rows` | `Database`, `Encoding` |
+| `Protected.TransitionReplay` | `Rows` | `Database`, `Encoding` |
+| `Protected.Operations` | `Guards`, `Rows` | `Database`, `Encoding` |
+| `Protected.RestartCheck` | `TransitionReplay`, `Guards`, `Rows` | `Database`, `Encoding`, `TransitionPlan` (5665), `Gateway` (`atomic_domain_request/1`, 6048; seam S2) |
+| `ProtectedPrimitives` (facade) | calls into `Rows`, `ReadSet` and `Operations`; `defdelegate` only to `Guards`, `Reads` and `RestartCheck` | `Database`, `Encoding` |
+
+The "Database, Encoding" column is an upper bound. A module that never uses one of them
+simply has fewer edges than listed, and the checker only fails on an edge that is not in
+the list.
 
 Two placements were chosen to break edges. `inbox_fact/2` and `ledger_fact/3` go to `Rows`,
 not `Reads`, because commands return the same fact shape that queries do; otherwise
@@ -126,7 +134,11 @@ records where each one is enforced so that a reviewer can spot-check it.
 | **Write order** | Inside each transition (e.g. `create_effect` 1318–1321: effect, then reservations, then leases). In `persist_committed_result/8` 421–424, `root_commands` must be inserted before `persist_v1_operation/2` copies from it, and then comes `inject(:before_commit)` | Definitions are unchanged, so the order is unchanged |
 | **Fault points** | `:before_commit` / `{:halt, :before_commit}` (737–739, `System.halt(71)`), `:after_commit_before_reply` (36) | Stay in the facade. The duplicate `inject/2` vocabulary (gateway seam S3) is left alone. Proved by `sync_fault_test.exs` and `operational_storage_test.exs` |
 | **Refusal atoms** | 43 distinct `{:reject, atom, _}` literals, one `{:quarantine, :conflicting_receipt, _}`, plus the `when reason in [...]` lists (e.g. 1331–1350) and `{:error, atom}` refusals from `Guards` | Definition equality keeps each literal. The sorted grep set equals the set at base |
-| **Write path: only the command pipeline reaches `root_*` writes** | Every insert and update is `defp` today (2786–4316), so only the 12 public functions reach them | **New gate rule 13, landing in C1:** in `lib/`, only `Foundry.DurableStore.ProtectedPrimitives` and `Foundry.DurableStore.Protected.*` may reference `Foundry.DurableStore.Protected.*`. It uses the existing `references/2` scanner (`architecture_boundary_test.exs:184`), which resolves aliases, with a red-control fixture: an aliased `Protected.Rows.update_ledger/3` call from a `lib/foundry/manual_lane` path is found. Test files are exempt, so restart probes may write corrupt rows. The matching sentence goes in [the boundary rules](../BOUNDARY-RULES.md), and `AGENTS.md`'s "twelve rules" becomes thirteen. This closes the boundary-rule-7-class hole that making the 12 `Rows` writers public would otherwise open (`insert_claim/2`, `insert_effect/2`, `insert_ledger/2`, `insert_receipt/2`, `insert_reservation/2`, `insert_simple_history/7`, `update_claim/3`, `update_effect/3`, `update_ledger/3`, `update_reservation/3`, `write_inbox_head/5`, `write_simple/7`) |
+| **Write path: only the command pipeline reaches `root_*` writes** | Every insert and update is `defp` today (2786–4316), so only the 12 public functions reach them | **New gate rule 13, landing in C1:** in `lib/`, only `Foundry.DurableStore.ProtectedPrimitives` and `Foundry.DurableStore.Protected.*` may reference `Foundry.DurableStore.Protected.*`. There is one declared exception site,
+declared the way rule 4 declares `@software_sites`: `@protected_sites [{Foundry.Repair.FR08AProtectedBoundary, {:@, :api_identity}}]`.
+The pin provider names these modules and never calls them, and `references/2` walks
+attribute values, so without this exception the C9 pin commit would be red. The list may
+shrink, never grow. It uses the existing `references/2` scanner (`architecture_boundary_test.exs:184`), which resolves aliases, with a red-control fixture: an aliased `Protected.Rows.update_ledger/3` call from a `lib/foundry/manual_lane` path is found. Test files are exempt, so restart probes may write corrupt rows. The matching sentence goes in [the boundary rules](../BOUNDARY-RULES.md), and `AGENTS.md`'s "twelve rules" becomes thirteen. This closes the boundary-rule-7-class hole that making the 12 `Rows` writers public would otherwise open (`insert_claim/2`, `insert_effect/2`, `insert_ledger/2`, `insert_receipt/2`, `insert_reservation/2`, `insert_simple_history/7`, `update_claim/3`, `update_effect/3`, `update_ledger/3`, `update_reservation/3`, `write_inbox_head/5`, `write_simple/7`) |
 | **FR-08A pinned identity** | [`fr08a_protected_boundary.ex:18–52`](../../lib/foundry/repair/fr08a_protected_boundary.ex) pins 10 modules: `Authority`, `Database`, `Gateway`, `ProtectedPrimitives`, `Kernel` (DurableStore), `RecordCodec`, `Encoding`, `FR08HandoffGate`, `TransitionPlan`, `ProtectedVerifier` | The list grows by seven. See the rebind procedure below |
 | **Rule 3 role sites** | `@role_sites`: `{ProtectedPrimitives, {:@, :dimensions}}`, `{…, {:def, :persist_nonstart_settlement}}` (token at 203), `{…, {:defp, :required_dimension}}` | Three keys are renamed, each in the commit that moves its function: C2 gives `{Protected.Guards, {:@, :dimensions}}` and `{Protected.Guards, {:def, :required_dimension}}`; C6 gives `{Protected.Operations, {:def, :persist_nonstart_settlement}}`. The count stays at 4 and never reaches 5. The review found this acceptable |
 | **Reopen-ready** (every committed state reopens `:ready`) | Writer and checker must agree. Proved by `reopen_property_test.exs` and the `*_restart_probe_test.exs` files | The writer (`Operations`) and the checkers (`RestartCheck`, `TransitionReplay`) are in different files. Each new file opens with a header comment naming its pair. Run the property test at every move commit |
@@ -148,10 +160,13 @@ and never commits a rebind.
    `length(...) == N` to the new count. If the gateway split has already landed (+3) the
    count is 20, or 19 if ML-DEAD-ROUTES has removed `ProtectedVerifier`. If this split
    lands alone, it is 17 or 16.
-2. **Commit** those two files. The script refuses a dirty tree (16–17) and binds the
+2. **Commit** those two files. The script refuses a dirty tree (17–18) and binds the
    subject to `HEAD`.
-3. Run `MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs` and check that all 14
-   placeholders appear in its `old -> new` output.
+3. Run `MIX_ENV=test mix run --no-start bin/rebind_fr08a.exs`. Its output prints only 8
+   characters per value, so it cannot show which placeholders were replaced. Check
+   instead that `grep -c 'pin-' lib/foundry/repair/fr08a_protected_boundary.ex
+   test/foundry/repair/fr08a_protected_boundary_test.exs` prints 0 for both files. It
+   prints 0 at base, so no existing text collides with a placeholder.
 4. Regenerate `docs/fr-08/fr08a-protected-report.txt` **in a fresh VM**, with the command
    the script prints, so that the rewritten provider is the one loaded.
 5. Run `TMPDIR=/private/tmp MIX_ENV=test mix test
@@ -171,6 +186,18 @@ amendment is routed to the operator (Q2).
 smaller and proves the move checker on 2.4k lines before the checker meets 8k. It changes
 no line of this file under its default for S2. **ML-DEAD-ROUTES lands before both** (§5).
 There is one rebind per landed split, run serially (gateway seam S5).
+
+**Planned tooling (operator note).** A later ticket, ML-PRECISION-TOOLING, is planned to
+land before this split. It would add four things:
+- the `boundary` library, under which rule 13 may become a compile-time boundary; the
+  ExUnit reference-scan version stays as the spec either way;
+- a Sourceror-based move task;
+- the shared debug_info checker;
+- an xref-graph test that compares the actual `Protected.*` dependency edges with §2's
+  allowed-edge list.
+
+If it lands, C0 and C1 use its tools, and this design's module boundaries, edge list and
+invariants are unchanged.
 
 **Move check: one shared checker.** The gateway split commits the checker (its M-series,
 §4 of that note). This split reuses it and extends it only through configuration. The
@@ -212,7 +239,7 @@ with `Kernel`.
 | # | Commit | Moves (fns / clause lines) | Other edits | Focused tests beyond S |
 |---|---|---|---|---|
 | C0 | Configure the shared checker for this split, if it needs a config file | — | a split-set list and the declared additions | its red control: flip one atom in a moved body and the check fails |
-| C1 | Extract `Protected.Rows` and add gate rule 13 | 66 / 920 | 2 accessors; a rule 13 test plus red control (~15 lines); BOUNDARY-RULES and AGENTS.md sentence | everything, since every layer uses Rows |
+| C1 | Extract `Protected.Rows` and add gate rule 13 | 66 / 920 | 2 accessors; a rule 13 test with `@protected_sites` (the one pin-provider exception) plus red control (~15 lines); BOUNDARY-RULES and AGENTS.md sentence | everything, since every layer uses Rows |
 | C2 | Extract `Protected.Guards` | 28 / 432 | `dimensions/0`; 2 `@role_sites` keys | `live_refusal_probe`, `create_effect_refusal`, `review_independence`, `atomic_bundle` (discriminator) |
 | C3 | Extract `Protected.ReadSet` | 25 / 592 | — | `decide_e2e`, `atomic_bundle`, `manual_lane` |
 | C4 | Extract `Protected.Reads` | 51 / 1,077 | — | `observations_test`, `atomic_bundle` (corrupt page), `manual_lane` (log) |
