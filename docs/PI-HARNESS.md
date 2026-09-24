@@ -1121,24 +1121,24 @@ plan and later full lifecycle acceptance.
 Do not create these paths until implementation scope is admitted, but prefer a separation
 like:
 
-    foundry/lib/pramana_foundry/harness.ex
-    foundry/lib/pramana_foundry/harness/pi/
+    lib/pramana_foundry/harness.ex
+    lib/pramana_foundry/harness/pi/
       process.ex
       rpc.ex
       protocol.ex
       observation.ex
 
-    foundry/pi/bridge/
+    pi/bridge/
       index.ts
       tools/
       hooks/
 
-    foundry/pi/skills/
+    pi/skills/
       assignment/
       review/
       adversarial-review/
 
-    foundry/test/pramana_foundry/harness/
+    test/pramana_foundry/harness/
       contract_test.exs
       pi_protocol_test.exs
       pi_conformance_test.exs

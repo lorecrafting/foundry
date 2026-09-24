@@ -111,7 +111,7 @@ disabled/routed to their containment owners until rewritten.
 ## Tracked layout
 
 ```text
-foundry/
+./
   .formatter.exs
   mix.exs
   mix.lock
@@ -149,9 +149,9 @@ restored from the lockfile/source and identified by the CI provenance manifest; 
 belong in Git. Live state, transcripts, config, caches, logs, releases, temporary files,
 worktrees, and provider authentication do not.
 
-The fixed runtime root is `/Users/raymondluong/dev/pramana/foundry/local/`. It is local to
-the original project checkout and ignored by Git; it must never be derived from the current
-task checkout. Provider credentials stay in provider-owned locations outside that root.
+The operator runtime root defaults to `local/` in the main checkout (`config/config.exs`;
+`PRAMANA_OPERATOR_RUNTIME_ROOT` overrides it). It is ignored by Git and is fixed when the
+release is built from the main checkout; it must never be derived from a task worktree. Provider credentials stay in provider-owned locations outside that root.
 
 ## Runtime dependencies
 

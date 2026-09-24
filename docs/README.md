@@ -47,7 +47,7 @@ contract still govern implementation.
 | Prepare FR-08B B3 (R4a control crossing), or check which control/role cells the kernel implements | [B3 gap inventory](fr-08/FR08B-B3-GAP-INVENTORY-2026-09-22.md) — roles × pause/drain/cancel/generation/limit/allocation/ordering with a verdict and test per cell, settlement-binding gaps, contract-reading questions and a correctness-versus-controller split; inventory only, taken at `3727f2e8`, changes nothing |
 | Decide the B3 inventory's contract-reading questions Q1–Q7, or see what B3 must contain under each reading | [B3 contract readings proposal](fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md) — competing readings with quoted contract text, a recommendation, the cells each reading moves and a minimal correctness-owned B3 scope; proposal, not approved, contract unchanged, taken at `bc62a3b4` |
 | Add or change a guard, transition, or a test that asserts a refusal | [Evidence tools](EVIDENCE-TOOLS.md); the gate enforces four of the five checks automatically, the guard mutation sweep is manual, and a green gate after adding a guard is not evidence the guard works |
-| Run a script in `foundry/bin/` or root `bin/`, or decide which belong in the gate | [Bin script health check](BIN-SCRIPT-HEALTH-2026-09-22.md) — what each one claims, how to run it, who calls it, and its result at `6bc015ed`; none of `foundry/bin/` is in `ci/run.exs` |
+| Run a script in `bin/`, or decide which belong in the gate | [Bin script health check](BIN-SCRIPT-HEALTH-2026-09-22.md) — what each one claims, how to run it, who calls it, and its result at `6bc015ed`; none of `foundry/bin/` is in `ci/run.exs` |
 | Observe the local system | [Observability](OBSERVABILITY.md), with the README's containment warnings |
 | Evaluate the optional semantic assessor | [Assessor Stage A](ASSESSOR.md), issue #26 and the governing repair boundaries |
 | Understand historical architecture choices | [Migration design](MIGRATION.md), [migration tickets](MIGRATION-TICKETS.md), [event sourcing](EVENT_SOURCING.md) |
@@ -76,6 +76,12 @@ This documentation reorganization does not replace Herdr, enable automatic dispa
 change launch profiles, promote an artifact or alter any repair ticket.
 
 ## Evidence and navigation
+
+**Records from before the 2026-09-23 split.** Foundry was `foundry/` inside Pramāṇa until
+2026-09-23. Older records write paths as `foundry/X` (read `X` at this repository's root) and
+cite Pramāṇa commits, which resolve only in
+[lorecrafting/pramana](https://github.com/lorecrafting/pramana); the two that tests read are
+tagged here as `pramana/<sha>`. Those records are evidence and are not rewritten.
 
 Dated audit, review, integration and attestation files are preserved as evidence, not
 rewritten into one current narrative. Use [the complete documentation catalog](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/CATALOG.md)

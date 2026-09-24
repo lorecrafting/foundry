@@ -11,7 +11,7 @@ storage, exports, duration observations and VM/process metrics, but the live age
 lifecycle is not yet a coherent end-to-end telemetry pipeline. FR-18B owns alignment of
 real producers, validators and consumers. Do not infer complete token/cost accounting
 from the presence of the `llm_phase` schema. Foundry is **not currently unified under
-OpenTelemetry**: `foundry/mix.exs` declares no OpenTelemetry packages and Foundry's own
+OpenTelemetry**: `mix.exs` declares no OpenTelemetry packages and Foundry's own
 runtime producers do not currently emit an application-wide `:telemetry` event contract.
 The Erlang `telemetry` package is present only transitively through current dependencies.
 
@@ -51,7 +51,7 @@ from controller activity would collapse the boundary this document is trying to 
 ## Data model: four local JSONL surfaces
 
 The current system uses four append-oriented JSONL surfaces under
-`foundry/local/state/current/`:
+`local/state/current/`:
 
 | Log | File | Current source | Boundary |
 |---|---|---|---|

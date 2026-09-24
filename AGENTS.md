@@ -34,7 +34,7 @@ Load only the topic the task needs; do not preload the plan, history or every li
 ## Checks
 
 - Gate: `TMPDIR=/private/tmp elixir ci/run.exs --output <dir outside the repo>`
-  ([CI](docs/CI.md)); GitHub Actions runs the same on every push and pull request.
+  ([CI](docs/CI.md)); GitHub Actions runs the same on pushes to `main` and on pull requests (not on other branch pushes).
 - Documentation: `elixir bin/check_docs.exs` (every relative Markdown link resolves).
 - Focused tests: `TMPDIR=/private/tmp MIX_ENV=test mix test <files>`.
 

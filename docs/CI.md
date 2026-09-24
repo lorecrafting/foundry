@@ -4,7 +4,6 @@ Foundry has a standalone, model-free CI gate. It runs from the repository root w
 umbrella, corpus, Postgres, Rust or Python model sidecar:
 
 ```bash
-cd foundry
 elixir ci/run.exs --output /absolute/path/to/artifacts
 ```
 

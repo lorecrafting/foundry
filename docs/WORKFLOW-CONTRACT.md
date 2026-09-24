@@ -49,7 +49,7 @@ working-tree changes; source was not changed by FR-06.
 
 The [storage spike](fr-06/storage_spike.py) and [machine output](fr-06/storage-results.json)
 compare the same command/result/event/state/intent bundle in SQLite WAL and a checksummed,
-locked, fsynced journal. Run `python3 foundry/docs/fr-06/storage_spike.py` from repo root.
+locked, fsynced journal. Run `python3 docs/fr-06/storage_spike.py` from the repository root.
 It uses fresh temporary files and subprocess exits, no Foundry startup or model calls.
 Python is experiment tooling only; production storage stays in the standalone Elixir app.
 
@@ -165,7 +165,7 @@ is required by the selected design; actual enforcement remains to be proved.
 where each guarantee is enforced at `c3b65161`; it changes no R1–R5 decision. Sources:
 review C3 in the [subcommit 2 `decide/3` design](fr-08/FR08B-SUBCOMMIT2-DECIDE-DESIGN-2026-09-23.md)
 and the [protected items spec](fr-08/FR08B-PROTECTED-ITEMS-SPEC-2026-09-23.md). Paths are
-under `foundry/lib/pramana_foundry/`; tests under `foundry/test/pramana_foundry/`.
+under `lib/pramana_foundry/`; tests under `test/pramana_foundry/`.
 
 **Rule:** every new protected operation or plan slot adds a row here in the same commit.
 

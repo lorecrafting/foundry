@@ -15,7 +15,7 @@ operate Herdr, or prove FR-15aB/FR-09 conformance. OMP remains the governing har
 Pi is an evaluated, blocked replacement candidate and is not selected by this document.
 
 The machine-readable source of truth is
-[`provisioning-manifest.exs`](provisioning-manifest.exs). From `foundry/`, validate it
+[`provisioning-manifest.exs`](provisioning-manifest.exs). From the repository root, validate it
 without Mix, a provider or a daemon:
 
 Candidate commands/results and remaining gates are frozen in
@@ -81,7 +81,7 @@ where a literal digest is the operative value being compared and a pin id would 
 | Pi production inventory | 186 offline `npm ls` manifests | `pi-production-tree`; inventory, not lock provenance |
 | Node / npm | Node `26.8.2`; npm `11.19.1` | Node `node`; npm digest not recorded at F |
 | Herdr presentation | `/opt/homebrew/bin/herdr`, `0.9.0` | `herdr` |
-| Foundry CI toolchain policy | Elixir `1.20.3`, OTP `29.0.5`, ERTS `17.0.5` | `foundry/ci/toolchain.exs`, pinned as `elixir-ci` and `otp-ci` |
+| Foundry CI toolchain policy | Elixir `1.20.3`, OTP `29.0.5`, ERTS `17.0.5` | `ci/toolchain.exs`, pinned as `elixir-ci` and `otp-ci` |
 | Foundry packages | exact `mix.lock` at the frozen input | `foundry-lock` |
 | current legacy config | `config/config.exs` at the frozen input | `foundry-config`; not the provisioning config |
 | assignment schema | v1 at the frozen input | `assignment-schema` |
@@ -378,6 +378,8 @@ policy and independent review.
 
 ```sh
 set -eu
+# Both checkouts are Pramāṇa checkouts from before the 2026-09-23 split, hence `foundry/`.
+# A spec checkout of lorecrafting/foundry drops that prefix.
 source_checkout=/path/to/exact/source-at-f5067d9
 spec_checkout=/path/to/independently-reviewed-fr15aa-candidate
 

@@ -47,7 +47,6 @@ call-site granularity, and the only one that can see a guard that is tested in o
 and untested in its identical twin three handlers away.
 
 ```sh
-cd foundry
 TMPDIR=/private/tmp elixir bin/guard_mutation_sweep.exs                 # all sites, ~1 hour
 TMPDIR=/private/tmp SWEEP_SITES=/tmp/sites.txt elixir bin/...           # only these guards
 TMPDIR=/private/tmp SWEEP_SINCE=<rev> elixir bin/...                    # only guards whose lines changed
