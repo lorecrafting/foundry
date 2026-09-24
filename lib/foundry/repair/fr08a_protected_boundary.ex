@@ -13,42 +13,42 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
   alias Foundry.DurableStore.Gateway
   alias Foundry.Repair.FR08HandoffGate
 
-  @subject_revision "ab41f06c4d7a5aa94bf91ff0c1ef0f87a6abf62d"
-  @subject_tree "b48930283b4f188cb162c453001fd4932ab07bfc"
+  @subject_revision "3b51299d2f61b5410613ab9343d4d59ec1b1eaab"
+  @subject_tree "719770e38cba3c32ef7437505faf841f184987b6"
   @api_identity [
     {Foundry.DurableStore.Authority, "lib/foundry/durable_store/authority.ex",
-     "83a4953eecbd2bad17857173a4e18de33e54ef4813ab4132b915494367d990c4",
-     "892cca52e5d95c4ed5d0c9b352bb601b"},
+     "fb2439a5424e4e9befe2d2e2c9b2044e238a7aa07d42f93bc68e5a3a03a39099",
+     "ca77dc4311b57ac2e95e2f2f08bcbf48"},
     {Foundry.DurableStore.Database, "lib/foundry/durable_store/database.ex",
-     "a584d7ef6c3e8109ef280b14eaa404cae5f22ee2798ed81c3813078960171d6a",
-     "346a68d8c70ab79a777c69dd227f995f"},
+     "ddb8f1c7bb470510e0f620be9c42f5c2d36387059a412796883413072d330170",
+     "bf8bc412867bec6f96e0d29616b0016e"},
     {Foundry.DurableStore.Gateway, "lib/foundry/durable_store/gateway.ex",
-     "e2ed0e49c71c46449f8c3da16a630aa3f7e5dd3b3be0742313624846c765f524",
-     "3482b1e7bef6a04794e2a17a0c91355f"},
+     "3776719d7edf3d47d8beb79b2b70edeee1075f565b5cb6d960cdeb6c44f1be72",
+     "8d06e37d889b69369863c6d12e1274c5"},
     {Foundry.DurableStore.ProtectedPrimitives,
      "lib/foundry/durable_store/protected_primitives.ex",
-     "7b1653e4613ffa2fbbff77cab97311172ff188d00c8aa3e48a3bc4b9503bf630",
-     "ab95d17ba2b276f1935e8f7d66bfc24b"},
+     "9fa8bbaef3d1a9d7af52f878a00a12240d70715dcd2d4ee446376ce8d813bb80",
+     "90843b758bd948edf7bf7a07b4ede16a"},
     {Foundry.DurableStore.Kernel, "lib/foundry/durable_store/kernel.ex",
-     "0182f7d4bc64248559d6472b3e350aa42104d4bd7cb4e94743473e8321349fab",
-     "f90178d58d43a57086408792aa6ee2ff"},
+     "d205857d23b4de281de50a9c045413ebeb601e1b279e50a179197617e01b5b26",
+     "0bdbbd459b78cb97b9ae8281edacb2d3"},
     {Foundry.DurableStore.RecordCodec, "lib/foundry/durable_store/record_codec.ex",
-     "75a65a232092187edc18afbf6e8a0532e9b00518b474a29def8c0fad17353b66",
-     "05cf8ca82957f84f737e8038f284eb4b"},
+     "e6dadf2770de2aaa4b95c6e1cd28ddb47769710afc56409d9bd0e35bca48384e",
+     "d21efb93156605ba0d53576acf28c633"},
     {Foundry.DurableStore.Encoding, "lib/foundry/durable_store/encoding.ex",
-     "140730a723527d3e7c9f71f0e54c209f14ce4a8b74004e553f12f14ce7c987ba",
-     "5f1bff0562b0fed9407a8af02bc84241"},
+     "866ab0cae52f503c851926409e67808aa4b5f20807088da3da28126be74e0e22",
+     "3467586c7829be7995aa1dc3cdd50047"},
     {Foundry.Repair.FR08HandoffGate, "lib/foundry/repair/fr08_handoff_gate.ex",
-     "0defdd85e69c2511614d736c5fb4690a0a2ff51bd54d86f89980cc1ea86345fd",
-     "1b1964a26b25b2f790ee2e4f098e8b63"},
+     "649db8f3c744cbf1d1544b34e1b226c5df334700687b8437578eeb42ba29641d",
+     "094900f27ae9e0f1159f4c349ec65e1e"},
     # Pinned 2026-09-23 (strategy review): Core guarantees live here too — plan binding,
     # the non-start discriminator rule, settlement identity, and predicate derivation.
     {Foundry.DurableStore.TransitionPlan, "lib/foundry/durable_store/transition_plan.ex",
-     "0cdaf83ef2f83225416277f23dfe0785153af77574c4c092d055f0d894266e3e",
-     "19406ba8717b2c8d9c3ddf19cc3b73d1"},
+     "daf129f53a1b1a40bd937a8e3c2befbbf5db8a1601502a5cb8e1e7bf78d72b02",
+     "38b2f0f9f1f44c1463b01611846e44ac"},
     {Foundry.DurableStore.ProtectedVerifier, "lib/foundry/durable_store/protected_verifier.ex",
-     "1e999ca8c310ec479973e310392fba23d0a68e07686e99d7b13d50d92d8fd7b8",
-     "39d2ac29cab68d281656f2350432f340"}
+     "0366e3e68c0fe6680828b947023e5e401f8e177c996b2bf09ac5855f07cade92",
+     "17a825663acef8c7208870e35e1e27c3"}
   ]
 
   def identity do
