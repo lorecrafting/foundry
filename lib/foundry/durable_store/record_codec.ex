@@ -13,54 +13,24 @@ defmodule Foundry.DurableStore.RecordCodec do
   @reservation ~w(schema_version reservation_id generation_id claim_id dimension units status value)
   @candidate_ledger ~w(schema_version generation_id parent_generation_id allocation consumed)
   @ledger ~w(schema_version generation_id parent_generation_id revision allocation consumed)
-  @legacy_record ~w(schema_version source_digest line_number byte_start byte_end record_digest valid error raw_record_digest)
   @command_request ~w(domain schema_version actor_id command)
   @command ~w(schema_version command_id expected_revisions type target_ids payload)
-  # Legacy command names, then the kernel's decide/3 commands (FR-08B subcommit 2; review
-  # C1). The kernel names are role-free: the role travels in the payload, so a new role or
-  # workflow needs no Core vocabulary.
-  @command_types ~w(legacy_event_append enqueue steer pause resume cancel reset propose submit_artifact submit_review request_effect record_receipt) ++
-                   ~w(plan_launch settle_nonstart finalize_cancellation)
-  @manifest ~w(schema_version source_path archived_path source_digest source_bytes byte_range line_count valid_count invalid_count errors)
-  @manifest_error ~w(line byte_start byte_end record_digest error)
-  # Two disjoint vocabularies share one flat namespace. A name identifies exactly one
-  # event contract, so no version dispatch is needed and no stored record can disagree
-  # with its own type. See docs/fr-08/event-vocabulary-design.md.
-  #
-  # Legacy: the pre-repair vocabulary. Never remove, rename or re-point a member; stored
-  # histories depend on these names validating unchanged.
-  @legacy_event_types ~w(legacy_event ticket_created ticket_enqueued ticket_steered ticket_paused ticket_resumed ticket_cancelled effect_requested receipt_recorded)
+  # `enqueue` carries the lane's event ingress; the rest are the kernel's decide/3 commands
+  # (FR-08B subcommit 2; review C1). The kernel names are role-free: the role travels in the
+  # payload, so a new role or workflow needs no Core vocabulary. `legacy_event_append` is
+  # dead but stays until the FR-08A protected-boundary probe stops forging with it.
+  @command_types ~w(legacy_event_append enqueue submit_review plan_launch settle_nonstart finalize_cancellation)
+  # Nothing in lib/ writes a domain intent (the kernel's plans carry none); these are the
+  # two operations the store tests exercise the path with.
+  @intent_types ~w(launch check)
 
-  # Lifecycle: the v2 vocabulary. Seeded with exactly the event types the FR-08A
-  # transition-plan destination slots require, rather than the full R4 seed, so every
-  # name here is justified by a concrete binding. FR-08B adds the remainder as its
-  # reduction is written; additions are cheap, redefinition is forbidden.
-  @lifecycle_event_types ~w(launch_planned launch_settled check_planned check_settled build_planned build_settled review_planned review_settled integration_planned integration_settled pm_launch_planned pm_launch_settled control_changed ticket_reset) ++
-                           ~w(objective_created ticket_admitted ticket_amended ticket_parked ticket_blocked ticket_unblocked cancellation_requested cancellation_finalized pm_proposal_recorded artifact_frozen artifact_blocked freeze_failed submission_rejected execution_observed stream_sealed developer_closed worker_closed checks_started check_recorded review_recorded reviewer_closed integration_recorded attempt_settled)
+  # The lifecycle vocabulary: exactly the kernel's event types (kernel_test and gateway_test
+  # hold the two sets equal). A name identifies exactly one event contract, so additions
+  # are cheap and redefinition is forbidden. See docs/fr-08/event-vocabulary-design.md.
+  @event_types ~w(launch_planned launch_settled check_planned check_settled build_planned build_settled review_planned review_settled integration_planned integration_settled pm_launch_planned pm_launch_settled control_changed ticket_reset) ++
+                 ~w(objective_created ticket_admitted ticket_amended ticket_parked ticket_blocked ticket_unblocked cancellation_requested cancellation_finalized pm_proposal_recorded artifact_frozen artifact_blocked freeze_failed submission_rejected execution_observed stream_sealed developer_closed worker_closed checks_started check_recorded review_recorded reviewer_closed integration_recorded attempt_settled)
 
-  @event_types @legacy_event_types ++ @lifecycle_event_types
-
-  # A reused name would silently give one stored type two contracts, which is the single
-  # failure this design must prevent. Enforced at compile time, not left to a test.
-  shared = @legacy_event_types -- (@legacy_event_types -- @lifecycle_event_types)
-
-  if shared != [] do
-    raise CompileError,
-      description:
-        "legacy and lifecycle event vocabularies must stay disjoint; shared: #{inspect(shared)}"
-  end
-
-  @intent_types ~w(launch prompt check freeze build integrate activate cleanup git_update)
-
-  @doc "The pre-repair event vocabulary. Stored histories depend on these names."
-  @spec legacy_event_types() :: [String.t()]
-  def legacy_event_types, do: @legacy_event_types
-
-  @doc "The v2 lifecycle event vocabulary, disjoint from the legacy one."
-  @spec lifecycle_event_types() :: [String.t()]
-  def lifecycle_event_types, do: @lifecycle_event_types
-
-  @doc "Every accepted event type."
+  @doc "Every accepted event type: the kernel's lifecycle vocabulary."
   @spec event_types() :: [String.t()]
   def event_types, do: @event_types
 
@@ -232,26 +202,6 @@ defmodule Foundry.DurableStore.RecordCodec do
     end
   end
 
-  def normalize(:legacy_record, value) do
-    with {:ok, map} <- normalize_map(value),
-         :ok <- keys(map, @legacy_record, @legacy_record),
-         1 <- map["schema_version"],
-         :ok <- nonempty(map, ~w(source_digest record_digest raw_record_digest)),
-         true <- lowercase_digest?(map["source_digest"]),
-         true <- lowercase_digest?(map["record_digest"]),
-         true <- lowercase_digest?(map["raw_record_digest"]),
-         line when is_integer(line) and line > 0 <- map["line_number"],
-         start when is_integer(start) and start >= 0 <- map["byte_start"],
-         finish when is_integer(finish) and finish >= start <- map["byte_end"],
-         true <- is_boolean(map["valid"]),
-         :ok <- legacy_error(map["valid"], map["error"]) do
-      {:ok, map}
-    else
-      {:error, _reason} = error -> error
-      _ -> {:error, :invalid_legacy_record}
-    end
-  end
-
   def normalize(:command_request, value) do
     with {:ok, map} <- normalize_map(value),
          :ok <- keys(map, @command_request, @command_request),
@@ -279,55 +229,6 @@ defmodule Foundry.DurableStore.RecordCodec do
     else
       {:error, _reason} = error -> error
       _ -> {:error, :invalid_command}
-    end
-  end
-
-  def normalize(:import_manifest, value) do
-    with {:ok, map} <- normalize_map(value),
-         :ok <- keys(map, @manifest, @manifest),
-         1 <- map["schema_version"],
-         :ok <- nonempty(map, ~w(source_path archived_path source_digest)),
-         true <- lowercase_digest?(map["source_digest"]),
-         true <- nonnegative_integer?(map["source_bytes"]),
-         true <- nonnegative_integer?(map["line_count"]),
-         true <- nonnegative_integer?(map["valid_count"]),
-         true <- nonnegative_integer?(map["invalid_count"]),
-         true <- map["valid_count"] + map["invalid_count"] == map["line_count"],
-         :ok <- byte_range(map["byte_range"], map["source_bytes"]),
-         :ok <- manifest_errors(map["errors"], map["invalid_count"]) do
-      {:ok, map}
-    else
-      {:error, _reason} = error -> error
-      _ -> {:error, :invalid_import_manifest}
-    end
-  end
-
-  def normalize(:import_placeholder, value) do
-    with {:ok, map} <- normalize_map(value),
-         :ok <-
-           keys(
-             map,
-             ~w(schema_version status source_digest),
-             ~w(schema_version status source_digest)
-           ),
-         1 <- map["schema_version"],
-         "importing" <- map["status"],
-         true <- lowercase_digest?(map["source_digest"]) do
-      {:ok, map}
-    else
-      {:error, _reason} = error -> error
-      _ -> {:error, :invalid_import_placeholder}
-    end
-  end
-
-  def normalize(:scaffold, value) do
-    with {:ok, map} <- normalize_map(value),
-         :ok <- keys(map, ~w(schema_version), ~w(schema_version)),
-         1 <- map["schema_version"] do
-      {:ok, map}
-    else
-      {:error, _reason} = error -> error
-      _ -> {:error, :invalid_scaffold}
     end
   end
 
@@ -507,22 +408,6 @@ defmodule Foundry.DurableStore.RecordCodec do
     end
   end
 
-  def decode_bound(:legacy_record, value, columns) when is_map(value) do
-    with {:ok, normalized} <- normalize(:legacy_record, value),
-         true <- normalized["source_digest"] == columns.source_digest,
-         true <- normalized["line_number"] == columns.line_number,
-         true <- normalized["byte_start"] == columns.byte_start,
-         true <- normalized["byte_end"] == columns.byte_end,
-         true <- normalized["record_digest"] == columns.record_digest,
-         true <- normalized["valid"] == columns.valid,
-         true <- normalized["error"] == columns.error do
-      {:ok, normalized}
-    else
-      {:error, reason} -> {:error, reason}
-      _ -> {:error, :relational_binding_mismatch}
-    end
-  end
-
   def decode_bound(:command_request, bytes, columns) do
     with {:ok, value} <- decode(:command_request, bytes),
          true <- value["schema_version"] == columns.protocol_version,
@@ -531,22 +416,6 @@ defmodule Foundry.DurableStore.RecordCodec do
          true <- value["command"]["command_id"] == columns.command_id,
          true <- value["command"]["type"] == columns.command_type,
          true <- columns.input_id == "input:" <> columns.command_id do
-      {:ok, value}
-    else
-      {:error, reason} -> {:error, reason}
-      _ -> {:error, :relational_binding_mismatch}
-    end
-  end
-
-  def decode_bound(:import_manifest, bytes, columns) do
-    with {:ok, value} <- decode(:import_manifest, bytes),
-         true <- value["source_digest"] == columns.source_digest,
-         true <- value["source_path"] == columns.source_path,
-         true <- value["archived_path"] == columns.archived_path,
-         true <- value["source_bytes"] == columns.source_bytes,
-         true <- value["line_count"] == columns.line_count,
-         true <- value["valid_count"] == columns.valid_count,
-         true <- value["invalid_count"] == columns.invalid_count do
       {:ok, value}
     else
       {:error, reason} -> {:error, reason}
@@ -601,10 +470,6 @@ defmodule Foundry.DurableStore.RecordCodec do
     else
       {:error, :projection_revision_sequence}
     end
-  end
-
-  def reduce_projection_plan(plan, initial_state) when is_list(plan) and is_map(initial_state) do
-    reduce_transitions(plan, initial_state)
   end
 
   def reconstruct(event_values, stored) do
@@ -804,44 +669,6 @@ defmodule Foundry.DurableStore.RecordCodec do
   defp supported_version(%{"schema_version" => _version}), do: {:error, :unsupported_version}
   defp supported_version(_map), do: {:error, :missing_field}
 
-  defp byte_range(value, source_bytes) do
-    with {:ok, range} <- normalize_map(value),
-         :ok <- keys(range, ~w(start end), ~w(start end)),
-         0 <- range["start"],
-         ^source_bytes <- range["end"] do
-      :ok
-    else
-      {:error, _reason} = error -> error
-      _ -> {:error, :invalid_byte_range}
-    end
-  end
-
-  defp manifest_errors(errors, invalid_count) when is_list(errors) do
-    with true <- proper_list?(errors) and length(errors) == invalid_count do
-      Enum.reduce_while(errors, :ok, fn error, :ok ->
-        with {:ok, item} <- normalize_map(error),
-             :ok <- keys(item, @manifest_error, @manifest_error),
-             true <- is_integer(item["line"]) and item["line"] > 0,
-             true <- nonnegative_integer?(item["byte_start"]),
-             true <- is_integer(item["byte_end"]) and item["byte_end"] >= item["byte_start"],
-             true <- lowercase_digest?(item["record_digest"]),
-             true <- is_binary(item["error"]) and item["error"] != "" do
-          {:cont, :ok}
-        else
-          _ -> {:halt, {:error, :invalid_manifest_error}}
-        end
-      end)
-    else
-      false -> {:error, :invalid_manifest_error_count}
-    end
-  end
-
-  defp manifest_errors(_errors, _invalid_count), do: {:error, :invalid_manifest_errors}
-
-  defp legacy_error(true, nil), do: :ok
-  defp legacy_error(false, error) when is_binary(error) and error != "", do: :ok
-  defp legacy_error(_valid, _error), do: {:error, :invalid_legacy_error}
-
   defp decode_identity(value) do
     with {:ok, decoded} <- Base.url_decode64(value, padding: false),
          true <- decoded != "" and String.valid?(decoded) do
@@ -861,14 +688,6 @@ defmodule Foundry.DurableStore.RecordCodec do
   defp decode_single_key(kind, encoded_id) do
     with {:ok, decoded_id} <- decode_identity(encoded_id), do: {:ok, {kind, decoded_id}}
   end
-
-  defp lowercase_digest?(value) when is_binary(value),
-    do:
-      byte_size(value) == 64 and value == String.downcase(value) and
-        Regex.match?(~r/\A[0-9a-f]+\z/, value)
-
-  defp lowercase_digest?(_value), do: false
-  defp nonnegative_integer?(value), do: is_integer(value) and value >= 0
 
   defp plain_map?(value), do: is_map(value) and not is_struct(value)
   defp unique?(values), do: length(values) == length(Enum.uniq(values))

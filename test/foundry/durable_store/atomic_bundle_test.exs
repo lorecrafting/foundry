@@ -561,89 +561,6 @@ defmodule Foundry.DurableStore.AtomicBundleTest do
     assert %{mode: :ready} = Gateway.status(reopened)
   end
 
-  # FR-08B protected items, item 1: a v2 store gains root_attempt_closures additively.
-  test "an atomic-v2 store migrates to v3 by adding the attempt closure table", ctx do
-    stop_supervised!(Gateway)
-    assert {:ok, raw} = Sqlite3.open(ctx.path, mode: :readwrite)
-    assert :ok = Sqlite3.execute(raw, "DROP TABLE root_attempt_closures")
-
-    assert :ok =
-             Database.execute(
-               raw,
-               "UPDATE metadata SET value = '2' WHERE key = 'protected_schema_version'"
-             )
-
-    assert :ok =
-             Database.execute(
-               raw,
-               "DELETE FROM metadata WHERE key = 'migration_attempt_closure_v3'"
-             )
-
-    assert :ok = Sqlite3.close(raw)
-
-    assert :ok = Gateway.migrate(ctx.path)
-    assert :ok = Gateway.migrate(ctx.path)
-
-    assert {:ok, raw} = Sqlite3.open(ctx.path, mode: :readonly)
-
-    assert {:ok, [["3"]]} =
-             Database.query(
-               raw,
-               "SELECT value FROM metadata WHERE key = 'protected_schema_version'"
-             )
-
-    assert {:ok, [[1]]} =
-             Database.query(
-               raw,
-               "SELECT count(*) FROM sqlite_master WHERE name = 'root_attempt_closures'"
-             )
-
-    assert :ok = Sqlite3.close(raw)
-  end
-
-  test "protected v1 history migrates to typed singleton operations and reruns safely", ctx do
-    accept_current!(ctx, %{
-      "type" => "set_policy",
-      "policy_id" => "v1-policy",
-      "value" => %{"allowed_operations" => [], "allowed_scopes" => []}
-    })
-
-    legacy = domain_envelope("v1-domain")
-
-    assert {:ok, _result, :committed} =
-             Gateway.transact(ctx.gateway, "operator", legacy["command"], legacy["proposal"])
-
-    stop_supervised!(Gateway)
-    assert {:ok, raw} = Sqlite3.open(ctx.path, mode: :readwrite)
-    assert :ok = Sqlite3.execute(raw, "PRAGMA foreign_keys = OFF")
-
-    for table <-
-          ~w(root_attempt_closures root_infrastructure_settlements durable_operations atomic_bundles) do
-      assert :ok = Sqlite3.execute(raw, "DROP TABLE #{table}")
-    end
-
-    assert :ok =
-             Database.execute(
-               raw,
-               "UPDATE metadata SET value = '1' WHERE key = 'protected_schema_version'"
-             )
-
-    assert :ok =
-             Database.execute(
-               raw,
-               "DELETE FROM metadata WHERE key IN ('migration_atomic_bundle_v2', 'migration_attempt_closure_v3')"
-             )
-
-    assert :ok = Sqlite3.close(raw)
-    assert :ok = Gateway.migrate(ctx.path)
-    assert :ok = Gateway.migrate(ctx.path)
-    assert {:ok, conn} = Database.open(ctx.path)
-    assert {:ok, %{content: content}} = Authority.read(conn, :all)
-    assert content["atomic_bundles"].count == 0
-    assert content["durable_operations"].count == 3
-    assert :ok = Database.close(conn)
-  end
-
   test "duplicate non-start cannot advance infrastructure and conflicting receipt quarantines",
        ctx do
     seed_issued_launch!(ctx)
@@ -942,7 +859,7 @@ defmodule Foundry.DurableStore.AtomicBundleTest do
           %{
             "schema_version" => 1,
             "event_id" => event_id,
-            "type" => "ticket_enqueued",
+            "type" => "execution_observed",
             "payload" => %{
               "projection" => %{
                 "namespace" => "atomic-v2",

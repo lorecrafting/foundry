@@ -83,7 +83,6 @@ defmodule Foundry.DurableStore.UnifiedContractTest do
     assert %{mode: :recovery, reason: :noncanonical_database_path} = Gateway.status(alias_gateway)
 
     assert {:error, :noncanonical_database_path} = Gateway.initialize(alias_path)
-    assert {:error, :noncanonical_database_path} = Gateway.migrate(alias_path)
 
     original = start_supervised!({Gateway, path: ctx.path}, id: :original_gateway)
     assert %{mode: :ready} = Gateway.status(original)
@@ -169,7 +168,7 @@ defmodule Foundry.DurableStore.UnifiedContractTest do
         %{
           schema_version: 1,
           event_id: event_id,
-          type: "legacy_event",
+          type: "execution_observed",
           payload: %{
             "projection" => %{
               "namespace" => "kernel-v1",

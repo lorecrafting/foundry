@@ -371,7 +371,7 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
     assert {:ok, %{"ledger_generations" => 1, "commands" => 1}} = Gateway.counts(gateway)
   end
 
-  test "one persistent owner excludes a second gateway and migration reruns", %{path: path} do
+  test "one persistent owner excludes a second gateway", %{path: path} do
     first = start_supervised!({Gateway, path: path})
     second = start_supervised!({Gateway, path: path}, id: :second_gateway)
 
@@ -389,15 +389,6 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
 
     assert :ok = stop_supervised(Gateway)
 
-    assert :ok = Gateway.migrate(path)
-    assert :ok = Gateway.migrate(path)
-
-    {:ok, conn} = Database.open(path)
-
-    assert {:ok, [["complete"]]} =
-             Database.query(conn, "SELECT value FROM metadata WHERE key = 'migration_v1'")
-
-    assert :ok = Database.close(conn)
     refute Process.alive?(first)
   end
 
@@ -654,7 +645,7 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
       "schema_version" => 1,
       "command_id" => id,
       "expected_revisions" => %{projection_key(id) => "absent"},
-      "type" => "request_effect",
+      "type" => "enqueue",
       "target_ids" => %{"ticket_id" => "T1"},
       "payload" => %{}
     }
@@ -670,7 +661,7 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
         %{
           schema_version: 1,
           event_id: event_id,
-          type: "effect_requested",
+          type: "execution_observed",
           payload: %{
             "projection" => %{
               "namespace" => "kernel-v1",

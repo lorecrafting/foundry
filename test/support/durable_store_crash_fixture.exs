@@ -14,7 +14,7 @@ build = fn command_id ->
     "schema_version" => 1,
     "command_id" => command_id,
     "expected_revisions" => %{projection_key => "absent"},
-    "type" => "request_effect",
+    "type" => "enqueue",
     "target_ids" => %{},
     "payload" => %{}
   }
@@ -33,7 +33,7 @@ build = fn command_id ->
       %{
         schema_version: 1,
         event_id: "event-" <> command_id,
-        type: "effect_requested",
+        type: "execution_observed",
         payload: %{"projection" => projection}
       }
     ],

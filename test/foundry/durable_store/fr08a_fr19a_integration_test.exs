@@ -10,9 +10,6 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
     Maintenance
   }
 
-  @protected_tables ~w(root_attempt_closures root_infrastructure_settlements durable_operations atomic_bundles root_leases root_receipts root_reservations root_claims root_effects root_ledgers root_control_history root_controls root_policy_history root_policies authenticated_inbox_items authenticated_inboxes root_pointers root_commands)
-  @legacy_tables ~w(inputs commands command_results events projections effects ledger_generations claims reservations receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records sqlite_sequence)
-
   setup do
     root =
       Path.join(
@@ -67,58 +64,43 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
     assert :ok = GenServer.stop(recovering)
   end
 
-  test "accepted-v1 migration is additive and idempotent while future, partial and corrupt states refuse",
+  # Stores are fresh-only (DOGFOOD-LOG Q1): there is no migration path, so every store
+  # that is not exactly the current schema refuses at open instead of being upgraded.
+  test "a fresh store reopens ready while future, partial, migrated and corrupt states refuse",
        %{root: root} do
-    accepted_path = Path.join(root, "accepted-v1.sqlite3")
+    path = Path.join(root, "fresh.sqlite3")
     capability = make_ref()
-    gateway = start_gateway(accepted_path, capability, "epoch-migration")
-    commit_domain!(gateway, "MIGRATION-DOMAIN")
+    gateway = start_gateway(path, capability, "epoch-fresh")
+    commit_domain!(gateway, "FRESH-DOMAIN")
     assert :ok = GenServer.stop(gateway)
 
-    before = content!(accepted_path)
-    legacy_before = Map.take(before, @legacy_tables)
-    make_accepted_v1!(accepted_path)
-
-    assert :ok = Gateway.migrate(accepted_path)
-    assert :ok = Gateway.migrate(accepted_path)
-    assert Map.take(content!(accepted_path), @legacy_tables) == legacy_before
-
-    migrated = start_existing(accepted_path, capability, "epoch-after-migration")
-
-    assert {:ok,
-            %{
-              "protected_schema_version" => "3",
-              "authority_mode" => "empty_or_legacy",
-              "writer_epoch" => "epoch-after-migration"
-            }} = Gateway.protected_snapshot(migrated, capability)
+    reopened = start_existing(path, capability, "epoch-reopened")
 
     assert {:ok, %{mode: :ready, last_durable_sequence: 1}} =
-             Gateway.operational_health(migrated)
+             Gateway.operational_health(reopened)
 
-    assert :ok = GenServer.stop(migrated)
+    assert :ok = GenServer.stop(reopened)
 
     future = initialized_path(root, "future")
     execute_raw!(future, "UPDATE metadata SET value = '4' WHERE key = 'protected_schema_version'")
 
-    assert {:error, {:unsupported_protected_migration, :partial_or_future_protected_state}} =
-             Gateway.migrate(future)
-
-    assert metadata!(future, "protected_schema_version") == "4"
-
     partial = initialized_path(root, "partial")
     execute_raw!(partial, "DELETE FROM metadata WHERE key = 'migration_fr08a_v1'")
 
-    assert {:error, {:unsupported_protected_migration, :partial_or_future_protected_state}} =
-             Gateway.migrate(partial)
-
-    assert metadata!(partial, "migration_fr08a_v1") == nil
+    # Only the deleted offline v1 migration wrote this key.
+    migrated = initialized_path(root, "migrated")
+    execute_raw!(migrated, "INSERT INTO metadata(key, value) VALUES ('migration_v1', 'complete')")
 
     corrupt = initialized_path(root, "corrupt")
     execute_raw!(corrupt, "DROP TABLE root_pointers")
 
-    assert {:error, {:unsupported_protected_migration, :partial_or_future_protected_state}} =
-             Gateway.migrate(corrupt)
+    for refused <- [future, partial, migrated, corrupt] do
+      gateway = start_existing(refused, capability, "epoch-refused")
+      assert %{mode: :recovery} = Gateway.status(gateway)
+      assert :ok = GenServer.stop(gateway)
+    end
 
+    assert metadata!(future, "protected_schema_version") == "4"
     refute table_exists?(corrupt, "root_pointers")
   end
 
@@ -506,7 +488,7 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
       "schema_version" => 1,
       "command_id" => id,
       "expected_revisions" => %{projection_key(id) => "absent"},
-      "type" => "request_effect",
+      "type" => "enqueue",
       "target_ids" => %{"ticket_id" => id},
       "payload" => %{}
     }
@@ -518,7 +500,7 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
         %{
           schema_version: 1,
           event_id: "event-#{id}",
-          type: "effect_requested",
+          type: "execution_observed",
           payload: %{
             "projection" => %{
               "namespace" => "integration-v1",
@@ -562,20 +544,6 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
     assert content["root_reservations"].count == 1
   end
 
-  defp make_accepted_v1!(path) do
-    {:ok, conn} = Sqlite3.open(path, mode: :readwrite)
-    assert :ok = Sqlite3.execute(conn, "PRAGMA foreign_keys = OFF")
-    Enum.each(@protected_tables, &assert(:ok = Sqlite3.execute(conn, "DROP TABLE #{&1}")))
-
-    assert :ok =
-             Database.execute(
-               conn,
-               "DELETE FROM metadata WHERE key IN ('protected_schema_version', 'migration_fr08a_v1', 'migration_atomic_bundle_v2', 'migration_attempt_closure_v3')"
-             )
-
-    assert :ok = Sqlite3.close(conn)
-  end
-
   defp initialized_path(root, name) do
     path = Path.join(root, "#{name}.sqlite3")
     assert :ok = Gateway.initialize(path)
@@ -609,13 +577,6 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
 
     assert :ok = Sqlite3.close(conn)
     result == {:ok, [[1]]}
-  end
-
-  defp content!(path) do
-    {:ok, conn} = Database.open(path)
-    assert {:ok, content} = Authority.content(conn)
-    assert :ok = Database.close(conn)
-    content
   end
 
   defp unique_id,

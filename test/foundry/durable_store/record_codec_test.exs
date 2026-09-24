@@ -94,7 +94,7 @@ defmodule Foundry.DurableStore.RecordCodecTest do
     %{
       "schema_version" => 1,
       "event_id" => id,
-      "type" => "legacy_event",
+      "type" => "execution_observed",
       "payload" => %{
         "projection" => %{
           "namespace" => "tickets",

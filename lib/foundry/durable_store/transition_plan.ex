@@ -311,10 +311,6 @@ defmodule Foundry.DurableStore.TransitionPlan do
   @spec operation_types() :: [String.t()]
   def operation_types, do: @operation_types
 
-  @doc "The closed set of protected derivations a plan may nominate."
-  @spec discriminator_kinds() :: [String.t()]
-  def discriminator_kinds, do: @discriminator_kinds
-
   # --- plan schema -----------------------------------------------------------------
 
   # An accepted plan chooses among alternatives, so it must name its derivation. A

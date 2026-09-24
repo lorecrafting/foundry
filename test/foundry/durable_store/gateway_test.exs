@@ -265,11 +265,11 @@ defmodule Foundry.DurableStore.GatewayTest do
        [{:blob, "request"}]}
 
     command =
-      {"INSERT INTO commands VALUES ('command-1', 'input-1', 'operator', 'digest-1', 'request_effect', 1)",
+      {"INSERT INTO commands VALUES ('command-1', 'input-1', 'operator', 'digest-1', 'enqueue', 1)",
        []}
 
     event =
-      {"INSERT INTO events(event_id, command_id, schema_version, event_type, event) VALUES ('event-1', 'command-1', 1, 'effect_requested', ?)",
+      {"INSERT INTO events(event_id, command_id, schema_version, event_type, event) VALUES ('event-1', 'command-1', 1, 'execution_observed', ?)",
        [{:blob, "{}"}]}
 
     orphan_projection =
@@ -389,7 +389,7 @@ defmodule Foundry.DurableStore.GatewayTest do
       "schema_version" => 1,
       "command_id" => id,
       "expected_revisions" => %{projection_key(id) => "absent"},
-      "type" => "request_effect",
+      "type" => "enqueue",
       "target_ids" => %{"ticket_id" => "T1"},
       "payload" => %{"text" => "literal"}
     }
@@ -405,7 +405,7 @@ defmodule Foundry.DurableStore.GatewayTest do
         %{
           schema_version: 1,
           event_id: event_id,
-          type: "effect_requested",
+          type: "execution_observed",
           payload: %{
             "id" => id,
             "projection" => %{
@@ -490,18 +490,8 @@ defmodule Foundry.DurableStore.GatewayTest do
     test "every kernel event type is a durable lifecycle event type" do
       kernel = Foundry.Workflow.Kernel.Event.types()
 
-      assert kernel -- RecordCodec.lifecycle_event_types() == [],
-             "kernel event types the codec refuses: #{inspect(kernel -- RecordCodec.lifecycle_event_types())}"
-    end
-
-    test "the legacy and lifecycle vocabularies are disjoint" do
-      legacy = RecordCodec.legacy_event_types()
-      lifecycle = RecordCodec.lifecycle_event_types()
-
-      refute Enum.empty?(legacy)
-      refute Enum.empty?(lifecycle)
-      assert MapSet.disjoint?(MapSet.new(legacy), MapSet.new(lifecycle))
-      assert Enum.sort(legacy ++ lifecycle) == Enum.sort(RecordCodec.event_types())
+      assert kernel -- RecordCodec.event_types() == [],
+             "kernel event types the codec refuses: #{inspect(kernel -- RecordCodec.event_types())}"
     end
 
     test "a lifecycle event commits, reopens, replays and survives backup validation",

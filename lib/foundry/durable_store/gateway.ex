@@ -47,25 +47,6 @@ defmodule Foundry.DurableStore.Gateway do
     end
   end
 
-  def migrate(path, opts \\ []) do
-    with {:ok, identity} <- PathIdentity.existing(path),
-         {:ok, owner} <- Owner.acquire(identity, opts) do
-      try do
-        with :ok <- PathIdentity.revalidate(owner.identity),
-             :ok <- Database.migrate_protected_owned(owner),
-             {:ok, conn} <- Database.open(owner.identity),
-             :ok <- PathIdentity.revalidate(owner.identity) do
-          result = Database.record_v1_migration(conn)
-          close_result = Database.close(conn)
-
-          with {:ok, :ok} <- result, :ok <- close_result, do: :ok
-        end
-      after
-        Owner.release(owner)
-      end
-    end
-  end
-
   def start_link(opts) do
     {gen_opts, init_opts} = Keyword.split(opts, [:name])
     GenServer.start_link(__MODULE__, init_opts, gen_opts)

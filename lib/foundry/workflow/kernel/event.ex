@@ -96,13 +96,9 @@ defmodule Foundry.Workflow.Kernel.Event do
     # so the at-limit *decision* stays with the R4a allowance product in subcommit 2. That
     # is the same split freeze_failed already uses for its blocked alternative.
     "ticket_blocked" => ~w(ticket_id reason resume_phase),
-    # R4 calls this row's input "explicit resume", but the name `ticket_resumed` is already
-    # taken by the pre-repair vocabulary in `RecordCodec.@legacy_event_types`, where it is a
-    # record type carrying a projection payload. The codec raises at compile time when the
-    # legacy and lifecycle vocabularies share a name, deliberately: "a reused name would
-    # silently give one stored type two contracts". Legacy names are immutable, so the
-    # lifecycle event takes a distinct one - a resolution the vocabulary design already
-    # required, leaving the choice of name to FR-08B.
+    # R4 calls this row's input "explicit resume". `ticket_resumed` was a pre-repair record
+    # type when this was named (deleted with the rest of that vocabulary once stores went
+    # fresh-only, ML-DEAD-VOCAB).
     #
     # `unblocked` rather than a decorated `resumed`: R4's own row ends "explicit operator
     # blocks require steering, not automatic **unblocking**", so this is the contract's

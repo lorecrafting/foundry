@@ -10,9 +10,6 @@ defmodule Foundry.DurableStore.Database do
   # command/event protocol.  The migration is additive so accepted FR-07 history is
   # never rewritten merely to gain protected lifecycle primitives.
   @protected_schema_version 3
-  @protected_v1_tables ~w(authenticated_inbox_items authenticated_inboxes root_claims root_commands root_control_history root_controls root_effects root_leases root_ledgers root_pointers root_policies root_policy_history root_receipts root_reservations)
-  @atomic_v2_tables ~w(atomic_bundles durable_operations root_infrastructure_settlements)
-  @closure_v3_tables ~w(root_attempt_closures)
 
   # FR-08B protected items, item 1: one row per closed (ticket, attempt). Its presence is
   # what makes the closure terminal: create_effect refuses work under a closed attempt.
@@ -373,7 +370,6 @@ defmodule Foundry.DurableStore.Database do
   """
 
   def schema_version, do: @schema_version
-  def protected_schema_version, do: @protected_schema_version
 
   def expected_schema_contract do
     case Sqlite3.open(":memory:") do
@@ -541,190 +537,6 @@ defmodule Foundry.DurableStore.Database do
     end
   end
 
-  def record_v1_migration(conn) do
-    transaction(conn, fn ->
-      with :ok <-
-             execute(
-               conn,
-               "INSERT INTO metadata(key, value) VALUES ('migration_v1', 'complete') ON CONFLICT(key) DO UPDATE SET value = excluded.value"
-             ),
-           {:ok, _checked} <- Authority.read(conn, :all) do
-        :ok
-      end
-    end)
-  end
-
-  def migrate_protected_owned(%{
-        __struct__: Foundry.DurableStore.Owner,
-        identity: %PathIdentity{mode: :existing} = identity
-      }) do
-    case Sqlite3.open(identity.path, mode: :readwrite) do
-      {:ok, conn} ->
-        try do
-          with :ok <- PathIdentity.revalidate(identity),
-               :ok <- configure(conn),
-               {:ok, migration_state} <- protected_migration_state(conn),
-               :ok <- apply_protected_migration(conn, migration_state),
-               :ok <- PathIdentity.revalidate(identity) do
-            :ok
-          end
-        after
-          _ = Sqlite3.close(conn)
-        end
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  def migrate_protected_owned(_owner), do: {:error, :invalid_store_owner}
-
-  defp apply_protected_migration(conn, :current) do
-    with {:ok, _checked} <- Authority.read(conn, :all), do: :ok
-  end
-
-  defp apply_protected_migration(conn, :atomic_v2) do
-    with {:ok, :ok} <-
-           transaction(conn, fn ->
-             with :ok <- Sqlite3.execute(conn, @attempt_closure_schema),
-                  :ok <-
-                    execute(
-                      conn,
-                      "UPDATE metadata SET value = ? WHERE key = 'protected_schema_version'",
-                      [Integer.to_string(@protected_schema_version)]
-                    ),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('migration_attempt_closure_v3', 'complete')"
-                    ),
-                  {:ok, _checked} <- Authority.read(conn, :all) do
-               :ok
-             end
-           end) do
-      :ok
-    end
-  end
-
-  defp apply_protected_migration(conn, :protected_v1) do
-    with {:ok, :ok} <-
-           transaction(conn, fn ->
-             with :ok <- Sqlite3.execute(conn, @atomic_bundle_schema),
-                  :ok <- Sqlite3.execute(conn, @attempt_closure_schema),
-                  :ok <- backfill_v1_operations(conn),
-                  :ok <-
-                    execute(
-                      conn,
-                      "UPDATE metadata SET value = ? WHERE key = 'protected_schema_version'",
-                      [Integer.to_string(@protected_schema_version)]
-                    ),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('migration_atomic_bundle_v2', 'complete')"
-                    ),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('migration_attempt_closure_v3', 'complete')"
-                    ),
-                  {:ok, _checked} <- Authority.read(conn, :all) do
-               :ok
-             end
-           end) do
-      :ok
-    end
-  end
-
-  defp apply_protected_migration(conn, :accepted_v1_without_protected) do
-    with {:ok, :ok} <-
-           transaction(conn, fn ->
-             with :ok <- Sqlite3.execute(conn, @protected_schema),
-                  :ok <- seed_root_pointers(conn),
-                  :ok <- backfill_v1_operations(conn),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('protected_schema_version', ?)",
-                      [Integer.to_string(@protected_schema_version)]
-                    ),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('migration_fr08a_v1', 'complete')"
-                    ),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('migration_atomic_bundle_v2', 'complete')"
-                    ),
-                  :ok <-
-                    execute(
-                      conn,
-                      "INSERT INTO metadata(key, value) VALUES ('migration_attempt_closure_v3', 'complete')"
-                    ),
-                  {:ok, _checked} <- Authority.read(conn, :all) do
-               :ok
-             end
-           end) do
-      :ok
-    end
-  end
-
-  defp apply_protected_migration(_conn, {:unsupported, reason}),
-    do: {:error, {:unsupported_protected_migration, reason}}
-
-  defp protected_migration_state(conn) do
-    with {:ok, metadata_rows} <-
-           query(
-             conn,
-             "SELECT key, value FROM metadata WHERE key IN ('schema_version', 'protected_schema_version', 'migration_fr08a_v1', 'migration_atomic_bundle_v2', 'migration_attempt_closure_v3')"
-           ),
-         metadata <- Map.new(metadata_rows, fn [key, value] -> {key, value} end),
-         {:ok, table_rows} <-
-           query(
-             conn,
-             "SELECT name FROM sqlite_master WHERE type = 'table' AND (name LIKE 'root_%' OR name LIKE 'authenticated_inbox%' OR name IN ('atomic_bundles', 'durable_operations')) ORDER BY name"
-           ),
-         tables <- Enum.map(table_rows, &hd/1),
-         table_set <- MapSet.new(tables),
-         protected_v1_set <- MapSet.new(@protected_v1_tables),
-         atomic_v2_set <- MapSet.union(protected_v1_set, MapSet.new(@atomic_v2_tables)),
-         current_set <- MapSet.union(atomic_v2_set, MapSet.new(@closure_v3_tables)) do
-      cond do
-        metadata["schema_version"] != Integer.to_string(@schema_version) ->
-          {:ok, {:unsupported, :outer_schema_version}}
-
-        metadata["protected_schema_version"] == Integer.to_string(@protected_schema_version) and
-          metadata["migration_fr08a_v1"] == "complete" and
-          metadata["migration_atomic_bundle_v2"] == "complete" and
-          metadata["migration_attempt_closure_v3"] == "complete" and table_set == current_set ->
-          {:ok, :current}
-
-        metadata["protected_schema_version"] == "2" and
-          metadata["migration_fr08a_v1"] == "complete" and
-          metadata["migration_atomic_bundle_v2"] == "complete" and
-          is_nil(metadata["migration_attempt_closure_v3"]) and table_set == atomic_v2_set ->
-          {:ok, :atomic_v2}
-
-        metadata["protected_schema_version"] == "1" and
-          metadata["migration_fr08a_v1"] == "complete" and
-          is_nil(metadata["migration_atomic_bundle_v2"]) and
-          is_nil(metadata["migration_attempt_closure_v3"]) and table_set == protected_v1_set ->
-          {:ok, :protected_v1}
-
-        is_nil(metadata["protected_schema_version"]) and
-          is_nil(metadata["migration_fr08a_v1"]) and
-          is_nil(metadata["migration_atomic_bundle_v2"]) and
-          is_nil(metadata["migration_attempt_closure_v3"]) and table_set == MapSet.new() ->
-          {:ok, :accepted_v1_without_protected}
-
-        true ->
-          {:ok, {:unsupported, :partial_or_future_protected_state}}
-      end
-    end
-  end
-
   defp commit(conn, value) do
     case Sqlite3.execute(conn, "COMMIT") do
       :ok -> {:ok, value}
@@ -861,28 +673,6 @@ defmodule Foundry.DurableStore.Database do
 
   defp random_id do
     16 |> :crypto.strong_rand_bytes() |> Base.url_encode64(padding: false)
-  end
-
-  defp backfill_v1_operations(conn) do
-    with :ok <-
-           execute(
-             conn,
-             "INSERT INTO durable_operations(owner_kind, owner_id, ordinal, operation_kind, operation_type, request, result) " <>
-               "SELECT 'domain_v1', c.command_id, 0, 'domain', c.command_type, i.canonical_request, r.result " <>
-               "FROM commands c JOIN inputs i ON i.input_id = c.input_id JOIN command_results r ON r.command_id = c.command_id " <>
-               "WHERE true " <>
-               "ON CONFLICT(owner_kind, owner_id, ordinal) DO NOTHING"
-           ),
-         :ok <-
-           execute(
-             conn,
-             "INSERT INTO durable_operations(owner_kind, owner_id, ordinal, operation_kind, operation_type, request, result) " <>
-               "SELECT 'protected_v1', command_id, 0, 'protected', operation, canonical_request, result FROM root_commands " <>
-               "WHERE true " <>
-               "ON CONFLICT(owner_kind, owner_id, ordinal) DO NOTHING"
-           ) do
-      :ok
-    end
   end
 
   defp seed_root_pointers(conn) do

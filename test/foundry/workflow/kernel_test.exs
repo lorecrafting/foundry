@@ -302,39 +302,6 @@ defmodule Foundry.Workflow.KernelTest do
     ])
   end
 
-  describe "the lifecycle vocabulary stays disjoint from the durable one" do
-    # The codec enforces disjointness at compile time for the names it already holds, but
-    # nothing checked the kernel's 36 against it, so a collision would only surface when
-    # subcommit 2 extended the codec and the build broke. `ticket_resumed` was exactly that:
-    # recorded as a required rename in the vocabulary design, then lost when the FR-08B
-    # enumeration was written. This is the assertion whose absence let that happen.
-    test "no kernel event type reuses a legacy durable event type" do
-      collisions =
-        MapSet.intersection(
-          MapSet.new(Event.types()),
-          MapSet.new(RecordCodec.legacy_event_types())
-        )
-
-      assert MapSet.size(collisions) == 0,
-             "kernel types collide with the immutable legacy vocabulary: " <>
-               "#{inspect(Enum.sort(collisions))}. Legacy names may never be reused; " <>
-               "rename the lifecycle event."
-    end
-
-    # The other half: every name the codec already holds must still be one the kernel
-    # declares, or the codec would accept a lifecycle event the reducer cannot apply.
-    test "every durable lifecycle type is a kernel event type" do
-      orphans =
-        MapSet.difference(
-          MapSet.new(RecordCodec.lifecycle_event_types()),
-          MapSet.new(Event.types())
-        )
-
-      assert MapSet.size(orphans) == 0,
-             "durable lifecycle types the kernel cannot apply: #{inspect(Enum.sort(orphans))}"
-    end
-  end
-
   describe "guards the mutation sweep found untested" do
     # Eleven of sixty-seven guard call sites survived neutralisation: removing them left
     # all 105 tests green. Two others survived because they cannot fire at all and are
@@ -1685,7 +1652,7 @@ defmodule Foundry.Workflow.KernelTest do
       # accepts would have no reducer; and every kernel type must be durable, or a plan the
       # kernel accepts would fail in Gateway. The 23-name gap this used to pin was closed by
       # decide/3 commit 0, which gated subcommit 2.
-      durable = Foundry.DurableStore.RecordCodec.lifecycle_event_types()
+      durable = RecordCodec.event_types()
 
       assert durable -- Event.types() == [],
              "a durable lifecycle type has no reducer clause"

@@ -13,7 +13,7 @@ command = %{
   "schema_version" => 1,
   "command_id" => id,
   "expected_revisions" => %{key => "absent"},
-  "type" => "request_effect",
+  "type" => "enqueue",
   "target_ids" => %{},
   "payload" => %{"bytes" => String.duplicate("x", 128 * 1024)}
 }
@@ -25,7 +25,7 @@ proposal = %{
     %{
       schema_version: 1,
       event_id: "event-" <> id,
-      type: "effect_requested",
+      type: "execution_observed",
       payload: %{
         "projection" => %{
           "namespace" => "kernel-v1",

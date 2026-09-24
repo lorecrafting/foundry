@@ -158,7 +158,7 @@ defmodule Foundry.DurableStore.DomainReadCheckTest do
                 %{
                   "schema_version" => 1,
                   "event_id" => event_id,
-                  "type" => "ticket_enqueued",
+                  "type" => "execution_observed",
                   "payload" => %{
                     "projection" => %{
                       "namespace" => @ticket,

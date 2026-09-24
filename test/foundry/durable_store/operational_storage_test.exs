@@ -698,7 +698,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
       "schema_version" => 1,
       "command_id" => id,
       "expected_revisions" => %{projection_key(id) => "absent"},
-      "type" => "request_effect",
+      "type" => "enqueue",
       "target_ids" => %{"ticket_id" => id},
       "payload" => %{"maintenance_padding" => String.duplicate("x", padding_bytes)}
     }
@@ -712,7 +712,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
         %{
           schema_version: 1,
           event_id: "event-#{id}",
-          type: "effect_requested",
+          type: "execution_observed",
           payload: %{
             "projection" => %{
               "namespace" => "kernel-v1",

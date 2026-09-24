@@ -232,7 +232,7 @@ defmodule Foundry.DurableStore.Authority do
   defp validate_metadata(rows) do
     allowed =
       MapSet.new(
-        ~w(schema_version protocol_version event_version projection_version installation_id repository_id migration_v1) ++
+        ~w(schema_version protocol_version event_version projection_version installation_id repository_id) ++
           ~w(protected_schema_version migration_fr08a_v1 migration_atomic_bundle_v2) ++
           ~w(migration_attempt_closure_v3)
       )
@@ -255,9 +255,6 @@ defmodule Foundry.DurableStore.Authority do
       not valid_identity?(values["installation_id"]) or
           not valid_identity?(values["repository_id"]) ->
         corrupt("metadata", "identity", :invalid_identity)
-
-      Map.has_key?(values, "migration_v1") and values["migration_v1"] != "complete" ->
-        corrupt("metadata", "migration_v1", :invalid_migration_state)
 
       values["protected_schema_version"] != "3" ->
         corrupt("metadata", "protected_schema_version", :unsupported_version)

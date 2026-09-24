@@ -16,8 +16,8 @@ for WAL, `synchronous=FULL`, foreign keys and schema/application versions before
 One strict `PathIdentity` is established before ownership or SQLite. Relative or lexical
 alias paths, dot/dotdot components, repeated/trailing separators, symlinks in any parent
 or leaf, hardlinks and non-regular database files are refused. The same identity is
-revalidated around owner acquisition and database open and is passed through gateway,
-migration and backup operations.
+revalidated around owner acquisition and database open and is passed through gateway
+and backup operations.
 
 The updatable kernel supplies only a versioned, pure-data proposal containing a result,
 known domain events, projections and pending effect requests. Exact domain-tagged request
@@ -39,8 +39,7 @@ an authoritative in-transaction debit; FR-07 does not claim that lifecycle early
 The gateway calculates command identity from the authenticated actor and complete
 canonical request, checks an existing command ID before current proposal processing, and
 commits the input, command, result, events, projections, intents, claims and ledger rows
-in one `BEGIN IMMEDIATE` transaction. Reply and opt-in compatibility publication happen
-only after checked `COMMIT`. Same actor/ID/digest returns the stored result; a different
+in one `BEGIN IMMEDIATE` transaction. The reply happens only after checked `COMMIT`. Same actor/ID/digest returns the stored result; a different
 actor or request returns an idempotency conflict. Storage errors put the gateway into
 visible recovery mode. Constraint-invalid proposals roll back without poisoning an
 otherwise valid store.
@@ -48,15 +47,12 @@ Valid stale-revision decisions instead durably commit an authenticated rejected
 command/result with no events, projections, intents or protected rows. Same-ID retry
 returns that immutable rejection.
 
-`EventLog.append/2` retains its JSONL destination and has a narrow opt-in destination:
-
-```elixir
-{:durable_store, gateway, authenticated_actor_id, opaque_command_id}
-```
-
-The caller must allocate the opaque ID; the adapter does not derive identity from a
-digest, ticket, process or clock. This is only a compatibility writer. It does not migrate
-the Coordinator's other mutations, replay or effect dispatch, which belong to FR-08.
+`RecordCodec` accepts closed vocabularies only: command types are the lane's `enqueue`
+ingress and the kernel's `decide/3` commands, event types are exactly the kernel's
+lifecycle events, and domain intents name `launch` or `check`. The pre-repair command,
+event and intent names and the legacy-import record codecs were deleted with the
+fresh-store decision (ML-DEAD-VOCAB); `legacy_event_append` alone survives, as the
+command type the FR-08A protected-boundary probe forges with.
 
 ## Initialization, recovery and versions
 
@@ -77,8 +73,9 @@ startup, result reads, backup and reconstruction. It applies only the declared o
 result-reason and omitted-bundle-collection defaults. Corruption at these boundaries uses
 one `authority_corrupt` classification. SQL,
 protocol, event and projection versions are recorded
-independently; schema creation is transactional and the offline v1 migration checkpoint
-is rerun-safe.
+independently; schema creation is transactional. There is no migration path: stores are
+fresh-only, and a store whose protected version, migration markers or table set differ
+from a fresh initialization refuses at open.
 
 Schema v1 has separate metadata, authenticated inputs, commands/results, ordered events,
 projections, effects, claims, receipts, leases, ledger generations/reservations,

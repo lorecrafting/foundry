@@ -3,7 +3,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitivesTest do
 
   alias Foundry.DurableStore.Gateway
   alias Exqlite.Sqlite3
-  alias Foundry.DurableStore.{Authority, Database}
+  alias Foundry.DurableStore.Database
 
   setup do
     root =
@@ -518,58 +518,6 @@ defmodule Foundry.DurableStore.ProtectedPrimitivesTest do
                capability,
                query("effect", "effect_id", "effect-1")
              )
-  end
-
-  test "accepted v1-shaped stores migrate additively and rerun without changing legacy content",
-       %{
-         gateway: _gateway,
-         capability: capability,
-         path: path
-       } do
-    assert {:ok, before_conn} = Database.open(path)
-    assert {:ok, before_content} = Authority.content(before_conn)
-    assert :ok = Database.close(before_conn)
-
-    legacy_tables =
-      ~w(inputs commands command_results events projections effects ledger_generations claims reservations receipts leases policy_revisions control_revisions artifact_references import_runs legacy_records sqlite_sequence)
-
-    legacy_before = Map.take(before_content, legacy_tables)
-    stop_supervised!(Gateway)
-
-    assert {:ok, raw} = Sqlite3.open(path, mode: :readwrite)
-    assert :ok = Sqlite3.execute(raw, "PRAGMA foreign_keys = OFF")
-
-    for table <-
-          ~w(root_attempt_closures root_infrastructure_settlements durable_operations atomic_bundles root_leases root_receipts root_reservations root_claims root_effects root_ledgers root_control_history root_controls root_policy_history root_policies authenticated_inbox_items authenticated_inboxes root_pointers root_commands) do
-      assert :ok = Sqlite3.execute(raw, "DROP TABLE #{table}")
-    end
-
-    assert :ok =
-             Database.execute(
-               raw,
-               "DELETE FROM metadata WHERE key IN ('protected_schema_version', 'migration_fr08a_v1', 'migration_atomic_bundle_v2', 'migration_attempt_closure_v3')"
-             )
-
-    assert :ok = Sqlite3.close(raw)
-
-    assert :ok = Gateway.migrate(path)
-    assert :ok = Gateway.migrate(path)
-
-    assert {:ok, after_conn} = Database.open(path)
-    assert {:ok, after_content} = Authority.content(after_conn)
-    assert Map.take(after_content, legacy_tables) == legacy_before
-    assert :ok = Database.close(after_conn)
-
-    migrated =
-      start_supervised!(
-        {Gateway,
-         path: path, protected_capability: capability, writer_epoch: "writer-after-migration"},
-        id: :migrated_gateway
-      )
-
-    assert {:ok, snapshot} = Gateway.protected_snapshot(migrated, capability)
-    assert snapshot["protected_schema_version"] == "3"
-    assert snapshot["pointers"]["accepted_source"]["producer_status"] == "absent"
   end
 
   test "reset closes an allocation, revokes unissued authority and parent-funds the new generation",

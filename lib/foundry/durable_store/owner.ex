@@ -67,10 +67,6 @@ defmodule Foundry.DurableStore.Owner do
     with :ok <- marker_result, :ok <- commit_result, :ok <- close_result, do: :ok
   end
 
-  def sidecars(database_path) do
-    database_path |> PathIdentity.store_namespace() |> tl()
-  end
-
   defp resolve_previous_marker(marker_path, nil) do
     case File.read(marker_path) do
       {:error, :enoent} -> :ok

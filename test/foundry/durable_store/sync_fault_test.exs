@@ -281,7 +281,7 @@ defmodule Foundry.DurableStore.SyncFaultTest do
         %{
           schema_version: 1,
           event_id: event_id,
-          type: "legacy_event",
+          type: "execution_observed",
           payload: %{
             "projection" => %{
               "namespace" => "kernel-v1",
