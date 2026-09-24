@@ -185,9 +185,11 @@ defmodule PramanaFoundry.ManualLane.CLI do
 
     with :ok <- one_of(verdict, @verdicts, :invalid_verdict),
          {:ok, notes} <- read_notes(opts[:notes]),
+         # F5: archived before any write, so a recorded digest always has its body.
+         {:ok, digest} <- archive_notes(ctx.store_path, notes),
          receipt =
            attestation(principal, "review verdict #{verdict} on candidate #{candidate}")
-           |> Map.merge(%{"verdict" => verdict, "notes_sha256" => sha256(notes)}),
+           |> Map.merge(%{"verdict" => verdict, "notes_sha256" => digest}),
          {:ok, %{"ticket" => t}} <-
            Backend.review(ctx, id, principal, verdict, candidate, receipt) |> refusal() do
       {:ok, %{"phase" => t["phase"], "verdict" => verdict, "candidate_id" => candidate}}
@@ -455,6 +457,13 @@ defmodule PramanaFoundry.ManualLane.CLI do
     end
   end
 
+  defp archive_notes(store_path, notes) do
+    case Log.archive_notes(store_path, notes) do
+      {:ok, digest} -> {:ok, digest}
+      {:error, reason} -> {:error, :notes_archive_failed, inspect(reason)}
+    end
+  end
+
   defp one_of(value, allowed, reason),
     do: if(value in allowed, do: :ok, else: {:error, reason, value})
 
@@ -517,8 +526,6 @@ defmodule PramanaFoundry.ManualLane.CLI do
       "statement" => statement
     }
   end
-
-  defp sha256(bytes), do: :crypto.hash(:sha256, bytes) |> Base.encode16(case: :lower)
 
   defp option_name(key), do: "--" <> String.replace(to_string(key), "_", "-")
 

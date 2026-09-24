@@ -151,6 +151,8 @@ only as real as your choice of a fresh agent on a different model.
 | `revision_conflict` | the store moved between the command's read and its write | rerun the same command; committed steps replay |
 | `execution_owned_by_other_principal` | another principal already holds this role's open packet | use that principal, or settle its packet |
 | `receipt_provenance_mismatch` | submit, review or settle by a principal that did not issue the effect | use the packet's principal |
+| `notes_unreadable` | `review --notes` does not name a readable file | fix the path |
+| `notes_archive_failed` | the notes body could not be archived beside the store (nothing was recorded) | fix `<runtime root>/state/manual-lane/notes/`, then rerun |
 | `lane_disabled` | no lane server on the node | `bin/foundry-lane start` |
 | `gateway_recovery` | the previous daemon stopped uncleanly; the store is fenced | see below |
 
@@ -175,7 +177,11 @@ epoch; `submit` and `settle` still work on them.
 
 ## 6. Logs
 
-- `lane log [ID]` reads the store: the authoritative trail, including refused commands.
+- `lane log [ID]` reads the store: the authoritative trail, including refused commands, and
+  each review's notes body.
+- `<runtime root>/state/manual-lane/notes/<sha256>.md`: every `review --notes` body, archived
+  before the review is recorded and named by the digest its receipt stores, so the notes
+  outlive `/private/tmp`. `lane log` shows a body only if it still matches its digest.
 - `<runtime root>/state/manual-lane/operator.log.jsonl`: one line per lane command (argv,
   result, principal, duration). Observation only; nothing reads it back.
 - Daemon console: `$FOUNDRY_LANE_BUILD/rel/pramana_foundry/tmp/log/erlang.log.*`.

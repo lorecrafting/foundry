@@ -313,7 +313,19 @@ defmodule PramanaFoundry.ManualLane.CLITest do
       "invalid_verdict"
     )
 
-    # Neither refusal settled the reviewer's claim: it still awaits a receipt.
+    # F5: notes that cannot be archived beside the store are refused before any write.
+    notes_dir = Path.join(c.root, "state/manual-lane/notes")
+    File.rm_rf!(notes_dir)
+    File.write!(notes_dir, "not a directory")
+
+    refused!(
+      ~w(review ML-1 --principal #{@rev} --verdict approved --candidate #{c.candidate} --notes #{c.notes}),
+      "notes_archive_failed"
+    )
+
+    File.rm!(notes_dir)
+
+    # No refusal settled the reviewer's claim: it still awaits a receipt.
     %{"tickets" => %{"ML-1" => t}} = ok!(~w(status ML-1))
     assert t["phase"] == "reviewing"
     [attempt] = Map.values(t["attempts"])
@@ -406,6 +418,8 @@ defmodule PramanaFoundry.ManualLane.CLITest do
     ok!(~w(review ML-1 --principal #{@rev} --verdict approved
            --candidate #{c.candidate} --notes #{c.notes}))
 
+    # F5: the notes body outlives the reviewer's file, archived beside the store.
+    File.rm!(c.notes)
     %{"mode" => "ready", "trail" => %{"ML-1" => t} = all} = ok!(~w(log ML-1))
     assert Map.keys(all) == ["ML-1"]
 
@@ -437,6 +451,10 @@ defmodule PramanaFoundry.ManualLane.CLITest do
     assert [dev, rev] = t["effects"]
     assert dev["principals"] == %{"issuer" => @dev, "inbox" => nil}
     assert rev["principals"] == %{"issuer" => @rev, "inbox" => nil}
+    assert dev["notes"] == nil
+    digest = :crypto.hash(:sha256, "looks right\n") |> Base.encode16(case: :lower)
+    archived = Path.join(c.root, "state/manual-lane/notes/#{digest}.md")
+    assert rev["notes"] == %{"sha256" => digest, "path" => archived, "body" => "looks right\n"}
 
     for page <- [dev, rev] do
       assert %{"status" => "succeeded", "receipt_history" => "complete"} = page["settlement"]
@@ -451,6 +469,7 @@ defmodule PramanaFoundry.ManualLane.CLITest do
     text = capture_io(fn -> RPC.run(encode(~w(lane log ML-1))) end)
     assert text =~ "principal_not_independent ML-1/reviewer/"
     assert text =~ "issuer=#{@rev}"
+    assert text =~ "notes sha256=#{digest}\n        looks right\n"
     # One operator line per command, refusals included; no line is read back.
     lines = operator_lines(c)
     assert length(lines) == 10
@@ -463,6 +482,11 @@ defmodule PramanaFoundry.ManualLane.CLITest do
 
     assert Enum.all?(lines, &(is_integer(&1["duration_ms"]) and &1["ts"] =~ ~r/Z$/))
     assert Enum.at(lines, 0)["argv"] |> hd() == "admit"
+
+    # A tampered archive is not shown as the notes.
+    File.write!(archived, "edited later\n")
+    %{"trail" => %{"ML-1" => %{"effects" => [_, tampered]}}} = ok!(~w(log ML-1))
+    assert tampered["notes"]["body"] == nil
   end
 
   test "an operator log write failure warns and leaves the outcome unchanged", c do
