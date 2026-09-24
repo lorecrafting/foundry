@@ -405,7 +405,7 @@ defmodule PramanaFoundry.BoardTest do
       ticket = %{
         "task_id" => "T-ISOLATION-1",
         "base_revision" => @base_rev,
-        "scope" => ["workflow/lib/pramana_foundry/**"],
+        "scope" => ["lib/pramana_foundry/**"],
         "required_checks" => [@check],
         "outcome" => "Fault isolation verification"
       }
@@ -441,7 +441,7 @@ defmodule PramanaFoundry.BoardTest do
         "run_id" => "run-iso-1",
         "assigned_base" => @base_rev,
         "commit" => @commit,
-        "changed_files" => ["workflow/lib/pramana_foundry/board.ex"],
+        "changed_files" => ["lib/pramana_foundry/board.ex"],
         "reproduction_evidence" => %{"before" => "fail", "after" => "pass"},
         "checks" => [%{"command" => @check, "exit_code" => 0}],
         "remaining_risks" => [],

@@ -6,26 +6,26 @@ defmodule PramanaFoundry.SchedulerTest do
 
   describe "scopes_may_overlap?/2" do
     test "proves disjoint paths do not overlap" do
-      scope1 = ["workflow/lib/pramana_foundry/scheduler/**"]
-      scope2 = ["workflow/lib/pramana_foundry/pm/**"]
+      scope1 = ["lib/pramana_foundry/scheduler/**"]
+      scope2 = ["lib/pramana_foundry/pm/**"]
       refute Policy.scopes_may_overlap?(scope1, scope2)
     end
 
     test "detects overlapping exact paths" do
-      scope1 = ["workflow/lib/pramana_foundry/coordinator.ex"]
-      scope2 = ["workflow/lib/pramana_foundry/coordinator.ex"]
+      scope1 = ["lib/pramana_foundry/coordinator.ex"]
+      scope2 = ["lib/pramana_foundry/coordinator.ex"]
       assert Policy.scopes_may_overlap?(scope1, scope2)
     end
 
     test "detects overlapping parent directory and child wildcard" do
-      scope1 = ["workflow/lib/**"]
-      scope2 = ["workflow/lib/pramana_foundry/scheduler/policy.ex"]
+      scope1 = ["lib/**"]
+      scope2 = ["lib/pramana_foundry/scheduler/policy.ex"]
       assert Policy.scopes_may_overlap?(scope1, scope2)
     end
 
     test "empty scope fails safe as overlapping" do
-      assert Policy.scopes_may_overlap?([], ["workflow/lib/**"])
-      assert Policy.scopes_may_overlap?(["workflow/lib/**"], [])
+      assert Policy.scopes_may_overlap?([], ["lib/**"])
+      assert Policy.scopes_may_overlap?(["lib/**"], [])
     end
   end
 
@@ -61,7 +61,7 @@ defmodule PramanaFoundry.SchedulerTest do
           "task_id" => "T1",
           "base_revision" => "abc1234",
           "checkout" => "/tmp/checkout-1",
-          "scope" => ["workflow/lib/pramana_foundry/scheduler/**"],
+          "scope" => ["lib/pramana_foundry/scheduler/**"],
           "environment" => @valid_env1,
           "shared_resources" => @valid_resources1,
           "dependencies" => []
@@ -75,7 +75,7 @@ defmodule PramanaFoundry.SchedulerTest do
           "task_id" => "T2",
           "base_revision" => "abc1234",
           "checkout" => "/tmp/checkout-2",
-          "scope" => ["workflow/lib/pramana_foundry/pm/**"],
+          "scope" => ["lib/pramana_foundry/pm/**"],
           "environment" => @valid_env2,
           "shared_resources" => @valid_resources2,
           "dependencies" => []
@@ -159,7 +159,7 @@ defmodule PramanaFoundry.SchedulerTest do
           "task_id" => "T1",
           "base_revision" => "rev-A",
           "checkout" => "/tmp/checkout-1",
-          "scope" => ["workflow/lib/**"],
+          "scope" => ["lib/**"],
           "dependencies" => []
         }
       }
@@ -171,7 +171,7 @@ defmodule PramanaFoundry.SchedulerTest do
           "task_id" => "T2",
           "base_revision" => "rev-A",
           "checkout" => "/tmp/checkout-2",
-          "scope" => ["workflow/lib/pramana_foundry/**"],
+          "scope" => ["lib/pramana_foundry/**"],
           "dependencies" => []
         }
       }
@@ -185,7 +185,7 @@ defmodule PramanaFoundry.SchedulerTest do
           "task_id" => "T1",
           "base_revision" => "rev-A",
           "checkout" => "/tmp/checkout-1",
-          "scope" => ["workflow/lib/scheduler/**"],
+          "scope" => ["lib/scheduler/**"],
           "environment" => @valid_env1,
           "shared_resources" => %{@valid_resources1 | "database" => ["shared_db"]},
           "dependencies" => []
@@ -199,7 +199,7 @@ defmodule PramanaFoundry.SchedulerTest do
           "task_id" => "T2",
           "base_revision" => "rev-A",
           "checkout" => "/tmp/checkout-2",
-          "scope" => ["workflow/lib/pm/**"],
+          "scope" => ["lib/pm/**"],
           "environment" => @valid_env2,
           "shared_resources" => %{@valid_resources2 | "database" => ["shared_db"]},
           "dependencies" => []
@@ -245,7 +245,7 @@ defmodule PramanaFoundry.SchedulerTest do
         "task_id" => id,
         "base_revision" => "same-base",
         "checkout" => "/tmp/checkout-#{id}",
-        "scope" => ["workflow/lib/#{id}/**"],
+        "scope" => ["lib/#{id}/**"],
         "dependencies" => [],
         "environment" => %{
           "MIX_TEST_PARTITION" => id,

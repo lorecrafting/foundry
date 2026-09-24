@@ -10,7 +10,7 @@ defmodule PramanaFoundry.AssignmentsTest do
   @ticket %{
     "task_id" => "T1",
     "base_revision" => @base_rev,
-    "scope" => ["workflow/lib/pramana_foundry/**"],
+    "scope" => ["lib/pramana_foundry/**"],
     "exclusions" => ["automation/**"],
     "required_checks" => [@check],
     "checkout" => nil
@@ -27,7 +27,7 @@ defmodule PramanaFoundry.AssignmentsTest do
     "run_id" => "run-1",
     "assigned_base" => @base_rev,
     "commit" => @commit,
-    "changed_files" => ["workflow/lib/pramana_foundry/scheduler.ex"],
+    "changed_files" => ["lib/pramana_foundry/scheduler.ex"],
     "reproduction_evidence" => %{"before" => "broken", "after" => "fixed"},
     "checks" => [%{"command" => @check, "exit_code" => 0}],
     "remaining_risks" => [],
