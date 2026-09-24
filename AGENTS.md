@@ -31,6 +31,14 @@ Load only the topic the task needs; do not preload the plan, history or every li
 - Never claim an unrun gate, provider session or CI job passed. Report changed paths,
   checks run with counts, limitations and deferred defects.
 
+## Searching code
+
+- Elixir structure (callers, dependencies, cycles): `mix xref callers <Module>`,
+  `mix xref graph --format cycles`. The compiler resolves aliases and imports, so these are
+  exact where a pattern search is not.
+- Syntactic patterns: where `ast-grep` is installed, `ast-grep --lang elixir -p '<pattern>' --json`.
+- Plain-text search for strings, docs, and the rename allowlist.
+
 ## Checks
 
 - Gate: `TMPDIR=/private/tmp elixir ci/run.exs --output <dir outside the repo>`
