@@ -19,6 +19,7 @@ contract still govern implementation.
 | Delegate Foundry work to an agent | [Agent brief](AGENT-BRIEF.md): the standing clauses every task prompt inherits; repository-wide agent rules are in [AGENTS.md](../AGENTS.md) |
 | Run a ticket through the manual lane as operator | [Lane runbook](batch-d/LANE-RUNBOOK.md): start the lane daemon, admit, packet, submit, review, settle, recover |
 | Understand investment priorities or evaluate architecture/tooling | [Foundry strategy brief](STRATEGY.md), then the relevant governing repair contract |
+| Read the product strategy, candidate initiatives (I-F1–I-F5), validation plan or research register moved from Pramāṇa | [Product strategy](strategy/PRODUCT.md), [validation](strategy/VALIDATION.md), [research register](strategy/RESEARCH.md), [meta-harness proposal](strategy/META-HARNESS.md) |
 | Understand Foundry's ecosystem position, what the kernel must own, and what should remain substitutable | [Ecosystem boundary and positioning](ECOSYSTEM-BOUNDARY.md), then [Foundry strategy](STRATEGY.md) and the governing workflow/repair contracts |
 | Understand how Cloudflare/AX/Pi/Claude/Codex or another controller should drive Foundry without becoming authority | [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md), then [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md), [Observability](OBSERVABILITY.md) and the governing workflow contract |
 | Start or check orchestrator-boundary step O0 (which workflow calls cross protected authority, and what could move above Core) | [O0 authority inventory](orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md). It is an inventory taken at `6bc015ed` and changes no behaviour; read it after [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) |
@@ -55,7 +56,7 @@ contract still govern implementation.
 | Plan FR-23 dead-surface removal, or check whether a `lib/` identifier still dispatches | [Dead surface inventory](DEAD-SURFACE-INVENTORY-2026-09-22.md) — unused functions, list-literal members and modules at `6bc015ed`, each with its recorded search and owner; it removed nothing |
 | Decide whether to split FR-23, or pick up FR-23 hygiene before FR-10/11/12/19B land | [FR-23 split proposal](fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md) — a proposal at `b46d3825`, not yet approved: FR-23a (hygiene, gated by which files it may touch) and FR-23b (decomposition and retirement, keeping FR-23's dependencies); the repair plan still governs |
 | Inspect implementation history | [Implementation log](IMPLEMENTATION-LOG.md); use its reading route and active-ticket headings rather than preloading the append-only history |
-| Review an agent assignment | The applicable [role documents](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/README.md#foundry-role-contracts) and current workflow contract |
+| Review an agent assignment | The applicable [role documents](../roles) and current workflow contract |
 
 **The active repair plan, not the original eight-ticket migration sequence, owns
 repair ordering.** A design-review approval applies to its named candidate; it is not
