@@ -91,8 +91,16 @@ bin/pramana lane packet ML-42 --role reviewer \
   --principal agent:claude-fable-5-1/review-ML-42 --out /private/tmp/ML-42.review.json
 ```
 
-Hand it to a fresh Fable agent, never a fork of the developer or of you. Give it the
-packet, the candidate SHA and `git diff <base_revision> <candidate>`, and ask for a verdict
+Hand it to a fresh Fable agent, never a fork of the developer or of you. Give it its own
+detached worktree at the candidate, never the developer's: the developer's checkout is the
+one the lane recorded, and a reviewer's red control or `git checkout` there would alter it.
+
+```sh
+git worktree add --detach /private/tmp/ML-42-review <candidate>
+```
+
+Give it the packet, that worktree, the candidate SHA and
+`git diff <base_revision> <candidate>`, and ask for a verdict
 (`approved`, `correction` or `rejected`) and notes written to a file. Risk A4: nothing
 checks the diff against `scope` except the reviewer, so ask it to.
 
