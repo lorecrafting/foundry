@@ -13,12 +13,12 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
   alias PramanaFoundry.DurableStore.Gateway
   alias PramanaFoundry.Repair.FR08HandoffGate
 
-  @subject_revision "66b921122a1b5d059e95c601c27c1722b81182e7"
-  @subject_tree "bc8ffb509f68f4d11fcdf4533f904e4f50236c63"
+  @subject_revision "ab41f06c4d7a5aa94bf91ff0c1ef0f87a6abf62d"
+  @subject_tree "b48930283b4f188cb162c453001fd4932ab07bfc"
   @api_identity [
     {PramanaFoundry.DurableStore.Authority, "lib/pramana_foundry/durable_store/authority.ex",
-     "0654ba8794260d1b8e6abd7d798aa5b58b0d6c8674c84c9d4fb00d8ee9120ffd",
-     "76ca2f38fe8df04214622c0583367a35"},
+     "83a4953eecbd2bad17857173a4e18de33e54ef4813ab4132b915494367d990c4",
+     "892cca52e5d95c4ed5d0c9b352bb601b"},
     {PramanaFoundry.DurableStore.Database, "lib/pramana_foundry/durable_store/database.ex",
      "a584d7ef6c3e8109ef280b14eaa404cae5f22ee2798ed81c3813078960171d6a",
      "346a68d8c70ab79a777c69dd227f995f"},
@@ -30,8 +30,8 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
      "7b1653e4613ffa2fbbff77cab97311172ff188d00c8aa3e48a3bc4b9503bf630",
      "ab95d17ba2b276f1935e8f7d66bfc24b"},
     {PramanaFoundry.DurableStore.Kernel, "lib/pramana_foundry/durable_store/kernel.ex",
-     "918e7efbfbaaf6f2943b1b1ce403cf08615c330b300d6e0c9e1b7b192a6406ac",
-     "e43949e9a2658ebbd12afabdf2f30086"},
+     "0182f7d4bc64248559d6472b3e350aa42104d4bd7cb4e94743473e8321349fab",
+     "f90178d58d43a57086408792aa6ee2ff"},
     {PramanaFoundry.DurableStore.RecordCodec, "lib/pramana_foundry/durable_store/record_codec.ex",
      "75a65a232092187edc18afbf6e8a0532e9b00518b474a29def8c0fad17353b66",
      "05cf8ca82957f84f737e8038f284eb4b"},
@@ -39,8 +39,8 @@ defmodule PramanaFoundry.Repair.FR08AProtectedBoundary do
      "140730a723527d3e7c9f71f0e54c209f14ce4a8b74004e553f12f14ce7c987ba",
      "5f1bff0562b0fed9407a8af02bc84241"},
     {PramanaFoundry.Repair.FR08HandoffGate, "lib/pramana_foundry/repair/fr08_handoff_gate.ex",
-     "710f42d0467e97f58540342ba1c566959d995f1d561242c275f88eab2017228b",
-     "e1eef77b648eb850b9a643629982d091"},
+     "0defdd85e69c2511614d736c5fb4690a0a2ff51bd54d86f89980cc1ea86345fd",
+     "1b1964a26b25b2f790ee2e4f098e8b63"},
     # Pinned 2026-09-23 (strategy review): Core guarantees live here too — plan binding,
     # the non-start discriminator rule, settlement identity, and predicate derivation.
     {PramanaFoundry.DurableStore.TransitionPlan,

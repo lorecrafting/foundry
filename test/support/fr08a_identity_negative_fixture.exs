@@ -18,7 +18,7 @@ Code.compile_string(changed, source)
 
 report = FR08AProtectedBoundary.report()
 "mismatch:source-sha256+beam-md5/v1" = report.identity.implementation_binding
-%{status: "blocked", passed_count: 0, failed_count: 0, unavailable_count: 7} = report.gate
+%{status: "blocked", passed_count: 0, failed_count: 0, unavailable_count: 6} = report.gate
 
 true =
   Enum.all?(report.gate.capabilities, fn capability ->
