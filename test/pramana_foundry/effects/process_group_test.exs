@@ -124,6 +124,28 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     refute ProcessGroup.gone?(sample_identity(), identity_reader)
   end
 
+  # The refusal precedes `kill`, so these send no real signal: the runner flunks if called.
+  # Formerly covered only by the deleted checks/runner_test (2026-09-23 review F1).
+  test "a replacement owner (same pid, different start time) is refused, never signalled" do
+    {port, identity} = marker_process("stale-replacement-owner")
+    on_exit(fn -> close_port(port) end)
+    forged = %{identity | started_at: "not-" <> identity.started_at}
+
+    assert {:error, :stale_identity} =
+             ProcessGroup.signal(forged, :sigterm, &ProcessGroup.identity/1, &no_kill/3)
+
+    assert {:ok, _still_alive} = ProcessGroup.identity(identity.pid)
+  end
+
+  test "an already-exited pid is refused, never signalled" do
+    {port, identity} = marker_process("stale-exited", 0.2)
+    assert_receive {^port, {:exit_status, 0}}, 5_000
+    assert await_gone(identity, 2_000)
+
+    assert {:error, :stale_identity} =
+             ProcessGroup.signal(identity, :sigkill, &ProcessGroup.identity/1, &no_kill/3)
+  end
+
   test "a failed signal against a live marker process remains a failure" do
     {port, identity} = marker_process("defunct-failed-signal")
     on_exit(fn -> close_port(port) end)
@@ -152,13 +174,13 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
     }
   end
 
-  defp marker_process(marker) do
+  defp marker_process(marker, seconds \\ 30) do
     port =
       Port.open({:spawn_executable, python_executable!()}, [
         :binary,
         :exit_status,
         :stderr_to_stdout,
-        args: ["-c", "import time; time.sleep(30)", marker]
+        args: ["-c", "import time; time.sleep(#{seconds})", marker]
       ])
 
     {:os_pid, pid} = Port.info(port, :os_pid)
@@ -213,6 +235,8 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
       end
     end
   end
+
+  defp no_kill(command, args, _opts), do: flunk("unexpected #{command} #{inspect(args)}")
 
   defp python_executable!, do: System.find_executable("python3") || flunk("python3 unavailable")
 
