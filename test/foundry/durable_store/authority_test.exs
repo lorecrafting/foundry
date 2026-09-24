@@ -1057,7 +1057,7 @@ defmodule Foundry.DurableStore.AuthorityTest do
   defp effect_digest(id) do
     {:ok, digest} =
       Encoding.semantic_digest(
-        "pramana-foundry-effect-request-v1",
+        "foundry-effect-request-v1",
         %{"effect_id" => "effect-#{id}", "operation" => %{"operation" => "check"}}
       )
 

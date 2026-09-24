@@ -55,7 +55,7 @@ build = fn command_id ->
         request_digest:
           elem(
             Foundry.DurableStore.Encoding.semantic_digest(
-              "pramana-foundry-effect-request-v1",
+              "foundry-effect-request-v1",
               %{"effect_id" => "effect-" <> command_id, "operation" => %{"operation" => "check"}}
             ),
             1

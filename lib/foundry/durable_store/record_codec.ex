@@ -154,7 +154,7 @@ defmodule Foundry.DurableStore.RecordCodec do
          true <- plain_map?(map["value"]),
          operation when operation in @intent_types <- map["value"]["operation"],
          {:ok, expected_digest} <-
-           Encoding.semantic_digest("pramana-foundry-effect-request-v1", %{
+           Encoding.semantic_digest("foundry-effect-request-v1", %{
              "effect_id" => map["effect_id"],
              "operation" => map["value"]
            }),
@@ -255,7 +255,7 @@ defmodule Foundry.DurableStore.RecordCodec do
   def normalize(:command_request, value) do
     with {:ok, map} <- normalize_map(value),
          :ok <- keys(map, @command_request, @command_request),
-         "pramana-foundry-command-v1" <- map["domain"],
+         "foundry-command-v1" <- map["domain"],
          1 <- map["schema_version"],
          :ok <- nonempty(map, ~w(actor_id)),
          {:ok, command} <- normalize(:command, map["command"]) do

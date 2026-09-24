@@ -81,7 +81,7 @@ Caller counts come from a per-module scan (`git grep -l -P '\bFoundry\.X\b|alias
 | `Repair.H0AcceptedFR07Boundary` (466) | **operator question Q3** (recommend retire) | Test reads two `pramana/<sha>` tags → CI `fetch-depth: 0`; "accepted FR-07 boundary" is superseded by FR-08A (REPAIR-PLAN:499-500) | The report is dated evidence → archive `docs/fr-08/h0-accepted-fr07-report.txt` | pins `legacy_import.ex`, blocking ML-DEL-LEGACY-IMPORT | ML-DEL-LEGACY-IMPORT |
 | `DurableStore.*` forward set (`Authority, Capacity, Database, Encoding, Gateway, Maintenance, Owner, PathIdentity, ProtectedPrimitives, ProtectedVerifier, RecordCodec, TransitionPlan`) | **keep; decompose** | `Maintenance` is test-only (FR-19A); `Capacity` called from `gateway.ex`. Dead-surface inventory's FR-08B rows (`protected_schema_version/0`, `sidecars/1`, `reduce_projection_plan/2`, `discriminator_kinds/0`, 11 unused `@command_types`/`@intent_types` members) become removable under the fresh-store decision | The 4 recorded contract divergences (`93fb057`), R5 ledger Quint (`spec/ledger`), reopen property (`reopen_property_test`) | FR-08A, H0 | ML-DECOMPOSE-PP (L), ML-DECOMPOSE-GATEWAY (M), ML-DEAD-VOCAB (S) — after rename |
 | `Workflow.Kernel*` (18 files) | **keep** | lane path; `@families` dispatch; evidence tools in `bin/` pin `lib/foundry/workflow/**` paths | — | none (rule 2: kernel never touches the store) | rename only |
-| `ManualLane.*`, `WorkPacket`, `GitEvidence`, `Observations.*`, `SchemaReference`, `CI` | **keep** | forward; `ci.ex` carries names `pramana-foundry-ci-provenance/v2` (`ci.ex:9`), tmp prefix `pramana-foundry-ci-` (`ci.ex:59`), escript `foundry` (`ci.ex:385`, then `Pramana`-prefixed), exclusion id `corpus-and-services` (`ci.ex:111-115`, asserted by `ci_test.exs:58`) | — | none | FR-23b |
+| `ManualLane.*`, `WorkPacket`, `GitEvidence`, `Observations.*`, `SchemaReference`, `CI` | **keep** | forward; `ci.ex` carries names `pramana-foundry-ci-provenance/v2` (`ci.ex:9`), tmp prefix `pramana-foundry-ci-` (`ci.ex:59`), escript `foundry` (`ci.ex:385`, then Pramāṇa-era-prefixed), exclusion id `corpus-and-services` (`ci.ex:111-115`, asserted by `ci_test.exs:58`) | — | none | FR-23b |
 
 Delete-list regex used for the 18,828-line count: `agent_server|assessor|assignments|board|checks|cli/validators|cleanup|consolidated_log|coordinator|effects/(checkpoint|launch|prompt_delivery|silence_watchdog)|event_log|exports|hardening_pm|herdr|import\.ex|improver|integration|launch_eligibility|log_store|parity|pm/|preparation|projections|quota|relocation|reviews|scheduler|schema\.ex|status|system_metrics|telemetry|transition\.ex|durable_store/(legacy_import|legacy_line|compatibility_writer|kernel)`. The complementary forward set (26,853 lines) is `manual_lane|work_packet|git_evidence|workflow/|durable_store/(the twelve above)|observations|runtime_root|runtime_owner|runtime_lease|fence|atomic_file|application|ci\.ex|cli\.ex|cli/rpc|repair/|schema_reference`; the four `runtime_owner|runtime_lease|fence|atomic_file` files (456 lines) are counted forward there but marked delete above.
 
@@ -179,8 +179,8 @@ Target tree: `docs/{README, STRATEGY, REPAIR-PLAN, WORKFLOW-CONTRACT, BOUNDARY-R
 | `.github/workflows/fr19a-sync-eio.yml` (262 lines) + `ci/fr19a_*` (5 files, 1,281 lines) + `test/fr19a_*` (2) + `test/support/fr19a_*` (2) | `if: github.ref == 'refs/heads/repair/fr19a-correction'` (`:32`); that branch is absent from `git ls-remote origin` (only `main`, `chore/split-cleanup`, `integ/lane-batch-1`); paths still say `lib/foundry/durable_store/**`; `ci_test.exs:59` asserts only on `foundry-ci.yml` | **operator question Q7**: archive scripts under `docs/archive/fr-19a/` as FR-19A evidence and delete workflow + tests (recommended), or keep the workflow retargeted at `main` |
 | `mise.toml` | pins erlang 29.0.5 / elixir 1.20.3-otp-29; comments `:2` "corpus bake", `:8-10` "dev repo … SQL sandbox pool" are Pramāṇa's | rewrite two comments |
 | `rel/vm.args` vs `rel/overlays/vm.args` | `diff` → identical; `mix.exs:11` uses `vm_args: "rel/vm.args"` | delete the overlay copy; `rel/overlays/env.sh:19` comment `RELEASE_NODE=pramana_workflow` |
-| `mix.exs` | app, release and escript module, then `Pramana`-prefixed (renamed to `:foundry`, `foundry`, `Foundry.CLI`) | FR-23b |
-| `.gitignore` | the escript (then `Pramana`-prefixed, renamed to `/foundry`), `/local/`, `/handoffs/`, `/.claude/` | rename escript line; drop `/local/`, `/handoffs/` after 4.1 |
+| `mix.exs` | app, release and escript module, then Pramāṇa-era-prefixed (renamed to `:foundry`, `foundry`, `Foundry.CLI`) | FR-23b |
+| `.gitignore` | the escript (then Pramāṇa-era-prefixed, renamed to `/foundry`), `/local/`, `/handoffs/`, `/.claude/` | rename escript line; drop `/local/`, `/handoffs/` after 4.1 |
 | `bin/` | `foundry-lane` (keep; `FOUNDRY_RELEASE`, `FOUNDRY_RUNTIME_ROOT` at `:16-18`), `foundry` (rewrite lane-only; header `:11-16` documents legacy commands; `$HOME/foundry` fallbacks `:62-64`), `check_docs.exs`, `rebind_fr08a.exs`, `sync_phoenix_rules.exs`, the six evidence tools, `preflight.sh`/`freeze-evidence.sh` (keep, per BIN-SCRIPT-HEALTH), `test_daemon_recovery.sh` (delete with `daemon_recovery_test`), `live_test.exs`/`pramana-live.sh`/`tickets_from_review.sh` (FR-05 disabled stubs; `pramana-live.sh` is pinned by `fr05_containment_test` → delete together), `assessor_eval.exs` (with Assessor) | as listed |
 | `spec/` | keep all three models; `spec/core_boundary/unbound_nonstart_probe.exs` referenced by its README only | keep |
 | `roles/` (5 files, 288 lines) | read only by `agent_server.ex:648,670`, `hardening_pm.ex:9`, `agent_server_test.exs:220`; `steerer.md` drives a supervisor that does not exist (`:4,21,29`) | delete all five with ML-DEL-DAEMON (retires steerer as planned); the developer/reviewer instructions already live in LANE-RUNBOOK §3 and the packet |
@@ -215,6 +215,46 @@ Target tree: `docs/{README, STRATEGY, REPAIR-PLAN, WORKFLOW-CONTRACT, BOUNDARY-R
 | Socket paths | `/var/run/pramana-foundry/*.sock` ×7 in `validate_fr15aa.exs:96-115` | with FR-15aA (Q2) |
 | Prose | 1,998 lines in docs, 22 in README, 17 in roles, 1 in AGENTS.md ("Pramāṇa's corpus", correct) | archive/rewrite per §3; dated records are not rewritten |
 
+### 5.1 What still says `pramana` after FR-23b (allowlist)
+
+ML-RENAME-DOMAIN-TAGS finished the renames. `git grep -il pramana -- ':!docs/fr-08'` must list
+exactly these files (`docs/fr-08` waits for batch C's triage). Anything else is a missed rename.
+
+| File | Why it keeps the name |
+|---|---|
+| `AGENTS.md` | link to the Pramāṇa repository |
+| `README.md` | link to the Pramāṇa repository; `pramana/<sha>` tags name Pramāṇa commits |
+| `docs/AGENT-BRIEF.md` | pinned-commit permalink into the Pramāṇa repository |
+| `docs/CI.md` | `pramana/<sha>` tags name Pramāṇa commits |
+| `docs/DOGFOOD-READINESS-2026-09-23.md` | names Pramāṇa's own supervisor script |
+| `docs/ELIXIR-CONVENTIONS.md` | pinned-commit permalink |
+| `docs/REPAIR-PLAN.md` | pinned-commit permalinks and Pramāṇa issue links |
+| `docs/STRATEGY.md` | pinned-commit permalinks |
+| `docs/batch-d/DOGFOOD-LOG.md` | rename rows and Q1 quote the retired names |
+| `docs/batch-d/reviews/ML-DEL-LEGACY-IMPORT.review.md` | quotes a grep for the `pramana/<sha>` tags |
+| `docs/batch-d/reviews/ML-DOCS-ARCHIVE.review.md` | cites the `pramana/<sha>` tags |
+| `docs/batch-d/reviews/ML-RENAME-BIN-ENV.review.md` | rename record quoting retired names |
+| `docs/batch-d/reviews/ML-RENAME-NS.review-1.md` | rename record quoting retired names |
+| `docs/batch-d/reviews/ML-RENAME-NS.review-2.md` | rename record quoting retired names |
+| `docs/design/AX-SUBSTRATE.md` | pinned-commit permalink |
+| `docs/design/CLOUDFLARE-OS.md` | pinned-commit permalink |
+| `docs/design/ECOSYSTEM-BOUNDARY.md` | pinned-commit permalink |
+| `docs/design/JIDO-HARNESS.md` | pinned-commit permalink |
+| `docs/design/MOVED-KNOWLEDGE-2026-09-23.md` | `pramana/<sha>` tags name Pramāṇa commits |
+| `docs/design/PI-HARNESS.md` | pinned-commit permalinks |
+| `docs/design/PLANNING-STRATEGIES.md` | Pramāṇa issue links and a pinned-commit permalink |
+| `docs/design/PROJECT-WORKFLOW-PROFILES.md` | pinned-commit permalink |
+| `docs/fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md` | this rename inventory quotes the retired names |
+| `docs/fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md` | permalink; the Pramāṇa repository's own `pramana/` app |
+| `docs/fr-23/WORKTREE-INVENTORY-2026-09-23.md` | paths in the Pramāṇa checkout |
+| `docs/orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md` | Pramāṇa pull request link |
+| `docs/strategy/META-HARNESS.md` | moved from Pramāṇa; links and the Pramāṇa project by name |
+| `docs/strategy/PRODUCT.md` | moved from Pramāṇa; links to its repository |
+| `docs/strategy/RESEARCH.md` | moved-from permalink |
+| `docs/strategy/VALIDATION.md` | moved-from permalink |
+| `test/foundry/architecture_boundary_test.exs` | rule 6 guard: the Pramāṇa apps and modules Foundry must not reference |
+| `test/foundry/ci_test.exs` | refutes Pramāṇa's own `mix pramana.gate` task in the CI plan |
+
 ## 6. Proposed lane ticket sequence
 
 Each batch's file sets are disjoint so its tickets can run in parallel worktrees; one serial gate per batch (memory: parallel-worktree-agents). "Deleting a subsystem before renaming it saves renaming it" is the ordering principle: Batch A removes ~41% of `lib/` and most non-doc `pramana` hits before FR-23b touches anything.
@@ -231,7 +271,7 @@ Each batch's file sets are disjoint so its tickets can run in parallel worktrees
 | A2 parallel | **ML-DEL-LEGACY-IMPORT** (Q3): `legacy_import.ex`, `legacy_line.ex`, `durable_store/kernel.ex`, `authority.ex:736` branch, `legacy_import_test`, H0 module/test/report, 2 tags, `fetch-depth`; **one FR-08A rebind** | touches pinned files → serial with any other Core edit | M | after A1; before FR-23b (the rename would otherwise rebind these twice) |
 | A2 parallel | **ML-DOCS-ARCHIVE** (whole-dir moves, `docs/lane/`, `docs/design/`, `bin/check_docs.exs` green) and **ML-DOCS-RETIRE** (EVENT_SOURCING, MIGRATION ×2, OBSERVABILITY rewrite, README sections) | docs only; RETIRE depends on A1's deletions being real | M + M | after A1 |
 | A2 parallel | **ML-GITEVIDENCE-TEST**, **ML-LANE-QUIET-RPC** (F1), **ML-LANE-INTEGRATE** (F6), **ML-LANE-NOTES-ARCHIVE** (F5), reviewer-worktree runbook line (F4) | `git_evidence.ex` test; `manual_lane/{cli,server,backend}.ex` (one owner) | S each | any time; F1/F5/F6 share `manual_lane/cli.ex` → one agent |
-| **B (FR-23b renames, after A2 gate)** | **ML-RENAME-NS** (the Pramāṇa-era `Pramana`-prefixed namespace, OTP app and `lib/`, `test/` directories → `Foundry`, `:foundry`, `lib/foundry/`, `test/foundry/`; release/escript names, `.gitignore`, evidence-tool paths, BOUNDARY-RULES paths, `ci.ex` schema/tmp names) + one `rebind_fr08a.exs` + FR-15aA rebind if it survived Q2 | everything; one mechanical commit when nothing else is in flight | L | after A2 |
+| **B (FR-23b renames, after A2 gate)** | **ML-RENAME-NS** (the Pramāṇa-era namespace, OTP app and `lib/`, `test/` directories → `Foundry`, `:foundry`, `lib/foundry/`, `test/foundry/`; release/escript names, `.gitignore`, evidence-tool paths, BOUNDARY-RULES paths, `ci.ex` schema/tmp names) + one `rebind_fr08a.exs` + FR-15aA rebind if it survived Q2 | everything; one mechanical commit when nothing else is in flight | L | after A2 |
 | B serial | **ML-RENAME-BIN-ENV** (the Pramāṇa-era wrapper → `bin/foundry` lane-only; the Pramāṇa-era env prefix → `FOUNDRY_*` in `runtime_root.ex`, `application.ex`, `config.exs`, `ci.ex`, `bin/foundry-lane`, RUNBOOK table; `rel/overlays` cleanup; `mise.toml` comments) | bin/config/rel + the few lib readers | S | after ML-RENAME-NS (paths) |
 | B serial | **ML-RENAME-DOMAIN-TAGS** (11 tags + `repair/` tags; archive the lane store; fresh store; FR-08A rebind) | `protected_primitives.ex`, `gateway.ex`, `record_codec.ex`, `repair/*` | M | last in B (pinned files; one rebind) |
 | **C (post-rename)** | **ML-DECOMPOSE-PP** (L), **ML-DECOMPOSE-GATEWAY** (M), **ML-DEAD-VOCAB** (dead-surface FR-08B rows, now unblocked; S), **ML-GATE-EVIDENCE-TOOLS** (`refusal_sites`, `contract_annotation_diff` as ExUnit; S), `docs/fr-08` per-file triage (M), Quint line-citation refresh (S) | Core files; serial by rebind | — | after B |

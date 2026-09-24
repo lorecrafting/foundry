@@ -477,7 +477,7 @@ defmodule Foundry.DurableStore.GatewayTest do
   defp effect_digest(id) do
     {:ok, digest} =
       Foundry.DurableStore.Encoding.semantic_digest(
-        "pramana-foundry-effect-request-v1",
+        "foundry-effect-request-v1",
         %{"effect_id" => "effect-#{id}", "operation" => %{"operation" => "check"}}
       )
 

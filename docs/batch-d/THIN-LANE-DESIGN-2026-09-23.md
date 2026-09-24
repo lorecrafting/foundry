@@ -43,7 +43,7 @@ The lane ends at `ready_to_integrate`. Integration is manual Git (A5).
 
 **Must stay disabled.** This is readiness §4's list, unchanged, and the lane touches none of
 it: `COORDINATOR_TICK` (`application.ex:17-19`); the Herdr System runner's subscription
-capability; AgentServer launch and prompt; `ticket integrate`, `pramana-live.sh`,
+capability; AgentServer launch and prompt; `ticket integrate`, the live-provider shell script,
 `tickets_from_review.sh` and `live_test.exs`; `auto_approve`; PM proposals acting as
 admission; paid profiles.
 

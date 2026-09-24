@@ -17,4 +17,4 @@ esac
 # # Set the release to work across nodes.
 # # RELEASE_DISTRIBUTION must be "sname" (local), "name" (distributed) or "none".
 # export RELEASE_DISTRIBUTION=name
-# export RELEASE_NODE=pramana_workflow
+# export RELEASE_NODE=foundry_workflow

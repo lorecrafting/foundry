@@ -89,7 +89,7 @@ audits) and every other dated record are archived (tag `records/2026-09-24`, [do
     work_packet.ex, git_evidence.ex, runtime_root.ex, schema_reference.ex, ci.ex
     launch_eligibility.ex, quota/, effects/process_group.ex — policy and process leaves kept for FR-09/FR-10
   test/
-  bin/                         — pramana (RPC wrapper), foundry-lane, evidence tools
+  bin/                         — foundry (RPC wrapper), foundry-lane, evidence tools
   ci/run.exs                   — the gate
   spec/                        — Quint models
   docs/

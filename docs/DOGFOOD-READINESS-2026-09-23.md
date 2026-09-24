@@ -164,7 +164,7 @@ subcommit 4's check workers for this lane.
 - The Herdr System runner's subscription capability. Do not change it as a workaround
   (`README.md:55-60`).
 - `AgentServer` launch and prompt.
-- `ticket integrate`, `pramana-live.sh`, `tickets_from_review.sh` and `live_test.exs`.
+- `ticket integrate`, the live-provider shell script, `tickets_from_review.sh` and `live_test.exs`.
 - `auto_approve`.
 - PM proposals acting as admission (O0 C9).
 - Any paid profile.

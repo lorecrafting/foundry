@@ -40,8 +40,8 @@ bin/foundry-lane stop       # clean stop; the next start comes up ready
 ```
 
 `bin/foundry lane …` reads the same settings, so it needs no exports. Set any override on
-`start` itself; every later command reaches the running node. The example seed grants 10
-developer and 10 reviewer starts for the whole store; a store is seeded once.
+`start` itself; every later command reaches the running node. The example seed grants 50
+developer and 50 reviewer starts for the whole store; a store is seeded once.
 
 ## 3. One ticket, phase by phase
 

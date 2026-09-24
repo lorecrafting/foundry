@@ -7,5 +7,5 @@
     "independent_of_roles": {"reviewer": ["developer"]}
   },
   "control": {"status": "active"},
-  "starts": {"developer": 10, "reviewer": 10}
+  "starts": {"developer": 50, "reviewer": 50}
 }

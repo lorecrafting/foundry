@@ -6,7 +6,7 @@ defmodule Foundry.CI do
   and non-Hex dependencies, and atomically updates one manifest through every stage.
   """
 
-  @schema "pramana-foundry-ci-provenance/v2"
+  @schema "foundry-ci-provenance/v2"
   @excluded_tags ~w(live_provider real_provider)
   @error_exit 70
 
@@ -56,7 +56,7 @@ defmodule Foundry.CI do
   @spec create_run_root(Path.t()) :: {:ok, Path.t()} | {:error, term()}
   def create_run_root(parent \\ System.tmp_dir!()) do
     suffix = 18 |> :crypto.strong_rand_bytes() |> Base.url_encode64(padding: false)
-    root = Path.join(parent, "pramana-foundry-ci-#{suffix}")
+    root = Path.join(parent, "foundry-ci-#{suffix}")
 
     case File.mkdir(root) do
       :ok -> {:ok, root}

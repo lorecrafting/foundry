@@ -81,7 +81,7 @@ defmodule Foundry.RuntimeRoot do
     suffix =
       @random_bytes |> then(&:crypto.strong_rand_bytes/1) |> Base.url_encode64(padding: false)
 
-    root = Path.join(System.tmp_dir!(), "pramana-foundry-mix-test-#{suffix}")
+    root = Path.join(System.tmp_dir!(), "foundry-mix-test-#{suffix}")
 
     if within?(root, operator_root) do
       raise ArgumentError, "generated test runtime root cannot target configured operator state"

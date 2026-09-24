@@ -332,7 +332,7 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
     operation = %{"operation" => "check"}
 
     {:ok, digest} =
-      Encoding.semantic_digest("pramana-foundry-effect-request-v1", %{
+      Encoding.semantic_digest("foundry-effect-request-v1", %{
         "effect_id" => "legacy-effect",
         "operation" => operation
       })

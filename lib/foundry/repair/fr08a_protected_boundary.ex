@@ -53,7 +53,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
 
   def identity do
     %{
-      schema: "pramana-foundry-fr08a-protected-boundary/v1",
+      schema: "foundry-fr08a-protected-boundary/v1",
       subject_revision: @subject_revision,
       subject_tree: @subject_tree,
       exercised_api:
@@ -584,7 +584,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
     root =
       Path.join(
         base,
-        "pramana-fr08a-gate-#{label}-#{System.unique_integer([:positive, :monotonic])}"
+        "foundry-fr08a-gate-#{label}-#{System.unique_integer([:positive, :monotonic])}"
       )
 
     File.mkdir!(root)
@@ -601,7 +601,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
   end
 
   defp initialize(path) do
-    Gateway.initialize(path, installation_id: "fr08a-gate", repository_id: "pramana-foundry")
+    Gateway.initialize(path, installation_id: "fr08a-gate", repository_id: "foundry")
   end
 
   defp stop_gateway(gateway) do
@@ -616,7 +616,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
   defp receipt(label, value) do
     bytes =
       :json.encode(%{
-        "schema" => "pramana-foundry-fr08a-receipt/v1",
+        "schema" => "foundry-fr08a-receipt/v1",
         "label" => label,
         "data" => value
       })

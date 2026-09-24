@@ -608,7 +608,7 @@ defmodule Foundry.DurableStore.Gateway do
          },
          {:ok, canonical} <- Encoding.canonical(normalized),
          {:ok, digest} <-
-           Encoding.semantic_digest("pramana-foundry-atomic-bundle-v2", normalized) do
+           Encoding.semantic_digest("foundry-atomic-bundle-v2", normalized) do
       {:ok, normalized, canonical, digest}
     else
       {:error, _reason} = error -> error
@@ -1515,7 +1515,7 @@ defmodule Foundry.DurableStore.Gateway do
          {:ok, normalized_command} <- RecordCodec.normalize(:command, command),
          {:ok, canonical} <-
            Encoding.canonical(%{
-             "domain" => "pramana-foundry-command-v1",
+             "domain" => "foundry-command-v1",
              "schema_version" => 1,
              "actor_id" => actor_id,
              "command" => normalized_command

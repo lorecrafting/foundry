@@ -17,7 +17,7 @@ defmodule Foundry.Repair.FR08HandoffGate do
   ordering for machine consumption.
   """
 
-  @schema "pramana-foundry-fr07-fr08-handoff/v1"
+  @schema "foundry-fr07-fr08-handoff/v1"
   @max_detail_bytes 512
   @max_subject_revision_bytes 128
   @default_probe_timeout_ms 5_000

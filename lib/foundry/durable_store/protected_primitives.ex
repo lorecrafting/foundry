@@ -773,7 +773,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
          sequence when is_integer(sequence) and sequence > 0 <- operation["sequence"],
          true <- plain_value?(operation["payload"]),
          {:ok, digest} <-
-           Encoding.semantic_digest("pramana-foundry-authenticated-inbox-item-v1", %{
+           Encoding.semantic_digest("foundry-authenticated-inbox-item-v1", %{
              "execution_id" => operation["execution_id"],
              "sequence" => sequence,
              "item_kind" => operation["item_kind"],
@@ -1247,7 +1247,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
              predecessor_effect_id
            ),
          {:ok, request_digest} <-
-           Encoding.semantic_digest("pramana-foundry-effect-request-v1", %{
+           Encoding.semantic_digest("foundry-effect-request-v1", %{
              "effect_id" => operation["effect_id"],
              "operation" => operation["operation"],
              "scope" => operation["scope"],
@@ -2676,7 +2676,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
 
   defp request_digest(actor_id, request),
     do:
-      Encoding.semantic_digest("pramana-foundry-protected-command-v1", %{
+      Encoding.semantic_digest("foundry-protected-command-v1", %{
         "actor_id" => actor_id,
         "request" => request
       })
@@ -4088,7 +4088,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
   end
 
   defp receipt_digest(operation) do
-    Encoding.semantic_digest("pramana-foundry-root-receipt-v1", %{
+    Encoding.semantic_digest("foundry-root-receipt-v1", %{
       "claim_id" => operation["claim_id"],
       "request_id" => operation["request_id"],
       "outcome" => operation["outcome"],
@@ -4372,11 +4372,11 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
     with {:ok, source} <- effect_observation_source(conn),
          {:ok, effect} <- bounded_effect_header(conn, request.effect_id),
          {:ok, scope_digest} <-
-           Encoding.semantic_digest("pramana-foundry-effect-observation-scope-v1", %{
+           Encoding.semantic_digest("foundry-effect-observation-scope-v1", %{
              "effect_id" => request.effect_id
            }),
          {:ok, source_digest} <-
-           Encoding.semantic_digest("pramana-foundry-effect-observation-source-v1", %{
+           Encoding.semantic_digest("foundry-effect-observation-source-v1", %{
              "installation_id" => source["installation_id"],
              "repository_id" => source["repository_id"]
            }),
@@ -5568,7 +5568,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
              ^actor <- envelope["actor_id"],
              ^actor <- domain_actor,
              {:ok, ^digest} <-
-               Encoding.semantic_digest("pramana-foundry-atomic-bundle-v2", envelope),
+               Encoding.semantic_digest("foundry-atomic-bundle-v2", envelope),
              {:ok, domain_request} <- decode(domain_request_bytes),
              true <- is_map(domain_request),
              ^actor <- domain_request["actor_id"],
@@ -5612,7 +5612,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
          true <- row_ordinals(rows) == Enum.to_list(0..(expected_count - 1)//1),
          {protected_rows, [domain_row]} <- Enum.split(rows, expected_count - 1),
          {:ok, digest} <-
-           Encoding.semantic_digest("pramana-foundry-atomic-bundle-v2", envelope),
+           Encoding.semantic_digest("foundry-atomic-bundle-v2", envelope),
          true <-
            Enum.zip([operations, operation_results, protected_rows])
            |> Enum.all?(fn tuple ->
@@ -6320,7 +6320,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
              if(is_integer(sealed) and sequence > sealed, do: "late", else: "accepted"),
            true <- disposition == expected_disposition,
            {:ok, ^digest} <-
-             Encoding.semantic_digest("pramana-foundry-authenticated-inbox-item-v1", %{
+             Encoding.semantic_digest("foundry-authenticated-inbox-item-v1", %{
                "execution_id" => execution_id,
                "sequence" => sequence,
                "item_kind" => kind,
@@ -6551,7 +6551,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
                end),
              true <- actor == effect.issuer and effect.channel == "protected-gateway",
              {:ok, digest} <-
-               Encoding.semantic_digest("pramana-foundry-effect-request-v1", %{
+               Encoding.semantic_digest("foundry-effect-request-v1", %{
                  "effect_id" => operation["effect_id"],
                  "operation" => operation["operation"],
                  "scope" => operation["scope"],
@@ -7980,7 +7980,7 @@ defmodule Foundry.DurableStore.ProtectedPrimitives do
              true <- state["receipt_digest"] == digest,
              :ok <- settlement_proof(outcome, state["proof"]),
              {:ok, ^digest} <-
-               Encoding.semantic_digest("pramana-foundry-root-receipt-v1", %{
+               Encoding.semantic_digest("foundry-root-receipt-v1", %{
                  "claim_id" => claim,
                  "request_id" => request,
                  "outcome" => outcome,

@@ -517,12 +517,12 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
 
     assert {:ok, canonical} =
              Encoding.canonical(%{
-               "domain" => "pramana-foundry-command-v1",
+               "domain" => "foundry-command-v1",
                "schema_version" => 1
              })
 
     assert Encoding.digest(canonical) ==
-             "a97024e2321b4803bd4f714ab66a47b0376e1a148bfc119154aa9992cb790b01"
+             "d194a1e3f7be1dfbd81e896b737b858568a39e1983d59253583499bcea81ea0b"
   end
 
   test "engine backup verifies every authority table and keeps unsupported authority empty", %{
@@ -739,7 +739,7 @@ defmodule Foundry.DurableStore.ReviewCorrectionsTest do
   defp effect_digest(id) do
     {:ok, digest} =
       Encoding.semantic_digest(
-        "pramana-foundry-effect-request-v1",
+        "foundry-effect-request-v1",
         %{"effect_id" => "effect-#{id}", "operation" => %{"operation" => "check"}}
       )
 

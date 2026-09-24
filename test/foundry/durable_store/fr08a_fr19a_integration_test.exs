@@ -295,7 +295,7 @@ defmodule Foundry.DurableStore.FR08AFR19AIntegrationTest do
     assert :ok =
              Gateway.initialize(path,
                installation_id: "fr08a-fr19a-integration",
-               repository_id: "pramana-foundry"
+               repository_id: "foundry"
              )
 
     {:ok, gateway} =

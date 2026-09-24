@@ -61,7 +61,7 @@ bundle = fn id ->
         request_digest:
           elem(
             Foundry.DurableStore.Encoding.semantic_digest(
-              "pramana-foundry-effect-request-v1",
+              "foundry-effect-request-v1",
               %{
                 "effect_id" => "effect-#{id}",
                 "operation" => %{"operation" => "check"}
