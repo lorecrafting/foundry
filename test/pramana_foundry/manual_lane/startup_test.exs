@@ -31,7 +31,12 @@ defmodule PramanaFoundry.ManualLane.StartupTest do
 
     Enum.each(@env, &System.delete_env/1)
 
-    root = Path.join("/private/tmp", "manual-lane-startup-#{System.unique_integer([:positive])}")
+    root =
+      Path.join(
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
+        "manual-lane-startup-#{System.unique_integer([:positive])}"
+      )
+
     File.mkdir_p!(root)
     on_exit(fn -> File.rm_rf!(root) end)
     %{root: root}

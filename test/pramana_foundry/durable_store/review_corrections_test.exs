@@ -498,7 +498,7 @@ defmodule PramanaFoundry.DurableStore.ReviewCorrectionsTest do
     script = "trap '' XFSZ; ulimit -f 100; exec mix run --no-start \"$1\" \"$2\""
 
     {output, 0} =
-      System.cmd("/bin/zsh", ["-c", script, "fr07-rlimit", fixture, path],
+      System.cmd("/bin/sh", ["-c", script, "fr07-rlimit", fixture, path],
         stderr_to_stdout: true,
         env: [{"MIX_ENV", "test"}]
       )

@@ -28,7 +28,12 @@ defmodule PramanaFoundry.ManualLane.CLITest do
   }
 
   setup do
-    root = Path.join("/private/tmp", "lane-cli-#{System.unique_integer([:positive])}")
+    root =
+      Path.join(
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
+        "lane-cli-#{System.unique_integer([:positive])}"
+      )
+
     repo = Path.join(root, "repo")
     File.mkdir_p!(repo)
     on_exit(fn -> File.rm_rf!(root) end)
@@ -100,7 +105,7 @@ defmodule PramanaFoundry.ManualLane.CLITest do
   end
 
   defp admit!(c) do
-    ok!(~w(admit ML-1 --base-ref base --title t --scope foundry/**,docs/** --acceptance passes))
+    ok!(~w(admit ML-1 --base-ref base --title t --scope lib/**,docs/** --acceptance passes))
     |> tap(fn r -> assert r["base_revision"] == c.base end)
   end
 
@@ -122,7 +127,7 @@ defmodule PramanaFoundry.ManualLane.CLITest do
     %{"packet" => dev} = ok!(~w(packet ML-1 --role developer --principal #{@dev}))
     assert %{"role" => "developer", "issuer" => @dev, "base_revision" => base} = dev
     assert base == c.base
-    assert dev["scope"] == ["foundry/**", "docs/**"]
+    assert dev["scope"] == ["lib/**", "docs/**"]
 
     assert %{"phase" => "awaiting_review", "candidate_id" => cand} = submit!(c)
     assert cand == c.candidate

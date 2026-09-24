@@ -1,5 +1,5 @@
 defmodule PramanaFoundry.DurableStore.QuarantineExitProbeTest do
-  # FR-10 design Q3 (foundry/docs/fr-10/FR10-DESIGN-2026-09-23.md §8): characterization
+  # FR-10 design Q3 (docs/fr-10/FR10-DESIGN-2026-09-23.md §8): characterization
   # probe. Pins what ordinary protected commands actually do to a claim/effect that
   # quarantine_conflicting_receipt moved to reconciliation_required. Not a fix: where a
   # test says "settles it", that is current behaviour, not endorsed behaviour.
@@ -15,7 +15,7 @@ defmodule PramanaFoundry.DurableStore.QuarantineExitProbeTest do
   setup do
     root =
       Path.join(
-        "/private/tmp",
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
         "quarantine-exit-#{System.pid()}-#{System.unique_integer([:positive, :monotonic])}"
       )
 

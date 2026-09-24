@@ -39,7 +39,12 @@ defmodule PramanaFoundry.ManualLane.RestartDrillTest do
   }
 
   setup do
-    root = Path.join("/private/tmp", "lane-drill-#{System.unique_integer([:positive])}")
+    root =
+      Path.join(
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
+        "lane-drill-#{System.unique_integer([:positive])}"
+      )
+
     repo = Path.join(root, "repo")
     File.mkdir_p!(repo)
     on_exit(fn -> File.rm_rf!(root) end)
@@ -81,7 +86,7 @@ defmodule PramanaFoundry.ManualLane.RestartDrillTest do
     assert %{
              "base_revision" => base,
              "base_ref" => "base",
-             "scope" => ["foundry/**", "docs/**"],
+             "scope" => ["lib/**", "docs/**"],
              "acceptance_criteria" => ["passes"]
            } = t["spec"]
 
@@ -365,7 +370,7 @@ defmodule PramanaFoundry.ManualLane.RestartDrillTest do
   # ── The lane's steps ─────────────────────────────────────────────────────────────
 
   defp admit!(c) do
-    ok!(~w(admit ML-1 --base-ref base --title t --scope foundry/**,docs/** --acceptance passes))
+    ok!(~w(admit ML-1 --base-ref base --title t --scope lib/**,docs/** --acceptance passes))
     |> tap(fn r -> assert r["base_revision"] == c.base end)
   end
 

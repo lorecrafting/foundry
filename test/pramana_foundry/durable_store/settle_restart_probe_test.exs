@@ -2,9 +2,9 @@ defmodule PramanaFoundry.DurableStore.SettleRestartProbeTest do
   # settle_claim defects that committed a state the restart check
   # (ProtectedPrimitives.validate, run when the database opens) then refused:
   #
-  # L1 (foundry/spec/ledger/README.md, finding 1): a settle_claim reusing another claim's
+  # L1 (spec/ledger/README.md, finding 1): a settle_claim reusing another claim's
   #   receipt_id quarantined a claimed-but-never-issued (or cancelled) claim.
-  # B (foundry/spec/fr10/README.md, finding B): a late `unknown` receipt moved an already
+  # B (spec/fr10/README.md, finding B): a late `unknown` receipt moved an already
   #   settled effect to reconciliation_required, stranding its retry.
   #
   # Each test drives the real gateway, checks the operation's outcome, then reopens the store.
@@ -15,7 +15,7 @@ defmodule PramanaFoundry.DurableStore.SettleRestartProbeTest do
   setup do
     root =
       Path.join(
-        "/private/tmp",
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
         "settle-restart-#{System.pid()}-#{System.unique_integer([:positive, :monotonic])}"
       )
 

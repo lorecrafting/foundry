@@ -21,12 +21,17 @@ defmodule PramanaFoundry.ManualLane.BackendTest do
     "base_revision" => String.duplicate("a", 40),
     "base_ref" => "main",
     "title" => "t",
-    "scope" => ["foundry/**"],
+    "scope" => ["lib/**"],
     "acceptance_criteria" => ["passes"]
   }
 
   setup do
-    root = Path.join("/private/tmp", "manual-lane-#{System.unique_integer([:positive])}")
+    root =
+      Path.join(
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
+        "manual-lane-#{System.unique_integer([:positive])}"
+      )
+
     File.mkdir_p!(root)
     path = Path.join(root, "authority.sqlite3")
     capability = make_ref()

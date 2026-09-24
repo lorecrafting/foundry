@@ -9,7 +9,7 @@ defmodule PramanaFoundry.DurableStore.LedgerRestartProbeTest do
   setup do
     root =
       Path.join(
-        "/private/tmp",
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
         "ledger-restart-#{System.pid()}-#{System.unique_integer([:positive, :monotonic])}"
       )
 

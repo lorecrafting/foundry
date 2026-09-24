@@ -365,7 +365,7 @@ defmodule PramanaFoundry.DurableStore.ReopenPropertyTest do
   defp execute(ops) do
     root =
       Path.join(
-        "/private/tmp",
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
         "reopen-prop-#{System.pid()}-#{System.unique_integer([:positive, :monotonic])}"
       )
 

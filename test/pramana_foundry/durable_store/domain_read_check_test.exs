@@ -7,7 +7,12 @@ defmodule PramanaFoundry.DurableStore.DomainReadCheckTest do
   alias PramanaFoundry.Workflow.Kernel.Plan
 
   setup do
-    root = Path.join("/private/tmp", "domain-read-#{System.unique_integer([:positive])}")
+    root =
+      Path.join(
+        if(File.dir?("/private/tmp"), do: "/private/tmp", else: System.tmp_dir!()),
+        "domain-read-#{System.unique_integer([:positive])}"
+      )
+
     File.mkdir!(root)
     path = Path.join(root, "authority.sqlite3")
     capability = make_ref()
