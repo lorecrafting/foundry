@@ -1,6 +1,6 @@
 # FR-19A Linux physical kernel-sync fault acceptance plan
 
-> Retired 2026-09-23 under [repair-plan amendment C3](../REPAIR-PLAN.md#clean-room-amendment):
+> Retired 2026-09-23 under [repair-plan amendment C3](../../REPAIR-PLAN.md#clean-room-amendment):
 > the workflow, `ci/fr19a_*`, `test/fr19a_*` and `test/support/fr19a_linux_sync_eio_fixture.exs`
 > were deleted because the workflow was gated on `repair/fr19a-correction`, a branch this
 > remote does not have, so it never ran here. The operational storage tests that stay in the

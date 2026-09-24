@@ -9,7 +9,7 @@ unchanged. This review evaluates the manifested v2 proposal and
 
 ### R4a — P1: proved launch non-start does not have a domain recovery transition
 
-**Exact contract:** [WORKFLOW-CONTRACT](WORKFLOW-CONTRACT.md), R1 lines 271–275,
+**Exact contract:** [WORKFLOW-CONTRACT](../WORKFLOW-CONTRACT.md), R1 lines 271–275,
 allows `issued → non_started`; R4 line 352 allows an execution to become `closed`
 on “proved non-start.” R5 lines 478–480 releases the associated held start units.
 But the R4 domain rows at lines 375 and 386 require, respectively, “verified

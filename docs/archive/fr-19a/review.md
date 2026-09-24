@@ -20,8 +20,8 @@ by this report. FR-19B remains open.
   source were checked again after execution, before adding this report.
 
 Reviewed repository instructions, code conventions, shared repair requirements,
-[FR-19A/B acceptance](../REPAIR-PLAN.md#fr-19--bound-storage-and-make-offline-maintenance-safe),
-[workflow contract](../WORKFLOW-CONTRACT.md), accepted
+[FR-19A/B acceptance](../../REPAIR-PLAN.md#fr-19--bound-storage-and-make-offline-maintenance-safe),
+[workflow contract](../../WORKFLOW-CONTRACT.md), accepted
 [FR-07 v9 evidence](../fr-07/review-v9.md), audit F20/F21, changed source and tests.
 
 ## B1 — Default health request times out instead of returning unknown capacity

@@ -4,9 +4,9 @@
 does not change the active repair plan, accepted workflow contract, current launch policy,
 provider entitlement, production authorization or FR-08 implementation scope.
 
-[Foundry strategy](STRATEGY.md) · [Workflow contract](WORKFLOW-CONTRACT.md) ·
+[Foundry strategy](../STRATEGY.md) · [Workflow contract](../WORKFLOW-CONTRACT.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
-[Observability](OBSERVABILITY.md) · [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) ·
+[Observability](../OBSERVABILITY.md) · [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) ·
 [Cloudflare OS lessons](CLOUDFLARE-OS.md)
 
 ## Decision
@@ -832,7 +832,7 @@ Foundry can delete overlapping planning machinery without giving up the protecte
 software workflow. It is replaceable, and deletable once another controller covers it. The
 R4 exhaustive search and mutation-sweep tooling is scoped to this reference controller as a
 conformance oracle, not a bar every controller must meet; what every controller must meet is
-the Core rows of the contract's [enforcement matrix](WORKFLOW-CONTRACT.md#enforcement-matrix).
+the Core rows of the contract's [enforcement matrix](../WORKFLOW-CONTRACT.md#enforcement-matrix).
 
 ## Failure and restart behavior
 
@@ -935,9 +935,9 @@ Do not interrupt the active repair to implement this abstraction.
 
 ### O1 — local reference adapter
 
-**Timing, 2026-09-22 (operator-approved):** begin O1 only after FR-08B lands. The [O0 inventory](orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) found the FR-08B kernel has no production caller yet and the live coordinator bypasses the protected store, so an adapter built now would wrap code FR-08B is about to rewire.
+**Timing, 2026-09-22 (operator-approved):** begin O1 only after FR-08B lands. The [O0 inventory](../orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) found the FR-08B kernel has no production caller yet and the live coordinator bypasses the protected store, so an adapter built now would wrap code FR-08B is about to rewire.
 
-**Approved 2026-09-23:** [keep this timing and build FR-08B's remaining protected items role-agnostic](orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md).
+**Approved 2026-09-23:** [keep this timing and build FR-08B's remaining protected items role-agnostic](../orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md).
 
 - implement an OrchestratorAdapter for the default Foundry workflow kernel;
 - make the CLI use the same semantic client library where practical;

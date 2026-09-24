@@ -6,12 +6,12 @@ Frozen 2026-09-19 as a documentation-only candidate against pushed main
 self-approve the candidate. It changes no source, runtime, provider, credential, policy,
 Git ref, deployment or activation permission.
 
-[Authoritative repair plan](REPAIR-PLAN.md) ·
-[workflow contract](WORKFLOW-CONTRACT.md) ·
+[Authoritative repair plan](../REPAIR-PLAN.md) ·
+[workflow contract](../WORKFLOW-CONTRACT.md) ·
 [implementation log](IMPLEMENTATION-LOG.md) ·
 [exact independent audit](ALIGNMENT-AUDIT-2026-09-19.md) ·
 [independent Astra-high PASS](alignment-disposition-review-2026-09-19.md) ·
-[FR-08 investigation](fr-08/investigation.md)
+[FR-08 investigation](../fr-08/investigation.md)
 
 **Current evidence status:** The exact frozen 12-path candidate received independent
 Astra-high **PASS** and was committed unchanged as

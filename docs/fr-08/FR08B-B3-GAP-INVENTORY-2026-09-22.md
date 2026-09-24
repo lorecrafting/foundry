@@ -72,7 +72,7 @@ above is the source; recount from it rather than from this sentence.
 Markers used below: **[READ]** the answer depends on a contract reading. **[PM-DEFERRED]**
 the answer depends on the PM lifecycle deferred until the orchestrator boundary exists
 ([R4a.03.f2 review](fr08b-r4a03f2-review-2026-09-22.md)). **[TOPOLOGY]** B3 would add
-role-specific surface that [the boundary](../ORCHESTRATOR-BOUNDARY.md#foundry-core) puts
+role-specific surface that [the boundary](../design/ORCHESTRATOR-BOUNDARY.md#foundry-core) puts
 above Core.
 
 ## What R4a requires, quoted once

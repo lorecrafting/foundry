@@ -5,7 +5,7 @@ implementation beyond naming seams, and does not interrupt the active repair. **
 commit `6bc015ed`** (`repair/fr08b-kernel`). Every `file:line` below is at that commit and
 will drift; re-derive rather than trust a line number after any later edit.
 
-This is step O0 of the [orchestrator boundary migration sequence](../ORCHESTRATOR-BOUNDARY.md):
+This is step O0 of the [orchestrator boundary migration sequence](../design/ORCHESTRATOR-BOUNDARY.md):
 inventory the workflow calls that cross protected authority, classify each as protected
 fact, evidence or telemetry, and identify the software-specific decisions that need not be
 protected. Class definitions are the boundary document's "Three classes of durable
@@ -213,9 +213,9 @@ Controller.** The gap belongs to Core.
   whose execution the kernel does not record (K6 discards the authority).
 - **Controller:** the fact that the role is "PM"; what a planning result is; whether
   `pm_proposal_recorded` or something else *ends* the planning assignment; and when to plan
-  again. [Project workflow profiles](../PROJECT-WORKFLOW-PROFILES.md) §8 makes the result
+  again. [Project workflow profiles](../design/PROJECT-WORKFLOW-PROFILES.md) §8 makes the result
   kind (a "planning/decomposition proposal") an `AssignmentResult` declared by the admitted
-  WorkflowPlan, not a role callback. [Planning strategies](../PLANNING-STRATEGIES.md) §4
+  WorkflowPlan, not a role callback. [Planning strategies](../design/PLANNING-STRATEGIES.md) §4
   says "PM/Shaper proposes the plan"; the contract's R4.01.o2 says "PM proposal is evidence,
   not authority". The boundary doc's Core "owns no permanent PM/developer/reviewer topology".
 

@@ -2,14 +2,14 @@
 
 Revision **4 (R3 observability boundary added; independent re-review outstanding)**,
 2026-09-20. Revision 3's R4a correction remains independently verified: the
-[focused review](fr-06/r4a-focused-review.md) returned **PASS** against the exact
+[focused review](archive/fr-06/r4a-focused-review.md) returned **PASS** against the exact
 revision-3 manifest, and revision 4 changes no R1, R2, R4, R4a or R5 decision. The added
 R3 paragraph has **not** been independently reviewed, and no candidate may cite it as
 verified contract text until it has. This is the
 interface contract for the [repair backlog](REPAIR-PLAN.md), subordinate to its agreed
-operator contract. The [audit](AUDIT-2026-09-12.md), [independent review v1](FR-06-DESIGN-REVIEW.md),
-[response v2](fr-06/review-response-v2.md) and [independent review v2](FR-06-DESIGN-REVIEW-V2.md)
-remain historical evidence. [Response v3](fr-06/review-response-v3.md) addresses only
+operator contract. The [audit](archive/AUDIT-2026-09-12.md), [independent review v1](archive/FR-06-DESIGN-REVIEW.md),
+[response v2](archive/fr-06/review-response-v2.md) and [independent review v2](archive/FR-06-DESIGN-REVIEW-V2.md)
+remain historical evidence. [Response v3](archive/fr-06/review-response-v3.md) addresses only
 R4a. FR-07 remains blocked on FR-03; its FR-06 design prerequisite is complete.
 No production code, running daemon, credentials or host permissions changed here.
 
@@ -20,7 +20,7 @@ No production code, running daemon, credentials or host permissions changed here
 > inventories that public boundary; FR-08A supplies missing protected lifecycle
 > primitives and substantive revision-bound handoff proof; FR-08B then migrates all
 > command ingress and replay. See the independent read-only
-> [alignment audit](ALIGNMENT-AUDIT-2026-09-19.md) and the historical
+> [alignment audit](archive/ALIGNMENT-AUDIT-2026-09-19.md) and the historical
 > [FR-08 investigation](fr-08/investigation.md). This route changes no R1–R5 decision,
 > runtime, policy, provider or activation permission.
 >
@@ -47,7 +47,7 @@ not deleting useful scheduling, validation or process primitives. See those modu
 F02/F08/F14 for the pre-repair behavior. Source baseline is the audit's HEAD plus existing
 working-tree changes; source was not changed by FR-06.
 
-The [storage spike](fr-06/storage_spike.py) and [machine output](fr-06/storage-results.json)
+The [storage spike](archive/fr-06/storage_spike.py) and [machine output](archive/fr-06/storage-results.json)
 compare the same command/result/event/state/intent bundle in SQLite WAL and a checksummed,
 locked, fsynced journal. Run `python3 docs/fr-06/storage_spike.py` from the repository root.
 It uses fresh temporary files and subprocess exits, no Foundry startup or model calls.
@@ -767,9 +767,9 @@ receipts. Diagnostic retention cannot erase authoritative work.
 ## Review and implementation gates
 
 R1–R5 are resolved at design level. See the
-[v2 response](fr-06/review-response-v2.md) for precise passages, arguments and deferred
-evidence, and [verification](fr-06/verification.md) for input provenance and limits.
-The [focused R4a review](fr-06/r4a-focused-review.md) verified the exact revision-3
+[v2 response](archive/fr-06/review-response-v2.md) for precise passages, arguments and deferred
+evidence, and [verification](archive/fr-06/verification.md) for input provenance and limits.
+The [focused R4a review](archive/fr-06/r4a-focused-review.md) verified the exact revision-3
 inputs and returned **PASS** without reopening R1/R2/R3/R5. FR-07 still waits for its
 FR-03 prerequisite. No implementation behavior, account provisioning, storage fault
 conformance, provider behavior, or activation is certified by this design disposition.

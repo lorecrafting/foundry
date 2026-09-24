@@ -34,14 +34,14 @@ than permanent Foundry ontology. Comparisons should pin the relevant dimensions,
 matched task classes and keep the protected acceptance boundary comparable. Record enough
 lineage to attribute an accepted outcome and its corrections, failures and operator effort
 to the exact experimental arm. See
-[Replaceable planning strategies](../PLANNING-STRATEGIES.md).
+[Replaceable planning strategies](../design/PLANNING-STRATEGIES.md).
 
 ## Foundry cross-workflow portability validation
 
 "Role-agnostic" must be demonstrated, not inferred from configurable model-profile names.
 
 After the active Foundry repair lifecycle is accepted, validate the proposed
-[project workflow profile](../PROJECT-WORKFLOW-PROFILES.md) abstraction
+[project workflow profile](../design/PROJECT-WORKFLOW-PROFILES.md) abstraction
 with at least two materially different workloads under the same protected kernel.
 
 ### Arm A — software engineering

@@ -1,10 +1,10 @@
 # FR-18A bounded effect query design
 
-> **Current status, 2026-09-22.** Implemented since this was written: the `bounded_effect_*` functions in `durable_store/protected_primitives.ex`, and the [B5 correction rereview](b5-correction-rereview.md) is PASS. The body below is the dated design record and is not updated.
+> **Current status, 2026-09-22.** Implemented since this was written: the `bounded_effect_*` functions in `durable_store/protected_primitives.ex`, and the [B5 correction rereview](../archive/fr-18a/b5-correction-rereview.md) is PASS. The body below is the dated design record and is not updated.
 
 Status: **design only; B5 remains blocking.** This record defines the smallest
 protected read interface needed to correct B5 from the
-[independent review](independent-review.md#b5--the-declared-public-bounds-sit-after-an-unbounded-protected-materialization).
+[independent review](../archive/fr-18a/independent-review.md#b5--the-declared-public-bounds-sit-after-an-unbounded-protected-materialization).
 It does not implement or accept the interface, change the protected write protocol,
 enable an observation producer, or establish an FR-18A PASS.
 

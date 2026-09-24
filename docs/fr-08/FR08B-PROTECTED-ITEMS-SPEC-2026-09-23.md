@@ -9,7 +9,7 @@ items 1–4. Line numbers are at `33e6b95b`.
 ## The rule every choice below follows
 
 **A guarantee Core owns must not depend on a controller choosing to check it.** The kernel is
-one controller among future ones ([orchestrator boundary](../ORCHESTRATOR-BOUNDARY.md)); an
+one controller among future ones ([orchestrator boundary](../design/ORCHESTRATOR-BOUNDARY.md)); an
 external controller is untrusted. So a fact R5 or R4a requires is produced and enforced by the
 protected layer, keyed on identities Core already owns (scope, attempt, execution, effect), never
 on role names. The controller keeps what a role means and which disposition to claim.

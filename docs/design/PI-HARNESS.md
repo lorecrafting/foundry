@@ -2,12 +2,12 @@
 
 **Status:** design candidate, updated 2026-09-20. This document does **not** adopt Pi, replace
 OMP, enable automatic model execution, approve a provider/billing route, or weaken any
-repair gate. The active [repair plan](REPAIR-PLAN.md) and
-[workflow contract](WORKFLOW-CONTRACT.md) remain governing until their owning requirements
+repair gate. The active [repair plan](../REPAIR-PLAN.md) and
+[workflow contract](../WORKFLOW-CONTRACT.md) remain governing until their owning requirements
 are explicitly revised and re-reviewed.
 
-[Foundry strategy](STRATEGY.md#pi-explicit-session-contracts-and-replaceable-execution) ·
-[Observability](OBSERVABILITY.md) ·
+[Foundry strategy](../STRATEGY.md#pi-explicit-session-contracts-and-replaceable-execution) ·
+[Observability](../OBSERVABILITY.md) ·
 [Jido / Jido.Harness evaluation](JIDO-HARNESS.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
 [Research sources](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)

@@ -3,7 +3,7 @@
 **Status:** specification complete; host provisioning and production execution blocked.
 
 **Archived 2026-09-23:** the manifest, `ci/validate_fr15aa.exs`, the gate test and the review
-probes moved to [`docs/archive/fr-15a/`](../archive/fr-15a/README.md) and left the gate under
+probes moved to [`docs/archive/fr-15a/`](README.md) and left the gate under
 plan amendment C2; the commands below ran at `db4334c` and earlier, not from the archive.
 
 **Frozen input:** repository commit `f5067d96d67a9ec3193a9b8bbadfa54c16525aa3`,
@@ -19,7 +19,7 @@ operate Herdr, or prove FR-15aB/FR-09 conformance. OMP remains the governing har
 Pi is an evaluated, blocked replacement candidate and is not selected by this document.
 
 The machine-readable source of truth is
-[`provisioning-manifest.exs`](../archive/fr-15a/provisioning-manifest.exs). From the repository root, validate it
+[`provisioning-manifest.exs`](provisioning-manifest.exs). From the repository root, validate it
 without Mix, a provider or a daemon:
 
 Candidate commands/results and remaining gates are frozen in
@@ -69,7 +69,7 @@ loopback fixture:
 The installed pins are recorded without opening credential/configuration contents.
 
 **This document names manifest pin ids, never digests.** The digests themselves live in
-[provisioning-manifest.exs](../archive/fr-15a/provisioning-manifest.exs) as data and in `ci/validate_fr15aa.exs`
+[provisioning-manifest.exs](provisioning-manifest.exs) as data and in `ci/validate_fr15aa.exs`
 as an independent frozen profile; those two are cross-checked against each other and against
 file bytes, and `fr15aa_provisioning_test.exs` fails if any disagree. A digest restated here
 would be a third copy that nothing checks — on 2026-09-22 the `current-process-group` pin moved

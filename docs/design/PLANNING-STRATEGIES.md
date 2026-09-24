@@ -5,9 +5,9 @@
 does not alter the active repair plan, workflow contract, launch policy, provider
 entitlement, repair ordering or current runtime behavior.
 
-[Foundry strategy](STRATEGY.md) · [Workflow contract](WORKFLOW-CONTRACT.md) ·
+[Foundry strategy](../STRATEGY.md) · [Workflow contract](../WORKFLOW-CONTRACT.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
-[Observability](OBSERVABILITY.md)
+[Observability](../OBSERVABILITY.md)
 
 ## 1. Thesis: preserve invariants, experiment with methodologies
 

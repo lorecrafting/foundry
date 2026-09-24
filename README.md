@@ -4,7 +4,7 @@ Split from [lorecrafting/pramana](https://github.com/lorecrafting/pramana) on 20
 its full history. Commit SHAs recorded before the split name Pramāṇa commits; the two that
 tests resolve survive here as `pramana/<sha>` tags.
 
-**Audit, 2026-09-12:** The [architecture and lifecycle audit](docs/AUDIT-2026-09-12.md)
+**Audit, 2026-09-12:** The [architecture and lifecycle audit](docs/archive/AUDIT-2026-09-12.md)
 found that the live execution path bypasses several safeguards described below.
 Treat the following capability list as an implementation inventory, not verified
 end-to-end guarantees. The audit includes reproductions and an ordered repair plan.
@@ -70,11 +70,11 @@ evaluation credential.
   run a ticket through it.
 - [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — FR-07 SQLite authority boundary,
   initialization/recovery and current limitations.
-- [`docs/ALIGNMENT-AUDIT-2026-09-19.md`](docs/ALIGNMENT-AUDIT-2026-09-19.md) — independent
+- [`docs/ALIGNMENT-AUDIT-2026-09-19.md`](docs/archive/ALIGNMENT-AUDIT-2026-09-19.md) — independent
   read-only source alignment audit and exact limitations (before the deletion).
 - [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — describes the deleted legacy telemetry;
   its rewrite around `Observations` and the lane log is pending.
-- [`docs/AX-SUBSTRATE.md`](docs/AX-SUBSTRATE.md) and [`docs/CLOUDFLARE-OS.md`](docs/CLOUDFLARE-OS.md)
+- [`docs/AX-SUBSTRATE.md`](docs/design/AX-SUBSTRATE.md) and [`docs/CLOUDFLARE-OS.md`](docs/design/CLOUDFLARE-OS.md)
   — 2026-09-21 research on alternate execution substrates beneath Foundry's
   authority/evidence boundary.
 - [`docs/MIGRATION.md`](docs/MIGRATION.md) and [`docs/MIGRATION-TICKETS.md`](docs/MIGRATION-TICKETS.md)

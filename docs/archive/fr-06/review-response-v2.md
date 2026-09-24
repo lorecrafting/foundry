@@ -26,9 +26,9 @@ own hash to avoid a self-reference. Inputs are working-tree bytes, not a new com
 
 ## R1 — accepted; explicit claim/issue ordering proposed
 
-**Revised passages:** [Durable claims and recovery](../WORKFLOW-CONTRACT.md#r1), especially
+**Revised passages:** [Durable claims and recovery](../../WORKFLOW-CONTRACT.md#r1), especially
 the effect-state table, the `issued` boundary, ordering table, cancellation acknowledgment
-and takeover paragraphs; [integration reconciliation](../WORKFLOW-CONTRACT.md#integration).
+and takeover paragraphs; [integration reconciliation](../../WORKFLOW-CONTRACT.md#integration).
 
 The objection holds: a pre-action check cannot prevent an already checked worker from
 running after cancel. V2 makes claim/issue/cancel/revocation/takeover short serialized
@@ -54,9 +54,9 @@ No new process, Git or broker probe was run in this revision.
 
 ## R2 — accepted; reusable authentication removed from arbitrary-tool authority
 
-**Revised passages:** [Authenticated harness separated from arbitrary tools](../WORKFLOW-CONTRACT.md#r2),
+**Revised passages:** [Authenticated harness separated from arbitrary tools](../../WORKFLOW-CONTRACT.md#r2),
 including gateway request checks, fixed OMP/tool bridge configuration, same-slot denial
-argument and unsupported-capability outcome; [request reservations](../WORKFLOW-CONTRACT.md#r5).
+argument and unsupported-capability outcome; [request reservations](../../WORKFLOW-CONTRACT.md#r5).
 
 The review's own-account bypass is valid even without cross-worker credential theft.
 V2 uses a protected authentication gateway, a pinned trusted OMP harness and a separately
@@ -85,9 +85,9 @@ paid fallback, replacement harness or governing-policy exception is pre-authoriz
 
 ## R3 — accepted; autonomous kernel repair restored in the proposal
 
-**Revised passages:** [Autonomously repairable kernel, protected verifier](../WORKFLOW-CONTRACT.md#r3),
+**Revised passages:** [Autonomously repairable kernel, protected verifier](../../WORKFLOW-CONTRACT.md#r3),
 the ownership/upgrade table, verifier predicates and counterexample; [activation write-set
-and root artifact exclusions](../WORKFLOW-CONTRACT.md#integration). FR-15a/17/20/22 now
+and root artifact exclusions](../../WORKFLOW-CONTRACT.md#integration). FR-15a/17/20/22 now
 explicitly distinguish the kernel from the protected root.
 
 V1's exclusion was an unsupported narrowing, not a necessary consequence of policy
@@ -117,7 +117,7 @@ Safety against all arbitrary program bugs is not proven by this protocol argumen
 
 ## R4 — accepted; legal states, result precedence and cleanup specified
 
-**Revised passages:** [Legal lifecycle and controls](../WORKFLOW-CONTRACT.md#r4), including
+**Revised passages:** [Legal lifecycle and controls](../../WORKFLOW-CONTRACT.md#r4), including
 entity vocabularies, sealed-inbox rule, from-state/guard table, successful-result cleanup,
 check classification, drain/stop and non-session cancellation rules.
 
@@ -151,7 +151,7 @@ if completeness cannot be established, remain unknown rather than inventing deli
 
 ## R5 — accepted; explicit units and conserved generations proposed
 
-**Revised passages:** [Budget ledger](../WORKFLOW-CONTRACT.md#r5), integer dimensions,
+**Revised passages:** [Budget ledger](../../WORKFLOW-CONTRACT.md#r5), integer dimensions,
 objective/child allocation, conservation equations, reservation ownership/settlement,
 reset and late-receipt paragraphs; reservation row in identities.
 
@@ -184,7 +184,7 @@ have been changed or measured here.
 
 | Review point | Exact revised passage / ticket | Disposition |
 |---|---|---|
-| Canonical request bytes | Contract [command encoding](../WORKFLOW-CONTRACT.md#interfaces) | Restricted JSON value types, key/escape/integer rules, actor/domain tag, duplicate-key rejection; artifact bytes remain raw |
+| Canonical request bytes | Contract [command encoding](../../WORKFLOW-CONTRACT.md#interfaces) | Restricted JSON value types, key/escape/integer rules, actor/domain tag, duplicate-key rejection; artifact bytes remain raw |
 | Multi-entity concurrency | Same section | Complete expected_revisions read/write map including protected policy/ledgers/resources; verifier supplies mandatory read set |
 | Lost-reply idempotency | Same section | Authenticated same-ID lookup precedes current revision validation; semantic rejection persists a result, no domain mutation |
 | Pure decision inputs | Same section | Time/IDs/observations supplied explicitly and persisted; one domain apply for live/replay |

@@ -14,7 +14,7 @@ This answers the seven contract-reading questions in the
 (taken at `3727f2e8`). Cell verdicts (ABSENT, PARTIAL, NOT-KERNEL, IMPLEMENTED) and the
 letters (P), (D), (C), (G) and (O) are that document's. It is subject to the operator's standing
 direction of 2026-09-22: do not grow the reference kernel beyond correctness fixes until the
-[orchestrator boundary](../ORCHESTRATOR-BOUNDARY.md) exists, and defer PM execution close
+[orchestrator boundary](../design/ORCHESTRATOR-BOUNDARY.md) exists, and defer PM execution close
 until then. Where the contract text genuinely allows it, this proposal prefers the reading that
 keeps an obligation out of the kernel. Where the text makes the kernel own something, it says
 so.

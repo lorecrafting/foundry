@@ -160,7 +160,7 @@ controller code wait without repeatedly waking a model to poll child status.
 This makes Foundry a neutral referee for workflow experiments: keep authority and
 acceptance fixed, swap controllers, and compare accepted-outcome correctness, token/cost
 usage, latency, correction tax and operator effort. See
-[Orchestrator boundary](../ORCHESTRATOR-BOUNDARY.md).
+[Orchestrator boundary](../design/ORCHESTRATOR-BOUNDARY.md).
 
 ## Positioning: own the contract, not commodity infrastructure
 
@@ -179,8 +179,8 @@ may read or affect without gaining ambient credentials. The controller seam may 
 Cloudflare OS, AX, Pi or future orchestrators. Execution may use a local Linux worker,
 AX/Agent Substrate, Cloudflare Dynamic Workers/Sandbox or future runtimes. Resource
 mediation may use provider-specific Gatekeeper-like brokers. None may create Foundry
-grants, settle budgets from self-reported counters or accept its own output. The [AX/Substrate](../AX-SUBSTRATE.md) and
-[Cloudflare OS](../CLOUDFLARE-OS.md) reviews record the current evidence
+grants, settle budgets from self-reported counters or accept its own output. The [AX/Substrate](../design/AX-SUBSTRATE.md) and
+[Cloudflare OS](../design/CLOUDFLARE-OS.md) reviews record the current evidence
 and non-authority constraints.
 
 Before post-repair work adds or substantially extends one of those implementation layers,
@@ -295,7 +295,7 @@ and a replaceable provider boundary because Jev is currently early access.
 
 The long-term product should not encode Pramāṇa's current `developer → reviewer`
 workflow as the protected ontology. The detailed direction is recorded in
-[Project workflow profiles](../PROJECT-WORKFLOW-PROFILES.md).
+[Project workflow profiles](../design/PROJECT-WORKFLOW-PROFILES.md).
 
 Projects may describe versioned RoleSpecs and request scoped tool/API surfaces, context,
 evidence adapters and workflow shapes. Foundry's protected kernel admits an exact
@@ -336,7 +336,7 @@ propose bounded tickets, but a future goal graph, blackboard, dynamic DAG or rep
 next-best-action planner should be able to use the same admission boundary. Human work
 views and compact continuity capsules should remain replaceable projections over durable
 state and evidence. The detailed boundary is in
-[Replaceable planning strategies](../PLANNING-STRATEGIES.md).
+[Replaceable planning strategies](../design/PLANNING-STRATEGIES.md).
 
 ## First post-repair investment: useful context and honest feedback
 
@@ -512,7 +512,7 @@ prove a materially different typed-content workflow such as Loka:
 - context/evidence routing changes by RoleSpec while protected authority semantics remain
   invariant.
 
-Use [Project workflow profiles](../PROJECT-WORKFLOW-PROFILES.md) as the
+Use [Project workflow profiles](../design/PROJECT-WORKFLOW-PROFILES.md) as the
 post-repair design target and [Validation](VALIDATION.md#foundry-cross-workflow-portability-validation)
 for falsification cases.
 
@@ -523,7 +523,7 @@ a separately authorized typed-content workflow. The model supplies planning inte
 a catalog, structured diagnostics/lab, semantic diffs and safe amendments make its
 commitments usable and testable. A complete upfront graph or universal workflow DSL is
 not required. Claimed hard bounds need actual protected enforcement and evidence.
-Detailed design is in [Planning strategies](../PLANNING-STRATEGIES.md#31-llm-first-planning-and-progressive-commitment).
+Detailed design is in [Planning strategies](../design/PLANNING-STRATEGIES.md#31-llm-first-planning-and-progressive-commitment).
 
 **Dependencies:** G0, a bounded allocation and separate project/workflow authorization
 under the governing contract. **Excludes:** multi-tenancy, self-granted capabilities,
@@ -539,9 +539,9 @@ Herdr parity or making Pramāṇa delivery depend on the migration.
 
 #### I-F5 — Core/Standard Controller split and substitution experiments
 
-**Outcome:** the O0–O4 ([orchestrator boundary](../ORCHESTRATOR-BOUNDARY.md)),
-A0–A4 ([AX substrate](../AX-SUBSTRATE.md)) and C0–C3
-([Cloudflare OS](../CLOUDFLARE-OS.md)) ladders run **one at a time** under
+**Outcome:** the O0–O4 ([orchestrator boundary](../design/ORCHESTRATOR-BOUNDARY.md)),
+A0–A4 ([AX substrate](../design/AX-SUBSTRATE.md)) and C0–C3
+([Cloudflare OS](../design/CLOUDFLARE-OS.md)) ladders run **one at a time** under
 FOUNDRY's one-bounded-improvement rule, so the Core/Standard Controller distribution is tested
 rather than assumed. **Evidence:** per ladder, a bounded workflow run against the seam it
 names, plus the conformance list that ladder declares. **Dependencies:** G0, the I-F3 software
@@ -563,7 +563,7 @@ Their runtime work requires the accepted FR-18/FR-20 and relevant controller int
 no current FR ticket depends on these implementations. #48's documentation-only A0 slice
 separately tracks the coordinated FR-18B/FR-20 ownership amendment for observability
 convergence steps 6/7. It may be prepared during repair but is not deemed applied by this
-roadmap. See [tracked delivery and handoff](../PLANNING-STRATEGIES.md#tracked-delivery-and-handoff).
+roadmap. See [tracked delivery and handoff](../design/PLANNING-STRATEGIES.md#tracked-delivery-and-handoff).
 Merging a planning PR closes neither implementation issue and enables no execution.
 
 ## Open decisions

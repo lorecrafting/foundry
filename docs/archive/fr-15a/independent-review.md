@@ -17,7 +17,7 @@ focused test, evidence record and Foundry index link. The evidence tip changes o
 `evidence.md` relative to the substantive candidate. I independently checked the
 recorded SHA-256 values of the validator, manifest, specification and focused test.
 No runtime implementation changed. This review adds only this record and the
-[reproduction script](../archive/fr-15a/independent-review-probes.exs).
+[reproduction script](independent-review-probes.exs).
 
 ## Verdict and boundary
 
@@ -38,7 +38,7 @@ provisioning specification is complete or fails closed under the contract it dec
 
 ### B1 — The repairable workflow kernel has no isolation/protocol/provisioning route
 
-[FR-06 R3](../WORKFLOW-CONTRACT.md#r3) requires the candidate workflow kernel to run
+[FR-06 R3](../../WORKFLOW-CONTRACT.md#r3) requires the candidate workflow kernel to run
 under a separate restricted account and submit bounded bundles to the protected
 verifier. Root must not load that candidate into its own BEAM. The FR-15aB acceptance
 also explicitly requires isolated-kernel forged budget/acceptance-event denial.

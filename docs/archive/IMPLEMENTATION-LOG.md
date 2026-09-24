@@ -1,6 +1,6 @@
 # Foundry repair implementation log
 
-This supplements [REPAIR-PLAN.md](REPAIR-PLAN.md), which remains the authoritative
+This supplements [REPAIR-PLAN.md](../REPAIR-PLAN.md), which remains the authoritative
 ticket, status, and dependency backlog. It records candidate provenance, independent
 review, integration decisions, executable evidence, limitations, and resumable next
 steps.
@@ -946,7 +946,7 @@ latest prose here, remains authoritative for status and dependencies.
 ### FR-08 preparation
 
 - `/root/fr08_investigate` completed a read-only mutation/replay inventory while FR-07
-  implementation proceeds. The concise durable [investigation](fr-08/investigation.md)
+  implementation proceeds. The concise durable [investigation](../fr-08/investigation.md)
   records the FR-07 handoff capabilities, duplicated mutation paths, acceptance risks and
   implementation order. FR-08 remains blocked and no FR-08 implementation owner exists.
 
@@ -1619,7 +1619,7 @@ latest prose here, remains authoritative for status and dependencies.
   calls cannot satisfy the workflow contract's atomic R4a/R5 settlement and restart
   obligations.
 - A fresh read-only Astra-high diagnosis confirmed the contradiction and bounded the
-  correction. [Its durable record](fr-08/atomic-composition-diagnosis.md) requires a
+  correction. [Its durable record](../fr-08/atomic-composition-diagnosis.md) requires a
   versioned bundle through the one Gateway transaction, fixed non-committing protected
   operations, global command idempotency, complete prestate CAS, typed ordered history,
   v1 replay compatibility, validated domain/protected linkage and a protected
@@ -1672,7 +1672,7 @@ latest prose here, remains authoritative for status and dependencies.
   execute the 28 required rows.
 - The review also exposed that the integrated atomic Gateway cannot bind protected facts
   derived during staging into its precomputed domain proposal. Fresh Astra-high diagnosis
-  [`fr08b-root-fact-composition-diagnosis.md`](fr-08/fr08b-root-fact-composition-diagnosis.md)
+  [`fr08b-root-fact-composition-diagnosis.md`](../fr-08/fr08b-root-fact-composition-diagnosis.md)
   confirms this is a bounded FR-08A interface correction: a closed versioned transition
   plan with fixed typed result slots and finite kernel-authored alternatives selected by
   root-derived discriminants. Gateway performs only mechanical validated selection and
@@ -1776,7 +1776,7 @@ latest prose here, remains authoritative for status and dependencies.
 ## FR-08A protected-result/domain-plan binding, partial candidate — 2026-09-20
 
 - The root-fact composition diagnosis assigns this interface correction to FR-08A.
-  [Its implementation specification](fr-08/plan-binding-specification.md) records the
+  [Its implementation specification](../fr-08/plan-binding-specification.md) records the
   confirmed defect at base `3f06a5a` with exact source lines: `commit_accepted_atomic_bundle/6`
   binds `proposal = envelope["proposal"]` and commits it unchanged, while
   `operation_results` — already carrying the authoritative settlement and its ordinal —
@@ -1833,7 +1833,7 @@ latest prose here, remains authoritative for status and dependencies.
 ## FR-08A durable event vocabulary, subcommit 0 — 2026-09-20
 
 - The blocking prerequisite recorded against the binding correction is resolved. The
-  [design](fr-08/event-vocabulary-design.md) required two revisions: revision 1 proposed
+  [design](../fr-08/event-vocabulary-design.md) required two revisions: revision 1 proposed
   versioning the durable event record and was returned **BLOCKER** because
   `events.schema_version` carries `CHECK (schema_version = 1)` on a STRICT table,
   `insert_events/3` writes that version as a SQL literal, and relaxing the CHECK without
@@ -1877,7 +1877,7 @@ latest prose here, remains authoritative for status and dependencies.
   examined the codec's mechanism — authority, slot enforcement, fail-closed derivation —
   and each was correct on those terms. Neither was asked whether the mechanism covered
   R4a, so neither looked. That evidence produced the contract-coverage review requirement
-  now recorded in [the repair plan](REPAIR-PLAN.md).
+  now recorded in [the repair plan](../REPAIR-PLAN.md).
 - `71e558b` adds the producer as `{"issue_claim", "effect"}`. `issue_claim` returns the
   authoritative issued effect, which carries every field the kind needs; the projection
   renames `assignment_id` to `work_owner` and `phase_generation` to
@@ -1960,7 +1960,7 @@ latest prose here, remains authoritative for status and dependencies.
   rows still said replay revalidation was outstanding. Recorded now from the commits and
   the attestation rather than from memory, and the rows are corrected in the same commit.
 - Subcommit 4 resolved a plan and committed the result but never revalidated it
-  afterwards. [The design](fr-08/plan-replay-revalidation-design.md) closes that on every
+  afterwards. [The design](../fr-08/plan-replay-revalidation-design.md) closes that on every
   path that validates protected authority — in-transaction, on reopen and during verified
   backup — by **re-running the binding** rather than inspecting fields. `b5d19e9`
   re-decodes the original plan from the canonical envelope, re-derives outputs from the
@@ -2014,7 +2014,7 @@ latest prose here, remains authoritative for status and dependencies.
 ## FR-08B kernel, subcommit 1 corrections — 2026-09-20
 
 - Independent review of `be1e19c` returned **BLOCK** with eight blocking findings, recorded
-  in full at [the review findings](fr-08/fr08b-subcommit1-review-findings.md). Four were
+  in full at [the review findings](../fr-08/fr08b-subcommit1-review-findings.md). Four were
   confirmed by the implementer by direct reading before the verdict was accepted.
 - **The finding that mattered most was about the evidence, not the kernel.** The property
   suite's `@known_unreached` recorded three integration rows as unreached and justified it
@@ -2076,7 +2076,7 @@ latest prose here, remains authoritative for status and dependencies.
   vocabulary, and the codec raises at compile time when the two vocabularies share a name.
   It is the only collision among the 22 and it blocks the codec extension.
 - The question of supporting other workflows was raised during this work and is analysed
-  at [the mechanism/definition seam](fr-08/workflow-definition-seam.md). It is deliberately
+  at [the mechanism/definition seam](../fr-08/workflow-definition-seam.md). It is deliberately
   not scheduled. One step *is* scheduled inside Batch C on its own correctness merits:
   make R4's rows executable data and drive the prober from that table, so two
   hand-maintained encodings can no longer be tuned against each other.
@@ -2092,7 +2092,7 @@ latest prose here, remains authoritative for status and dependencies.
   payload. The codec raises a `CompileError` when the legacy and lifecycle vocabularies
   share a name, so subcommit 2's codec extension could not have compiled.
 - **The collision was already recorded, and the mechanism already decided.**
-  [The vocabulary design](fr-08/event-vocabulary-design.md) called it at FR-08A subcommit 0:
+  [The vocabulary design](../fr-08/event-vocabulary-design.md) called it at FR-08A subcommit 0:
   "The legacy and lifecycle sets currently collide on one name, `ticket_resumed`. The
   lifecycle event takes a distinct name instead. Which name is FR-08B's call." The FR-08B
   enumeration then reintroduced the legacy name while asserting every one of its 36 types
@@ -2142,7 +2142,7 @@ latest prose here, remains authoritative for status and dependencies.
   tests ask what the kernel accepts and the walks ask what the prober can reach, and
   neither asks what the contract requires.
 - The third attempt therefore replaces the method. [The row-driven
-  design](fr-08/fr08b-row-driven-coverage.md) records it. R4's transition table and R4a's
+  design](../fr-08/fr08b-row-driven-coverage.md) records it. R4's transition table and R4a's
   domain-owner table are **parsed from the contract** and each row is driven through
   `Kernel.apply/2` with the outcome the contract states asserted; rows stating a
   prohibition assert the refusal too, since driving the happy path would pass while the
@@ -2408,7 +2408,7 @@ what was being asserted unchecked as it does about the tools.
 - **The tools had no home.** All five were described in exactly one place — a 1,667-line
   plan that `AGENTS.md` tells agents not to preload — and no entry document mentioned them.
   A fresh session in any harness routed straight past four review rounds of method.
-  [EVIDENCE-TOOLS.md](EVIDENCE-TOOLS.md) records what the gate enforces automatically (four
+  [EVIDENCE-TOOLS.md](../EVIDENCE-TOOLS.md) records what the gate enforces automatically (four
   of five), what must be run by hand and when, the six rules that decide whether a green
   result means anything, and the known gaps. Routed from `AGENTS.md`, this index and
   `docs/TESTING.md`, and written against a guarded reducer judged by a written contract
@@ -2476,7 +2476,7 @@ what was being asserted unchecked as it does about the tools.
   39,024 holding a rejected verdict, 0 violating**. With the inductive argument recorded
   alongside, both sites are now *redundant given an invariant*, not unwitnessed.
 - The sweep's full verdict table and both neutralisation confirmations are committed as
-  [evidence](fr-08/fr08b-subcommit1-sweep-2026-09-21.md), assembled by script from the tool's own
+  [evidence](../fr-08/fr08b-subcommit1-sweep-2026-09-21.md), assembled by script from the tool's own
   output. Every hand-carried count from this tool has been weaker than its claim five times
   running, so nothing in it is transcribed. It is also the **answer key** a coverage-guided
   replacement must reproduce exactly.
@@ -2641,7 +2641,7 @@ what was being asserted unchecked as it does about the tools.
   every guard was already correct and the post-state write was wrong. That is the standing
   argument for EV-3, now scoped rather than recorded.
 - Sol's three undesigned proposals are scoped as work items in
-  [the evidence-reduction tickets](fr-08/fr08b-evidence-reduction-tickets.md), with the two
+  [the evidence-reduction tickets](../fr-08/fr08b-evidence-reduction-tickets.md), with the two
   orderings that decide the sequence stated: payoff per unit cost runs EV-4, EV-3, EV-2, while
   cost-growth-if-deferred runs the reverse. They create no FR node; the namespace is closed at
   FR-23. **EV-4 first** — every "N states, M holding the precondition, 0 violating" recorded in
@@ -3866,8 +3866,8 @@ notion, not in the reducer.
 
 ## The clause-ID candidate was independently reviewed and BLOCKED, and both findings held — 2026-09-22
 
-Review at [findings](fr-08/fr08b-ev6-ev2-review-findings.md), against
-[the briefing](fr-08/fr08b-ev6-ev2-review-briefing.md), delta `16fc73db..dc9582b3`, inside its
+Review at [findings](../fr-08/fr08b-ev6-ev2-review-findings.md), against
+[the briefing](../fr-08/fr08b-ev6-ev2-review-briefing.md), delta `16fc73db..dc9582b3`, inside its
 25-minute budget. **Everything numeric reproduced** — 196/72/124 markers with no duplicates, the
 63/40/16/5/1/1 disposition split, 71/47/24/9 refusal sites, `124 - 64 asserted, 60 uncited` printed
 green, both probes' red controls passing, 27 `kernel.ex:NNN` citations spot-checked correct, and the
@@ -3957,7 +3957,7 @@ green, which is precisely the habit the rest of this evidence discipline exists 
 
 ## The answer to the BLOCK was itself BLOCKED, for the same defect — 2026-09-22
 
-Re-review appended to [the findings](fr-08/fr08b-ev6-ev2-review-findings.md), delta
+Re-review appended to [the findings](../fr-08/fr08b-ev6-ev2-review-findings.md), delta
 `dc9582b3..f749c080`, 20-minute budget. It **accepted the substance and blocked the bookkeeping**,
 which is the fifth round on this branch to block on exactly that.
 
@@ -4267,7 +4267,7 @@ kernel can express "objective allocation" at all needs the contract read, not th
 ## The citation pass was reviewed and ACCEPTED, and the review improved it anyway — 2026-09-22
 
 Third independent review, delta `dc9582b3..f3195112`, 20-minute budget, appended to
-[the findings](fr-08/fr08b-ev6-ev2-review-findings.md). **ACCEPT** — the first on this branch after
+[the findings](../fr-08/fr08b-ev6-ev2-review-findings.md). **ACCEPT** — the first on this branch after
 two BLOCKs.
 
 **All three removals verified correct.** `cancel_finalized` never applies `integration_recorded`, so
@@ -4606,7 +4606,7 @@ The entry for `ebc3ab34` filed a question to FR-04: `same_process?/2` compares `
 `/usr/bin/python3` re-execs into the framework Python, so two `ps` reads of one live pid disagree.
 It was raised on two reads inside a test and guessed at a consequence — "a check whose command is a
 re-execing shim can become permanently uncancellable". **That guess was wrong, and the measurement
-is how.** The witness is committed at [fr-04/identity-drift-probe.exs](fr-04/identity-drift-probe.exs);
+is how.** The witness is committed at [fr-04/identity-drift-probe.exs](../fr-04/identity-drift-probe.exs);
 everything below is its output, not a reading.
 
 ### Measured, through the real `Checks.Runner` path
@@ -4746,7 +4746,7 @@ protected fact that `TransitionPlan` already validates, leaving **118 slots — 
 key names**, because `ticket_id` appears 32 times, `attempt_id` 24 and `execution_id` 11. The type
 is a property of the key name rather than the pair, so the table to write is ~31 rows with
 per-`(type, key)` overrides only where a name means two things. Written up as a candidate design at
-[fr-08/fr08b-closure-candidate-design.md](fr-08/fr08b-closure-candidate-design.md), with the
+[fr-08/fr08b-closure-candidate-design.md](../fr-08/fr08b-closure-candidate-design.md), with the
 enumerations a reviewer should attack. (The paragraph above first named the attribute
 `@payload_keys`; it is `@payloads`, corrected in place — a wrong pointer, not a changed claim.)
 
@@ -4921,7 +4921,7 @@ compiles and leaves `next` bound.
 ## Closure review: the deleted assertion did carry information — 2026-09-22
 
 Independent review of 253d9467 passed it with one FIX, recorded with dispositions in
-[fr08b-closure-review-2026-09-22.md](fr-08/fr08b-closure-review-2026-09-22.md). The entry above
+[fr08b-closure-review-2026-09-22.md](../fr-08/fr08b-closure-review-2026-09-22.md). The entry above
 said the harness's deleted shape assertion and the kernel's new check were "the same function on
 the same value". True of the predicate, false of the consequence: the assertion raised inside the
 depth-7 search, the refusal prunes the branch silently, and `@validation` in the reachability test
@@ -4982,7 +4982,7 @@ blocked by independent review: the PM role has no success-path close, so its new
 `:planning_already_open` guard would stop every objective after its first real PM run, and
 `pm_launch_settled` cannot name the execution it settles. Removed from the branch before push; the
 commits remain on the agent branch. Findings and what a correct candidate needs are in
-[fr08b-r4a03f2-review-2026-09-22.md](fr-08/fr08b-r4a03f2-review-2026-09-22.md). The fix is a
+[fr08b-r4a03f2-review-2026-09-22.md](../fr-08/fr08b-r4a03f2-review-2026-09-22.md). The fix is a
 vocabulary change (a PM close and an execution-naming settle), not a guard, and is not being built
 now. R4a.03.f2 stays `{:unguarded}`.
 
@@ -5088,7 +5088,7 @@ in `foundry/bin/` and root `bin/` was checked for the same shape at `6bc015ed`; 
 
 ## Loose refusal assertions outside the kernel: audit and pins — 2026-09-22
 
-Rule 5 of [EVIDENCE-TOOLS.md](EVIDENCE-TOOLS.md) applied to all of `test/`, not only
+Rule 5 of [EVIDENCE-TOOLS.md](../EVIDENCE-TOOLS.md) applied to all of `test/`, not only
 `test/pramana_foundry/workflow/`, which was already audited. Population: a refusal assertion whose
 error term is a bare wildcard — `assert {:error, _}`, `assert {:error, _reason}`,
 `assert {:reply, {:error, _reason}, _}`, `match?({:error, _}, ...)`. Rerun from `foundry/`:
@@ -5395,11 +5395,11 @@ carried information, and the first fix patched the one consumer that was named.
 "run once in full" under the committed script, that every red control passed "in every run", and
 quoted numbers nothing printed. Run 1, the only complete run, used an earlier script; the committed
 script has never completed a full run. The text below states which run used which version and quotes
-only what [fr-08/ev1-sweep-2026-09-22-raw.txt](fr-08/ev1-sweep-2026-09-22-raw.txt) prints. That file's
+only what [fr-08/ev1-sweep-2026-09-22-raw.txt](../fr-08/ev1-sweep-2026-09-22-raw.txt) prints. That file's
 `=== run N` headers and the `#` lines under them are hand-written; every other line is captured
 output.
 
-`bin/coverage_guided_sweep.exs`, per [COVERAGE-GUIDED-SWEEP.md](COVERAGE-GUIDED-SWEEP.md). Phase 1
+`bin/coverage_guided_sweep.exs`, per [COVERAGE-GUIDED-SWEEP.md](../COVERAGE-GUIDED-SWEEP.md). Phase 1
 instruments every `require_*(` call site in `kernel.ex` (same scanner, same red control as the old
 sweep) with a probe, runs the five workflow suites serially, and records each site against the tests
 that evaluated it; hits outside a test window are a `setup_all`'s and are charged to every test of
@@ -5474,7 +5474,7 @@ site; trial lines print full labels.
 
 The 12 run-1 survivors and `:911` were re-judged under that commit. Raw output, captured verbatim
 under a labelled hand-written header:
-[fr-08/ev1-rejudge-2026-09-22-raw.txt](fr-08/ev1-rejudge-2026-09-22-raw.txt). It printed:
+[fr-08/ev1-rejudge-2026-09-22-raw.txt](../fr-08/ev1-rejudge-2026-09-22-raw.txt). It printed:
 
 - every red control ok, including "result parser, 7 shapes" and "0 of 117 site mutants change what
   declared_reasons/0 reads"; "mapped 117 of 117 sites to tests" with the probe that records before
@@ -5560,13 +5560,13 @@ predates `96fa4569` (walks and the search raise on `:malformed_post_state`) and 
 `:not_the_active_attempt`. Re-judged on this branch with the committed script, `EV1_SITES` set to that
 one site: `:caught (65/199 tests, 1s)`, `0 disagreements over 3 keyed trials` (the other two trials are
 the tool's known-caught and known-survived controls). Raw output, unedited:
-[ev1-rejudge-968-2026-09-22-raw.txt](fr-08/ev1-rejudge-968-2026-09-22-raw.txt). EV-1 lands as an audit
+[ev1-rejudge-968-2026-09-22-raw.txt](../fr-08/ev1-rejudge-968-2026-09-22-raw.txt). EV-1 lands as an audit
 tool, not a gate step; the committed script still owes one complete full run.
 
 ## B3 contract readings approved — 2026-09-22
 
 The operator accepted all seven recommended readings in
-[the B3 contract readings proposal](fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md) as the
+[the B3 contract readings proposal](../fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md) as the
 interpretation B3 is built against; the contract text is unchanged. B3's kernel scope is therefore:
 `launch_planned` refuses under pause, drain or the ticket's pending cancel (R4.04.f3); every
 ticket-scoped `*_planned` handler refuses while the ticket's cancel is pending; and tests that a
@@ -5577,7 +5577,7 @@ revision) are scheduled separately because they touch attestation-pinned files.
 
 ## B3 kernel scope: control crossing at the issue point — 2026-09-22
 
-Built against the approved [B3 contract readings](fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md),
+Built against the approved [B3 contract readings](../fr-08/FR08B-B3-CONTRACT-READINGS-PROPOSAL-2026-09-22.md),
 "if approved" items 1–3. Base `937f6b54`. No protected code and nothing under `durable_store/` changed.
 
 **Guards.** Three new `require_*` functions in `kernel.ex`, spelled `{:error, :atom}` so
@@ -5636,7 +5636,7 @@ whenever its counter is 0, and in the search the counter is always 0, so the pau
 the drain guard. A second proposal is the same change with pause cleared.
 
 The search space grew with it. Measured by
-[`search_states.exs`](fr-08/b3-measurements-2026-09-22/search_states.exs) at this commit (no test
+[`search_states.exs`](../fr-08/b3-measurements-2026-09-22/search_states.exs) at this commit (no test
 prints it): depth 6 went from 13,290 to 15,591 states, and depth 7 from 58,324 to
 69,234. Comments elsewhere that quote 58,324 describe the pre-B3 bound.
 
@@ -5650,7 +5650,7 @@ touched. EVIDENCE-TOOLS' "two are recorded unguarded" sentence is corrected.
 guards are the cause. The walks spend long stretches paused or draining, so fewer developer
 attempts start and fewer reach `ready_to_integrate`. I counted walk-accepted labels over the 40
 broad and 25 deep walks from `kernel_properties_test`'s `setup_all`, using
-[`walk_labels.exs`](fr-08/b3-measurements-2026-09-22/walk_labels.exs). For the first two rows the
+[`walk_labels.exs`](../fr-08/b3-measurements-2026-09-22/walk_labels.exs). For the first two rows the
 guard bodies were neutralised and restored, and the proposer was toggled and restored.
 
 | Configuration | `launch_planned` | `review_planned` | `integration_planned` | `superseded_base` | `ref_created` |
@@ -5714,7 +5714,7 @@ Two review notes recorded, not changed:
 ## Option 2 read as role-agnostic protected items; O1 timing kept — 2026-09-23
 
 The operator chose the orchestrator-boundary direction and approved
-[the sequencing proposal](orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md): O1 stays after
+[the sequencing proposal](../orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md): O1 stays after
 FR-08B; FR-08B's four remaining protected items (`terminal_settlement_v1` and `reset_fact_v1`
 producers, B3's settlement-to-execution binding and non-start-after-policy-revision) are authorized
 as operator maintenance and are written against execution identity, not role names; the U9 probe
@@ -5725,8 +5725,8 @@ test supports the same direction and keeps composition post-repair.
 ## #48 A0: FR-18B/FR-20 observability ownership proposed — 2026-09-23
 
 *Status: APPROVED by the operator 2026-09-23.* Documentation only. Proposal
-blocks were added to the FR-18B and FR-20 sections of [the repair plan](REPAIR-PLAN.md)
-and to the staged convergence route in [OBSERVABILITY.md](OBSERVABILITY.md). Board/status
+blocks were added to the FR-18B and FR-20 sections of [the repair plan](../REPAIR-PLAN.md)
+and to the staged convergence route in [OBSERVABILITY.md](../OBSERVABILITY.md). Board/status
 consumption moves to FR-18B, because FR-18B's acceptance already requires board/status
 agreement. The Improver's canonical consumption and step 7 efficiency validation go to
 FR-20. FR-19B keeps retention, and export stays optional. The 2026-09-20 assignment in

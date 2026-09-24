@@ -4,7 +4,7 @@
 change the active repair plan, workflow contract, launch policy, provider entitlement,
 or current runtime behavior.
 
-[Foundry strategy](STRATEGY.md) · [Workflow contract](WORKFLOW-CONTRACT.md) ·
+[Foundry strategy](../STRATEGY.md) · [Workflow contract](../WORKFLOW-CONTRACT.md) ·
 [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) · [Validation](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/VALIDATION.md)
 
 ## 1. Purpose
@@ -226,7 +226,7 @@ receiving a shell or repository write access.
 
 A role that can execute candidate-controlled code, build hooks, compilers or arbitrary
 shell commands requires the stronger worker isolation contract described in
-[STRATEGY](STRATEGY.md).
+[STRATEGY](../STRATEGY.md).
 
 This distinction is central to the Loka example:
 

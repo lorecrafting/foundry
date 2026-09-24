@@ -6,7 +6,7 @@ recommended). Taken at `57e41229` (`repair/fr08b-kernel`). Changes no contract t
 ## What was asked, and the conflict in it
 
 On 2026-09-23 the operator chose "option 2": move to the
-[orchestrator adapter boundary](../ORCHESTRATOR-BOUNDARY.md), with the FR-08B kernel as the default
+[orchestrator adapter boundary](../design/ORCHESTRATOR-BOUNDARY.md), with the FR-08B kernel as the default
 controller and no new guards except correctness fixes. That choice was framed without the
 2026-09-22 operator-approved timing recorded under O1: **begin O1 only after FR-08B lands**, because
 the [O0 inventory](O0-AUTHORITY-INVENTORY-2026-09-22.md) §1 found the kernel has no production caller
@@ -18,7 +18,7 @@ wait for FR-08B.
 
 ## The reading
 
-[PR #49](https://github.com/lorecrafting/pramana/pull/49) ([planning strategies §2, §3.1, §11](../PLANNING-STRATEGIES.md))
+[PR #49](https://github.com/lorecrafting/pramana/pull/49) ([planning strategies §2, §3.1, §11](../design/PLANNING-STRATEGIES.md))
 merged the same morning and points the same way: composable workflow primitives, LLM-proposed
 work and replaceable methodologies are post-repair (issues #47/#48, roadmap I-F3/I-F5), and its
 design test is "if replacing the planning methodology requires invasive changes to the authority

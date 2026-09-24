@@ -19,7 +19,7 @@ activation pointer, authorize provider execution, or claim FR-18B/FR-22 completi
 - Branch/worktree: `repair/fr18a-honest-observations`,
   `/private/tmp/pramana-fr18a.8plkoi`.
 - Accepted combined FR-08A/FR-19A review:
-  [`fr08a-fr19a-integration-review.md`](../fr-08/fr08a-fr19a-integration-review.md),
+  [`fr08a-fr19a-integration-review.md`](../../fr-08/fr08a-fr19a-integration-review.md),
   PASS at frozen record `176dab44354b5bbdde5b488f44766849c9d8927d`.
 
 Direct ancestry checks established that both accepted combined review commit `176dab4`

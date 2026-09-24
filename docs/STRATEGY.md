@@ -8,9 +8,9 @@ at pinned revisions, not comparative performance measurements or certification o
 operator's machine.
 
 [Documentation index](README.md) · [Repair plan](REPAIR-PLAN.md) ·
-[Workflow contract](WORKFLOW-CONTRACT.md) · [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) ·
-[Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) · [AX/Substrate backend](AX-SUBSTRATE.md) ·
-[Cloudflare OS lessons](CLOUDFLARE-OS.md) ·
+[Workflow contract](WORKFLOW-CONTRACT.md) · [Orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md) ·
+[Ecosystem boundary](design/ECOSYSTEM-BOUNDARY.md) · [AX/Substrate backend](design/AX-SUBSTRATE.md) ·
+[Cloudflare OS lessons](design/CLOUDFLARE-OS.md) ·
 [Broader product strategy](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md)
 
 ## Working summary
@@ -45,8 +45,8 @@ effort per independently accepted outcome, including preparation, review, recove
 Foundry maintenance. Safety without useful completion and apparent productivity without
 valid evidence are both failures.
 
-The 2026-09-21 [AX + Agent Substrate review](AX-SUBSTRATE.md) and
-[Cloudflare OS review](CLOUDFLARE-OS.md) make the composition rule concrete on two
+The 2026-09-21 [AX + Agent Substrate review](design/AX-SUBSTRATE.md) and
+[Cloudflare OS review](design/CLOUDFLARE-OS.md) make the composition rule concrete on two
 independent axes. `ExecutionBackend` should decide where/how admitted code runs; a
 Gatekeeper-like `ResourceAdapter` or capability broker should mediate narrowly scoped
 external resources without handing ambient credentials to the agent. AX/Substrate is the
@@ -82,7 +82,7 @@ than repeatedly spending model calls polling child completion.
 
 The detailed boundary, controller responsibilities, candidate API vocabulary and
 conformance obligations are in
-[Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md). This is post-repair guidance: the active
+[Orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md). This is post-repair guidance: the active
 workflow contract remains authoritative for current identities and transitions.
 
 ### Ship a reference controller without making it the kernel
@@ -183,7 +183,7 @@ human-facing strategy, not a protected ontology; a future goal graph, blackboard
 next-best-action planner or domain-specific method should be able to propose bounded work
 through the same admission contract. Human work views and handoff summaries are rebuildable
 projections over acknowledged state and evidence. See [Replaceable planning strategies
-and human work projections](PLANNING-STRATEGIES.md).
+and human work projections](design/PLANNING-STRATEGIES.md).
 
 Do not bake today's PM/developer/reviewer names or one software lifecycle into protected
 storage and authority semantics. Preserve generic identities such as project, workflow,
@@ -203,13 +203,13 @@ bounded parent scope/budget ceilings unless protected policy grants less; compos
 cannot expand authority. Avoid a Turing-complete **protected** workflow DSL or a second
 internal authority-bearing orchestrator inside Foundry. External controllers are
 replaceable strategy implementations behind
-[the orchestrator boundary](ORCHESTRATOR-BOUNDARY.md), not competing protected state
+[the orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md), not competing protected state
 machines. Introduce generalization only after real portability evidence.
 
 ### Project-declared roles and capability surfaces
 
 The post-repair generalization should be **role-agnostic in the kernel and role-specific
-at the project boundary**. See [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md).
+at the project boundary**. See [Project workflow profiles](design/PROJECT-WORKFLOW-PROFILES.md).
 
 A versioned ProjectProfile may declare RoleSpecs, tool/API surfaces, context policy,
 evidence adapters, acceptance profiles and workflow templates. Foundry admits an exact
@@ -246,7 +246,7 @@ on any such layer, perform a bounded substitution evaluation against the best av
 candidate. If a candidate satisfies the required contract with lower operator,
 maintenance and security burden, use it and delete or avoid overlapping Foundry code.
 
-The [ecosystem boundary synthesis](ECOSYSTEM-BOUNDARY.md) records the 2026-09-20 comparison
+The [ecosystem boundary synthesis](design/ECOSYSTEM-BOUNDARY.md) records the 2026-09-20 comparison
 against AgentLedger, Restate/Temporal, Microsoft AGT/ACS, Cedar/OPA, Tandem and Permission
 Protocol. Its central integration rule is deliberately stronger than ordinary dependency
 hygiene: **external systems may execute, evaluate, isolate, observe or present
@@ -557,7 +557,7 @@ completion. Borrow mechanisms and failure scenarios, not a competing authority s
 
 ### Pi: explicit session contracts and replaceable execution
 
-The concrete [Pi harness design](PI-HARNESS.md) turns this strategy into a bounded
+The concrete [Pi harness design](design/PI-HARNESS.md) turns this strategy into a bounded
 feature disposition, bridge threat model, P0/P1/P2 scope and conformance matrix. It is
 a design candidate, not adoption or permission to bypass the governing repair gates.
 
@@ -608,7 +608,7 @@ rewrite Foundry as a collection of Pi extensions.
 
 ### Jido.Harness/ACP: benchmark the bridge before building it
 
-The [Jido / Jido.Harness evaluation](JIDO-HARNESS.md) records a second implementation
+The [Jido / Jido.Harness evaluation](design/JIDO-HARNESS.md) records a second implementation
 candidate for the same harness-neutral boundary. At the pinned revision checked
 2026-09-20, Jido.Harness normalizes Pi, Claude Code, Codex, Gemini and other coding-agent
 CLIs into supervised Elixir runs/sessions/processes with stable IDs, replay journals,

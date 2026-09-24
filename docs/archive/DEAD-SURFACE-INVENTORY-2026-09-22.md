@@ -2,7 +2,7 @@
 
 **This is an inventory only. It was taken at `6bc015ed` on `repair/fr08b-kernel`, and nothing was removed.**
 It is input to the dead-surface part of
-[FR-23](REPAIR-PLAN.md#fr-23--retire-legacy-surfaces-decompose-god-modules-and-restore-code-hygiene).
+[FR-23](../REPAIR-PLAN.md#fr-23--retire-legacy-surfaces-decompose-god-modules-and-restore-code-hygiene).
 FR-23 says an identifier is removed only on "a recorded search showing no dispatch, not by
 inspection alone". Every row below records that search. The rows are candidates, not
 decisions: each still needs its owner's decision. Removal must also meet FR-23's other
@@ -105,7 +105,7 @@ then be the only evidence that attach instructions still work.
 
 | File:line | Identifier | Search and result | Dynamic-dispatch risk checked | Owner |
 |---|---|---|---|---|
-| `lib/pramana_foundry/coordinator.ex:31` | `Coordinator.replace_projection/1` | xref edges: none. `rg -nwF replace_projection …` gives 1 hit, the def. **It sends `{:replace_projection, records}`, and no `handle_call` clause matches that message.** The recovery catch-all at line 277 matches only while `recovery_error` is set, so on a healthy server the call would crash the Coordinator. FR-08B has already recorded this in [the ingress inventory](fr-08/fr08b-ingress-inventory.md) | GenServer message: the sender side exists, the handler side is absent | FR-08B. This is a recorded defect, not only dead surface |
+| `lib/pramana_foundry/coordinator.ex:31` | `Coordinator.replace_projection/1` | xref edges: none. `rg -nwF replace_projection …` gives 1 hit, the def. **It sends `{:replace_projection, records}`, and no `handle_call` clause matches that message.** The recovery catch-all at line 277 matches only while `recovery_error` is set, so on a healthy server the call would crash the Coordinator. FR-08B has already recorded this in [the ingress inventory](../fr-08/fr08b-ingress-inventory.md) | GenServer message: the sender side exists, the handler side is absent | FR-08B. This is a recorded defect, not only dead surface |
 | `lib/pramana_foundry/coordinator/state.ex:350` | `Coordinator.State.integrate_candidate/2,3` | xref edges: none. `rg -nwF integrate_candidate …` gives 2 hits, the `@spec` and the def. `Coordinator.handle_call({:integrate, …})` (line 564) returns its own suspension error and never calls it. `EVENT_SOURCING.md:142` still names it as a suspended path | No atom or `apply`. Its message names FR-13 and FR-14 as the restorers of verified promotion | FR-08B (Coordinator/State ingress). Removing it also needs FR-13/14 and the `EVENT_SOURCING.md` route updated |
 | `lib/pramana_foundry/durable_store/kernel.ex:6-7` | `@callback decide/2`, `@callback apply/2` on `DurableStore.Kernel` | `rg -n '@behaviour' lib test`: no module declares `@behaviour PramanaFoundry.DurableStore.Kernel`. The behaviour has no implementer | These are callbacks, so they count as dispatch surface. But nothing implements them, so nothing can dispatch through them | FR-08B. The file is attested by `FR08AProtectedBoundary` and `H0AcceptedFR07Boundary` |
 | `lib/pramana_foundry/durable_store/kernel.ex:9` | `DurableStore.Kernel.validate_bundle/1` | xref edges: none. `rg -nwF validate_bundle …` gives 1 hit, the def. `DURABLE-STORE.md:24` and `fr-07/diagnosis-v3.md:19` still describe it | None | FR-08B. The file is attested, and a doc route needs updating |

@@ -25,7 +25,7 @@ and verification record while retaining the historical evidence inputs.
 
 R4a is accepted. The review's trace was valid: R1 could prove a reviewer launch never
 started and R5 could release its reservation while R4 left the ticket in `reviewing` with
-no legal successor. The revised [R4a contract](../WORKFLOW-CONTRACT.md#r4a)
+no legal successor. The revised [R4a contract](../../WORKFLOW-CONTRACT.md#r4a)
 adds one shared classification and role-specific transitions.
 
 The three launch outcomes are now disjoint:

@@ -17,4 +17,4 @@ The files are unchanged apart from the move. Their relative paths (`../../ci/…
 `../docs/fr-15a/…`) and sha256 pins are as they were at the last gated commit,
 `db4334c`; none of them runs from here. To reproduce a result, check out that commit.
 
-The prose record stays in [`docs/fr-15a/`](../../fr-15a/evidence.md).
+The prose record stays in [`docs/fr-15a/`](evidence.md).

@@ -11,10 +11,10 @@ revision-bound attestation rebound in the same commit as its subject. It exclude
 behaviour change.
 
 **Evidence used**, all dated 2026-09-22 and all in the tree:
-[documentation retirement inventory](../DOC-RETIREMENT-INVENTORY-2026-09-22.md) (`5ba15f3b`),
-[bin script health check](../BIN-SCRIPT-HEALTH-2026-09-22.md) (`87ee6d57`),
+[documentation retirement inventory](../archive/DOC-RETIREMENT-INVENTORY-2026-09-22.md) (`5ba15f3b`),
+[bin script health check](../archive/BIN-SCRIPT-HEALTH-2026-09-22.md) (`87ee6d57`),
 [O0 authority inventory](../orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) (`b4396ac0`),
-and the [implementation log](../IMPLEMENTATION-LOG.md) entries of that date named below.
+and the [implementation log](../archive/IMPLEMENTATION-LOG.md) entries of that date named below.
 A **dead-identifier inventory is forthcoming** and is not in this tree. This proposal does
 not state its contents. It only says where its rows would go.
 
@@ -239,11 +239,11 @@ reads `runner_sha256` back, so nothing in the tree checks it.
 
 The only other records of these files' hashes are the dated FR-21 evidence files:
 
-- [integration attestation](../fr-21/integration-attestation.md): `ci.ex` `b2cc9c67…` and
+- [integration attestation](../archive/fr-21/integration-attestation.md): `ci.ex` `b2cc9c67…` and
   `ci/run.exs` `c1cecbc2…`;
-- [review-v2](../fr-21/review-v2.md) and [acceptance-v2](../fr-21/acceptance-v2.md);
-- [review](../fr-21/review.md);
-- [review-v3](../fr-21/review-v3.md).
+- [review-v2](../archive/fr-21/review-v2.md) and [acceptance-v2](../archive/fr-21/acceptance-v2.md);
+- [review](../archive/fr-21/review.md);
+- [review-v3](../archive/fr-21/review-v3.md).
 
 These are prose evidence of what was checked at that time. `ci.ex` has already changed since
 then (`d311a03d`), and `shasum -a 256` at `b46d3825` gives `f863e070…`, with no test

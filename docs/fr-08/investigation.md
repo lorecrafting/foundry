@@ -13,7 +13,7 @@ provider or Git ref. The full working note had SHA-256
 > any-FR-08 wording as H0 → FR-08A → FR-08B. H0 must report the accepted FR-07 boundary
 > honestly even when capabilities are unavailable; FR-08A implements missing protected
 > primitives and passes the substantive full gate before FR-08B migration. See the
-> independent [alignment audit](../ALIGNMENT-AUDIT-2026-09-19.md). No direct SQL or
+> independent [alignment audit](../archive/ALIGNMENT-AUDIT-2026-09-19.md). No direct SQL or
 > synthetic passing adapter is permitted.
 
 ## Conclusion

@@ -18,7 +18,7 @@ The Erlang `telemetry` package is present only transitively through current depe
 ## Authority path versus observation path
 
 The controller-neutral architecture in
-[Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) restates a distinction the workflow
+[Orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md) restates a distinction the workflow
 contract already makes mandatory — the command transaction protocol (FR-06/FR-08) versus
 telemetry surfaces (FR-18):
 **authority-changing commands and high-volume observations are separate paths**.
@@ -201,7 +201,7 @@ resume to first productive effect, model calls before that effect, tokens/contex
 spent reconstructing prior state, repeated reads after handoff, stale-context failures,
 and operator time spent reconstructing current state. This supports experiments with
 compact continuity capsules or other context projections without treating those
-projections as durable truth. See [Planning strategies](PLANNING-STRATEGIES.md).
+projections as durable truth. See [Planning strategies](design/PLANNING-STRATEGIES.md).
 
 The normalized model should cover at least these event families:
 

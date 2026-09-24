@@ -22,7 +22,7 @@ deleted tests that encoded each. Test paths are as of `db4334c`.
 
 ## Where the deleted code fell short
 
-The [2026-09-12 audit, F21](../AUDIT-2026-09-12.md) found the implementation weaker than
+The [2026-09-12 audit, F21](AUDIT-2026-09-12.md) found the implementation weaker than
 these rules, and that is why it was disabled rather than repaired:
 
 - Live handles were collected as warnings but did not block movability.

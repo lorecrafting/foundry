@@ -9,7 +9,7 @@ open; this review does not amend the proposed workflow contract.
 
 ### R1 — P0: cancellation and privileged execution have no common ordering point
 
-**Contract:** [WORKFLOW-CONTRACT](WORKFLOW-CONTRACT.md), lines 199–208: “Revoke pending
+**Contract:** [WORKFLOW-CONTRACT](../WORKFLOW-CONTRACT.md), lines 199–208: “Revoke pending
 productive effects and capabilities,” “Integration that already happened cannot be
 undone by cancel,” and “Every irreversible worker action rechecks current authority.”
 Lines 235–240 require old epochs to be rejected. Lines 268–271 put `git update-ref`

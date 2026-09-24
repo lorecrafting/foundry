@@ -4,7 +4,7 @@
 implementation inventory, repair-ticket disposition, dependency selection or authorization
 to activate execution.
 
-[Foundry strategy](STRATEGY.md) · [Workflow contract](WORKFLOW-CONTRACT.md) ·
+[Foundry strategy](../STRATEGY.md) · [Workflow contract](../WORKFLOW-CONTRACT.md) ·
 [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) ·
 [Planning strategies](PLANNING-STRATEGIES.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·

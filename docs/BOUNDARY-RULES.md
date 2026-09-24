@@ -26,9 +26,9 @@ that fails, with the file and line of the offence.
 9. **Observation is not authority** ([workflow contract, R3](WORKFLOW-CONTRACT.md#r3-autonomously-repairable-kernel-protected-verifier)).
    Prose only.
 10. **No controller-specific state in the protected schema**
-    ([orchestrator boundary](ORCHESTRATOR-BOUNDARY.md)). Prose only.
+    ([orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md)). Prose only.
 11. **Design test: replacing the methodology must not touch the ledger**
-    ([planning strategies §2](PLANNING-STRATEGIES.md#2-kernel-invariants-versus-replaceable-methodology)).
+    ([planning strategies §2](design/PLANNING-STRATEGIES.md#2-kernel-invariants-versus-replaceable-methodology)).
     Prose only.
 12. **`kernel/software/` is the replaceable reference controller, and deletable.** Prose
     only; rule 4 keeps the generic kernel from growing new dependencies on it.
