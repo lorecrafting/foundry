@@ -32,6 +32,7 @@ onto `main`, one gate run per push.
 | ML-DOCS-ARCHIVE | `5fb7603` | `6761d1b` | [approved](reviews/ML-DOCS-ARCHIVE.review.md) | batch A2 | 37 top-level docs → 14; 137 files under `docs/archive/` and `docs/design/`; new router, archive index and OBSERVABILITY |
 | ML-LANE-FRICTIONS | `5fb7603` | `fd208d1` | [approved](reviews/ML-LANE-FRICTIONS.review.md) | batch A2 | F1 quiet stdout, F5 notes archive, F6/F10 `lane integrated`, F4 reviewer worktrees in the runbook |
 | ML-PROCESS-GROUP-TESTS | `5fb7603` | `c32df8a` | [correction](reviews/ML-PROCESS-GROUP-TESTS.review-1.md): one stale header comment | carried over | correction packet refused `allocation_unavailable` (F7); re-admit as ML-PROCESS-GROUP-TESTS-2 in a fresh store |
+| ML-PROCESS-GROUP-TESTS-2 | `69855d9` | `1f5f487` | [approved](reviews/ML-PROCESS-GROUP-TESTS-2.review.md) | batch PG | store 2's first ticket: `c32df8a` cherry-picked unchanged plus the header-comment correction |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -54,6 +55,8 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q3 | LocalExclude's default `local/` is unanchored; `/local/` would match `.gitignore` but breaks `verify_protection`'s pathspec | open, low |
 | Q4 | `Preparation`'s `@database_checks` (`ecto.create`) are Pramāṇa-project checks with no Foundry caller: delete, or keep for project profiles? | open |
 | Q5 | Clean-room sweep Q1–Q12 ([sweep](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#7-operator-questions)) | **Decided 2026-09-23:** delete the legacy daemon stack and amend the plan ([C1–C4](../REPAIR-PLAN.md#clean-room-amendment)); archive FR-15aA; retire H0 + legacy import, Relocation, FR-19A sync-EIO, Assessor; operator hygiene done (legacy `local/`, `handoffs/`, `ci-artifacts/` removed; 3 worktrees, 2 merged branches and 12 `archive/2026-09-20/*` tags deleted). Q2–Q4 above become moot with the deletions |
+| Q6 | FR-23b renames: do dated records (`docs/archive`, reviews, fr-08 evidence, this log) keep the old names? | **Decided 2026-09-24: rewrite everything**; only references to the Pramāṇa repository keep the name |
+| Q7 | Do `PRAMANA_*` and `bin/pramana` keep working as aliases after the rename? | **Decided 2026-09-24: hard rename, no aliases** |
 
 ## Frictions
 
