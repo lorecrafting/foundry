@@ -79,11 +79,6 @@ defmodule PramanaFoundry.CITest do
            end)
 
     assert Enum.any?(exclusions, fn item ->
-             item.id == "python-tiktoken-recomputation" and item.status == "excluded" and
-               item.declared_test_matches == 1
-           end)
-
-    assert Enum.any?(exclusions, fn item ->
              item.id == "live-daemon-and-activation" and item.status == "absent" and
                item.declared_test_matches == 0
            end)

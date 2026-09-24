@@ -2,7 +2,6 @@ defmodule PramanaFoundry.DurableStore.GatewayTest do
   use ExUnit.Case, async: false
 
   alias PramanaFoundry.DurableStore.{Database, Gateway, RecordCodec, TransitionPlan}
-  alias PramanaFoundry.EventLog
 
   setup do
     root = Path.join(System.tmp_dir!(), "durable-store-#{System.unique_integer([:positive])}")
@@ -221,26 +220,6 @@ defmodule PramanaFoundry.DurableStore.GatewayTest do
 
     assert inspect(reason) =~ "database or disk is full"
     assert %{mode: :recovery} = Gateway.status(gateway)
-  end
-
-  test "legacy EventLog writers can opt into the checked durable boundary", %{path: path} do
-    gateway = ready_gateway(path)
-
-    record = %{
-      "schema_version" => 1,
-      "event" => "ticket_enqueued",
-      "at" => "2026-09-13T00:00:00Z",
-      "attributes" => %{},
-      "evidence" => %{}
-    }
-
-    destination = {:durable_store, gateway, "legacy-controller", "opaque-command-1"}
-    assert :ok = EventLog.append(destination, record)
-    assert :ok = EventLog.append(destination, record)
-    assert {:ok, %{"commands" => 1, "events" => 1}} = Gateway.counts(gateway)
-
-    changed = put_in(record["event"], "different")
-    assert {:error, :idempotency_conflict} = EventLog.append(destination, changed)
   end
 
   # Neither case reaches SQLite: RecordCodec refuses both before SQL. The SQLite UNIQUE and

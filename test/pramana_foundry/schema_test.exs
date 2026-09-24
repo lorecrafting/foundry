@@ -1,7 +1,7 @@
 defmodule PramanaFoundry.SchemaTest do
   use ExUnit.Case, async: true
 
-  alias PramanaFoundry.{CLI, Import, Schema}
+  alias PramanaFoundry.Schema
 
   defp assignment do
     fixture("assignment-v1.json")
@@ -44,7 +44,7 @@ defmodule PramanaFoundry.SchemaTest do
              Schema.validate(:assignment, contradictory)
   end
 
-  test "no-opts assignment import and CLI reject contradictory internal task identity" do
+  test "no-opts assignment decode rejects contradictory internal task identity" do
     root = Path.join(System.tmp_dir!(), "assignment-#{System.unique_integer([:positive])}")
     path = Path.join(root, "assignment.json")
     File.mkdir_p!(root)
@@ -56,28 +56,21 @@ defmodule PramanaFoundry.SchemaTest do
     assert {:error,
             %{
               reason: {:identity_mismatch, "ticket.task_id"},
-              evidence: ^contradictory,
-              source_path: ^path
-            }} = Import.read(path, :assignment)
-
-    assert {:error,
-            %{
-              reason: {:identity_mismatch, "ticket.task_id"},
-              evidence: ^contradictory,
-              source_path: ^path
-            }} = CLI.validate("assignment", path)
+              evidence: ^contradictory
+            }} = Schema.decode_file(path, :assignment)
   end
 
   test "accepts production-shaped Python snapshot, control, and event records" do
-    assert {:ok, snapshot} = Import.read(fixture("snapshot-v1.json"), :snapshot)
+    assert {:ok, snapshot} = Schema.decode_file(fixture("snapshot-v1.json"), :snapshot)
     assert snapshot["scheduler"]["dirty_reasons"] == ["startup"]
 
-    assert {:ok, control} = Import.read(fixture("control-v1.json"), :control)
+    assert {:ok, control} = Schema.decode_file(fixture("control-v1.json"), :control)
     assert control["action"] == "pause"
     assert control["payload"] == %{"fixture" => true}
     assert control["evidence"]["python_wire_record"]["created_at"] == "2026-09-08T00:00:00Z"
 
-    assert {:ok, [event]} = Import.read_jsonl(fixture("event-v1.jsonl"), :event)
+    [line] = fixture("event-v1.jsonl") |> File.read!() |> String.split("\n", trim: true)
+    assert {:ok, event} = Schema.validate(:event, :json.decode(line))
 
     assert Map.take(event, ~w(task_id run_id role)) == %{
              "task_id" => "T1",
@@ -145,7 +138,7 @@ defmodule PramanaFoundry.SchemaTest do
              Schema.validate(:event, authority_event)
   end
 
-  test "contains malformed, non-UTF8, and oversized JSON and JSONL artifacts" do
+  test "contains malformed, non-UTF8, and oversized JSON artifacts" do
     root = Path.join(System.tmp_dir!(), "schema-#{System.unique_integer([:positive])}")
     File.mkdir_p!(root)
     on_exit(fn -> File.rm_rf!(root) end)
@@ -154,21 +147,15 @@ defmodule PramanaFoundry.SchemaTest do
     File.write!(malformed, "{")
     assert {:error, %{reason: :malformed_json}} = Schema.decode_file(malformed, :assignment)
 
-    invalid_utf8 = Path.join(root, "invalid.jsonl")
+    invalid_utf8 = Path.join(root, "invalid.json")
     File.write!(invalid_utf8, <<255>>)
-    assert {:error, %{reason: :invalid_utf8}} = Import.read_jsonl(invalid_utf8, :event)
+    assert {:error, %{reason: :invalid_utf8}} = Schema.decode_file(invalid_utf8, :assignment)
 
     oversized = Path.join(root, "large.json")
     File.write!(oversized, String.duplicate("x", 17))
 
     assert {:error, %{reason: :oversized}} =
              Schema.decode_file(oversized, :assignment, max_bytes: 16)
-
-    malformed_jsonl = Path.join(root, "events.jsonl")
-    File.write!(malformed_jsonl, "{\"event\":\"ok\",\"at\":\"now\"}\n{\n")
-
-    assert {:error, %{reason: :malformed_json, line: 2, source_path: ^malformed_jsonl}} =
-             Import.read_jsonl(malformed_jsonl, :event)
   end
 
   defp fixture(name), do: Path.expand("../fixtures/python/#{name}", __DIR__)

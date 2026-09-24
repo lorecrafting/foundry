@@ -6,8 +6,9 @@ defmodule PramanaFoundry.Effects.ProcessGroupTest do
   @moduletag :process_group
 
   @doc false
-  # Real termination and descendant-cleanup behaviour is exercised in
-  # `PramanaFoundry.Checks.RunnerTest` against a process this suite itself spawned
+  # Real termination and descendant-cleanup behaviour was exercised in the deleted
+  # `PramanaFoundry.Checks.RunnerTest` (2026-09-23; FR-10 owns it now, see
+  # docs/design/MOVED-KNOWLEDGE-2026-09-23.md) against a process it itself spawned
   # into its own session. Nothing here ever signals a live pid: a raw `ps`-reported
   # process group for an arbitrary process could be shared with the test runner's own
   # BEAM VM, and blindly signalling it would be able to kill the test run itself.

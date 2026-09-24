@@ -7,7 +7,7 @@ defmodule PramanaFoundry.CI do
   """
 
   @schema "pramana-foundry-ci-provenance/v2"
-  @excluded_tags ~w(live_provider real_provider python_tiktoken_recompute)
+  @excluded_tags ~w(live_provider real_provider)
   @error_exit 70
 
   @spec main([String.t()]) :: non_neg_integer()
@@ -91,14 +91,6 @@ defmodule PramanaFoundry.CI do
         test_tags: ["live_provider", "real_provider"],
         declared_test_matches: counts["live_provider"] + counts["real_provider"],
         reason: "FR-09/FR-15a/FR-22 require a separately authorized bounded profile"
-      },
-      %{
-        id: "python-tiktoken-recomputation",
-        status: "excluded",
-        test_tags: ["python_tiktoken_recompute"],
-        declared_test_matches: counts["python_tiktoken_recompute"],
-        reason:
-          "recorded measurement is checked in Elixir; optional recomputation has external inputs"
       },
       %{
         id: "live-daemon-and-activation",

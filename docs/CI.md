@@ -69,17 +69,15 @@ be pinned by SHA-256 and CI would fail if its bytes changed.
 
 ## Explicitly absent evidence
 
-This job starts no daemon, Herdr pane, provider session, database or corpus service. It does
-not authorize paid credentials, inspect provider conformance, integrate Git candidates,
-activate releases or establish restart lifecycle acceptance. Real-provider evidence stays
-bounded and separately reported under FR-09/FR-15a/FR-22. The job never closes a pane, so it
-cannot close a foreign pane.
+This job starts no daemon, provider session, database or corpus service. It does not
+authorize paid credentials, inspect provider conformance, integrate Git candidates, activate
+releases or establish restart lifecycle acceptance. Real-provider evidence stays bounded and
+separately reported under FR-09/FR-15a/FR-22.
 
-The default suite checks the saved tokenizer benchmark in Elixir. One separately tagged test
-can deliberately recompute that dated measurement using external Python/tiktoken inputs; CI
-excludes and counts that one test. No current test has a live-provider tag, which the manifest
-reports as zero/absent rather than implying provider coverage was skipped.
+No current test has a live-provider tag, which the manifest reports as zero/absent rather than
+implying provider coverage was skipped. The tokenizer benchmark and its separately tagged
+Python/tiktoken recomputation were deleted with the legacy projections on 2026-09-23.
 
 The Python-migration parity harness and `pramana_diagnose.py` were retired on 2026-09-13.
-Their former inputs did not describe the current store, fence or runtime. Sanitized Python
-fixtures remain only as dated import-compatibility tests; they are not current parity proof.
+Sanitized Python fixtures remain only for `Schema`, which the legacy import still calls until
+its own deletion ticket; they are not current parity proof.

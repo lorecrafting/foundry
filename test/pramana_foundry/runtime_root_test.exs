@@ -167,7 +167,7 @@ defmodule PramanaFoundry.RuntimeRootTest do
     System.delete_env("PRAMANA_RUNTIME_ROOT_FRESH")
 
     # A daemon restart deliberately reuses the same explicit root. Exclusivity is
-    # then enforced by RuntimeOwner's lock, not by fresh-root provisioning.
+    # then enforced by the lane store's owner lock, not by fresh-root provisioning.
     assert RuntimeRoot.resolve_and_publish!(:dev, operator) == root
     assert RuntimeRoot.resolve_and_publish!(:dev, operator) == root
     assert RuntimeRoot.fetch!() == root

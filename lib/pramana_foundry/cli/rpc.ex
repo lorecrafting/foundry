@@ -4,7 +4,8 @@ defmodule PramanaFoundry.CLI.RPC do
 
   The release still exposes a general evaluation command until FR-15a replaces it
   with the protected local command protocol. This module only ensures that arguments
-  sent by `bin/pramana` are data rather than generated Elixir source.
+  sent by `bin/pramana` are data rather than generated Elixir source, and that only a
+  `lane` command the lane's own parser accepts is dispatched: the lane is the only ingress.
   """
 
   alias PramanaFoundry.ManualLane
@@ -13,7 +14,6 @@ defmodule PramanaFoundry.CLI.RPC do
   @max_encoded_bytes 87_382
   @token_regex ~r/\A[A-Za-z0-9_-]+\z/
   @envelope_keys MapSet.new(["argv", "version"])
-  @ticket_create_options MapSet.new(["--acceptance", "--scope"])
 
   @type decode_error ::
           :invalid_encoding
@@ -31,7 +31,6 @@ defmodule PramanaFoundry.CLI.RPC do
   def run(encoded) do
     case decode(encoded) do
       {:ok, ["lane" | argv]} -> ManualLane.CLI.main(argv)
-      {:ok, argv} -> PramanaFoundry.CLI.main(argv)
       {:error, reason} -> raise ArgumentError, "invalid RPC payload: #{reason}"
     end
   end
@@ -127,28 +126,6 @@ defmodule PramanaFoundry.CLI.RPC do
 
   defp validate_argv(_argv), do: {:error, :invalid_argv}
 
-  defp validate_command_shape(["handoff", "submit", _task_id, "--handoff-path", _path]),
-    do: :ok
-
-  defp validate_command_shape(["handoff", "block", _task_id, "--reason" | [_ | _]]),
-    do: :ok
-
-  defp validate_command_shape(["review", "submit", _task_id, "--review-path", _path]),
-    do: :ok
-
-  defp validate_command_shape([
-         "ticket",
-         "create",
-         "--title",
-         _title,
-         "--priority",
-         priority
-         | options
-       ])
-       when priority in ["P0", "P1", "P2", "P3"] do
-    validate_ticket_create_options(options, MapSet.new())
-  end
-
   # One shape per lane command, owned by the lane's own parser (THIN-LANE-DESIGN §4).
   defp validate_command_shape(["lane" | argv]) do
     case ManualLane.CLI.parse(argv) do
@@ -157,20 +134,5 @@ defmodule PramanaFoundry.CLI.RPC do
     end
   end
 
-  defp validate_command_shape(["ticket", "status", _task_id]), do: :ok
-  defp validate_command_shape(["ticket", "list"]), do: :ok
-  defp validate_command_shape(["ticket", "integrate", _task_id]), do: :ok
   defp validate_command_shape(_argv), do: {:error, :unknown_command_shape}
-
-  defp validate_ticket_create_options([], _seen), do: :ok
-
-  defp validate_ticket_create_options([option, _value | rest], seen) do
-    if MapSet.member?(@ticket_create_options, option) and not MapSet.member?(seen, option) do
-      validate_ticket_create_options(rest, MapSet.put(seen, option))
-    else
-      {:error, :unknown_command_shape}
-    end
-  end
-
-  defp validate_ticket_create_options(_options, _seen), do: {:error, :unknown_command_shape}
 end

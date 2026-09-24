@@ -57,7 +57,9 @@ defmodule PramanaFoundry.RPCWrapperTest do
     File.write!(eval_recorder, """
     Code.compiler_options(ignore_module_conflict: true)
 
-    defmodule PramanaFoundry.CLI do
+    defmodule PramanaFoundry.ManualLane.CLI do
+      def parse([command | _]), do: {:ok, command, nil, []}
+
       def main(argv) do
         File.write!(System.fetch_env!("RPC_DISPATCH_CAPTURE"), :erlang.term_to_binary(argv))
       end
@@ -89,12 +91,15 @@ defmodule PramanaFoundry.RPCWrapperTest do
     title = "quote \" slash \\ newline\nUnicode प्रमाण literal #{interpolation}"
 
     argv = [
-      "ticket",
-      "create",
+      "lane",
+      "admit",
+      "T-1",
+      "--base-ref",
+      "main",
       "--title",
       title,
-      "--priority",
-      "P0",
+      "--scope",
+      "lib/**",
       "--acceptance",
       ""
     ]
@@ -107,7 +112,8 @@ defmodule PramanaFoundry.RPCWrapperTest do
 
   test "actual wrapper carries a large payload below the bound", ctx do
     title = String.duplicate("界", 20_000)
-    argv = ["ticket", "create", "--title", title, "--priority", "P2"]
+    argv = ["lane", "review", "T-1", "--principal", "p", "--verdict", "approved"]
+    argv = argv ++ ["--candidate", "c", "--notes", title]
 
     assert {"", 0} = run_wrapper(ctx, argv)
     assert {:ok, ^argv} = ctx.capture |> File.read!() |> token!() |> RPC.decode()
@@ -151,7 +157,8 @@ defmodule PramanaFoundry.RPCWrapperTest do
   test "actual wrapper reaches server-side empty and unknown-shape rejection", ctx do
     ebin = app_ebin()
 
-    Enum.each([[], ["unknown", "literal " <> <<35>> <> "{1 + 1}"]], fn argv ->
+    # The legacy ticket command is one more unknown shape: the lane is the only ingress.
+    Enum.each([[], ["unknown", "literal " <> <<35>> <> "{1 + 1}"], ["ticket", "list"]], fn argv ->
       {output, status} =
         run_wrapper(ctx, argv, env: [{"RPC_EVAL", "1"}, {"RPC_EBIN", ebin}])
 
@@ -163,7 +170,7 @@ defmodule PramanaFoundry.RPCWrapperTest do
   end
 
   test "actual evaluated wrapper rejects duplicate keys without dispatch", ctx do
-    raw = ~S({"version":1,"argv":["ticket","list"],"argv":["unknown"]})
+    raw = ~S({"version":1,"argv":["lane","status"],"argv":["unknown"]})
     forged_token = Base.url_encode64(raw, padding: false)
     tool_dir = Path.join(ctx.root, "forged-encoder")
     dispatch_capture = Path.join(ctx.root, "dispatch")

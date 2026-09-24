@@ -8,12 +8,4 @@ operator_runtime_root =
       Path.expand("../local", __DIR__)
     end
 
-config :pramana_foundry,
-  runtime_root: operator_runtime_root,
-  max_assignments: 3,
-  max_tasks: 8
-
-config :pramana_foundry,
-  herdr_command: "/opt/homebrew/bin/herdr",
-  herdr_timeout_ms: 30_000,
-  poll_seconds: 15
+config :pramana_foundry, runtime_root: operator_runtime_root

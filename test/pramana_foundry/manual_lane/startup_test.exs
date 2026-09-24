@@ -1,7 +1,7 @@
 defmodule PramanaFoundry.ManualLane.StartupTest do
   @moduledoc """
-  Lane mode as a release starts it: the flag turns the daemon into a lane-only daemon, its
-  supervisor runs none of the legacy stack, and the store settings come from env vars
+  Lane mode as a release starts it: the flag makes the node a lane daemon, the only daemon; its
+  supervisor runs ManualLane.Server alone, and the store settings come from env vars
   (`bin/foundry-lane`), seeded from the shipped example policy.
   """
   use ExUnit.Case, async: false
@@ -11,13 +11,6 @@ defmodule PramanaFoundry.ManualLane.StartupTest do
   alias PramanaFoundry.ManualLane.Server
 
   @example Path.expand("../../../docs/batch-d/lane-policy.example.json", __DIR__)
-  @legacy [
-    PramanaFoundry.Coordinator,
-    PramanaFoundry.Improver,
-    PramanaFoundry.HardeningPM,
-    PramanaFoundry.AssignmentSupervisor,
-    PramanaFoundry.RuntimeOwner
-  ]
   @env ~w(FOUNDRY_MANUAL_LANE PRAMANA_STARTUP_MODE FOUNDRY_MANUAL_LANE_REPO
           FOUNDRY_MANUAL_LANE_POLICY FOUNDRY_MANUAL_LANE_STORE)
 
@@ -42,13 +35,14 @@ defmodule PramanaFoundry.ManualLane.StartupTest do
     %{root: root}
   end
 
-  test "the lane flag turns a daemon into a lane daemon; a client stays a client" do
-    assert App.startup_mode([]) == :daemon
-    System.put_env("FOUNDRY_MANUAL_LANE", "1")
-    assert App.startup_mode([]) == :lane
-    assert App.startup_mode(["eval", "x"]) == :client
+  test "the lane flag is the only daemon; without it the node is a child-less client" do
+    assert App.startup_mode() == :client
+    assert App.runtime_children(:client) == []
+    # The retired daemon switch no longer starts anything.
     System.put_env("PRAMANA_STARTUP_MODE", "daemon")
-    assert App.startup_mode(["eval", "x"]) == :lane
+    assert App.startup_mode() == :client
+    System.put_env("FOUNDRY_MANUAL_LANE", "1")
+    assert App.startup_mode() == :lane
   end
 
   test "the lane supervisor runs ManualLane.Server alone, from env config and the example policy",
@@ -62,13 +56,11 @@ defmodule PramanaFoundry.ManualLane.StartupTest do
       start_supervised!(%{
         id: :lane_supervisor,
         type: :supervisor,
-        start:
-          {Supervisor, :start_link, [App.runtime_children(:lane, []), [strategy: :one_for_one]]}
+        start: {Supervisor, :start_link, [App.runtime_children(:lane), [strategy: :one_for_one]]}
       })
 
     ids = for {id, _pid, _type, _modules} <- Supervisor.which_children(sup), do: id
     assert ids == [Server]
-    for module <- @legacy, do: refute(module in ids)
 
     context = Server.context()
     assert context.repo == ctx.root
@@ -83,20 +75,6 @@ defmodule PramanaFoundry.ManualLane.StartupTest do
              })
 
     assert policy["independent_of_roles"] == %{"reviewer" => ["developer"]}
-  end
-
-  test "red control: the daemon children are the legacy stack", ctx do
-    opts = [
-      herdr_command: "herdr",
-      poll_ms: 1000,
-      enable_tick: false,
-      require_runtime_owner: false,
-      runtime_root: ctx.root
-    ]
-
-    ids = for spec <- App.runtime_children(:daemon, opts), do: Supervisor.child_spec(spec, []).id
-    assert PramanaFoundry.Coordinator in ids
-    assert PramanaFoundry.Improver in ids
   end
 
   test "bin/pramana sends lane commands to the lane node, and only lane commands", ctx do
