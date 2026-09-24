@@ -50,7 +50,6 @@ contract still govern implementation.
 | Add or change a guard, transition, or a test that asserts a refusal | [Evidence tools](EVIDENCE-TOOLS.md); the gate enforces four of the five checks automatically, the guard mutation sweep is manual, and a green gate after adding a guard is not evidence the guard works |
 | Run a script in `bin/`, or decide which belong in the gate | [Bin script health check](BIN-SCRIPT-HEALTH-2026-09-22.md) — what each one claims, how to run it, who calls it, and its result at `6bc015ed`; none of `foundry/bin/` is in `ci/run.exs` |
 | Observe the local system | [Observability](OBSERVABILITY.md), with the README's containment warnings |
-| Evaluate the optional semantic assessor | [Assessor Stage A](ASSESSOR.md), issue #26 and the governing repair boundaries |
 | Understand historical architecture choices | [Migration design](MIGRATION.md), [migration tickets](MIGRATION-TICKETS.md), [event sourcing](EVENT_SOURCING.md) |
 | Plan FR-23 documentation retirement, or decide whether a Foundry document is evidence, current, superseded or retirable | [Documentation retirement inventory](DOC-RETIREMENT-INVENTORY-2026-09-22.md) — a classification of every file at `e374322b`, with grep evidence; it retired nothing and applied no banner |
 | Plan FR-23 dead-surface removal, or check whether a `lib/` identifier still dispatches | [Dead surface inventory](DEAD-SURFACE-INVENTORY-2026-09-22.md) — unused functions, list-literal members and modules at `6bc015ed`, each with its recorded search and owner; it removed nothing |

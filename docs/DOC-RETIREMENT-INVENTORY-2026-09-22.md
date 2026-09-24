@@ -93,7 +93,7 @@ they describe running code.
 | [DURABLE-STORE-SCHEMA.md](DURABLE-STORE-SCHEMA.md) | Generated; `SchemaReferenceTest` enforces it |
 | [EVIDENCE-TOOLS.md](EVIDENCE-TOOLS.md) | `foundry/bin/{refusal_sites,guard_mutation_sweep,contract_annotation_diff,closure_probe}.exs`, `preflight.sh` present |
 | [COVERAGE-GUIDED-SWEEP.md](COVERAGE-GUIDED-SWEEP.md) | "Design note. Not implemented"; still the open proposal referenced by the evidence-reduction tickets |
-| [ASSESSOR.md](ASSESSOR.md) | `foundry/lib/pramana_foundry/assessor/` present |
+| [ASSESSOR.md](archive/ASSESSOR.md) | `foundry/lib/pramana_foundry/assessor/` present |
 | [OBSERVABILITY.md](OBSERVABILITY.md) | Live inventory plus target; every backticked reference resolves |
 | [STRATEGY.md](STRATEGY.md), [ECOSYSTEM-BOUNDARY.md](ECOSYSTEM-BOUNDARY.md), [ORCHESTRATOR-BOUNDARY.md](ORCHESTRATOR-BOUNDARY.md), [PROJECT-WORKFLOW-PROFILES.md](PROJECT-WORKFLOW-PROFILES.md), [PLANNING-STRATEGIES.md](PLANNING-STRATEGIES.md), [AX-SUBSTRATE.md](AX-SUBSTRATE.md), [CLOUDFLARE-OS.md](CLOUDFLARE-OS.md) | Dated research or design guidance; nothing supersedes them |
 | [PI-HARNESS.md](PI-HARNESS.md), [JIDO-HARNESS.md](JIDO-HARNESS.md) | Two live candidates. JIDO-HARNESS says to compare both, so neither replaces the other |
