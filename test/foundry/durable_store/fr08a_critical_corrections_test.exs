@@ -385,7 +385,7 @@ defmodule Foundry.DurableStore.FR08ACriticalCorrectionsTest do
         "schema_version" => 1,
         "command_id" => unique_id(),
         "expected_revisions" => %{},
-        "type" => "legacy_event_append",
+        "type" => "enqueue",
         "target_ids" => %{},
         "payload" => %{}
       },

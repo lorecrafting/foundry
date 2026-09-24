@@ -282,7 +282,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
         "schema_version" => 1,
         "command_id" => "FORGE-DOMAIN",
         "expected_revisions" => %{},
-        "type" => "legacy_event_append",
+        "type" => "enqueue",
         "target_ids" => %{},
         "payload" => %{}
       }

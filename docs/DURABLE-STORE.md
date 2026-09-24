@@ -51,8 +51,7 @@ returns that immutable rejection.
 ingress and the kernel's `decide/3` commands, event types are exactly the kernel's
 lifecycle events, and domain intents name `launch` or `check`. The pre-repair command,
 event and intent names and the legacy-import record codecs were deleted with the
-fresh-store decision (ML-DEAD-VOCAB); `legacy_event_append` alone survives, as the
-command type the FR-08A protected-boundary probe forges with.
+fresh-store decision (ML-DEAD-VOCAB).
 
 ## Initialization, recovery and versions
 

@@ -17,9 +17,8 @@ defmodule Foundry.DurableStore.RecordCodec do
   @command ~w(schema_version command_id expected_revisions type target_ids payload)
   # `enqueue` carries the lane's event ingress; the rest are the kernel's decide/3 commands
   # (FR-08B subcommit 2; review C1). The kernel names are role-free: the role travels in the
-  # payload, so a new role or workflow needs no Core vocabulary. `legacy_event_append` is
-  # dead but stays until the FR-08A protected-boundary probe stops forging with it.
-  @command_types ~w(legacy_event_append enqueue submit_review plan_launch settle_nonstart finalize_cancellation)
+  # payload, so a new role or workflow needs no Core vocabulary.
+  @command_types ~w(enqueue submit_review plan_launch settle_nonstart finalize_cancellation)
   # Nothing in lib/ writes a domain intent (the kernel's plans carry none); these are the
   # two operations the store tests exercise the path with.
   @intent_types ~w(launch check)

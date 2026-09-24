@@ -11,7 +11,7 @@ defmodule Foundry.ManualLane.StartupTest do
   alias Foundry.ManualLane.Server
 
   @example Path.expand("../../../docs/batch-d/lane-policy.example.json", __DIR__)
-  @env ~w(FOUNDRY_MANUAL_LANE FOUNDRY_STARTUP_MODE FOUNDRY_MANUAL_LANE_REPO
+  @env ~w(FOUNDRY_MANUAL_LANE FOUNDRY_MANUAL_LANE_REPO
           FOUNDRY_MANUAL_LANE_POLICY FOUNDRY_MANUAL_LANE_STORE)
 
   setup do
@@ -38,9 +38,6 @@ defmodule Foundry.ManualLane.StartupTest do
   test "the lane flag is the only daemon; without it the node is a child-less client" do
     assert App.startup_mode() == :client
     assert App.runtime_children(:client) == []
-    # The retired daemon switch no longer starts anything.
-    System.put_env("FOUNDRY_STARTUP_MODE", "daemon")
-    assert App.startup_mode() == :client
     System.put_env("FOUNDRY_MANUAL_LANE", "1")
     assert App.startup_mode() == :lane
   end

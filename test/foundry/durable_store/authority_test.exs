@@ -969,7 +969,7 @@ defmodule Foundry.DurableStore.AuthorityTest do
       "schema_version" => 1,
       "command_id" => id,
       "expected_revisions" => %{projection_key(id) => "absent"},
-      "type" => "legacy_event_append",
+      "type" => "enqueue",
       "target_ids" => %{},
       "payload" => %{}
     }
