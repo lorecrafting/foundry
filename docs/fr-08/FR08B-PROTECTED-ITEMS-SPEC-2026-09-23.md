@@ -1,5 +1,7 @@
 # FR-08B protected items: attempt close, reset fact, settlement binding
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B protected items: attempt close, reset fact, settlement binding
+
 **Date:** 2026-09-23. **Type:** design spec. **Independently reviewed 2026-09-23 (Fable): PASS WITH
 CHANGES**; the four changes (F1–F4) are folded in below and marked.
 Taken at `33e6b95b` (`repair/fr08b-kernel`, gate green, 989 passed). Authorized as operator

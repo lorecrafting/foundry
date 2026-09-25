@@ -1,11 +1,13 @@
 # Foundry research register
 
+[Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Foundry research register
+
 [Product strategy](PRODUCT.md) · [Validation](VALIDATION.md)
 **Checked:** 2026-09-21. This register distinguishes source evidence from our
 recommendations. A retrieved article or README is not local conformance, a licence
 review, a partnership or a benchmark reproduction. Recheck moving upstream sources
 at evaluation/adoption; pin actual package/model/data revisions in that work.
-> Moved from Pramāṇa on 2026-09-24 ([`docs/strategy/RESEARCH.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/docs/strategy/RESEARCH.md)); the pre-move text is pinned there.
+> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 ## Engineering sources
 

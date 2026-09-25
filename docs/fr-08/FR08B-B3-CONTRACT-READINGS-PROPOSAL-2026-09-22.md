@@ -1,5 +1,7 @@
 # FR-08B B3 contract readings: a proposal for Q1–Q7
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B B3 contract readings: a proposal for Q1–Q7
+
 > **Approved by the operator, 2026-09-22:** all seven recommended readings are accepted as the interpretation B3 is built against. The contract text is unchanged. B3's kernel scope is items 1–3 of "if approved" below; items 4–5 are protected-code maintenance, scheduled separately because they touch attestation-pinned files.
 
 **Date:** 2026-09-22. **Type:** proposal, **not approved**. The

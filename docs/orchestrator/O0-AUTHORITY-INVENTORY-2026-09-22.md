@@ -1,5 +1,7 @@
 # O0 authority inventory: where workflow code crosses protected authority
 
+[Foundry](../../README.md) › [Docs](../README.md) › O0 authority inventory: where workflow code crosses protected authority
+
 **Date:** 2026-09-22. **Type:** inventory only. It **changes no behaviour**, proposes no
 implementation beyond naming seams, and does not interrupt the active repair. **Taken at
 commit `6bc015ed`** (`repair/fr08b-kernel`). Every `file:line` below is at that commit and

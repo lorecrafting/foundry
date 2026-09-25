@@ -1,5 +1,7 @@
 # `apply/2` closure: candidate design
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › apply/2 closure: candidate design
+
 **Status: superseded on 2026-09-22 — closed, but not by the table below.** The candidate that
 landed is a post-condition, not a typed payload table: `advance/2` runs `State.well_formed?/1`
 over the committed post-state and refuses with `:malformed_post_state` (kernel property 6,

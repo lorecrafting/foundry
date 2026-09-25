@@ -1,5 +1,7 @@
 # Design: decompose `gateway.ex`
 
+[Foundry](../../README.md) › [Docs](../README.md) › Design: decompose gateway.ex
+
 Ticket ML-DECOMPOSE-GATEWAY-DESIGN, 2026-09-24, base `e74fb88`. This is protected Core, so
 the design is reviewed before anyone implements it ([agent brief](../AGENT-BRIEF.md#reviews)).
 Implementation is ML-DECOMPOSE-GATEWAY (batch C2). Subject:

@@ -1,5 +1,7 @@
 # Clean-room sweep — 2026-09-23
 
+[Foundry](../../README.md) › [Docs](../README.md) › Clean-room sweep — 2026-09-23
+
 **Type:** read-only audit by a fresh Fable agent. Nothing was edited, deleted, moved, committed or
 run beyond `git`, `gh`, `grep`, `find`, `du`, `ls`, `cat`, `diff`. No test, gate or Quint run.
 **Baseline:** `25f7174` (`integ/lane-batch-1`). While this sweep ran, PR #2 merged and

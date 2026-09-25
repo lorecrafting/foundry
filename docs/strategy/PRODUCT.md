@@ -1,12 +1,14 @@
 # Foundry product strategy
 
+[Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Foundry product strategy
+
 [Strategy brief](../STRATEGY.md) · [Validation](VALIDATION.md) · [Research register](RESEARCH.md) · [Meta-harness proposal](META-HARNESS.md)
 **Status:** post-repair investment proposal under the existing authority contract.
-> Moved from Pramāṇa on 2026-09-24 ([`docs/strategy/FOUNDRY.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/docs/strategy/FOUNDRY.md), [`docs/PRODUCT_STRATEGY.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/docs/PRODUCT_STRATEGY.md), [`docs/strategy/ROADMAP.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/docs/strategy/ROADMAP.md), [`docs/strategy/DECISIONS.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/docs/strategy/DECISIONS.md)); the pre-move text is pinned there.
+> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
 
-This was written as one half of a joint Pramāṇa/Foundry strategy. Pramāṇa's side,
-including the G0/FR-22 gate its pilot waits on, stays in [its strategy](https://github.com/lorecrafting/pramana/blob/main/docs/PRODUCT_STRATEGY.md).
-Horizon (H0–H4) and gate (G0–G4) labels are shared with that document.
+This was written as one half of a joint Pramāṇa/Foundry strategy and is now Foundry's
+alone. The horizon (H0–H4) and gate (G0–G4) labels keep their pre-split meaning. G0 is
+the repair entry gate: [FR-22](../REPAIR-PLAN.md#fr-22--prove-full-lifecycle-and-reconcile-operating-docs) accepted.
 
 ## Choices
 
@@ -28,21 +30,22 @@ own the boundary and investment logic.
 Foundry is a trusted execution and governance kernel for model-directed work. Given a
 bounded objective, capable models may propose how to decompose and perform the work;
 Foundry supplies observable progress, controlled authority/expenditure, attributable
-evidence, acceptance and recoverable failure. Software engineering in Pramāṇa is the
+evidence, acceptance and recoverable failure. Software engineering on Foundry itself is the
 first workload and first customer, not the permanent role/workflow model.
 
 The longer-term product option is the same dependable kernel across repositories and
 across materially different workflows within one project, without Buddhist-domain or
 Pramāṇa database dependencies. Independence is architectural; external demand is still
-unproved. The current repair contract covers one operator, one machine and Pramāṇa. A
-second-repository or non-software workflow pilot needs separately approved project
-scope and policies; FR-22 is not blanket authorization for expansion.
+unproved. Scope is not limited to one operator, one machine or one repository, but a
+new repository or non-software workflow pilot needs its own approved project scope and
+policies; FR-22 is not blanket authorization for expansion.
 
 Keep the standalone OTP system. It may require appropriate local libraries and
 protected host provisioning; “standalone” does not mean zero dependencies, zero
-operations cost or an unmeasured two-second test cycle. Pramāṇa must build and run
-without Foundry. A Foundry assignment may invoke authorized project commands in an
-isolated environment; Foundry's own authority store must not become Pramāṇa's Repo.
+operations cost or an unmeasured two-second test cycle. Every supervised project must
+build and run without Foundry. A Foundry assignment may invoke authorized project
+commands in an isolated environment; Foundry's authority store must never become a
+supervised project's database.
 
 ## Repair acceptance is the entry gate, not another initiative
 
@@ -136,7 +139,7 @@ RPG content-authoring workflow could expose only its typed Builder API, simulati
 certification. The same model could serve as engine developer in one assignment and
 quest author in another because authority follows the assignment, not the model name.
 Released game/runtime artifacts should remain independently useful without Foundry or an
-LLM. This is a future portability target, not part of the current Pramāṇa repair scope.
+LLM. This is a future portability target, not part of the current repair scope.
 
 ## Replaceable controllers over one authority plane
 
@@ -208,18 +211,20 @@ evidence and completion claims from accepted outcomes.
 
 ## Current host path and why execution isolation matters
 
-Today the production automatic agent route is fail-closed before launch because the
-installed Herdr/OMP path has not proved subscription/billing isolation. The code path
-that would run after that gate is host-based: Herdr opens a terminal pane at the
-assignment checkout and starts OMP there, while the Elixir adapter invokes Herdr as a
-host OS child. Foundry tracks exact pane/process/process-group identity for ownership and
-cleanup, but that is not container or credential isolation.
+Today no automatic agent route exists: the Herdr/OMP path was deleted on 2026-09-23
+([plan amendment C1](../REPAIR-PLAN.md#clean-room-amendment)) and the manual lane launches
+nothing. Before deletion it was fail-closed, because it had not proved subscription and
+billing isolation, and the path under that gate was host-based. Herdr opened a terminal
+pane at the assignment checkout and started OMP there as a host OS child. Foundry tracked
+pane, process and process-group identity for ownership and cleanup, but that is not
+container or credential isolation. The [strategy brief](../STRATEGY.md#current-execution-baseline-nothing-launches-the-old-path-was-host-bound)
+has the current baseline.
 
 A worktree keeps concurrent Git changes separate; a pane keeps sessions distinguishable;
 a process group makes descendant cleanup safer. None limits a shell-capable worker to the
 checkout, removes the host principal's readable files, or disables arbitrary network
 egress. Restoring automatic execution therefore requires the FR-09/15a security boundary,
-not simply flipping the existing launch capability on.
+not reviving the deleted launch path.
 
 Dagger is conceptually above Docker rather than a Docker replacement. Docker/Podman/etc.
 supply OCI container execution; Dagger can programmatically compose those containers,
@@ -293,7 +298,7 @@ and a replaceable provider boundary because Jev is currently early access.
 
 ## Project-defined roles, surfaces and escalation
 
-The long-term product should not encode Pramāṇa's current `developer → reviewer`
+The long-term product should not encode today's `developer → reviewer`
 workflow as the protected ontology. The detailed direction is recorded in
 [Project workflow profiles](../design/PROJECT-WORKFLOW-PROFILES.md).
 
@@ -390,8 +395,8 @@ a model silently make global policy from one anecdote. Measure recurrence reduct
 and false alarms. Personal, task, project and shared scopes need explicit access and
 promotion boundaries, even before any multi-user product exists.
 
-Pramāṇa's research notes remain separate from canonical sources and from this
-engineering ledger. Similar provenance concepts do not justify shared tables,
+A supervised project's own research notes remain separate from canonical sources and
+from this engineering ledger. Similar provenance concepts do not justify shared tables,
 credentials, embeddings or a required memory SaaS.
 
 ## Providers, budgets and recovery
@@ -407,7 +412,7 @@ Do not freeze model brand names or price tiers into strategy. Evaluate permitted
 profiles by task success, review effort, latency and total cost. Reviewer capability
 must fit the risk; a cheaper model is not automatically an adequate grader. A new
 API gateway is an optional dependency, not a reason to route around the selected harness,
-protected request path or billing isolation. Pramāṇa's user-facing model service needs its
+protected request path or billing isolation. A supervised project's user-facing model service needs its
 own approved policy; builder subscription permission does not authorize serving public
 product queries.
 
@@ -435,14 +440,14 @@ and an explicit maintenance/security cost.
 ## Portability and the Superlogical option
 
 Candidate I-F3 first proves the accepted software workflow on one operator-selected,
-non-Pramāṇa repository and compares the result with the best practical off-the-shelf
+second repository (not Foundry itself) and compares the result with the best practical off-the-shelf
 alternative for the same job rather than assuming custom Foundry orchestration is needed. Identify project-specific commands, roles and evidence adapters
 without generalizing the entire platform. After that baseline, a stronger portability
 proof is a separately authorized workflow with a materially different tool/evidence
 surface in the same project, such as typed content authoring rather than Git/shell.
 Evaluate onboarding effort, reliability and net operator effort before pursuing
 multi-user hosting or a commercial package. This is a separate product hypothesis,
-not a permanent support feature of Pramāṇa.
+not a permanent support feature of any one project.
 
 Retain Superlogical as the preferred **future candidate to evaluate** for session/
 presentation integration, not a completed or feature-equivalent Herdr replacement.
@@ -450,7 +455,7 @@ Its public roadmap is not backend conformance evidence. I-F4 requires a real
 available interface, ownership/cleanup and reconnect tests, failure reconciliation,
 headless operation, credential/billing separation, licensing review and a reversible
 cutover. If it changes execution rather than presentation, return to FR-09/15a's
-contract boundary. Do not block the first Pramāṇa product workflow on its availability.
+contract boundary. Do not block the first supervised workflow on its availability.
 
 ## Prevent endless infrastructure work
 
@@ -464,8 +469,8 @@ a generalized multi-tenant rewrite.
 
 ## Candidate initiatives
 
-Initiative IDs are stable planning handles, not tickets. I-P initiatives belong to
-[Pramāṇa's roadmap](https://github.com/lorecrafting/pramana/blob/main/docs/strategy/ROADMAP.md).
+Initiative IDs are stable planning handles, not tickets. I-F initiatives are Foundry's;
+the I-P initiatives of the pre-split roadmap belong to Pramāṇa and do not apply here.
 
 For Foundry initiatives, **compose before build**. Before adding substantial custom
 orchestration, durable-execution, policy or sandbox infrastructure, perform a bounded
@@ -494,7 +499,7 @@ infrastructure justified only by ownership.
 
 #### I-F3 — project and workflow portability
 
-**Outcome:** Foundry works on another approved project without Pramāṇa dependencies,
+**Outcome:** Foundry works on a second approved project,
 then demonstrates that project/workflow roles and tool/evidence surfaces are not baked
 into the protected kernel.
 
@@ -516,8 +521,8 @@ Use [Project workflow profiles](../design/PROJECT-WORKFLOW-PROFILES.md) as the
 post-repair design target and [Validation](VALIDATION.md#foundry-cross-workflow-portability-validation)
 for falsification cases.
 
-**Tracked follow-on:** [#47 — LLM-proposed workflows, progressive admission and safe
-replanning](https://github.com/lorecrafting/pramana/issues/47). After the software baseline,
+**Tracked follow-on:** LLM-proposed workflows, progressive admission and safe
+replanning (pre-split issue #47, not yet re-filed in Foundry). After the software baseline,
 prove both next-step and composed work through the same bounded semantic interface, then
 a separately authorized typed-content workflow. The model supplies planning intelligence;
 a catalog, structured diagnostics/lab, semantic diffs and safe amendments make its
@@ -535,7 +540,7 @@ a general workflow platform before evidence, or assumed demand from one successf
 exists. **Evidence:** installed backend tests against [the Foundry requirements](#portability-and-the-superlogical-option),
 including headless behavior and rollback. **Dependencies:** G0, actual availability
 and approved interface/security scope. **Excludes:** treating roadmap promises as
-Herdr parity or making Pramāṇa delivery depend on the migration.
+Herdr parity or making any project's delivery depend on the migration.
 
 #### I-F5 — Core/Standard Controller split and substitution experiments
 
@@ -549,8 +554,8 @@ baseline. **Excludes:** refactoring protected authority out of the kernel before
 than one ladder active at once; treating any "first experiment" claim in the positioning
 documents as a commitment.
 
-**Tracked workflow learning loop:** [#48 — workflow analytics and governed
-optimization](https://github.com/lorecrafting/pramana/issues/48), consuming #47's automatic
+**Tracked workflow learning loop:** workflow analytics and governed
+optimization (pre-split issue #48, not yet re-filed in Foundry), consuming the I-F3 track's automatic
 instrumentation and amendment contract. Start with reproducible, scoped read-only queries
 and exact contributing runs; then observed critical-path/outcome analysis and one bounded
 workflow experiment with fixed acceptance requirements. Support dynamic execution history
@@ -568,7 +573,8 @@ Merging a planning PR closes neither implementation issue and enables no executi
 
 ## Open decisions
 
-IDs continue [Pramāṇa's decision register](https://github.com/lorecrafting/pramana/blob/main/docs/strategy/DECISIONS.md).
+IDs continue the numbering of the pre-split decision register. New decisions go in the
+[dogfood log's decision table](../batch-d/DOGFOOD-LOG.md#operator-questions-and-decisions).
 
 | ID | Decision / recommended default | Owner role | Required before |
 |---|---|---|---|

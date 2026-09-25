@@ -1,5 +1,7 @@
 # Cloudflare OS lessons for Foundry
 
+[Foundry](../../README.md) › [Docs](../README.md) › Cloudflare OS lessons for Foundry
+
 **Date:** 2026-09-21. **Type:** architecture research and design pressure, not dependency
 adoption, repair-ticket reprioritization, production authorization or evidence that
 Cloudflare OS satisfies Foundry conformance.
@@ -7,7 +9,7 @@ Cloudflare OS satisfies Foundry conformance.
 [Foundry strategy](../STRATEGY.md) · [Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) ·
 [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) · [AX/Substrate backend](AX-SUBSTRATE.md) ·
 [Workflow contract](../WORKFLOW-CONTRACT.md) ·
-[Broader research register](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
+[Broader research register](../strategy/RESEARCH.md)
 
 ## Source snapshot
 

@@ -1,5 +1,7 @@
 # FR-10 Quint model: effects, claims, receipts and reconciliation
 
+[Foundry](../../README.md) › [Docs](../../docs/README.md) › FR-10 Quint model: effects, claims, receipts and reconciliation
+
 [`effects.qnt`](effects.qnt) is commit 0 of
 [the FR-10 design](../../docs/fr-10/FR10-DESIGN-2026-09-23.md). It models the protocol **as
 designed** (D1–D5 plus the operator's answers Q2–Q4), not today's code. Each store action

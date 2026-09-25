@@ -1,5 +1,7 @@
 # Manual lane runbook
 
+[Foundry](../../README.md) › [Docs](../README.md) › Manual lane runbook
+
 For an LLM operator in a fresh session. The manual lane records a ticket's admission, one
 claimed effect per work packet, the developer's candidate and an independent review, and
 replays all of it after a restart. It launches nothing: you hand each packet to an agent

@@ -1,5 +1,7 @@
 # Durable event vocabulary extension — design, revision 2
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › Durable event vocabulary extension — design, revision 2
+
 Date: 2026-09-20
 
 Status: **design note; no implementation, no acceptance, no accepted vocabulary**

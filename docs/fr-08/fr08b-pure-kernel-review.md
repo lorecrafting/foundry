@@ -1,5 +1,7 @@
 # FR-08B pure domain kernel independent review — BLOCKER
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B pure domain kernel independent review — BLOCKER
+
 Date: 2026-09-20
 
 Reviewer: `/root/fr08b_pure_kernel_review`, independent of implementation

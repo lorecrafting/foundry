@@ -1,5 +1,7 @@
 # Batch D: the thin dogfood lane
 
+[Foundry](../../README.md) › [Docs](../README.md) › Batch D: the thin dogfood lane
+
 **Date:** 2026-09-23. **Type:** design for T3–T7 of
 [dogfood readiness §4](../DOGFOOD-READINESS-2026-09-23.md#4-the-thin-dogfood-option). It
 changes no code. **Taken at `8ed8d233`** (`repair/fr08b-kernel`). Code paths are under

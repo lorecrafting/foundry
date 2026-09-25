@@ -1,5 +1,7 @@
 # Foundry ecosystem boundary and positioning
 
+[Foundry](../../README.md) › [Docs](../README.md) › Foundry ecosystem boundary and positioning
+
 **Date:** 2026-09-20. **Updated:** 2026-09-21 for AX/Agent Substrate and Cloudflare OS. **Type:** research synthesis and architecture guidance, not an
 implementation inventory, repair-ticket disposition, dependency selection or authorization
 to activate execution.
@@ -9,7 +11,7 @@ to activate execution.
 [Planning strategies](PLANNING-STRATEGIES.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
 [AX/Substrate backend](AX-SUBSTRATE.md) · [Cloudflare OS lessons](CLOUDFLARE-OS.md) ·
-[Broader research record](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
+[Broader research record](../strategy/RESEARCH.md)
 
 ## Executive conclusion
 

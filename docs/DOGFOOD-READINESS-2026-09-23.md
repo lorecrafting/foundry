@@ -1,5 +1,7 @@
 # Dogfood readiness and the shortest safe path
 
+[Foundry](../README.md) › [Docs](README.md) › Dogfood readiness and the shortest safe path
+
 > **Status, later on 2026-09-23:** M1–M5 **approved by the operator**, recorded as a
 > [plan amendment](REPAIR-PLAN.md#dogfood-gate-amendment). T1 (subcommit 2) and T2
 > (subcommit 3, reviewer, with Core reviewer independence) have landed and passed Fable

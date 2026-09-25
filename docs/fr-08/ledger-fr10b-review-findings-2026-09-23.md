@@ -1,5 +1,7 @@
 # Ledger L1–L4 and FR-10 B fixes — independent review findings
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › Ledger L1–L4 and FR-10 B fixes — independent review findings
+
 **Reviewer:** Fable 5.1 (`claude-fable-5-1`), fresh agent, read-only. **Subjects:** `3cb470e6`
 (L1), `13650882` (FR-10 B), `5f021010` (L2), `5b701a57` (L3), `d67eeac2` (L4), fixing the
 states in [the ledger model](../../spec/ledger/README.md) and

@@ -1,5 +1,7 @@
 # FR-08B subcommit 3: reviewer and PM roles — scope, prerequisites, two decisions
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B subcommit 3: reviewer and PM roles — scope, prerequisites, two decisions
+
 **Date:** 2026-09-23. **Type:** design proposal. **Status: D1–D4 APPROVED by the
 operator 2026-09-23, as recommended.** P1 (subcommit 2's developer `decide/3`) is still unmet
 and comes first. No production code changes. Taken at `7514c930` (`repair/fr08b-kernel`); line

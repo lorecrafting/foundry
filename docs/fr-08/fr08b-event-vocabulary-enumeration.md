@@ -1,5 +1,7 @@
 # FR-08B kernel event vocabulary — enumeration
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B kernel event vocabulary — enumeration
+
 Date: 2026-09-20
 
 Status: **specification; first deliverable of subcommit 1. No implementation, no acceptance.**

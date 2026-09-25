@@ -1,5 +1,7 @@
 # Driving R4's rows — design
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › Driving R4's rows — design
+
 Date: 2026-09-20
 
 Supersedes the guard-by-guard method used for `be1e19c` and `40ac559`, both of which were

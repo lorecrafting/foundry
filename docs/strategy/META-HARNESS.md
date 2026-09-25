@@ -1,9 +1,11 @@
 # Harness Engineering — Planning — chapter 4
 
-> Moved from Pramāṇa on 2026-09-24 ([`pramana/docs/harness/04-10-parallel-track-the-self-improving-supervisor-foundry-s-own-met.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/pramana/docs/harness/04-10-parallel-track-the-self-improving-supervisor-foundry-s-own-met.md)); the pre-move text is pinned there.
+[Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Harness Engineering — Planning — chapter 4
+
+> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 > Design/research note. Proposed commands and guarantees are not shipped capabilities unless current source and acceptance evidence establish them.
-> [Contents](https://github.com/lorecrafting/pramana/blob/main/docs/HARNESS.md) · [Documentation](https://github.com/lorecrafting/pramana/blob/main/docs/README.md) · [Current architecture](https://github.com/lorecrafting/pramana/blob/main/docs/ARCHITECTURE.md)
+> Written before the split, when Foundry maintained Pramāṇa. Read "Pramana" below as "the project under supervision"; for Foundry today that is Foundry itself. The Improver and health commands it names were deleted on 2026-09-23 ([observability](../OBSERVABILITY.md#what-is-gone)).
 
 ## 10. Parallel Track: the Self-Improving Supervisor (Foundry's Own Meta-Harness)
 

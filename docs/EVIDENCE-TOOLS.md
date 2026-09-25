@@ -1,5 +1,7 @@
 # Evidence tools: what runs automatically, what you must run
 
+[Foundry](../README.md) › [Docs](README.md) › Evidence tools: what runs automatically, what you must run
+
 These check a **guarded reducer against a written contract**. Nothing in them is specific
 to the workflow kernel — the inputs are a reducer, a proposer and a contract document — so
 they carry to later tickets and to any future workflow. The kernel is simply the first

@@ -1,5 +1,7 @@
 # Foundry workflow contract — FR-06
 
+[Foundry](../README.md) › [Docs](README.md) › Foundry workflow contract — FR-06
+
 Revision **4 (R3 observability boundary added; independent re-review outstanding)**,
 2026-09-20. Revision 3's R4a correction remains independently verified: the
 [focused review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/r4a-focused-review.md) returned **PASS** against the exact

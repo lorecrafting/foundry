@@ -1,5 +1,7 @@
 # Knowledge moved out of the deleted daemon stack — 2026-09-23
 
+[Foundry](../../README.md) › [Docs](../README.md) › Knowledge moved out of the deleted daemon stack — 2026-09-23
+
 **Why this exists.** Plan amendment [C1](../REPAIR-PLAN.md#clean-room-amendment) deleted the
 legacy daemon stack instead of migrating it (ticket ML-DEL-DAEMON, following the
 [clean-room sweep](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md) §1.1 and §2). The deleted tests

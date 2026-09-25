@@ -1,7 +1,9 @@
 # Foundry validation
 
+[Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Foundry validation
+
 [Product strategy](PRODUCT.md) · [Research register](RESEARCH.md)
-> Moved from Pramāṇa on 2026-09-24 ([`docs/strategy/VALIDATION.md`](https://github.com/lorecrafting/pramana/blob/2ad8ed912a5ed1c30e8f4f1e97ce069fd1400c94/docs/strategy/VALIDATION.md)); the pre-move text is pinned there.
+> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 ## Scorecard
 

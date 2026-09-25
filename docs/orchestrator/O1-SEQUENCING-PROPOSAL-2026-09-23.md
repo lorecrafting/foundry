@@ -1,5 +1,7 @@
 # Option 2 without reopening O1's timing: build FR-08B's protected items role-agnostic
 
+[Foundry](../../README.md) › [Docs](../README.md) › Option 2 without reopening O1's timing: build FR-08B's protected items role-agnostic
+
 **Date:** 2026-09-23. **Type:** proposal, **approved by the operator 2026-09-23** (all three decisions below, as
 recommended). Taken at `57e41229` (`repair/fr08b-kernel`). Changes no contract text.
 
@@ -18,7 +20,7 @@ wait for FR-08B.
 
 ## The reading
 
-[PR #49](https://github.com/lorecrafting/pramana/pull/49) ([planning strategies §2, §3.1, §11](../design/PLANNING-STRATEGIES.md))
+PR #49 of the pre-split repository ([planning strategies §2, §3.1, §11](../design/PLANNING-STRATEGIES.md))
 merged the same morning and points the same way: composable workflow primitives, LLM-proposed
 work and replaceable methodologies are post-repair (issues #47/#48, roadmap I-F3/I-F5), and its
 design test is "if replacing the planning methodology requires invasive changes to the authority

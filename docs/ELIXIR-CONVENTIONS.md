@@ -1,5 +1,7 @@
 # Elixir, Mix and ExUnit conventions
 
+[Foundry](../README.md) › [Docs](README.md) › Elixir, Mix and ExUnit conventions
+
 Applies to every Elixir change in Foundry. Read the
 [Phoenix Elixir usage rules](conventions/phoenix/elixir.md) first: they apply as written,
 except where this page overrides them. That file is vendored verbatim from Phoenix; refresh it
@@ -10,8 +12,7 @@ govern design.
 
 ## Overrides of the upstream rules
 
-Carried from Pramāṇa's reviewed adaptation of the same rules (Phoenix v1.8.11,
-[record](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/code-conventions/elixir.md)).
+Carried over at the split from the reviewed adaptation of the same rules (Phoenix v1.8.11).
 
 - **Nested modules.** Prefer one independently maintained module per file, but existing
   nested helper modules are allowed; several modules in a file are not a compilation error.

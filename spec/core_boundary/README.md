@@ -1,5 +1,7 @@
 # Core boundary model: an adversarial controller against Core's guarantees
 
+[Foundry](../../README.md) › [Docs](../../docs/README.md) › Core boundary model: an adversarial controller against Core's guarantees
+
 **Date:** 2026-09-23, at `df1ac5f8`. **Type:** Quint model and one Elixir probe. Neither is a
 test in the gate.
 

@@ -1,12 +1,14 @@
 # Jido / Jido.Harness evaluation for Foundry
 
+[Foundry](../../README.md) › [Docs](../README.md) › Jido / Jido.Harness evaluation for Foundry
+
 **Checked:** 2026-09-20. **Status:** substitution research only. This document does
 not adopt Jido, Jido.Harness, ACP, ExMCP, Jido.VFS, Jido.Workspace or any provider
 adapter; it does not replace the active repair plan, workflow contract, FR-09/15a
 isolation/billing requirements or the existing production fail-closed posture.
 
 [Foundry strategy](../STRATEGY.md) · [Pi harness design](PI-HARNESS.md) ·
-[Observability](../OBSERVABILITY.md) · [Research register](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
+[Observability](../OBSERVABILITY.md) · [Research register](../strategy/RESEARCH.md)
 
 ## Decision summary
 

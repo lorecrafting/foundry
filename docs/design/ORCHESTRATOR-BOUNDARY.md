@@ -1,5 +1,7 @@
 # Orchestrator boundary — authority path, observation path, and controller adapters
 
+[Foundry](../../README.md) › [Docs](../README.md) › Orchestrator boundary — authority path, observation path, and controller adapters
+
 **Date:** 2026-09-21. **Type:** post-repair architecture guidance. This document
 does not change the active repair plan, accepted workflow contract, current launch policy,
 provider entitlement, production authorization or FR-08 implementation scope.

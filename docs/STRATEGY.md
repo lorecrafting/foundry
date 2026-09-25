@@ -1,5 +1,7 @@
 # Foundry strategy brief
 
+[Foundry](../README.md) › [Docs](README.md) › Foundry strategy brief
+
 **Date:** 2026-09-19. **Updated:** 2026-09-21 for execution/capability substrate positioning. **Type:** investment direction and design guidance, not an
 implementation inventory or authorization to execute. Records the operator's
 Foundry-first investment direction, the model-directed-work vision and the lessons from
@@ -11,7 +13,7 @@ operator's machine.
 [Workflow contract](WORKFLOW-CONTRACT.md) · [Orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md) ·
 [Ecosystem boundary](design/ECOSYSTEM-BOUNDARY.md) · [AX/Substrate backend](design/AX-SUBSTRATE.md) ·
 [Cloudflare OS lessons](design/CLOUDFLARE-OS.md) ·
-[Broader product strategy](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md)
+[Product strategy](strategy/PRODUCT.md)
 
 ## Working summary
 
@@ -25,9 +27,10 @@ kernel: hold authority/evidence/acceptance invariants stable while comparing wor
 strategies, models, harnesses, context policies, tool configurations, review topologies
 and concurrency by accepted-outcome correctness, effort, latency and resource cost.
 
-Retain the standalone Elixir/OTP project. Beneath the current fail-closed launch gate,
-the implemented execution path still targets OMP through Herdr; that is implementation
-truth, not the desired permanent dependency.
+Retain the standalone Elixir/OTP project. Since 2026-09-23 no execution path exists in
+the tree: the OMP-through-Herdr path was deleted with the legacy daemon
+([plan amendment C1](REPAIR-PLAN.md#clean-room-amendment)), and the manual lane launches
+nothing. The repair contract still names OMP and Herdr until an explicit revision.
 Keep agent execution harness-neutral behind a small versioned execution/observation
 contract. Pi remains the preferred first replacement **agent**, but the bridge is now a
 substitution question: compare direct pinned Pi RPC with pinned Jido.Harness/ACP before
@@ -113,11 +116,12 @@ no parallel backlog. Investigations may inform blocked work; production implemen
 and activation still require the owning prerequisites and evidence.
 
 This brief owns the Foundry-first investment rationale and cross-project lessons.
-The [broader Foundry chapter](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md) retains post-repair product
+The [product strategy](strategy/PRODUCT.md) retains post-repair product
 initiatives and portfolio sequencing. Funding the repair foundations first does not
-silently waive its post-repair evaluation gates. One operator, one machine and Pramāṇa
-remain the present scope; a second repository requires separately approved scope.
-Pramāṇa must continue to build and run without Foundry.
+silently waive its post-repair evaluation gates. Foundry is independent
+of Pramāṇa, and its first workload is its own development. Scope is not limited to one
+operator, one machine or one repository; each new one still needs the isolation and
+authenticated identity FR-15aB proves before Foundry trusts it.
 
 ## Product thesis
 
@@ -141,9 +145,9 @@ requests and test coverage percentages are not the product outcome.
 |---|---|---|
 | Authority | Authenticated policy, capabilities, reservations, effect claims and acceptance predicates | OS security primitives and appropriate transactional storage libraries |
 | Workflow | Admission, pure decision/replay, scheduling, correction, cancellation and reconciliation for versioned workflow definitions | OTP supervision and ordinary concurrency mechanisms |
-| Agent execution | A small versioned and tested execution/observation contract | Current source: OMP; preferred first replacement agent: Pi; compare direct pinned Pi RPC with pinned Jido.Harness/ACP before selecting the bridge, subject to FR-09/15a conformance and explicit contract review |
+| Agent execution | A small versioned and tested execution/observation contract | Contract harness: OMP (no code in the tree since C1); preferred first replacement agent: Pi; compare direct pinned Pi RPC with pinned Jido.Harness/ACP before selecting the bridge, subject to FR-09/15a conformance and explicit contract review |
 | Project tools | Approved capability/evidence surfaces for the current assignment | Git/compiler tools for software; typed project APIs where appropriate |
-| Presentation | Honest projections and outstanding operator decisions | Herdr initially; future backends only after conformance evidence |
+| Presentation | Honest projections and outstanding operator decisions | Herdr under the current contract (no code in the tree since C1); future backends only after conformance evidence |
 
 These are responsibilities, not five new services. Keep the protected verifier small:
 it checks whether an exact operation is authorized and supported by receipts. It must
@@ -279,22 +283,20 @@ durable effect accounting, exact evidence binding, independent acceptance and re
 use that system rather than maintaining Foundry as a duplicate. The product thesis is
 the contract and outcome, not ownership of a particular codebase.
 
-## Current execution baseline: host-bound path, automatic launch fail-closed
+## Current execution baseline: nothing launches; the old path was host-bound
 
-The current source should not be described simply as "agents run unsandboxed" because
-production automatic dispatch is intentionally blocked earlier. `AgentServer.init/1`
-first resolves an admitted launch profile and requires the Herdr adapter to prove the
-selected route is subscription-only. The production Herdr System runner currently
-reports that proof as unsupported, so a normal automatic launch stops before pane
-creation. FR-09 and FR-15a own the evidence needed to restore live automatic execution.
+Today nothing in the tree launches an agent. The operator hands each lane packet to an
+agent by hand ([lane runbook](batch-d/LANE-RUNBOOK.md)), so the agent runs with whatever
+isolation the operator's own tool gives it. Foundry only records the outcome.
 
-The implemented execution path beneath that gate is nevertheless host-bound rather than
-containerized. `AgentServer.do_launch/1` asks Herdr to split a terminal pane whose
-working directory is the assignment checkout, then starts `omp` in that pane.
-`Herdr.Runner.System` invokes the configured Herdr executable directly as an OS child
-with `Port.open/2`. Foundry records pane/process identities and process groups so it can
-refuse stale cleanup and signal the correct descendants, but it does not create a
-container, micro-VM or separate OS security principal in this path.
+The deleted daemon's path (`AgentServer`, the Herdr adapter, `omp` in a terminal pane) is
+still the right warning for what comes next. Automatic launch there was blocked before
+pane creation, because the Herdr runner could not prove a subscription-only route. The path
+under that gate was host-bound, not containerized: `omp` ran in the assignment checkout as
+an ordinary OS child. Foundry recorded pane and process-group identities for safe cleanup,
+but it created no container, micro-VM or separate OS principal. The edge cases it encoded
+are in [moved knowledge](design/MOVED-KNOWLEDGE-2026-09-23.md). FR-09 and FR-15a own
+restoring automatic execution.
 
 Git worktrees, terminal panes and process groups solve different problems from a sandbox:
 they provide checkout separation, presentation/session identity and safer lifecycle
@@ -774,7 +776,7 @@ Postpone multi-machine fleets, deep agent hierarchies, broad plugin marketplaces
 automatic policy learning, custom terminals/harnesses, generalized memory platforms and
 custom replacements for mature external infrastructure that has not failed a Foundry
 conformance evaluation.
-The [broader strategy](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/FOUNDRY.md) owns later repository portability,
+The [product strategy](strategy/PRODUCT.md) owns later repository portability,
 context/tool experiments and Superlogical evaluation. Do not put an unverified future
 presentation backend on the repair critical path.
 

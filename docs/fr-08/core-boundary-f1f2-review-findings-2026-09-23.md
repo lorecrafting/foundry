@@ -1,5 +1,7 @@
 # Core boundary F1/F2 fix — independent review findings
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › Core boundary F1/F2 fix — independent review findings
+
 **Reviewer:** Fable 5.1 (`claude-fable-5-1`), fresh agent, read-only. **Subject:** `c82e2076`
 (bound-fact slots come only from a binding; proposals carry no slot-typed event), for
 findings F1/F2 of the [core boundary model](../../spec/core_boundary/README.md).

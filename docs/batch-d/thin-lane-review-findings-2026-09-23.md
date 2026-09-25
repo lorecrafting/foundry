@@ -1,5 +1,7 @@
 # Thin lane and hardening — independent review findings
 
+[Foundry](../../README.md) › [Docs](../README.md) › Thin lane and hardening — independent review findings
+
 **Reviewer:** Fable 5.1 (`claude-fable-5-1`), fresh agent, read-only, at `c0466058`.
 **Subject:** the [thin lane](THIN-LANE-DESIGN-2026-09-23.md) (work packet, manual backend,
 server, CLI, restart drill) and the day's hardening (decide/3 binds the allocation key; the

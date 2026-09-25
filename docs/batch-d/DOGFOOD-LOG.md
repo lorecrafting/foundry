@@ -1,5 +1,7 @@
 # Dogfood log: the manual lane
 
+[Foundry](../../README.md) › [Docs](../README.md) › Dogfood log: the manual lane
+
 The operator's running record of Foundry work driven through the manual lane
 ([runbook](LANE-RUNBOOK.md)). One entry per ticket, then the frictions found in the lane,
 its tooling or the runbook. The lane store is the authoritative trail (`bin/foundry lane
@@ -192,6 +194,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q10 | Keep dated records (`docs/archive`, fr-08 evidence) in the tree? | **Decided 2026-09-24: no.** Tag `records/2026-09-24` at `b30d0a2` (the last commit before the renames, so the records keep their original names), delete `docs/archive`, and turn inbound links into permalinks at the tag. `docs/fr-08` gets the same treatment in batch C's triage; reviews and this log stay. Supersedes Q6 for those records |
 | Q11 | Is FR-18A (bounded effect queries, the `Observations` module) still live? | **Decided 2026-09-24 (operator deferred to the recommendation): keep.** The plan lists it in progress; its `:legacy` branch goes with the legacy-tables ticket |
 | Q12 | Tools for precise, cheaper agent work | **Decided 2026-09-24:** add `boundary` and `sourceror` (Hex, locked), use `mix xref` / `mix xref graph` and compiled `debug_info` checks, and an Elixir outline script; ticket ML-PRECISION-TOOLING opens batch C2. `AGENTS.md` now says how to search code |
+| Q13 | Is Foundry still scoped to "one operator, one machine, Pramāṇa", and must status go to Pramāṇa's `docs/PLAN.md`? | **Decided 2026-09-25: no to both.** Foundry is fully decoupled from Pramāṇa: the repair plan's scope clause and completion requirement are rewritten, and no document links to Pramāṇa pages. Trust in a new operator, host or repository still waits on FR-15aB |
 
 ## Frictions
 

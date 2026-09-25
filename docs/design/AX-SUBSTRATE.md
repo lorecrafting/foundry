@@ -1,12 +1,14 @@
 # AX + Agent Substrate as a Foundry execution backend
 
+[Foundry](../../README.md) › [Docs](../README.md) › AX + Agent Substrate as a Foundry execution backend
+
 **Date:** 2026-09-21. **Type:** architecture research and bounded integration proposal, not
 dependency adoption, repair-ticket reprioritization, production authorization or evidence that
 AX/Agent Substrate satisfy Foundry conformance.
 
 [Foundry strategy](../STRATEGY.md) · [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) ·
 [Workflow contract](../WORKFLOW-CONTRACT.md) · [Observability](../OBSERVABILITY.md) ·
-[Broader research register](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
+[Broader research register](../strategy/RESEARCH.md)
 
 ## Source snapshot
 

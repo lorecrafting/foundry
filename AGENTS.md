@@ -1,14 +1,15 @@
 # Repository guide for agents
 
 Foundry is an OTP execution and governance system for supervised agent work. It was split
-from [Pramāṇa](https://github.com/lorecrafting/pramana) on 2026-09-23 and needs neither
-Pramāṇa's corpus nor its services. These instructions apply to every provider.
+from the Pramāṇa project on 2026-09-23 and is independent of it: no Pramāṇa code, service,
+document or process applies here. These instructions apply to every provider.
 
 ## Start here
 
 | Task | Read next |
 |---|---|
-| Anything | [The Foundry index](docs/README.md), then the current [repair plan](docs/REPAIR-PLAN.md) and the ticket's own evidence |
+| Anything | [The Foundry index](docs/README.md) (read its layers top down), then the current [repair plan](docs/REPAIR-PLAN.md) and the ticket's own evidence |
+| Understanding a mechanism or a term | [How Foundry works](docs/CONCEPTS.md): each mechanism in plain terms, and the glossary |
 | Any code change | [Boundary rules](docs/BOUNDARY-RULES.md) first — twelve rules, most enforced by the gate |
 | Writing Elixir or tests | [Elixir conventions](docs/ELIXIR-CONVENTIONS.md) |
 | Adding or changing a guard, transition or refusal test | [Evidence tools](docs/EVIDENCE-TOOLS.md) first |

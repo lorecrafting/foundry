@@ -1,5 +1,7 @@
 # Proposal: split FR-23 into FR-23a (hygiene now) and FR-23b (decomposition and retirement)
 
+[Foundry](../../README.md) › [Docs](../README.md) › Proposal: split FR-23 into FR-23a (hygiene now) and FR-23b (decomposition and retirement)
+
 **Type:** proposal only. It edits no ticket, and it needs the user's approval before
 [REPAIR-PLAN](../REPAIR-PLAN.md) changes. **Baseline:** `b46d3825` on `repair/fr08b-kernel`.
 Every path and line below is at that commit.
@@ -124,7 +126,7 @@ code lives. Paths are under `foundry/lib/foundry/`.
 | FR-19B | Diagnostic retention; repair or retire relocation | `relocation.ex`, `relocation/`, and the diagnostic log writers (`telemetry/`, `event_log.ex`, `consolidated_log.ex`) |
 
 The rows are inferred from scope prose and O0's `file:line` citations. They are not a
-dependency-graph run, and the [dependency review runbook](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/DEPENDENCY_REVIEW.md)
+dependency-graph run, and the dependency review (a recorded `mix xref callers` search, [AGENTS.md](../../AGENTS.md#searching-code))
 still applies to each FR-23a change.
 
 FR-23a's contents are `ci/format_debt.exs` (done), `docs/`, `bin/` scripts and their

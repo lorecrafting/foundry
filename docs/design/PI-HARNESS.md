@@ -1,5 +1,7 @@
 # Foundry Pi harness design
 
+[Foundry](../../README.md) › [Docs](../README.md) › Foundry Pi harness design
+
 **Status:** design candidate, updated 2026-09-20. This document does **not** adopt Pi, replace
 OMP, enable automatic model execution, approve a provider/billing route, or weaken any
 repair gate. The active [repair plan](../REPAIR-PLAN.md) and
@@ -10,7 +12,7 @@ are explicitly revised and re-reviewed.
 [Observability](../OBSERVABILITY.md) ·
 [Jido / Jido.Harness evaluation](JIDO-HARNESS.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
-[Research sources](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md)
+[Research sources](../strategy/RESEARCH.md)
 
 ### Use this document by task
 
@@ -1201,7 +1203,7 @@ Primary references checked for this design:
   https://code.claude.com/docs/en/checkpointing
 
 The repository's source-quality summary for Pi is
-[research entry E30](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/RESEARCH.md). External examples establish
+[research entry E30](../strategy/RESEARCH.md). External examples establish
 available mechanisms and design inspiration, not Foundry acceptance evidence.
 
 ## 19. Open decisions intentionally deferred

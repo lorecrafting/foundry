@@ -1,11 +1,13 @@
 # Project workflow profiles — post-repair design direction
 
+[Foundry](../../README.md) › [Docs](../README.md) › Project workflow profiles — post-repair design direction
+
 **Status:** strategy/design guidance for the post-repair Foundry direction. It does not
 change the active repair plan, workflow contract, launch policy, provider entitlement,
 or current runtime behavior.
 
 [Foundry strategy](../STRATEGY.md) · [Workflow contract](../WORKFLOW-CONTRACT.md) ·
-[Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) · [Validation](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/VALIDATION.md)
+[Orchestrator boundary](ORCHESTRATOR-BOUNDARY.md) · [Validation](../strategy/VALIDATION.md)
 
 ## 1. Purpose
 

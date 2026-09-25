@@ -1,5 +1,7 @@
 # Foundry continuous integration
 
+[Foundry](../README.md) › [Docs](README.md) › Foundry continuous integration
+
 Foundry has a standalone, model-free CI gate. It runs from the repository root without the
 umbrella, corpus, Postgres, Rust or Python model sidecar:
 

@@ -1,5 +1,7 @@
 # FR-18A bounded effect query design
 
+[Foundry](../../README.md) › [Docs](../README.md) › FR-18A bounded effect query design
+
 > **Current status, 2026-09-22.** Implemented since this was written: the `bounded_effect_*` functions in `durable_store/protected_primitives.ex`, and the [B5 correction rereview](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-18a/b5-correction-rereview.md) is PASS. The body below is the dated design record and is not updated.
 
 Status: **design only; B5 remains blocking.** This record defines the smallest

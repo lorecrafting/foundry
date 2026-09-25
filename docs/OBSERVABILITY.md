@@ -1,5 +1,7 @@
 # Observability
 
+[Foundry](../README.md) › [Docs](README.md) › Observability
+
 Observation is never authority ([boundary rule 9](BOUNDARY-RULES.md)). A log line, a
 process exit or an agent's "tests pass" can explain work; it cannot admit, accept or
 integrate anything. Authority lives in the durable store's committed events, written only

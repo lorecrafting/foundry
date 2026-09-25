@@ -1,5 +1,7 @@
 # Decomposing protected_primitives.ex
 
+[Foundry](../../README.md) › [Docs](../README.md) › Decomposing protected_primitives.ex
+
 Status: **design only, for review before implementation** (ticket ML-DECOMPOSE-PP-DESIGN;
 Protected Core designs are reviewed first, per the [agent brief](../AGENT-BRIEF.md)).
 Nothing here is implemented. Checked against `main` `e74fb8803cb2`, where

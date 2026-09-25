@@ -1,5 +1,7 @@
 # Foundry repair plan
 
+[Foundry](../README.md) › [Docs](README.md) › Foundry repair plan
+
 Created 2026-09-12 from [the audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/AUDIT-2026-09-12.md) and the operator's agreed
 contract. This is an external Markdown backlog; it does not depend on Foundry's
 admission, state tracking, or agents. No repairs are marked complete by creating it.
@@ -32,7 +34,10 @@ explicit file/interface ownership; this plan does not itself launch agents.
 
 ### Product and authority contract
 
-- One operator, one machine, Pramāṇa. Retain a standalone OTP application.
+- Foundry is a standalone OTP application, independent of Pramāṇa. Its first workload is
+  its own development through the manual lane. Scope is not limited to one operator,
+  one machine or one repository, but each new project, operator or host needs the
+  isolation and authenticated identity its tickets prove (FR-15aB) before it is trusted.
 - Implement supervisor repairs, transport, persistence, orchestration, validation and
   fixtures in Elixir wherever technically possible. A non-Elixir process is acceptable
   only when the contract inherently crosses that boundary (for example Git, OS process
@@ -59,8 +64,7 @@ explicit file/interface ownership; this plan does not itself launch agents.
 ### Shared completion requirements
 
 Each implementation must include its relevant executable acceptance evidence,
-updated operator/developer documentation, and a status entry here and in
-[`docs/PLAN.md`](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/PLAN.md). Record the candidate revision, test commands,
+updated operator/developer documentation, and a status entry here. Record the candidate revision, test commands,
 results and remaining limitations. Required review evaluates the exact candidate.
 Changing it after review requires renewed validation appropriate to the change.
 
@@ -1359,8 +1363,8 @@ assignment before either started.
 Neither step is on the supervised dogfood alpha path, so this assignment closes a recorded
 gap; it starts nothing and moves no ticket out of Blocked.
 
-**Proposed amendment to steps 6 and 7 ([#48](https://github.com/lorecrafting/pramana/issues/48) slice A0).**
-*Status 2026-09-23: APPROVED by the operator (#48 A0); it supersedes the 2026-09-20
+**Proposed amendment to steps 6 and 7 (workflow analytics track, slice A0).**
+*Status 2026-09-23: APPROVED by the operator (pre-split issue #48, slice A0); it supersedes the 2026-09-20
 assignment above where they differ.* It narrows that
 assignment to what each ticket's acceptance already requires, and changes no dependency,
 status or acceptance obligation:
@@ -1389,7 +1393,7 @@ status or acceptance obligation:
 - **FR-19B** keeps retention, rotation and bounded query behaviour for `telemetry.jsonl`;
   no observation store replaces protected authority.
 - General workflow step/revision analytics, conversational queries and workflow reshaping
-  stay post-repair in #48 and are not a prerequisite of any FR ticket.
+  stay post-repair in the workflow analytics track (pre-split issue #48) and are not a prerequisite of any FR ticket.
 
 FR-20 carries the matching pointer back to this block.
 
@@ -1550,8 +1554,8 @@ Unknown usage yields insufficient evidence, not a zero-cost win. Every optimizat
 needs a baseline, fixed acceptance gates, bounded experiment and ordinary admission/review/
 activation; telemetry cannot weaken authority or auto-promote its own recommendation.
 
-**Observability steps 6 and 7 (proposed, [#48](https://github.com/lorecrafting/pramana/issues/48) slice A0).**
-*Status 2026-09-23: APPROVED by the operator (#48 A0).* This is the pointer
+**Observability steps 6 and 7 (proposed, workflow analytics track, slice A0).**
+*Status 2026-09-23: APPROVED by the operator (pre-split issue #48, slice A0).* This is the pointer
 the [FR-18B section](#fr-18b--complete-status-and-telemetry-chain) requires. Under the
 proposal FR-20 owns moving the Improver's classifiers, findings and proposals onto
 canonical observations (route step 6, Improver half) and the efficiency validation above
@@ -1642,7 +1646,7 @@ identity at once. FR-22 therefore depends on FR-23.
 suite passes before and after with no test deleted or weakened to accommodate a move, and
 every revision-bound attestation is rebound in the same commit that changes its subject,
 never in a follow-up. Decomposition preserves public interfaces or migrates every caller
-in the same change, using the [dependency review runbook](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/DEPENDENCY_REVIEW.md).
+in the same change, with a recorded `mix xref callers` search for every changed public function ([AGENTS.md](../AGENTS.md#searching-code)).
 Removal of any identifier is justified by a recorded search showing no dispatch, not by
 inspection alone. Documentation routes and the catalog resolve after the sweep.
 

@@ -1,5 +1,7 @@
 # FR-08 files still in the tree
 
+[Foundry](../../README.md) › [Docs](../README.md) › FR-08 files still in the tree
+
 The FR-08 reviews, probes, candidates, raw sweeps, briefings and superseded designs are dated
 records. Per operator decision Q10 they are not kept in the tree: tag `records/2026-09-24`
 preserves all of them ([docs/fr-08 at the tag](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/fr-08)).

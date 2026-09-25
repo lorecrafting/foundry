@@ -1,5 +1,7 @@
 # Foundry agent brief: the standing clauses
 
+[Foundry](../README.md) › [Docs](README.md) › Foundry agent brief: the standing clauses
+
 Every delegated Foundry task inherits these. A task prompt names only its base commit, its
 goal, its file ownership and its report shape, then says "follow `docs/AGENT-BRIEF.md`".
 Written 2026-09-23 from one day's integration of about twenty agent candidates.
@@ -8,7 +10,7 @@ Written 2026-09-23 from one day's integration of about twenty agent candidates.
 
 - Reset your worktree to the base commit the prompt names, and confirm `git log -1` before
   editing. Worktree agents have started on the wrong base
-  ([worktree bases](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/agents/WORKFLOW.md)).
+  ([dogfood log gotchas](batch-d/DOGFOOD-LOG.md#handoff-where-the-campaign-stands)).
 - Never `git stash` or `git checkout` to undo an edit. Reverse the exact string.
 - From the repository root: `TMPDIR=/private/tmp MIX_ENV=test mix test <files>`. If deps are
   missing, set `MIX_DEPS_PATH` to the main checkout's `deps`.

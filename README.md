@@ -1,114 +1,164 @@
 # Foundry
 
-Split from [lorecrafting/pramana](https://github.com/lorecrafting/pramana) on 2026-09-23 with
-its full history. Commit SHAs recorded before the split name Pramāṇa commits; two of them
-survive here as `pramana/<sha>` tags, which no test reads any more.
+**Foundry is a governance kernel for AI agents that write code.** It keeps a durable,
+tamper-evident record of what an agent was asked to do and what it was allowed to spend.
+It also records what the agent actually delivered, and whether an independent reviewer
+accepted it. Agents do the work. Foundry decides what counts.
 
-**Current shape, 2026-09-23:** Foundry is not in production. The legacy daemon stack
-(Coordinator, AgentServer, the Herdr adapter, launch effects, JSONL persistence, Board,
-telemetry, Improver, PM, Scheduler and the legacy CLI) was deleted rather than migrated
-([plan amendment C1](docs/REPAIR-PLAN.md#clean-room-amendment)). The
-[manual lane](docs/batch-d/LANE-RUNBOOK.md) over the durable store and the workflow kernel is
-the only ingress, and it launches nothing: the operator hands each work packet to an agent.
-Edge cases the deleted tests encoded are listed, with their owners, in
-[moved knowledge](docs/design/MOVED-KNOWLEDGE-2026-09-23.md).
+> **Status (2026-09-25): early and not in production.** Foundry runs today as the
+> [manual lane](docs/batch-d/LANE-RUNBOOK.md). It records work but launches nothing:
+> a human or LLM operator hands each work packet to an agent by hand. Foundry is being
+> built by using it on itself ([dogfood log](docs/batch-d/DOGFOOD-LOG.md)).
 
-The project remains independent of the Phoenix umbrella, Postgres, the research corpus, and
-`priv/embed/`.
+## The problem
 
-## Independent CI and build provenance
+Coding agents are now capable enough to do real work unattended. The hard part has moved
+from getting an agent to act to trusting what it did:
 
-The [Foundry-only CI job](docs/CI.md) runs from this directory with fresh dependency, build,
-temporary and runtime roots. It compiles with warnings as errors, enforces all new formatting,
-runs the model-free suite and emits source/tool/dependency/escript provenance. It starts no
-corpus service, live daemon or provider session. Real-provider and activation evidence remain
-explicit downstream acceptance, not implied by a green CI job.
+- An agent reports "tests pass". Did they pass, on which commit?
+- Did the reviewer see the same code the developer submitted, and were they
+  independent, or the same model checking its own work?
+- A session crashed halfway through. What finished, what is still uncertain, and what is
+  safe to retry?
+- Did the run stay within its budget, or quietly fall back to a paid API?
 
-## Acceptance and launch containment
+Most agent tooling improves the agent: better prompts, more tools, bigger task graphs.
+Foundry works on the other side of that line. It is the part that does not trust the
+agent.
 
-Nothing in the tree promotes a candidate, activates a release or launches an agent. The lane
-records a candidate only when it is the checkout's HEAD with the admitted base as an
-ancestor, binds each receipt to its claimed effect, and Core refuses a reviewer who is not
-independent of the developer. FR-13 restores controller-verified artifact and check evidence,
-FR-14 protected Git promotion, and FR-17 immutable accepted-build activation.
+## The value proposition
 
-The FR-01 launch policy survives as a pure leaf, `LaunchEligibility` with `Quota`, called by
-nothing: subscription-only eligibility per role, no paid fallback, and a stable refusal for
-any malformed policy. FR-09 decides what harness calls it; do not treat a model name,
-available credential or this policy as entitlement.
+Foundry lets capable models direct useful work while it keeps these guarantees:
 
-The [Foundry strategy](docs/STRATEGY.md#pi-explicit-session-contracts-and-replaceable-execution)
-prefers a bounded pinned-Pi-RPC evaluation for that harness. No production harness, FR-06
-authority contract or automatic-launch permission changes until a candidate passes FR-09/15a
-and any affected contract text is explicitly revised and re-reviewed.
+| Guarantee | What it means in practice |
+|---|---|
+| **Admitted intent** | Work starts as an admitted ticket with a base commit, a file scope and acceptance criteria. Agents cannot widen it. |
+| **Bounded authority and budget** | Every agent run spends a pre-granted allocation. There are no paid fallbacks, and no eligible budget means the work waits with a reason. |
+| **Exact evidence** | A submission is a specific commit in a clean checkout, descended from the admitted base. Reviews bind to that exact commit. |
+| **Independent acceptance** | Core refuses a reviewer whose recorded principal did the developer work. An agent's own claim never counts as acceptance. Until isolation lands (FR-15aB), principals are recorded, not authenticated. |
+| **Durable, replayable state** | Every acknowledged decision is a committed event in one SQLite store. A restart replays it, and uncertain outcomes are reconciled before any retry. |
+| **Observation is not authority** | Logs, process exits and transcripts can explain work. They cannot admit, accept or integrate anything. |
 
-## Command transport
+The short version is a phrase from the [strategy](docs/STRATEGY.md#working-summary):
+*a working process is not progress; progress is not completion; completion is not
+acceptance.*
 
-`bin/foundry` treats every user argument as inert data. It invokes Elixir with those values
-only in `System.argv/0`, encodes a bounded versioned JSON envelope as canonical URL-safe
-base64, and sends one fixed `Foundry.CLI.RPC.run/1` expression to the release.
-The daemon rejects malformed, duplicate-key, oversized, non-UTF-8 and NUL-containing
-payloads, and every command that is not a `lane` command its parser accepts. The wrapper
-preserves remote stdout, stderr and exit status.
-
-This is FR-02 containment, not a claim that the release's general `rpc` evaluator is a
-safe public authority boundary. Keep access local/protected; FR-15a replaces that general
-evaluation credential.
-
-## Read first
-
-- [`docs/README.md`](docs/README.md) — the documentation index, by task.
-- [`docs/batch-d/LANE-RUNBOOK.md`](docs/batch-d/LANE-RUNBOOK.md) — start the lane daemon and
-  run a ticket through it.
-- [`docs/REPAIR-PLAN.md`](docs/REPAIR-PLAN.md) — sole authoritative repair backlog,
-  current status, dependencies and acceptance obligations.
-- [`docs/WORKFLOW-CONTRACT.md`](docs/WORKFLOW-CONTRACT.md) — accepted FR-06 authority,
-  lifecycle and budget contract.
-- [`docs/BOUNDARY-RULES.md`](docs/BOUNDARY-RULES.md) — the decoupling rules every code change
-  keeps.
-- [`docs/DURABLE-STORE.md`](docs/DURABLE-STORE.md) — the SQLite authority store,
-  initialization and recovery.
-
-Why the repairs exist (the [2026-09-12 audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/AUDIT-2026-09-12.md) and later
-audits) and every other dated record are archived (tag `records/2026-09-24`, [docs/archive at the tag](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/archive)).
-
-## Tracked layout
+## How it works, in one pass
 
 ```text
-./
-  mix.exs, mix.lock, .formatter.exs
-  config/config.exs           — operator runtime root only
-  lib/foundry/
-    application.ex            — starts ManualLane.Server when FOUNDRY_MANUAL_LANE=1, else nothing
-    manual_lane/              — the lane: CLI, backend, server, log, replay
-    workflow/                 — the pure workflow kernel (Workflow.Kernel*)
-    durable_store/            — Core: the SQLite authority store and its gateway
-    observations/             — bounded read queries over the store
-    repair/                   — FR-08A/FR-08 attestation modules
-    cli/rpc.ex                — FR-02 inert transport; dispatches lane commands only
-    work_packet.ex, git_evidence.ex, runtime_root.ex, schema_reference.ex, ci.ex
-    launch_eligibility.ex, quota/, effects/process_group.ex — policy and process leaves kept for FR-09/FR-10
-  test/
-  bin/                         — foundry (RPC wrapper), foundry-lane, evidence tools
-  ci/run.exs                   — the gate
-  spec/                        — Quint models
-  docs/
-  README.md
+ operator            Foundry (manual lane)                     agents
+ ────────            ─────────────────────                     ──────
+ lane admit   ──►  ticket: base, scope, acceptance
+ lane packet  ──►  developer packet (spends one allocation) ──►  developer works in its own worktree
+                                                             ◄──  lane submit <commit> <checkout>
+ lane packet  ──►  reviewer packet (different principal)   ──►  fresh reviewer, different model
+                                                             ◄──  lane review: approved | correction | rejected
+                   ready_to_integrate
+ git (manual) ──►  lane integrated: is base..candidate in main?
 ```
 
-Source, tests, specs, sanitized milestone records and the dependency lockfile belong in Git.
-Hex dependency sources and generated executables are restored from the lockfile/source and
-identified by the CI provenance manifest; they do not belong in Git. Live state,
-transcripts, caches, logs, releases, temporary files, worktrees and provider authentication
-do not.
+Each arrow into Foundry is a command. The kernel checks it against the current state and
+refuses it with a stable reason if it does not fit, for example `wrong_source_phase` or
+`candidate_mismatch`. Otherwise it is committed as an event. [How Foundry works](docs/CONCEPTS.md)
+explains each mechanism (the store, the kernel, packets, principals, reviewer independence,
+refusals, recovery) and defines the vocabulary.
 
-The operator runtime root defaults to `local/` in the main checkout (`config/config.exs`;
-`FOUNDRY_OPERATOR_RUNTIME_ROOT` overrides it). It is ignored by Git and is fixed when the
-release is built from the main checkout; it must never be derived from a task worktree.
-Provider credentials stay in provider-owned locations outside that root.
+## What Foundry is not
 
-## Running
+- **Not a coding agent or harness.** It does not write code or prompt models. Claude,
+  Codex, Pi or any other agent does the work. Foundry records and governs it.
+- **Not an orchestrator or DAG engine.** Planning, decomposition and sequencing belong to
+  replaceable controllers, which can be model-driven. Foundry owns the rules that judge
+  their results, and keeps them where the planner cannot change them
+  ([orchestrator boundary](docs/design/ORCHESTRATOR-BOUNDARY.md)).
+- **Not a sandbox, yet.** Nothing in the tree launches an agent, so nothing needs
+  sandboxing today. Isolated execution is a prerequisite for automatic launch (FR-15a), not
+  something Foundry has now.
+- **Not a model gateway or billing system.** It never grants entitlement. A model name or an
+  available credential is not permission to spend.
+- **Not production software.** It is not limited to one operator or machine, but so far it
+  has only run that way, on its own repository. There is no release, no multi-tenant
+  story, and no stability promise on any interface.
 
-`bin/foundry-lane build|start|stop|status` builds and drives the lane daemon's release; the
-[runbook](docs/batch-d/LANE-RUNBOOK.md) covers its settings, every `bin/foundry lane …`
-command and recovery. A node started without `FOUNDRY_MANUAL_LANE=1` starts no children.
+## Where it is headed
+
+The [repair plan](docs/REPAIR-PLAN.md) is the sole backlog. It restores capabilities in
+order, each behind evidence:
+
+1. **Now: the manual lane, and cleaning up the codebase.** Batch C2 adds precision tooling
+   for agents and splits two oversized Core modules. The live queue is the
+   [dogfood log handoff](docs/batch-d/DOGFOOD-LOG.md#handoff-where-the-campaign-stands).
+2. **Next: governed execution.** Foundry launches agents itself, inside a proven isolation
+   boundary, through one small harness contract (FR-09, FR-10, FR-15a). Pinned Pi RPC is the
+   preferred first harness to evaluate
+   ([Pi harness](docs/design/PI-HARNESS.md)).
+3. **Then: the full lifecycle.** Corrections, timeouts, scheduling, verified check receipts,
+   Git integration and activation of accepted builds (FR-11 to FR-17), proved end to end
+   by FR-22.
+4. **Longer term: a portable kernel.** One stable authority plane with replaceable
+   controllers, harnesses and execution backends. It becomes a place to compare workflow
+   strategies and models by accepted outcomes, not token counts
+   ([product strategy](docs/strategy/PRODUCT.md)).
+
+Automatic launch stays closed until its owning tickets pass. The only surviving launch
+policy, `LaunchEligibility`, has no callers. It allows subscription-only routes and refuses
+any malformed policy.
+
+## Quick start
+
+You need the Elixir/Erlang toolchain pinned in `mise.toml`, plus `git` and `python3`.
+
+```sh
+mix deps.get
+TMPDIR=/private/tmp MIX_ENV=test mix test        # model-free suite
+bin/foundry-lane build && bin/foundry-lane start  # the lane daemon
+bin/foundry lane status
+```
+
+To run a real ticket through the lane, follow the [lane runbook](docs/batch-d/LANE-RUNBOOK.md).
+The full gate is `TMPDIR=/private/tmp elixir ci/run.exs --output <dir outside the repo>`
+([CI](docs/CI.md)).
+
+## Read next
+
+| If you want to… | Read |
+|---|---|
+| Understand the mechanisms and vocabulary | [How Foundry works](docs/CONCEPTS.md) |
+| Find any document, by task or by layer | [Documentation index](docs/README.md) |
+| Run the lane | [Lane runbook](docs/batch-d/LANE-RUNBOOK.md) |
+| See what is next | [Repair plan](docs/REPAIR-PLAN.md), then the [dogfood log handoff](docs/batch-d/DOGFOOD-LOG.md#handoff-where-the-campaign-stands) |
+| Change code | [AGENTS.md](AGENTS.md), then the [boundary rules](docs/BOUNDARY-RULES.md) |
+| Understand why | [Strategy working summary](docs/STRATEGY.md#working-summary) |
+
+## Repository layout
+
+```text
+lib/foundry/
+  manual_lane/     the lane: CLI, backend, server, log, replay
+  workflow/        the pure workflow kernel: decides transitions, never writes
+  durable_store/   Core: the SQLite authority store and its gateway
+  observations/    bounded read queries over the store
+  repair/          FR-08A attestation modules
+  cli/rpc.ex       inert command transport; dispatches lane commands only
+  launch_eligibility.ex, quota/, effects/   policy and process leaves kept for FR-09/FR-10
+test/              model-free ExUnit suite, including the architecture gate
+bin/               foundry (RPC wrapper), foundry-lane, evidence tools, doc checker
+ci/run.exs         the gate
+spec/              Quint models of the ledger, the Core boundary and FR-10 effects
+docs/              everything above; start at docs/README.md
+```
+
+Git holds source, tests, specs and the lockfile. It does not hold live state, logs,
+releases or provider credentials. The operator runtime root defaults to the ignored
+`local/` directory in the main checkout (`FOUNDRY_OPERATOR_RUNTIME_ROOT` overrides it).
+It must never come from a task worktree.
+
+## History
+
+Foundry was split from the Pramāṇa project on 2026-09-23, with its full history. It is
+now fully independent: it depends on no Pramāṇa code, service, document or process. Commit SHAs recorded
+before the split name Pramāṇa commits. The legacy daemon stack was deleted rather than
+migrated ([plan amendment C1](docs/REPAIR-PLAN.md#clean-room-amendment)). The edge cases its
+tests encoded are kept in [moved knowledge](docs/design/MOVED-KNOWLEDGE-2026-09-23.md).
+Audits and other dated records are at tag
+[`records/2026-09-24`](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/archive).

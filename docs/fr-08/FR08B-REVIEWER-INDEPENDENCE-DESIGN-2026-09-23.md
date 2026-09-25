@@ -1,5 +1,7 @@
 # FR-08B: the reviewer-independence predicate as a Core check
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B: the reviewer-independence predicate as a Core check
+
 **Date:** 2026-09-23. **Type:** design. **Status:** protected item approved by the operator
 ([amendment](../REPAIR-PLAN.md#reviewer-independence-amendment)); lands with
 [subcommit 3](FR08B-SUBCOMMIT3-DESIGN-2026-09-23.md). Taken at `8596c04a`.

@@ -1,5 +1,7 @@
 # Foundry boundary rules
 
+[Foundry](../README.md) › [Docs](README.md) › Foundry boundary rules
+
 Read before any Foundry code change. Core is `lib/foundry/durable_store/`; the
 kernel is `lib/foundry/workflow/`; `kernel/software/` is the reference controller.
 "Gate" means `test/foundry/architecture_boundary_test.exs`; each rule names the test

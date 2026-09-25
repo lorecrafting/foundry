@@ -1,5 +1,7 @@
 # R5 budget ledger — Quint model
 
+[Foundry](../../README.md) › [Docs](../../docs/README.md) › R5 budget ledger — Quint model
+
 `ledger.qnt` models the R5 budget ledger as the code implements it
 (`lib/foundry/durable_store/protected_primitives.ex` at Pramāṇa `df1ac5f8`; every
 action cites its line). The contract is the "Budget ledger — R5" section of

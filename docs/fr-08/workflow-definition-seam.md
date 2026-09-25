@@ -1,5 +1,7 @@
 # The mechanism / lifecycle-definition seam
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › The mechanism / lifecycle-definition seam
+
 Date: 2026-09-20
 
 Status: **analysis, not a commitment.** No ticket, no scheduled work. Recorded so the

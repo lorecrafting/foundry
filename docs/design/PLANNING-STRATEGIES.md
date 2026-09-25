@@ -1,5 +1,7 @@
 # Replaceable planning strategies and human work projections
 
+[Foundry](../../README.md) › [Docs](../README.md) › Replaceable planning strategies and human work projections
+
 **Date:** 2026-09-20. **Updated:** 2026-09-22 for LLM-proposed workflows and analytics.
 **Status:** post-repair strategy/design guidance. This document
 does not alter the active repair plan, workflow contract, launch policy, provider
@@ -501,17 +503,17 @@ Turing-complete planning DSL as a shortcut.
 
 ### Tracked delivery and handoff
 
-[Issue #47](https://github.com/lorecrafting/pramana/issues/47) owns the post-repair thin
+The LLM-proposed workflows track ([I-F3](../strategy/PRODUCT.md#i-f3--project-and-workflow-portability)) owns the post-repair thin
 proposal/catalog surface, structured validation/lab, safe amendments, automatic controller
 instrumentation and software/typed-content portability proof. Start with next-step work;
 add reusable composition only when needed. Its instrumentation contract feeds
-[issue #48](https://github.com/lorecrafting/pramana/issues/48), which owns reproducible
+the workflow analytics track ([I-F5](../strategy/PRODUCT.md#i-f5--corestandard-controller-split-and-substitution-experiments)), which owns reproducible
 workflow queries, observed critical paths and bounded workflow-reshaping experiments.
-Their detailed acceptance checklists are in the issues, not duplicated here. Both remain
-open when this planning change merges; no feature is implemented by this document.
+Their acceptance checklists were filed as issues #47 and #48 of the pre-split repository
+and have not been re-filed in Foundry yet. Both remained open when this planning change merged; no feature is implemented by this document.
 
 Both runtime tracks require G0/FR-22, the I-F3 software baseline and their accepted
-interfaces, under [I-F3/I-F5](https://github.com/lorecrafting/pramana/blob/e1e4b3bf2c666f5d84652758afee446a0b21ebe1/docs/strategy/ROADMAP.md). One bounded improvement runs
+interfaces, under [I-F3/I-F5](../strategy/PRODUCT.md#candidate-initiatives). One bounded improvement runs
 at a time. No active FR ticket depends on these post-repair implementations.
 
 Issue #48's documentation-only A0 slice tracks the outstanding coordinated ownership

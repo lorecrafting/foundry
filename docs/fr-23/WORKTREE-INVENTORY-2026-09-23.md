@@ -1,5 +1,7 @@
 # Worktree and branch inventory — 2026-09-23
 
+[Foundry](../../README.md) › [Docs](../README.md) › Worktree and branch inventory — 2026-09-23
+
 Inventory only, per FR-23a's "Remaining" item on worktrees and branches. Nothing here was
 deleted or pruned. Snapshot taken from `git worktree list --porcelain`, `git branch --format`,
 and `git merge-base --is-ancestor` against `origin/repair/fr08b-kernel`

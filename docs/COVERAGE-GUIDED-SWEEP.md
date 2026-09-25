@@ -1,5 +1,7 @@
 # Making the guard mutation sweep a gate step
 
+[Foundry](../README.md) › [Docs](README.md) › Making the guard mutation sweep a gate step
+
 **Status 2026-09-22:** implemented as `bin/coverage_guided_sweep.exs`, not yet a gate step; results
 and the one soundness hole found are in the IMPLEMENTATION-LOG entry of that date. The "Not
 implemented" in the next paragraph was true when this note was written and is kept as written; this

@@ -1,5 +1,7 @@
 # FR-08A protected-result/domain-plan binding — implementation specification
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08A protected-result/domain-plan binding — implementation specification
+
 Date: 2026-09-20
 
 Status: **implementation specification; no acceptance, no integrated behavior**

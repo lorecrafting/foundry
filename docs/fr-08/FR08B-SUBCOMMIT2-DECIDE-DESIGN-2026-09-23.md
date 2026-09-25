@@ -1,5 +1,7 @@
 # FR-08B subcommit 2: the developer `decide/3`
 
+[Foundry](../../README.md) › [Docs](../README.md) › [FR-08 files](README.md) › FR-08B subcommit 2: the developer decide/3
+
 > **Status 2026-09-23:** independently reviewed (Fable), **PASS WITH CHANGES**, and **approved by
 > the operator with O1–O4 as recommended**. Changes folded into the build: **C1** commit 0 also
 > admits the kernel's *command* types to `RecordCodec` (its `@command_types` held only the 12
