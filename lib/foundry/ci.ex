@@ -74,9 +74,7 @@ defmodule Foundry.CI do
       {"TMPDIR", Path.join(run_root, "tmp")},
       {"FOUNDRY_OPERATOR_RUNTIME_ROOT", Path.join(run_root, "operator")},
       {"FOUNDRY_RUNTIME_ROOT", nil},
-      {"FOUNDRY_RUNTIME_ROOT_FRESH", "1"},
-      {"COORDINATOR_TICK", nil},
-      {"HERDR_ENV", nil}
+      {"FOUNDRY_RUNTIME_ROOT_FRESH", "1"}
     ]
   end
 
@@ -743,9 +741,7 @@ defmodule Foundry.CI do
     %{
       mix_build_path: Path.join(run_root, "build"),
       mix_deps_path: Path.join(run_root, "deps"),
-      tmpdir: Path.join(run_root, "tmp"),
-      coordinator_tick: "unset",
-      herdr_env: "unset"
+      tmpdir: Path.join(run_root, "tmp")
     }
   end
 

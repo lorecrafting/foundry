@@ -85,7 +85,6 @@ first lines.
 | [Strategy brief](STRATEGY.md) | investment direction: models direct and the kernel governs; compose before build |
 | [Product strategy](strategy/PRODUCT.md) | mission, post-repair initiatives I-F1 to I-F5, open decisions |
 | [Validation](strategy/VALIDATION.md), [Research register](strategy/RESEARCH.md) | how success is measured; external sources checked |
-| [Meta-harness](strategy/META-HARNESS.md) | the self-improving-supervisor proposal, moved from Pramāṇa |
 | [Orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md) | replaceable controllers over one authority plane |
 | [Ecosystem boundary](design/ECOSYSTEM-BOUNDARY.md) | what Foundry owns and what it reuses |
 | [Workflow profiles](design/PROJECT-WORKFLOW-PROFILES.md), [Planning strategies](design/PLANNING-STRATEGIES.md) | project-declared workflows; model-proposed plans |
@@ -111,7 +110,7 @@ tests or live docs cite them.
 | `batch-d/reviews/` | one review per lane ticket, linked from the [dogfood log ticket table](batch-d/DOGFOOD-LOG.md#tickets) |
 
 Everything else that is dated (audits, candidates, attestations, retired mechanisms, the
-implementation log) is at tag `records/2026-09-24`
+implementation log, the pre-split [meta-harness proposal](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/strategy/META-HARNESS.md)) is at tag `records/2026-09-24`
 ([docs/archive at the tag](https://github.com/lorecrafting/foundry/tree/records/2026-09-24/docs/archive)).
 
 ## Keeping this tree healthy

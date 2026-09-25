@@ -55,8 +55,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundaryTest do
 
     {output, 0} =
       System.cmd(System.find_executable("mix"), ["run", "--no-start", "--no-compile", fixture],
-        cd: foundry_root,
-        env: [{"COORDINATOR_TICK", "0"}, {"HERDR_ENV", nil}]
+        cd: foundry_root
       )
 
     assert output == "identity_mismatch_refused\n"

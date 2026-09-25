@@ -2,7 +2,7 @@
 
 [Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Foundry product strategy
 
-[Strategy brief](../STRATEGY.md) · [Validation](VALIDATION.md) · [Research register](RESEARCH.md) · [Meta-harness proposal](META-HARNESS.md)
+[Strategy brief](../STRATEGY.md) · [Validation](VALIDATION.md) · [Research register](RESEARCH.md)
 **Status:** post-repair investment proposal under the existing authority contract.
 > Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
 
@@ -522,7 +522,7 @@ post-repair design target and [Validation](VALIDATION.md#foundry-cross-workflow-
 for falsification cases.
 
 **Tracked follow-on:** LLM-proposed workflows, progressive admission and safe
-replanning (pre-split issue #47, not yet re-filed in Foundry). After the software baseline,
+replanning ([#15](https://github.com/lorecrafting/foundry/issues/15)). After the software baseline,
 prove both next-step and composed work through the same bounded semantic interface, then
 a separately authorized typed-content workflow. The model supplies planning intelligence;
 a catalog, structured diagnostics/lab, semantic diffs and safe amendments make its
@@ -555,7 +555,7 @@ than one ladder active at once; treating any "first experiment" claim in the pos
 documents as a commitment.
 
 **Tracked workflow learning loop:** workflow analytics and governed
-optimization (pre-split issue #48, not yet re-filed in Foundry), consuming the I-F3 track's automatic
+optimization ([#16](https://github.com/lorecrafting/foundry/issues/16)), consuming the I-F3 track's automatic
 instrumentation and amendment contract. Start with reproducible, scoped read-only queries
 and exact contributing runs; then observed critical-path/outcome analysis and one bounded
 workflow experiment with fixed acceptance requirements. Support dynamic execution history

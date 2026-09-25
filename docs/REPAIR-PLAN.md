@@ -1363,8 +1363,8 @@ assignment before either started.
 Neither step is on the supervised dogfood alpha path, so this assignment closes a recorded
 gap; it starts nothing and moves no ticket out of Blocked.
 
-**Proposed amendment to steps 6 and 7 (workflow analytics track, slice A0).**
-*Status 2026-09-23: APPROVED by the operator (pre-split issue #48, slice A0); it supersedes the 2026-09-20
+**Proposed amendment to steps 6 and 7 ([#16](https://github.com/lorecrafting/foundry/issues/16), slice A0).**
+*Status 2026-09-23: APPROVED by the operator ([#16](https://github.com/lorecrafting/foundry/issues/16), slice A0); it supersedes the 2026-09-20
 assignment above where they differ.* It narrows that
 assignment to what each ticket's acceptance already requires, and changes no dependency,
 status or acceptance obligation:
@@ -1393,7 +1393,7 @@ status or acceptance obligation:
 - **FR-19B** keeps retention, rotation and bounded query behaviour for `telemetry.jsonl`;
   no observation store replaces protected authority.
 - General workflow step/revision analytics, conversational queries and workflow reshaping
-  stay post-repair in the workflow analytics track (pre-split issue #48) and are not a prerequisite of any FR ticket.
+  stay post-repair in the workflow analytics track ([#16](https://github.com/lorecrafting/foundry/issues/16)) and are not a prerequisite of any FR ticket.
 
 FR-20 carries the matching pointer back to this block.
 
@@ -1554,8 +1554,8 @@ Unknown usage yields insufficient evidence, not a zero-cost win. Every optimizat
 needs a baseline, fixed acceptance gates, bounded experiment and ordinary admission/review/
 activation; telemetry cannot weaken authority or auto-promote its own recommendation.
 
-**Observability steps 6 and 7 (proposed, workflow analytics track, slice A0).**
-*Status 2026-09-23: APPROVED by the operator (pre-split issue #48, slice A0).* This is the pointer
+**Observability steps 6 and 7 (proposed, [#16](https://github.com/lorecrafting/foundry/issues/16), slice A0).**
+*Status 2026-09-23: APPROVED by the operator ([#16](https://github.com/lorecrafting/foundry/issues/16), slice A0).* This is the pointer
 the [FR-18B section](#fr-18b--complete-status-and-telemetry-chain) requires. Under the
 proposal FR-20 owns moving the Improver's classifiers, findings and proposals onto
 canonical observations (route step 6, Improver half) and the efficiency validation above

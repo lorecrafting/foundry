@@ -12,8 +12,6 @@ defmodule Foundry.DurableStore.FR08ARereviewMatrixTest do
         ["run", "--no-start", "--no-compile", probe],
         cd: foundry_root,
         env: [
-          {"COORDINATOR_TICK", "0"},
-          {"HERDR_ENV", nil},
           {"TMPDIR", canonical_tmp()}
         ],
         stderr_to_stdout: true
@@ -34,8 +32,6 @@ defmodule Foundry.DurableStore.FR08ARereviewMatrixTest do
         ["run", "--no-start", "--no-compile", probe],
         cd: foundry_root,
         env: [
-          {"COORDINATOR_TICK", "0"},
-          {"HERDR_ENV", nil},
           {"TMPDIR", canonical_tmp()}
         ],
         stderr_to_stdout: true
@@ -56,8 +52,6 @@ defmodule Foundry.DurableStore.FR08ARereviewMatrixTest do
         ["run", "--no-start", "--no-compile", probe],
         cd: foundry_root,
         env: [
-          {"COORDINATOR_TICK", "0"},
-          {"HERDR_ENV", nil},
           {"TMPDIR", canonical_tmp()}
         ],
         stderr_to_stdout: true

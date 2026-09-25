@@ -509,8 +509,8 @@ instrumentation and software/typed-content portability proof. Start with next-st
 add reusable composition only when needed. Its instrumentation contract feeds
 the workflow analytics track ([I-F5](../strategy/PRODUCT.md#i-f5--corestandard-controller-split-and-substitution-experiments)), which owns reproducible
 workflow queries, observed critical paths and bounded workflow-reshaping experiments.
-Their acceptance checklists were filed as issues #47 and #48 of the pre-split repository
-and have not been re-filed in Foundry yet. Both remained open when this planning change merged; no feature is implemented by this document.
+Their acceptance checklists are in issues [#15](https://github.com/lorecrafting/foundry/issues/15) and [#16](https://github.com/lorecrafting/foundry/issues/16), re-filed from the pre-split
+repository on 2026-09-25. Both remained open when this planning change merged; no feature is implemented by this document.
 
 Both runtime tracks require G0/FR-22, the I-F3 software baseline and their accepted
 interfaces, under [I-F3/I-F5](../strategy/PRODUCT.md#candidate-initiatives). One bounded improvement runs

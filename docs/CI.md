@@ -12,8 +12,7 @@ elixir ci/run.exs --output /absolute/path/to/artifacts
 Use the Elixir 1.20.3 / OTP 29.0.5 toolchain pinned by the repository. The GitHub job
 installs those exact versions and pins each action to a full commit SHA. The Elixir runner
 creates exclusive random dependency, build, temporary and runtime roots for every
-invocation. It unsets the runtime override, tick and Herdr-provider switches before
-running these checks. It rejects any tracked or untracked source change before work and
+invocation. It unsets the runtime override before running these checks. It rejects any tracked or untracked source change before work and
 rechecks the exact clean commit/tree afterward.
 
 1. restore the exact committed `mix.lock` with `mix deps.get --check-locked`;

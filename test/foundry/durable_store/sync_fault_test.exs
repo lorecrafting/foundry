@@ -119,8 +119,7 @@ defmodule Foundry.DurableStore.SyncFaultTest do
       System.cmd(
         System.find_executable("mix"),
         ["run", "--no-start", fixture, ctx.path, ctx.extension],
-        stderr_to_stdout: true,
-        env: [{"COORDINATOR_TICK", nil}, {"HERDR_ENV", nil}]
+        stderr_to_stdout: true
       )
 
     assert output =~ "SYNC_OBS="

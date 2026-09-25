@@ -51,8 +51,6 @@ defmodule Foundry.CITest do
     assert environment["MIX_DEPS_PATH"] == Path.join(first, "deps")
     assert environment["TMPDIR"] == Path.join(first, "tmp")
     assert environment["FOUNDRY_RUNTIME_ROOT"] == nil
-    assert environment["COORDINATOR_TICK"] == nil
-    assert environment["HERDR_ENV"] == nil
   end
 
   test "workflow uses immutable official action revisions and no corpus service" do

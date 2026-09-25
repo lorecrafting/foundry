@@ -122,8 +122,7 @@ defmodule Foundry.DurableStore.GatewayTest do
 
       {_output, ^status} =
         System.cmd(System.find_executable("mix"), ["run", "--no-start", fixture, path, boundary],
-          stderr_to_stdout: true,
-          env: [{"COORDINATOR_TICK", nil}, {"HERDR_ENV", nil}]
+          stderr_to_stdout: true
         )
 
       fenced = start_supervised!({Gateway, path: path})

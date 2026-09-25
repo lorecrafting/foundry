@@ -454,7 +454,7 @@ defmodule Foundry.DurableStore.OperationalStorageTest do
           System.find_executable("mix"),
           ["run", "--no-start", fixture, path, operation, destination],
           stderr_to_stdout: true,
-          env: [{"COORDINATOR_TICK", nil}, {"HERDR_ENV", nil}, {"TMPDIR", canonical_tmp()}]
+          env: [{"TMPDIR", canonical_tmp()}]
         )
 
       fenced = start_supervised!({Gateway, path: path}, id: {:fenced, operation})
