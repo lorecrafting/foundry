@@ -1,5 +1,7 @@
 correction
 
+Reviewer: a fresh Fable 5.1 agent (`claude-fable-5-1`), read-only, not the author and not a fork; run outside the lane on 2026-09-25.
+
 Reviewed: /private/tmp/foundry-front-door-review at a076625 (base b43dc0f, commits e30e780 and a076625). Read-only; nothing edited in the checkout.
 
 ## Findings

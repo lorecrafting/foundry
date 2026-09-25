@@ -1,5 +1,7 @@
 PASS WITH CHANGES
 
+Reviewer: a fresh Fable 5.1 agent (`claude-fable-5-1`), read-only, not the author and not a fork; run outside the lane on 2026-09-25.
+
 # Review: WORKFLOW-CONTRACT.md revision 4, R3 "Observability is not authority"
 
 Checkout `/private/tmp/foundry-front-door-review` at `a076625`, read-only. Text under
