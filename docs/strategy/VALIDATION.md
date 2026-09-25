@@ -3,7 +3,7 @@
 [Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Foundry validation
 
 [Product strategy](PRODUCT.md) · [Research register](RESEARCH.md)
-> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
+> Moved from Pramāṇa on 2026-09-24 (Pramāṇa commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 ## Scorecard
 

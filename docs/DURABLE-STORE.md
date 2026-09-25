@@ -3,8 +3,8 @@
 [Foundry](../README.md) › [Docs](README.md) › Durable workflow store
 
 FR-07 introduced the version-1 SQLite authority boundary. It is the store behind the
-[manual lane](batch-d/LANE-RUNBOOK.md): every lane command goes through the workflow kernel
-and this gateway, and the legacy mutation paths it once contained were deleted with the
+[manual lane](batch-d/LANE-RUNBOOK.md): every lane write goes through this gateway, and every
+transition through the workflow kernel, and the legacy mutation paths it once contained were deleted with the
 daemon stack ([plan amendment C1](REPAIR-PLAN.md#clean-room-amendment)). For the
 mechanism in plain terms, read [How Foundry works §4](CONCEPTS.md#4-core-the-durable-authority-store)
 first.

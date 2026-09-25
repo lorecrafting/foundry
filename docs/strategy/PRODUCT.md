@@ -4,7 +4,7 @@
 
 [Strategy brief](../STRATEGY.md) · [Validation](VALIDATION.md) · [Research register](RESEARCH.md)
 **Status:** post-repair investment proposal under the existing authority contract.
-> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
+> Moved from Pramāṇa on 2026-09-24 (Pramāṇa commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 This was written as one half of a joint Pramāṇa/Foundry strategy and is now Foundry's
 alone. The horizon (H0–H4) and gate (G0–G4) labels keep their pre-split meaning. G0 is

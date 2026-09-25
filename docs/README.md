@@ -91,7 +91,6 @@ first lines.
 | [Pi harness](design/PI-HARNESS.md), [Jido harness](design/JIDO-HARNESS.md) | FR-09 harness candidates |
 | [AX substrate](design/AX-SUBSTRATE.md), [Cloudflare OS](design/CLOUDFLARE-OS.md) | execution backend and resource-broker candidates |
 | [FR-10 design](fr-10/FR10-DESIGN-2026-09-23.md) | owned effects and reconciliation |
-| [Bounded effect query](design/bounded-effect-query-design.md) | the FR-18A read interface (now implemented) |
 | [Decompose gateway](design/DECOMPOSE-GATEWAY.md), [Decompose protected primitives](design/DECOMPOSE-PROTECTED-PRIMITIVES.md) | approved batch C2 splits of two Core modules |
 | [O0 authority inventory](orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md), [O1 sequencing](orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md) | the orchestrator seam, step by step |
 
@@ -102,6 +101,7 @@ tests or live docs cite them.
 
 | Document | Why it is here |
 |---|---|
+| [Bounded effect query](design/bounded-effect-query-design.md) | the FR-18A read interface's design, now implemented; cited by observability |
 | [Dogfood readiness](DOGFOOD-READINESS-2026-09-23.md) | the thin-dogfood decision and the lane's accepted risks |
 | [Thin lane design](batch-d/THIN-LANE-DESIGN-2026-09-23.md), [its review](batch-d/thin-lane-review-findings-2026-09-23.md) | the lane's design; tests cite it |
 | [Moved knowledge](design/MOVED-KNOWLEDGE-2026-09-23.md) | edge cases of the deleted daemon and which of FR-09 to FR-13 owns each |
@@ -117,6 +117,7 @@ implementation log, the pre-split [meta-harness proposal](https://github.com/lor
 
 - A new document gets a breadcrumb line under its title, a status line if it is dated or
   design-ahead, and a row in the layer table above.
-- `elixir bin/check_docs.exs` fails on any relative link that does not resolve.
+- `elixir bin/check_docs.exs` fails on any relative link that does not resolve, or any
+  `#anchor` that names no heading in its target.
 - [AGENTS.md](../AGENTS.md) applies to every provider. That neutrality does not relax
   launch policy, billing authorization, review identity or backend conformance.

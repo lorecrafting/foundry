@@ -93,14 +93,15 @@ Core is `lib/foundry/durable_store/`. `DurableStore.Gateway` owns the only SQLit
 connection. It runs in WAL mode with `synchronous=FULL` and a single owner across OS
 processes. For each command it:
 
-1. derives the command's identity from the actor and the complete canonical request;
-2. returns the stored result if that exact command was already committed (**idempotency**:
-   rerun anything after a timeout or crash), and reports a conflict if the same ID arrives
-   with a different request;
+1. takes the command's id from the caller (the lane derives it from state, never from a
+   clock) and fingerprints the actor plus the complete canonical request;
+2. returns the stored result if that id was already committed with the same fingerprint
+   (**idempotency**: rerun anything after a timeout or crash), and reports
+   `idempotency_conflict` if the id arrives with a different one;
 3. commits the input, the result, the events and the projections in one transaction, and
    replies only after `COMMIT` succeeds.
 
-**Protected operations** are policy, allocation ledger, reservations, effects, receipts and
+**Protected operations** include policy, allocation ledger, reservations, effects, receipts and
 leases. They enter only through `Gateway.protected_command/4` and `Gateway.atomic_bundle/4`,
 which need a capability the kernel never sees. So a kernel proposal can ask for an effect
 but cannot mint budget or forge a receipt. The **allocation ledger** holds the budget. The
@@ -131,7 +132,10 @@ Next: [reviewer-independence design](fr-08/FR08B-REVIEWER-INDEPENDENCE-DESIGN-20
 ## 6. Refusals, recovery and uncertain outcomes
 
 - **Refusals are stable atoms**, for example `wrong_source_phase`, `candidate_mismatch` or
-  `git_evidence`. A refusal commits nothing to the ticket, and `lane log` still shows it.
+  `git_evidence`. A refusal commits nothing. Refusals Core itself records (a reviewer refused for
+  independence, a lost revision race) appear in `lane log`. Refusals made before Core is
+  asked (`wrong_source_phase`, `candidate_mismatch`, `git_evidence`) appear only in the
+  operator log.
   Each atom and its remedy is in [runbook §5](batch-d/LANE-RUNBOOK.md#5-refusals).
 - **Crash recovery is fenced.** After an unclean stop, every command reports
   `gateway_recovery` until the operator confirms that no other process owns the store
@@ -157,7 +161,7 @@ bounded query surface for the future status work (FR-18A). Next:
 Nothing in the tree launches an agent, promotes a candidate or activates a release. What
 survives for later tickets is inert:
 
-- `LaunchEligibility` with `Quota` is a pure launch policy with no callers. It allows
+- `LaunchEligibility` with `Quota` is a launch policy with no callers. It allows
   subscription-only routes per role, has no paid fallback, and gives a stable refusal for
   any malformed policy. A model name or an available credential is never entitlement.
 - `effects/process_group.ex` is a process leaf for FR-10.
@@ -179,7 +183,7 @@ FR-15a (isolation). See the [dependency inventory](REPAIR-PLAN.md#dependency-inv
 - **The gate.** `ci/run.exs` runs from fresh roots. It compiles with warnings as errors,
   checks formatting, runs the model-free suite and emits a provenance manifest. See
   [CI](CI.md).
-- **Independent review.** Every change goes through the lane, and a fresh agent on a
+- **Independent review.** Every code change goes through the lane, and a fresh agent on a
   different model reviews it. See [agent brief](AGENT-BRIEF.md) and
   [dogfood log](batch-d/DOGFOOD-LOG.md).
 

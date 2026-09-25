@@ -36,7 +36,7 @@ Foundry lets capable models direct useful work while it keeps these guarantees:
 | **Bounded authority and budget** | Every agent run spends a pre-granted allocation. There are no paid fallbacks, and no eligible budget means the work waits with a reason. |
 | **Exact evidence** | A submission is a specific commit in a clean checkout, descended from the admitted base. Reviews bind to that exact commit. |
 | **Independent acceptance** | Core refuses a reviewer whose recorded principal did the developer work. An agent's own claim never counts as acceptance. Until isolation lands (FR-15aB), principals are recorded, not authenticated. |
-| **Durable, replayable state** | Every acknowledged decision is a committed event in one SQLite store. A restart replays it, and uncertain outcomes are reconciled before any retry. |
+| **Durable, replayable state** | Every acknowledged decision is a committed event in one SQLite store. A restart replays it. An uncertain outcome is never retried: it is settled as `unknown` until FR-10 supplies reconciliation. |
 | **Observation is not authority** | Logs, process exits and transcripts can explain work. They cannot admit, accept or integrate anything. |
 
 The short version is a phrase from the [strategy](docs/STRATEGY.md#working-summary):
@@ -50,9 +50,9 @@ acceptance.*
  ────────            ─────────────────────                     ──────
  lane admit   ──►  ticket: base, scope, acceptance
  lane packet  ──►  developer packet (spends one allocation) ──►  developer works in its own worktree
-                                                             ◄──  lane submit <commit> <checkout>
+                                                             ◄──  lane submit --candidate <sha> --checkout <dir>
  lane packet  ──►  reviewer packet (different principal)   ──►  fresh reviewer, different model
-                                                             ◄──  lane review: approved | correction | rejected
+                                                             ◄──  lane review --verdict approved|correction|rejected
                    ready_to_integrate
  git (manual) ──►  lane integrated: is base..candidate in main?
 ```

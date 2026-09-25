@@ -44,7 +44,7 @@ Load only the topic the task needs; do not preload the plan, history or every li
 
 - Gate: `TMPDIR=/private/tmp elixir ci/run.exs --output <dir outside the repo>`
   ([CI](docs/CI.md)); GitHub Actions runs the same on pushes to `main` and on pull requests (not on other branch pushes).
-- Documentation: `elixir bin/check_docs.exs` (every relative Markdown link resolves).
+- Documentation: `elixir bin/check_docs.exs` (every relative Markdown link and `#anchor` resolves).
 - Focused tests: `TMPDIR=/private/tmp MIX_ENV=test mix test <files>`.
 
 `CLAUDE.md` is a compatibility entry point to this file, not separate policy.

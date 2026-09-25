@@ -221,8 +221,9 @@ epoch; `submit` and `settle` still work on them.
 
 ## 6. Logs
 
-- `lane log [ID]` reads the store: the authoritative trail, including refused commands, and
-  each review's notes body.
+- `lane log [ID]` reads the store: the authoritative trail, including the commands Core refused
+  (refusals raised before Core is asked, such as `wrong_source_phase`, are only in the
+  operator log), and each review's notes body.
 - `<runtime root>/state/manual-lane/notes/<sha256>.md`: every `review --notes` body, archived
   before the review is recorded and named by the digest its receipt stores, so the notes
   outlive `/private/tmp`. `lane log` shows a body only if it still matches its digest.

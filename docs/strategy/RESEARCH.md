@@ -7,7 +7,7 @@
 recommendations. A retrieved article or README is not local conformance, a licence
 review, a partnership or a benchmark reproduction. Recheck moving upstream sources
 at evaluation/adoption; pin actual package/model/data revisions in that work.
-> Moved from Pramāṇa on 2026-09-24 (commit `2ad8ed9`); Foundry maintains this copy on its own.
+> Moved from Pramāṇa on 2026-09-24 (Pramāṇa commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 ## Engineering sources
 

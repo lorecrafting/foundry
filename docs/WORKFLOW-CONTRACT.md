@@ -2,12 +2,13 @@
 
 [Foundry](../README.md) › [Docs](README.md) › Foundry workflow contract — FR-06
 
-Revision **4 (R3 observability boundary added; independent re-review outstanding)**,
-2026-09-20. Revision 3's R4a correction remains independently verified: the
+Revision **4 (R3 observability boundary added and independently reviewed)**,
+2026-09-20; review folded in 2026-09-25. Revision 3's R4a correction remains independently verified: the
 [focused review](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/r4a-focused-review.md) returned **PASS** against the exact
 revision-3 manifest, and revision 4 changes no R1, R2, R4, R4a or R5 decision. The added
-R3 paragraph has **not** been independently reviewed, and no candidate may cite it as
-verified contract text until it has. This is the
+R3 paragraph was independently reviewed on 2026-09-25 (Fable, **PASS WITH CHANGES**,
+[review](batch-d/reviews/CONTRACT-R3.review.md)); its four wording changes are folded in,
+so it may be cited as verified contract text. This is the
 interface contract for the [repair backlog](REPAIR-PLAN.md), subordinate to its agreed
 operator contract. The [audit](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/AUDIT-2026-09-12.md), [independent review v1](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/FR-06-DESIGN-REVIEW.md),
 [response v2](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/fr-06/review-response-v2.md) and [independent review v2](https://github.com/lorecrafting/foundry/blob/records/2026-09-24/docs/archive/FR-06-DESIGN-REVIEW-V2.md)
@@ -112,22 +113,36 @@ interpretation; the candidate cannot rewrite/drop them or acknowledge an uncommi
 command. Bad lifecycle proposals can block progress, but cannot manufacture authority.
 
 **Observability is not authority.** An observation, telemetry record or diagnostic log is
-evidence *about* the system, never a fact the system may decide on. No observation may
+evidence *about* the system, never a fact the system may decide on. Here an observation is a
+record made to explain or display the system: a telemetry record, a diagnostic log line,
+an `operator.log.jsonl` entry, an observation page, an exported trace, or the free-text
+`observation` an `execution_observed` event carries. It is distinct from the attributable
+evidence the contract does decide on (an authenticated command, a claim-bound receipt
+(R1), a sealed inbox stream (R4a) and a root-verified check or review receipt), which R1
+and R4 also call observations when they name the delivery, not the authority. No observation may
 establish a lifecycle disposition, a closed execution, a check or review outcome, or any
-protected fact. The R4 rows already say this one case at a time — a closed execution
-requires verified process/session termination or proved non-start, a check failure uses
-its controller's own `reason_code` rather than an agent's assertion, a review verdict is
-read only from a sealed stream, and pane closure alone cannot assert completion — and
-stating it once here makes it reviewable as a boundary instead of re-derived per row. A
+protected fact. R1 and R4 already say this one case at a time: a `closed` execution "requires
+verified process/session termination or proved non-start" (R4 lifecycle row); a check
+failure "uses its controller exit/receipt reason_code ..., not an agent's assertion"
+(R4); no valid result or verdict is decided until the sealed stream has been processed
+through its last accepted sequence, and later messages are late evidence (R4a, R4.08,
+R4.19); and "missing pane alone is insufficient" and "observing expiry alone proves
+neither termination nor non-start" (R1). Stating it once here makes it reviewable as a
+boundary instead of re-derived per row. A
 projection, board or analytics surface computed from observations is likewise a view, not
 a source. This holds whichever surface an observation reaches: the canonical observation
 envelope, a JSONL diagnostic file, or an exported trace. It is also why the observability
 work may change what is measured, how it is retained and where it is exported without
-ever changing what is decided.
+ever changing what is decided. Enforcement is split as the matrix is: Core refuses an
+observation standing in for a protected fact (receipts settle only their own claim;
+kernel events cannot supply root-derived fields); the lifecycle half (an observation
+cannot close an execution, a verdict is recorded only against a sealed stream and never
+terminalises by itself) is the reference kernel's and holds only for that controller.
 
 Recorded at revision 4 on implementation evidence rather than from first principles. The
 FR-08B kernel enforced this rule three separate times in one subcommit — `execution_observed`
-may not close an execution, a verdict string is not a disposition, and a review verdict
+may not close an execution, a verdict string is not a disposition (`review_recorded`
+records it; only `attempt_settled` terminalises), and a review verdict
 needs a sealed stream — and each was re-derived from individual R4 row text because the
 rule was written nowhere. A rule stated only inside FR-18B would also become ownerless when
 that ticket closes, while the boundary must outlive it.
