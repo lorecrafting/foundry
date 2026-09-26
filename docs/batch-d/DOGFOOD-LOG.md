@@ -44,10 +44,11 @@ on `integ/C2`; `lane integrated` reported no missing commits. The operator pinne
 `DomainCommit`, `AtomicBundle` and `Maintenance`, then ran one FR-08A rebind on the
 integrated tip. The frozen report says `ready=true` and the FR-08A focused test passed
 4/4; the pin list is 12. No batch gate or CI has run.
-ML-DECOMPOSE-PP is admitted on `aa19b69` with an issued Sol developer packet. Its
-uncommitted seven-module split compiles. The developer paused while the shared compiled
-move checker corrected relocation-sensitive imported captures and an anonymous rescue
-variable, then resumed after the approved checker landed. The PP packet remains issued.
+ML-DECOMPOSE-PP candidate `364008a` completed the seven-module split in two commits.
+Its independent [Astra review](reviews/ML-DECOMPOSE-PP.review.md) approved the exact
+range, and both commits are on `integ/C2`; `lane integrated` reports true. The reviewer
+passed 403 focused tests, 337→347 compiled definitions, the closed xref table and
+rule-13 red controls. The seven FR-08A pins and rebind are next.
 The separate xref ratchet ticket `ML-XREF-PP-RATCHET` has an independently
 [approved review](reviews/ML-XREF-PP-RATCHET.review.md) and is integrated on `integ/C2`:
 the six new compile edges are in the approved dependency table, the ceiling is 18,
@@ -69,8 +70,7 @@ can still collapse when both caller and helper move. Its
 direct `Enum.map/2` or `Enum.flat_map/2` callback allowance for the actual PP need. Fifth
 candidate `70dd91c` received [independent approval](reviews/ML-MOVE-CHECK-CONTEXT.review-5.md)
 under that bounded invocation claim. All five candidate commits are on `integ/C2`, and
-`lane integrated` reports true. The PP developer resumed with the corrected checker;
-its code remains unsubmitted. Closure introspection through a custom Enumerable is
+`lane integrated` reports true. Closure introspection through a custom Enumerable is
 outside the checker's claim and is demonstrated in the approval note.
 
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
@@ -91,9 +91,8 @@ The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
 
-**Next:** finish and independently review ML-DECOMPOSE-PP under the
-[Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md) design. Rebind FR-08A
-on its integrated tip, run one local batch gate, open a visible PR for
+**Next:** add the seven named [Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md)
+FR-08A pins and rebind once on the integrated tip, run one local batch gate, open a visible PR for
 Linux CI, then fast-forward `main` locally. The Quint citation update follows the moves.
 Then admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
 serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
@@ -212,7 +211,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
 | ML-MOVE-CHECK-CONTEXT | `246bdf9` | `70dd91c` (five commits) | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md), [correction 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md), [correction 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md), [approved 5](reviews/ML-MOVE-CHECK-CONTEXT.review-5.md) | integ/C2 (`886c743`), gate pending | Direct Enum mapper normalization only; 13 focused tests and 38 independent compiled comparisons passed, real PP check passed, bounded invocation claim recorded. Full range integrated; `lane integrated` true |
 | ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), gate pending | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
-| ML-DECOMPOSE-PP | `aa19b69` | active developer packet | pending | pending | Seven-module split compiles in a dedicated worktree but remains uncommitted and unsubmitted pending the checker correction; no rebind or gate |
+| ML-DECOMPOSE-PP | `aa19b69` | `364008a` (two commits) | [approved](reviews/ML-DECOMPOSE-PP.review.md) | integ/C2 (`ee3075e`), rebind and gate pending | Seven-module split, rule 13 fence and live citations passed 403 reviewer focused tests, compiled 337→347 move check, 18/18 xref, and scratch red controls. Full range integrated; `lane integrated` true |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
