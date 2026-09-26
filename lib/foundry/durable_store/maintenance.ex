@@ -40,11 +40,13 @@ defmodule Foundry.DurableStore.Maintenance do
   end
 
   defp last_sequence(conn) do
-    case Database.query(conn, "SELECT coalesce(max(seq), 0) FROM events") do
+    case sequence_query(conn) do
       {:ok, [[sequence]]} -> {:ok, sequence}
       {:error, reason} -> {:error, {:storage_unavailable, reason}}
     end
   end
+
+  defp sequence_query(conn), do: Database.query(conn, "SELECT coalesce(max(seq), 0) FROM events")
 
   defp replay_evidence(state) do
     %{
@@ -60,7 +62,7 @@ defmodule Foundry.DurableStore.Maintenance do
          {:ok, [[page_size]]} <- Database.query(state.conn, "PRAGMA page_size"),
          {:ok, [[max_page_count]]} <- Database.query(state.conn, "PRAGMA max_page_count"),
          {:ok, [[last_sequence]]} <-
-           Database.query(state.conn, "SELECT coalesce(max(seq), 0) FROM events") do
+           sequence_query(state.conn) do
       {:ok,
        %{
          mode: :ready,
@@ -131,7 +133,7 @@ defmodule Foundry.DurableStore.Maintenance do
          true <- before_view.content == after_view.content,
          true <- before_view.reconstructed == after_view.reconstructed,
          {:ok, [[last_sequence]]} <-
-           Database.query(conn, "SELECT coalesce(max(seq), 0) FROM events") do
+           sequence_query(conn) do
       {:ok,
        %{
          busy: busy,
@@ -337,7 +339,7 @@ defmodule Foundry.DurableStore.Maintenance do
              %{
                path: path,
                content: backup_view.content,
-               reconstruction: publication_reconstruction(backup_view.reconstructed)
+               reconstruction: replay_evidence(backup_view.reconstructed)
              }}
           else
             false -> {:error, :backup_content_mismatch}
@@ -387,15 +389,5 @@ defmodule Foundry.DurableStore.Maintenance do
       {:error, reason} ->
         {:error, reason}
     end
-  end
-
-  defp publication_reconstruction(state) do
-    bytes = :erlang.term_to_binary(state, [:deterministic])
-
-    %{
-      projection_count: map_size(state),
-      sha256: Encoding.digest(bytes),
-      state: state
-    }
   end
 end
