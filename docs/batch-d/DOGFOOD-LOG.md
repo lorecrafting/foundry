@@ -27,18 +27,18 @@ starts, Q9); stores 1 and 2 are archived under `~/.local/state/foundry-lane.stor
 Batch C1b (evidence tools in the gate, the dead verified-transaction route, and the two approved decomposition designs) is the last integrated batch. Developers and reviewers run their own `lane submit` and `lane review` (Q8). Older lane records still list ML-DEAD-VOCAB as `blocked` (superseded by ML-DEAD-VOCAB-2) and ML-DRILL-1 as `rejected` (drills), both by design.
 
 **Current C2 checkpoint.** ML-PRECISION-TOOLING was admitted on `c55413f` in store 3.
-Its clean developer worktree is `/private/tmp/ML-PRECISION-TOOLING-dev` at corrected
-candidate `3511fee2fc13f4c70e0ed59966d40a986edeb34b`. Independent GPT-6 Astra
-reviews under two distinct principals recorded [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md)
-and [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md). The lane is `queued`, with
-no outstanding packet. The second review's four blockers are bare piped local calls,
-unsound declared delegates, compiled clause metadata that makes valid moves fail, and
-the protected import lint rejecting approved `only:` imports. Its detached reviewer worktree
-is clean. The integration worktree `/private/tmp/foundry-integ-C2` is on `integ/C2`;
+Its latest clean developer worktree is `/private/tmp/ML-PRECISION-TOOLING-dev-3` at
+candidate `3d3ec7345148ea36f0d74ba3126ced495784cdfd`. Independent GPT-6 Astra
+reviews under three distinct principals recorded [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md),
+[correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), and
+[correction 3](reviews/ML-PRECISION-TOOLING.review-3.md). The lane is `queued`, with
+no outstanding packet. The third review confirmed the second review's four blockers
+closed but found default-generated arities bypassing move safety and a declared facade
+with a restricted head accepted by the checker. Its detached reviewer worktree is clean.
+The integration worktree `/private/tmp/foundry-integ-C2` is on `integ/C2`;
 it contains only operator decisions and review records, with no candidate cherry-picked.
 No C2 gate, CI, PR or FR-08A rebind has run. Next: issue the developer correction packet
-to a fresh GPT-6 Sol agent with a new principal (the earlier instance ends with this
-session; F9), fix the four findings with lean red controls,
+to a fresh GPT-6 Sol agent with a new principal (F9), fix the two new findings with lean red controls,
 submit, and obtain a fresh different-principal GPT-6 Astra review before integrating.
 Q16 approves the Gateway design defaults; Q17 approves grouped mechanical moves with
 one rebind for the Protected Primitives split. Its other open design questions still
@@ -195,7 +195,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DEAD-ROUTES | `e74fb88` | `1414280` | [approved](reviews/ML-DEAD-ROUTES.review.md) | batch C1b + FR-08A rebind | the test-only `transact_verified` route and `ProtectedVerifier` deleted (FR-08A now pins 9); `Observations` kept because FR-18A is in progress (Q11) |
 | ML-DECOMPOSE-GATEWAY-DESIGN | `e74fb88` | `9e4a710`, then `1f50910` | [correction](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-1.md) (the rebind placeholders would have left FR-08A red; a source-AST move check cannot see alias shadowing), then [approved](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-2.md) | batch C1b + operator fixup | [design](../design/DECOMPOSE-GATEWAY.md): Gateway facade + DomainCommit + AtomicBundle + Maintenance. The operator aligned its rebind steps with ML-DEAD-ROUTES and the sibling review |
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
-| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`; correction pending | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md) | pending | OpenAI-only developer/reviewer on different models (Q15). First review found four unsafe tool paths plus format and stale Fable wording; second closed several but found bare pipes, declared delegate semantic drift, clause-metadata false failures and rejected narrow imports. Lane `queued`, no outstanding packet; no gate or PR yet |
+| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`; correction pending | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md) | pending | OpenAI-only developer/reviewer on different models (Q15). Third review confirmed the second review's four blockers closed, but found default-generated arities bypassing move safety and restricted facade heads accepted by the checker. Lane `queued`, no outstanding packet; no gate or PR yet |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -255,7 +255,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | F17 | refusals | Every refused lane command also prints an Elixir `RuntimeError` stack trace from `cli.ex:86` on stderr; stdout and the exit code are right | print the refusal and exit non-zero without raising |
 | F18 | `bin/check_docs.exs` | It resolves links against tracked files only, so a link to a newly copied, unstaged review file reads as broken (hit twice) | `git add` before `check_docs`, or check the working tree |
 | F19 | usage limits | A shared API session limit killed both running developers and a reviewer at once. The lane recorded nothing: the tickets sat in `active` and `reviewing`. Resuming the same agent instances after the reset lost no work and kept one principal per instance (compare F9) | the operator checks `lane status` and worktrees after any limit; run fewer agents at once when the budget is tight |
-| F20 | new move tooling | The first ML-PRECISION-TOOLING candidate's focused suite was green, but independent review reproduced four unsafe or falsely reassuring paths: piped callers, alias shadowing/chains, a wrong split-set call target accepted by the compiled checker, and source modification before a failed destination write. One capture-form defect had already been caught by the developer's red control. The second review found four more gaps despite 24 focused tests. Cost so far: two correction rounds before either decomposition can use the tools | add each realistic failure as a controlled regression, fix or conservatively refuse it, and have a new reviewer probe the corrected candidate before integration |
+| F20 | new move tooling | The first ML-PRECISION-TOOLING candidate's focused suite was green, but independent review reproduced four unsafe or falsely reassuring paths: piped callers, alias shadowing/chains, a wrong split-set call target accepted by the compiled checker, and source modification before a failed destination write. One capture-form defect had already been caught by the developer's red control. The second review found four more gaps despite 24 focused tests; the third found two more despite 27 focused tests. Cost so far: three correction rounds before either decomposition can use the tools | add each realistic failure as a controlled regression, fix or conservatively refuse it, and have a new reviewer probe the corrected candidate before integration |
 | F21 | model-specific brief | `docs/AGENT-BRIEF.md` still named Fable as the required independent reviewer after Q15 switched this campaign to OpenAI-only models; independent review found it in the first C2 candidate. Cost: a documentation correction and risk that a future operator would pause unnecessarily | make the standing rule fresh/different-model, record same-vendor independence limitation, and name the chosen principal only in each ticket's brief |
 | F22 | local lane access under managed sandbox | After the session's sandbox profile changed, a read-only `bin/foundry lane status` and the reviewer's `lane review` initially failed with `Protocol 'inet_tcp': register/listen error: eperm`; the local Erlang distribution needs sandbox escalation. Cost: delayed recording the second verdict | use the command approval path for lane RPC under this sandbox; confirm the store receipt rather than treating a written review file as recorded |
 
