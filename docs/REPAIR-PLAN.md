@@ -130,7 +130,7 @@ committed facts and idempotent requests after restart. Client hooks may suggest 
 are not authority or proof that every action was observed. A failed or unavailable client
 integration cannot silently fall back to asserted identity or self-reported checks.
 
-The full autonomous repair remains a **later, separately chosen finish line**. Existing
+The full autonomous repair remains a **later, separately chosen finish line**.
 Remaining unresolved FR-08B–FR-22 full-scope obligations and F01–F24 findings stay open
 until their own acceptance; completed statuses remain unchanged. The portable milestone
 does not mark the remaining obligations complete. Work on FR-09–12, the

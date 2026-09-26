@@ -48,7 +48,8 @@ agent-session recovery or autonomous execution in this milestone. The first exte
 pilot compares Foundry-governed and ordinary native-client work on LokaCore, with
 operator effort and false refusals included. An independent Astra
 [strategy review](reviews/PORTABLE-STRATEGY.review-1.md) required correction of the
-protected promotion boundary and three wording errors; the revised plan awaits re-review.
+protected promotion boundary and three wording errors; its
+[re-review](reviews/PORTABLE-STRATEGY.review-2.md) approved the corrected plan.
 The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
