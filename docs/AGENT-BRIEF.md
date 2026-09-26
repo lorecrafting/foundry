@@ -38,6 +38,24 @@ Written 2026-09-23 from one day's integration of about twenty agent candidates.
   committed states in one day.
 - **Record, do not decide, open operator questions.** Stop and report rather than choosing a
   contract reading the operator has not approved.
+- **Review every implementation twice before handoff.** Apply Ponytail to the actual diff:
+  reuse existing code and standard tools, delete speculative structure, and keep the smallest
+  solution that meets the contract. Then check correctness against callers, failure cases,
+  changed behavior and scope. This is a model-neutral self-review, not a replacement for
+  independent review.
+
+## Writing lean tests
+
+- Each new test must catch a **distinct plausible regression** that existing tests miss.
+  Name that break before writing the test; consolidate overlapping cases and delete tests
+  that only raise a count. Keep exact contract pins and golden answers when they guard a
+  real invariant.
+- Derive expected answers independently from a fixture, contract row or hand-checked literal,
+  never from the implementation under test. Exercise controlled behavior and exit status
+  where possible, rather than matching source text. Do not test trivial dependencies,
+  forwarding functions or the language itself; use minimal fixtures.
+- Before handoff, make one realistic mutation per new mechanism and observe a red failure.
+  Use `mix test --force` for an Elixir mutation when file mtimes could hide recompilation.
 
 ## Commits and report
 

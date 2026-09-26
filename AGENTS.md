@@ -48,3 +48,7 @@ Load only the topic the task needs; do not preload the plan, history or every li
 - Focused tests: `TMPDIR=/private/tmp MIX_ENV=test mix test <files>`.
 
 `CLAUDE.md` is a compatibility entry point to this file, not separate policy.
+
+Keep this entry point under 800 words. Put each fact in one owning document and link to it
+elsewhere. At milestones, tidy live documentation to match the code; leave frozen contracts,
+historical records and review notes intact.

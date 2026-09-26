@@ -7,6 +7,13 @@
 root = Path.expand("..", __DIR__)
 {files, 0} = System.cmd("git", ["ls-files", "-z", "--", "*.md"], cd: root)
 
+agents_words =
+  root
+  |> Path.join("AGENTS.md")
+  |> File.read!()
+  |> String.split(~r/\s+/, trim: true)
+  |> length()
+
 slug = fn heading ->
   heading
   |> String.replace(~r/\[([^\]]*)\]\([^)]*\)/, "\\1")
@@ -54,4 +61,5 @@ broken =
 
 Enum.each(Enum.sort(broken), &IO.puts/1)
 IO.puts("#{length(broken)} broken link(s)")
-System.halt(if broken == [], do: 0, else: 1)
+IO.puts("AGENTS.md: #{agents_words}/800 words")
+System.halt(if broken == [] and agents_words <= 800, do: 0, else: 1)
