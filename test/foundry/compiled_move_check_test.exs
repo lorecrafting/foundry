@@ -141,6 +141,118 @@ defmodule Foundry.CompiledMoveCheckTest do
     assert output =~ "declared delegate target differs"
   end
 
+  test "line shifts preserve compiled bodies" do
+    root = Path.join(System.tmp_dir!(), "line_move_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    compile_source(base, "value.ex", "defmodule Lines.Before do\n  def value(v), do: v\nend\n")
+
+    compile_source(
+      candidate,
+      "value.ex",
+      "defmodule Lines.After do\n  # moved\n  def value(v), do: v\nend\n"
+    )
+
+    {output, 0} =
+      System.cmd("elixir", ["bin/check_move.exs", base, candidate, "Lines.Before", "Lines.After"],
+        stderr_to_stdout: true
+      )
+
+    assert output =~ "compiled definitions match"
+  end
+
+  test "a declared facade must forward unchanged to its own moved body" do
+    root = Path.join(System.tmp_dir!(), "facade_move_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    compile_source(
+      base,
+      "base.ex",
+      "defmodule Identity.Facade do\n  def value(a, b), do: a - b\nend\ndefmodule Identity.Other do\n  def value(a, b), do: b - a\nend\n"
+    )
+
+    modules = "Identity.Facade,Identity.Other,Identity.Owner"
+
+    args = [
+      "bin/check_move.exs",
+      base,
+      candidate,
+      "Identity.Facade,Identity.Other",
+      modules,
+      "Identity.Facade.value/2"
+    ]
+
+    for {facade, accepted?} <- [
+          {"defdelegate value(a, b), to: Identity.Owner", true},
+          {"defdelegate value(a, b), to: Identity.Other", false},
+          {"def value(a, b), do: Identity.Owner.value(b, a)", false},
+          {"def value(a, b), do: -Identity.Owner.value(a, b)", false},
+          {"def value(a, b) do\n    Identity.Owner.value(a, b)\n    :wrong\n  end", false}
+        ] do
+      compile_source(
+        candidate,
+        "candidate.ex",
+        "defmodule Identity.Other do\n  def value(a, b), do: b - a\nend\ndefmodule Identity.Owner do\n  def value(a, b), do: a - b\nend\ndefmodule Identity.Facade do\n  #{facade}\nend\n"
+      )
+
+      {output, status} = System.cmd("elixir", args, stderr_to_stdout: true)
+      assert status == 0 == accepted?, output
+    end
+  end
+
+  test "protected lint permits narrow imports but rejects unrelated imports" do
+    root = Path.join(System.tmp_dir!(), "import_move_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+    compile_source(base, "value.ex", "defmodule Imports.Before do\n  def value(v), do: v\nend\n")
+
+    compile_source(
+      candidate,
+      "value.ex",
+      "defmodule Imports.After do\n  def value(v), do: v\nend\n"
+    )
+
+    source = Path.join(root, "lint.ex")
+
+    args = [
+      "bin/check_move.exs",
+      base,
+      candidate,
+      "Imports.Before",
+      "Imports.After",
+      "--lint-protected",
+      source
+    ]
+
+    File.write!(
+      source,
+      "defmodule Imports.Lint do\n  import Foundry.DurableStore.Protected.Rows, only: [row: 1]\nend\n"
+    )
+
+    {output, 0} = System.cmd("elixir", args, stderr_to_stdout: true)
+    assert output =~ "compiled definitions match"
+
+    File.write!(
+      source,
+      "defmodule Imports.Lint do\n  import Foundry.ManualLane.Replay, only: [row: 1]\nend\n"
+    )
+
+    {output, status} = System.cmd("elixir", args, stderr_to_stdout: true)
+    assert status != 0
+    assert output =~ "forbidden split directive"
+  end
+
   defp compile(dir, module, body) do
     compile_source(
       dir,

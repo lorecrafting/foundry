@@ -230,8 +230,8 @@ if Mix.env() in [:dev, :test] do
         {_node, found} =
           Macro.prewalk(node, false, fn
             {:|>, _, [_, {name, _, args}]} = ast, seen
-            when is_atom(name) and is_list(args) ->
-              {ast, seen or MapSet.member?(signatures, {name, length(args) + 1})}
+            when is_atom(name) and (is_list(args) or is_nil(args)) ->
+              {ast, seen or MapSet.member?(signatures, {name, length(args || []) + 1})}
 
             {:&, _, [{:/, _, [{name, _, _}, {:__block__, _, [arity]}]}]} = ast, seen
             when is_atom(name) and is_integer(arity) ->

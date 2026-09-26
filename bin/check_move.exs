@@ -39,7 +39,7 @@ defmodule Foundry.MoveCheck do
     if MapSet.size(disputed) > 0,
       do: raise("ambiguous split call: #{inspect(MapSet.to_list(disputed))}")
 
-    Enum.each(declared, &check_addition!(&1, base, candidate))
+    Enum.each(declared, &check_addition!(&1, base, candidate, candidate_dir))
 
     unexpected =
       candidate
@@ -108,7 +108,11 @@ defmodule Foundry.MoveCheck do
   end
 
   defp allowed_directive?(:import, text),
-    do: String.match?(text, ~r/^import Foundry\.DurableStore\.Protected\.[A-Z][A-Za-z]+$/)
+    do:
+      String.match?(
+        text,
+        ~r/^import Foundry\.DurableStore\.Protected\.[A-Z][A-Za-z]+(?:, only: \[[a-z_?!]+: \d+(?:, [a-z_?!]+: \d+)*\])?$/
+      )
 
   defp allowed_directive?(_, _), do: false
 
@@ -123,8 +127,8 @@ defmodule Foundry.MoveCheck do
      {String.to_atom(List.last(parts)), String.to_integer(arity)}}
   end
 
-  defp check_addition!({_, key} = added, base, candidate) do
-    base_bodies = for {_, ^key, body, _, _} <- base, do: body
+  defp check_addition!({base_owner, key} = added, base, candidate, candidate_dir) do
+    base_bodies = for {^base_owner, ^key, body, _, _} <- base, do: body
 
     if base_bodies != [] do
       owners =
@@ -132,20 +136,27 @@ defmodule Foundry.MoveCheck do
             {owner, key} != added and body in base_bodies,
             do: owner
 
-      remote =
-        case Enum.find(candidate, fn {owner, name, _, _, _} -> {owner, name} == added end) do
-          {_, _, _, _, calls} -> Enum.reject(calls, fn {owner, _} -> is_nil(owner) end)
-          nil -> []
-        end
+      unless forwarding_target(candidate_dir, base_owner, key) in owners,
+        do: raise("declared delegate target differs: #{inspect(added)}")
+    end
+  end
 
-      case remote do
-        [{target, ^key}] ->
-          if target not in owners,
-            do: raise("declared delegate target differs: #{inspect(added)}")
+  defp forwarding_target(dir, mod, {name, arity} = key) do
+    beam = Path.join(dir, "#{mod}.beam")
+    {:ok, {^mod, [debug_info: {:debug_info_v1, backend, data}]}} =
+      :beam_lib.chunks(String.to_charlist(beam), [:debug_info])
 
-        _ ->
-          raise("declared delegate target differs: #{inspect(added)}")
-      end
+    {:ok, %{definitions: defs}} = backend.debug_info(:elixir_v1, mod, data, [])
+
+    case Enum.find(defs, fn {found, _, _, _} -> found == key end) do
+      {^key, :def, _, [{_, args, [], {{:., _, [target, ^name]}, _, forwarded}}]}
+      when is_list(args) and length(args) == arity and is_list(forwarded) ->
+        if normalize(args, MapSet.new()) == normalize(forwarded, MapSet.new()),
+          do: target,
+          else: nil
+
+      _ ->
+        nil
     end
   end
 
@@ -174,6 +185,9 @@ defmodule Foundry.MoveCheck do
 
       {head, meta, args} when is_list(meta) ->
         {normalize(head, split), [], normalize(args, split)}
+
+      {meta, args, guards, body} when is_list(meta) ->
+        {[], normalize(args, split), normalize(guards, split), normalize(body, split)}
 
       tuple when is_tuple(tuple) ->
         tuple |> Tuple.to_list() |> Enum.map(&normalize(&1, split)) |> List.to_tuple()
