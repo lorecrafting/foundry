@@ -253,25 +253,46 @@ defmodule Foundry.MoveCheck do
   defp call_sites(list, split) when is_list(list), do: Enum.flat_map(list, &call_sites(&1, split))
   defp call_sites(_, _), do: []
 
-  defp capture_targets({:&, _, [{:/, _, [{name, _, context}, arity]}]}, owner, _split)
+  defp capture_targets(term, owner, split, direct_mapper? \\ false)
+
+  defp capture_targets(
+         {:&, _, [{:/, _, [{name, _, context}, arity]}]},
+         owner,
+         _split,
+         direct_mapper?
+       )
        when is_atom(name) and (is_nil(context) or context == []) and is_integer(arity),
-       do: [{owner, {name, arity}, :local}]
+       do: [{owner, {name, arity}, :local, direct_mapper?}]
 
-  defp capture_targets({:&, _, [{:/, _, [{{:., _, [mod, name]}, _, []}, arity]}]}, _, split)
+  defp capture_targets(
+         {:&, _, [{:/, _, [{{:., _, [mod, name]}, _, []}, arity]}]},
+         _,
+         split,
+         direct_mapper?
+       )
        when is_atom(mod) and is_atom(name) and is_integer(arity),
-       do: if(MapSet.member?(split, mod), do: [{mod, {name, arity}, :remote}], else: [])
+       do:
+         if(MapSet.member?(split, mod),
+           do: [{mod, {name, arity}, :remote, direct_mapper?}],
+           else: []
+         )
 
-  defp capture_targets(tuple, owner, split) when is_tuple(tuple),
+  # Only a direct arity-1 Enum mapper invokes the capture before it can escape.
+  defp capture_targets({{:., _, [Enum, fun]}, _, [input, mapper]}, owner, split, _)
+       when fun in [:map, :flat_map],
+       do: capture_targets(input, owner, split) ++ capture_targets(mapper, owner, split, true)
+
+  defp capture_targets(tuple, owner, split, _) when is_tuple(tuple),
     do: tuple |> Tuple.to_list() |> Enum.flat_map(&capture_targets(&1, owner, split))
 
-  defp capture_targets(list, owner, split) when is_list(list),
+  defp capture_targets(list, owner, split, _) when is_list(list),
     do: Enum.flat_map(list, &capture_targets(&1, owner, split))
 
-  defp capture_targets(_, _, _), do: []
+  defp capture_targets(_, _, _, _), do: []
 
   defp same_capture?(
-         {before_owner, key, before_kind} = before,
-         {after_owner, key, after_kind} = moved,
+         {before_owner, key, before_kind, before_direct?} = before,
+         {after_owner, key, after_kind, after_direct?} = moved,
          base,
          candidate,
          enclosing_moved?
@@ -289,13 +310,15 @@ defmodule Foundry.MoveCheck do
         end) == 1
 
     before_body != nil and before_body == after_body and
-      (before_kind == after_kind or (enclosing_moved? and target_moved?)) and
+      (before_kind == after_kind or
+         (enclosing_moved? and target_moved? and elem(key, 1) == 1 and before_direct? and
+            after_direct?)) and
       (before_owner == after_owner or target_moved?)
   end
 
   defp same_capture?(_, _, _, _, _), do: false
 
-  defp capture_body({owner, key, _kind}, definitions) do
+  defp capture_body({owner, key, _kind, _direct_mapper?}, definitions) do
     case Enum.find(definitions, fn {mod, found, _, _, _, _} -> {mod, found} == {owner, key} end) do
       {_, _, body, _, _, _} -> body
       nil -> nil

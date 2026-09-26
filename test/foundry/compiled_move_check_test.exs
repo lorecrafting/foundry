@@ -349,6 +349,70 @@ defmodule Foundry.CompiledMoveCheckTest do
     assert output =~ "capture target differs"
   end
 
+  test "moved captures that escape across tuple or function boundaries keep their identity" do
+    root = Path.join(System.tmp_dir!(), "capture_identity_#{:erlang.unique_integer([:positive])}")
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    for {shape, base_calls, candidate_calls, expression} <- [
+          {"tuple", "def captures, do: {&helper/1, &Identity.Before.helper/1}",
+           "def captures, do: {&helper/1, &Identity.Owner.helper/1}",
+           "(fn -> {a, b} = Identity.Before.captures(); a == b end).()"},
+          {"separate", "def first, do: &helper/1\n  def second, do: &Identity.Before.helper/1",
+           "def first, do: &helper/1\n  def second, do: &Identity.Owner.helper/1",
+           "Identity.Before.first() == Identity.Before.second()"}
+        ] do
+      base = Path.join([root, shape, "base"])
+      candidate = Path.join([root, shape, "candidate"])
+      File.mkdir_p!(base)
+      File.mkdir_p!(candidate)
+
+      compile_source(base, "value.ex", """
+      defmodule Identity.Before do
+        #{base_calls}
+        def helper(v), do: v + 1
+      end
+      """)
+
+      compile_source(candidate, "value.ex", """
+      defmodule Identity.Owner do
+        def helper(v), do: v + 1
+      end
+      defmodule Identity.After do
+        import Identity.Owner, only: [helper: 1]
+        #{candidate_calls}
+      end
+      """)
+
+      {before_value, 0} = System.cmd("elixir", ["-pa", base, "-e", "IO.inspect(#{expression})"])
+
+      after_expression =
+        expression
+        |> String.replace("Identity.Before", "Identity.After")
+
+      {after_value, 0} =
+        System.cmd("elixir", ["-pa", candidate, "-e", "IO.inspect(#{after_expression})"])
+
+      assert String.trim(before_value) == "false"
+      assert String.trim(after_value) == "true"
+
+      {output, status} =
+        System.cmd(
+          "elixir",
+          [
+            "bin/check_move.exs",
+            base,
+            candidate,
+            "Identity.Before",
+            "Identity.After,Identity.Owner"
+          ],
+          stderr_to_stdout: true
+        )
+
+      assert status != 0
+      assert output =~ "capture target differs"
+    end
+  end
+
   test "unresolved capture targets are refused" do
     root = Path.join(System.tmp_dir!(), "capture_missing_#{:erlang.unique_integer([:positive])}")
     base = Path.join(root, "base")
