@@ -42,7 +42,7 @@ session; F9), fix the four findings with lean red controls,
 submit, and obtain a fresh different-principal GPT-6 Astra review before integrating.
 Q16 approves the Gateway design defaults; Q17 approves grouped mechanical moves with
 one rebind for the Protected Primitives split. Its other open design questions still
-need human decisions before that ticket starts.
+have Q18 decisions recorded below.
 
 **Next.**
 
@@ -230,6 +230,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q15 | C2 review models, Ponytail, docs and test discipline | **Decided 2026-09-26 by the human:** use OpenAI models only while Claude Code is unavailable; choose model by task complexity and use a different model for independent review. Install Ponytail for Codex and require its developer self-review in standing briefs. Add a docs Ponytail (800-word `AGENTS.md` cap and milestone tidy pass) to ML-PRECISION-TOOLING. Adapt Lokacore's test guidance so every new test has a distinct plausible regression, independent expected answer and demonstrated red control where required; keep fixtures and test count lean. Put pinned `ast-grep` CI lints in a separate follow-up ticket. Open visible GitHub PRs for batch CI, then fast-forward locally rather than merge on GitHub. Same-vendor model review is weaker independence than cross-vendor review (risk A3) |
 | Q16 | Gateway split's open design choices | **Decided 2026-09-26 by the human:** use the [Gateway design](../design/DECOMPOSE-GATEWAY.md#8-operator-questions-recorded-not-decided) defaults: pin `Maintenance` in FR-08A, retain the `Gateway` delegate for the ProtectedPrimitives back-edge, and defer T3's semantic deletion of legacy protected inserts to its own reviewed ticket. Q15/Q12 already keep the shared move checker in `bin/` |
 | Q17 | Speed of the Protected Primitives split | **Decided 2026-09-26 by the human:** use grouped mechanical moves verified as they land, focused checks during the split, one independent review and one FR-08A rebind on the integrated tip. Keep semantic cleanup, including legacy deletion, in separate reviewed work. The 9 → 19 pin-list growth means one rebind with more pinned files, not a rebind after each move |
+| Q18 | Protected Primitives design's remaining open questions | **Decided 2026-09-26 by the human:** keep the facade through this ticket and decide delegate removal separately; amend FR-23 acceptance to allow one rebind on each integrated split tip; pin the seven named `Protected.*` modules; retain the shared move checker in `bin/`; keep `Operations` whole; use `Protected.*` files in a subdirectory. These are the proposed defaults in [the design §7](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md#7-risks-and-open-questions-recorded-not-decided), approved together before implementation |
 
 ## Frictions
 

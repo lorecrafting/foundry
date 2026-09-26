@@ -1643,9 +1643,11 @@ its source SHA-256 and loaded BEAM MD5, broke the frozen FR-08A attestation and 
 identity at once. FR-22 therefore depends on FR-23.
 
 **Acceptance:** Each part is behavior-preserving and demonstrated so: the full model-free
-suite passes before and after with no test deleted or weakened to accommodate a move, and
-every revision-bound attestation is rebound in the same commit that changes its subject,
-never in a follow-up. Decomposition preserves public interfaces or migrates every caller
+suite passes before and after with no test deleted or weakened to accommodate a move. For
+each reviewed decomposition split, rebind revision-bound attestations once on the
+integrated tip after its grouped mechanical moves, before the batch gate, PR and main
+fast-forward; intermediate move commits may leave the pin test expected-red.
+Decomposition preserves public interfaces or migrates every caller
 in the same change, with a recorded `mix xref callers` search for every changed public function ([AGENTS.md](../AGENTS.md#searching-code)).
 Removal of any identifier is justified by a recorded search showing no dispatch, not by
 inspection alone. Documentation routes and the catalog resolve after the sweep.
