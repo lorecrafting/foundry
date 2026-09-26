@@ -34,9 +34,13 @@ that fails, with the file and line of the offence.
     Prose only.
 12. **`kernel/software/` is the replaceable reference controller, and deletable.** Prose
     only; rule 4 keeps the generic kernel from growing new dependencies on it.
+13. **Only the protected command pipeline may reference `Protected.*` modules.** The
+    facade and modules under `lib/foundry/durable_store/protected/` may reference them;
+    the FR-08A pin provider may name them only in `@api_identity`. Gate: `rule 13 only
+    the protected split and facade reference protected modules`.
 
 `boundary` also checks declared module groups during compilation with warnings as errors.
-The architecture test above remains the source specification for rules 1–4 and 6; the
+The architecture test above remains the source specification for rules 1–4, 6 and 13; the
 declarations give an earlier failure for forbidden cross-group calls. The xref ratchet in
 `bin/check_xref.exs` preserves the measured cycle and compile-edge ceilings and the
 approved split-module edges.

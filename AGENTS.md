@@ -10,7 +10,7 @@ document or process applies here. These instructions apply to every provider.
 |---|---|
 | Anything | [The Foundry index](docs/README.md) (read its layers top down), then the current [repair plan](docs/REPAIR-PLAN.md) and the ticket's own evidence |
 | Understanding a mechanism or a term | [How Foundry works](docs/CONCEPTS.md): each mechanism in plain terms, and the glossary |
-| Any code change | [Boundary rules](docs/BOUNDARY-RULES.md) first — twelve rules, most enforced by the gate |
+| Any code change | [Boundary rules](docs/BOUNDARY-RULES.md) first — thirteen rules, most enforced by the gate |
 | Writing Elixir or tests | [Elixir conventions](docs/ELIXIR-CONVENTIONS.md) |
 | Adding or changing a guard, transition or refusal test | [Evidence tools](docs/EVIDENCE-TOOLS.md) first |
 | Delegating work to an agent | [Agent brief](docs/AGENT-BRIEF.md): the standing clauses every task prompt inherits |

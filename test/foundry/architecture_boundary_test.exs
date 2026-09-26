@@ -32,6 +32,8 @@ defmodule Foundry.ArchitectureBoundaryTest do
     {Foundry.Workflow.Kernel, {:@, :families}}
   ]
 
+  @protected_sites [{Foundry.Repair.FR08AProtectedBoundary, {:@, :api_identity}}]
+
   # Rule 3's declared sites: every place Core may spell a role (`developer`, `reviewer`,
   # `pm`, alone or as a dotted part such as `starts.developer`). Pinned by module and
   # attribute or function name, not by line or count, so removing a site stays green and a
@@ -44,9 +46,9 @@ defmodule Foundry.ArchitectureBoundaryTest do
   # Snake-case compounds (`developer_closed`) are event-type names, not role tokens.
   @role_sites [
     {Foundry.DurableStore.TransitionPlan, {:@, :read_kinds}},
-    {Foundry.DurableStore.ProtectedPrimitives, {:@, :dimensions}},
-    {Foundry.DurableStore.ProtectedPrimitives, {:def, :persist_nonstart_settlement}},
-    {Foundry.DurableStore.ProtectedPrimitives, {:defp, :required_dimension}}
+    {Foundry.DurableStore.Protected.Guards, {:@, :dimensions}},
+    {Foundry.DurableStore.Protected.Operations, {:def, :persist_nonstart_settlement}},
+    {Foundry.DurableStore.Protected.Guards, {:def, :required_dimension}}
   ]
   @role ~r/(?<![A-Za-z0-9_])(developer|reviewer|pm)(?![A-Za-z0-9_])/i
 
@@ -56,6 +58,7 @@ defmodule Foundry.ArchitectureBoundaryTest do
   @workflow_prefix ~w(Foundry Workflow)
   @store_prefix ~w(Foundry DurableStore)
   @software_prefix ~w(Foundry Workflow Kernel Software)
+  @protected_prefix ~w(Foundry DurableStore Protected)
 
   describe "rule 1" do
     test "Core references no Workflow module" do
@@ -162,6 +165,31 @@ defmodule Foundry.ArchitectureBoundaryTest do
     test "red control: a dotted role part in an attribute is seen" do
       path = fixture("defmodule M do\n @x ~w(starts.pm)\nend")
       assert [{^path, 2, {M, {:@, :x}}, "starts.pm"}] = role_tokens([path])
+    end
+  end
+
+  describe "rule 13" do
+    test "only the protected split and facade reference protected modules" do
+      Path.wildcard("lib/**/*.ex")
+      |> references(&under?(&1, @protected_prefix))
+      |> Enum.reject(fn {path, _, site, _} ->
+        String.starts_with?(path, "lib/foundry/durable_store/protected/") or
+          path == "lib/foundry/durable_store/protected_primitives.ex" or
+          site in @protected_sites
+      end)
+      |> assert_none(13)
+    end
+
+    test "red control: an aliased protected writer outside the split is seen" do
+      path =
+        fixture(
+          "defmodule Foundry.ManualLane.Leak do\n" <>
+            " alias Foundry.DurableStore.Protected.Rows\n" <>
+            " def write(conn, id, row), do: Rows.update_ledger(conn, id, row)\nend"
+        )
+
+      assert [{^path, 2, _, _}, {^path, 3, _, _}] =
+               references([path], &under?(&1, @protected_prefix))
     end
   end
 
