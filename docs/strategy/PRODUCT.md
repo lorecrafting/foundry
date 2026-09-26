@@ -71,7 +71,7 @@ not that acceptance. This strategy neither closes tickets nor suspends obligatio
 A discovered contradiction returns to the owning contract through review. The
 operator-approved portable milestone changes the active queue, not the evidence
 required to claim a full autonomous repair. Funding that later capability is a
-separate choice informed by the LokaCore comparison.
+separate choice informed by the Foundry-internal comparison.
 
 ## One operating model, not several overlapping stacks
 

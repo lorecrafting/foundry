@@ -43,30 +43,32 @@ supports it. If the baseline also rejects the attempt, Foundry added no
 measured prevention for that case; if the baseline was not observed, the counterfactual
 is unknown. No denominator or too few comparable trials means **insufficient evidence**.
 
-### LokaCore live comparison
+### Foundry-internal comparison
 
-After project-specific admission and isolation are approved, use LokaCore as the first
-external-repository pilot. Start with Codex; add Claude Code when it is available and
-record its results as a separate client stratum. Prospectively allocate comparable real
-tickets between the operator's ordinary native-client workflow and that same workflow with Foundry
-governing evidence and acceptance. Balance by task class and estimated difficulty;
-keep model, required checks, independent review standard and observation window as
-similar as practical. A brief shadow period may measure integration overhead and
-counterfactual refusal signals, but cannot demonstrate prevention because Foundry did
-not control acceptance in that arm. Do not run the same production change twice and
-pretend the second run is independent; replay exact inputs only for a specific disputed
-boundary decision in isolated copies.
+Use real, prospectively selected Foundry maintenance tickets as the first pilot. Keep
+LokaCore separate. Start with Codex; add Claude Code when available and report it as a
+separate client stratum. Match tickets by task class and estimated difficulty, then
+allocate them between the operator's ordinary native-client workflow and that workflow
+with Foundry governing evidence and acceptance. Pin the model, required checks,
+independent review standard and observation window as closely as practical. Run baseline
+work in isolated branches with the same ordinary PR/CI protections. Do not give either
+agent access to the other arm's authority or accepted ref. Admit any baseline result to
+the live Foundry tree only through the project's normal reviewed integration policy;
+record that later step separately from the baseline outcome.
 
-An independent assessor inspects actual merged trees and later corrections or failures,
-blinded to the arm where practical. The primary live outcome is accepted changes that
-remain acceptable through the declared window **per total operator hour**. Include
-setup, review, interventions, failed submissions, false blocks and Foundry maintenance in
-those hours. Report per-arm counts, task mix, time to acceptance, escaped defects and
-resource cost; explain allocation changes or missing follow-up. A refusal count alone is
-not a benefit. Before the pilot, state what extra operator time is acceptable for a
-demonstrated reduction in unsafe acceptance or rework. If Foundry shows no incremental
-benefit at that cost, remove or narrow the governed surface rather than preserving a
-layer merely because it produced a detailed log.
+An independent assessor inspects exact candidate trees, ordinary review/CI results and
+later corrections, blinded to the arm where practical. The primary comparison is changes
+adjudicated acceptable through the declared window **per total operator hour**. Include
+setup, review, interventions, failed submissions, false blocks and Foundry maintenance.
+Report per-arm counts, task mix, time to adjudication, escaped defects and resource cost;
+explain allocation changes and missing follow-up. A refusal count alone is not a benefit.
+Controlled hostile attempts run against isolated copies of both workflows; claim
+prevention only when the native workflow actually accepts the same unsafe input under
+its declared rules. A shadow candidate that was never eligible for acceptance supplies
+overhead and quality evidence, not prevention evidence. Before the pilot, state how much
+extra operator time is acceptable for a demonstrated reduction in unsafe acceptance or
+rework. If Foundry shows no incremental benefit at that cost, remove or narrow the
+governed surface.
 
 ## Scorecard
 

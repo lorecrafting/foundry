@@ -78,9 +78,9 @@ as the first product milestone. Codex, Claude Code and other clients orchestrate
 Foundry authenticates and protects exact admission, candidate/check/review evidence,
 and operator-triggered exact-candidate promotion to an authoritative accepted ref through
 CLI/MCP. It does not claim model-spend control,
-agent-session recovery or autonomous execution in this milestone. The first external
-pilot compares Foundry-governed and ordinary native-client work on LokaCore, with
-operator effort and false refusals included. An independent Astra
+agent-session recovery or autonomous execution in this milestone. The first pilot
+compares Foundry-governed and ordinary native-client work while building Foundry, with
+operator effort and false refusals included. LokaCore stays separate. An independent Astra
 [strategy review](reviews/PORTABLE-STRATEGY.review-1.md) required correction of the
 protected promotion boundary and three wording errors; its
 [re-review](reviews/PORTABLE-STRATEGY.review-2.md) approved the corrected plan.
@@ -246,6 +246,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q17 | Speed of the Protected Primitives split | **Decided 2026-09-26 by the human:** use grouped mechanical moves verified as they land, focused checks during the split, one independent review and one FR-08A rebind on the integrated tip. Keep semantic cleanup, including legacy deletion, in separate reviewed work. The 9 → 19 pin-list growth means one rebind with more pinned files, not a rebind after each move |
 | Q18 | Protected Primitives design's remaining open questions | **Decided 2026-09-26 by the human:** keep the facade through this ticket and decide delegate removal separately; amend FR-23 acceptance to allow one rebind on each integrated split tip; pin the seven named `Protected.*` modules; retain the shared move checker in `bin/`; keep `Operations` whole; use `Protected.*` files in a subdirectory. These are the proposed defaults in [the design §7](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md#7-risks-and-open-questions-recorded-not-decided), approved together before implementation |
 | Q19 | First product milestone and value test | **Decided 2026-09-26 by the human:** pivot after the C2 god-module decompositions to [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first). Codex, Claude Code and other clients orchestrate; Foundry provides authenticated durable provenance, exact evidence and acceptance through CLI/MCP. Defer Foundry-run launch, scheduling, billing, session recovery, Pi harness and bundled reference controller until measured need. Use real LokaCore work to compare against the ordinary native-client workflow, including operator effort and false blocks; retain controlled refusal drills. The human clarified that Gateway and Protected Primitives decomposition still proceeds in C2. Request an independent Astra review of the reprioritization before landing it |
+| Q20 | Evaluation repository | **Decided 2026-09-26 by the human:** evaluate Foundry's usefulness while building Foundry, using prospectively matched internal tickets and the ordinary native-client workflow as the comparison. Keep LokaCore separate for now. Revise ML-PG-EVALUATION and its validation protocol; Q19's LokaCore pilot target is superseded, while the portable-governance milestone and C2 decompositions remain |
 
 ## Frictions
 

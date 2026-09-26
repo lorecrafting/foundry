@@ -33,8 +33,9 @@ CLI/MCP operations. Those clients own their agent launches, planning, scheduling
 billing and session recovery. Foundry owns only the admitted intent and its own durable
 facts, exact candidate/check/review evidence, acceptance and observed integration. It
 does not claim to enforce model spend, recover external sessions or guarantee their tool
-effects in this milestone. Prove value on LokaCore against the operator's ordinary native
-agent workflow before expanding the product. The active ticket order and acceptance are
+effects in this milestone. Prove value while building Foundry against the operator's
+ordinary native-agent workflow before expanding the product. Keep LokaCore separate for
+now. The active ticket order and acceptance are
 in the [repair plan](REPAIR-PLAN.md#delivery-sequence-portable-governance-first).
 
 Retain the standalone Elixir/OTP project. Since 2026-09-23 no execution path exists in
