@@ -9,10 +9,11 @@ if Mix.env() in [:dev, :test] do
 
     `--module` is required when TARGET does not exist. Move all clauses of each
     named function together. Local callers crossing the move boundary, captures,
-    dynamic calls, module attributes, macros, imports and alias conflicts are
-    refused before either file is written. Cross-module caller rewrites in the
-    Gateway and ProtectedPrimitives splits remain manual and are checked with
-    `bin/check_move.exs` against independently compiled revisions.
+    dynamic calls, module attributes, macros, imports, alias chains and conflicts
+    are refused before either file is written. Changes are staged in both
+    directories so a destination failure leaves the source intact. Cross-module
+    caller rewrites in the Gateway and ProtectedPrimitives splits remain manual
+    and are checked with `bin/check_move.exs` against compiled revisions.
     """
 
     @impl true
@@ -34,6 +35,8 @@ if Mix.env() in [:dev, :test] do
 
       if names == [] or Path.expand(from) == Path.expand(to),
         do: Mix.raise("provide functions and distinct files")
+
+      if not File.dir?(Path.dirname(to)), do: Mix.raise("destination parent does not exist")
 
       source = File.read!(from)
       source_ast = Sourceror.parse_string!(source)
@@ -89,6 +92,26 @@ if Mix.env() in [:dev, :test] do
       target_aliases = aliases(target_nodes)
       used = selected |> Enum.flat_map(&alias_roots/1) |> MapSet.new()
 
+      first_moved_line =
+        selected_defs |> Enum.map(fn {_, meta, _} -> meta[:line] end) |> Enum.min()
+
+      Enum.each(used, fn short ->
+        if Map.has_key?(target_aliases, short) and not Map.has_key?(aliases, short),
+          do: Mix.raise("alias #{short} conflicts in target")
+
+        case Map.get(aliases, short) do
+          {full, {:alias, meta, _}} ->
+            if Map.has_key?(target_aliases, hd(full)),
+              do: Mix.raise("alias #{hd(full)} conflicts in target")
+
+            if meta[:line] >= first_moved_line,
+              do: Mix.raise("alias #{short} is declared after the moved function")
+
+          nil ->
+            :ok
+        end
+      end)
+
       still_used =
         retained
         |> Enum.reject(&match?({:alias, _, _}, &1))
@@ -131,8 +154,7 @@ if Mix.env() in [:dev, :test] do
       # Parse both results before writing either file.
       Sourceror.parse_string!(changed_source)
       Sourceror.parse_string!(changed_target)
-      File.write!(from, changed_source)
-      File.write!(to, changed_target)
+      write_pair!(from, to, changed_source, changed_target, target, File.exists?(to))
 
       Mix.shell().info(
         "moved #{length(selected_defs)} clause(s) from #{source_module} to #{target_module}"
@@ -175,7 +197,7 @@ if Mix.env() in [:dev, :test] do
       end)
     end
 
-    defp directive?({kind, _, _}) when kind in [:import, :require, :use], do: true
+    defp directive?({kind, _, _}) when kind in [:import, :require, :use, :defmodule], do: true
     defp directive?(_), do: false
 
     defp unsafe_body?(node) do
@@ -207,6 +229,10 @@ if Mix.env() in [:dev, :test] do
       Enum.any?(nodes, fn node ->
         {_node, found} =
           Macro.prewalk(node, false, fn
+            {:|>, _, [_, {name, _, args}]} = ast, seen
+            when is_atom(name) and is_list(args) ->
+              {ast, seen or MapSet.member?(signatures, {name, length(args) + 1})}
+
             {:&, _, [{:/, _, [{name, _, _}, {:__block__, _, [arity]}]}]} = ast, seen
             when is_atom(name) and is_integer(arity) ->
               {ast, seen or MapSet.member?(signatures, {name, arity})}
@@ -240,22 +266,28 @@ if Mix.env() in [:dev, :test] do
     end
 
     defp aliases(nodes) do
-      Enum.reduce(nodes, %{}, fn
-        {:alias, _, _} = node, acc ->
-          case Code.string_to_quoted(Sourceror.to_string(node)) do
-            {:ok, {:alias, _, [{:__aliases__, _, full}]}} ->
-              put_alias(acc, List.last(full), full, node)
+      aliases =
+        Enum.reduce(nodes, %{}, fn
+          {:alias, _, _} = node, acc ->
+            case Code.string_to_quoted(Sourceror.to_string(node)) do
+              {:ok, {:alias, _, [{:__aliases__, _, full}]}} ->
+                put_alias(acc, List.last(full), full, node)
 
-            {:ok, {:alias, _, [{:__aliases__, _, full}, [as: {:__aliases__, _, [short]}]]}} ->
-              put_alias(acc, short, full, node)
+              {:ok, {:alias, _, [{:__aliases__, _, full}, [as: {:__aliases__, _, [short]}]]}} ->
+                put_alias(acc, short, full, node)
 
-            _ ->
-              Mix.raise("complex alias needs a manual move")
-          end
+              _ ->
+                Mix.raise("complex alias needs a manual move")
+            end
 
-        _, acc ->
-          acc
-      end)
+          _, acc ->
+            acc
+        end)
+
+      if Enum.any?(aliases, fn {_, {full, _}} -> Map.has_key?(aliases, hd(full)) end),
+        do: Mix.raise("alias chain needs a manual move")
+
+      aliases
     end
 
     defp put_alias(acc, short, full, node) do
@@ -274,5 +306,29 @@ if Mix.env() in [:dev, :test] do
     end
 
     defp indent(text), do: text |> String.split("\n") |> Enum.map_join("\n", &("  " <> &1))
+
+    defp write_pair!(from, to, source, target, previous_target, existed?) do
+      id = :erlang.unique_integer([:positive])
+      source_tmp = Path.join(Path.dirname(from), ".foundry-move-#{id}-source")
+      target_tmp = Path.join(Path.dirname(to), ".foundry-move-#{id}-target")
+      rollback_tmp = Path.join(Path.dirname(to), ".foundry-move-#{id}-rollback")
+
+      try do
+        File.write!(source_tmp, source)
+        File.write!(target_tmp, target)
+        if existed?, do: File.write!(rollback_tmp, previous_target)
+        File.rename!(target_tmp, to)
+
+        try do
+          File.rename!(source_tmp, from)
+        rescue
+          error ->
+            if existed?, do: File.rename!(rollback_tmp, to), else: File.rm!(to)
+            reraise error, __STACKTRACE__
+        end
+      after
+        Enum.each([source_tmp, target_tmp, rollback_tmp], &File.rm/1)
+      end
+    end
   end
 end
