@@ -7,10 +7,10 @@ The operator's running record of Foundry work driven through the manual lane
 its tooling or the runbook. The lane store is the authoritative trail (`bin/foundry lane
 log`); this log records what the operator saw and decided.
 
-Roles: operator = an LLM session (Claude Opus 5.5); developer = a worktree agent
-`agent:claude-opus-5-5/dev-<ticket>`; reviewer = a fresh Fable agent
-`agent:claude-fable-5-1/review-<ticket>`, never a fork. Integration is manual: cherry-pick
-onto `main`, one gate run per push.
+Roles: operator = an LLM session; developer = a worktree agent; reviewer = a fresh agent
+on a different model, never the developer. Principals name the provider, model and ticket.
+Integration is manual: cherry-pick onto an integration branch, run one local gate per batch,
+then fast-forward `main` after PR CI.
 
 ## Handoff: where the campaign stands
 
@@ -50,6 +50,8 @@ Batch C1b (evidence tools in the gate, the dead verified-transaction route, and 
    Each with a red control (an illegal call fails compilation; a changed moved body fails the
    checker; a new cycle fails the ratchet). The gate's dependency policy accepts Hex packages
    locked in `mix.lock` (`ci.ex` `validate_dependency_inventory/1`).
+   **Follow-up after this ticket:** add pinned `ast-grep` CI convention lints with rule tests
+   and red controls; Q15 keeps that work separate from the compiler and xref tooling.
 2. **Batch C2, then:** ML-DECOMPOSE-GATEWAY, then ML-DECOMPOSE-PP, each to its approved design
    ([gateway](../design/DECOMPOSE-GATEWAY.md), [protected primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md)),
    serial (both touch FR-08A pins; one rebind each, following the design's §3 procedure). The
@@ -88,6 +90,14 @@ Batch C1b (evidence tools in the gate, the dead verified-transaction route, and 
    runbook's landing and rotation steps instead of a plain fast-forward (F15, F7).
 8. End the batch with a fresh reviewer's re-sweep of everything changed since the last sweep;
    its ranked list feeds the next batch.
+
+**Dogfood assessment at each batch end.** Use the lane log as the event record, then update
+the scorecard and F table from observed behavior. For each new friction, record the command or
+workflow step that triggered it, what work it cost (retry, review round, gate run, or blocked
+ticket), and a specific candidate fix. Turn repeated or high-cost frictions into ranked tickets;
+when a fix lands, rerun its original trigger or a red-control drill and record the result. Judge
+the lane by real errors caught versus legitimate work blocked and by defects that escaped review,
+not by how many events it recorded. Keep manual overhead visible alongside those outcomes.
 
 Ask the operator (the human) before any operator-level decision: record it in the Q table.
 
@@ -165,6 +175,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DEAD-ROUTES | `e74fb88` | `1414280` | [approved](reviews/ML-DEAD-ROUTES.review.md) | batch C1b + FR-08A rebind | the test-only `transact_verified` route and `ProtectedVerifier` deleted (FR-08A now pins 9); `Observations` kept because FR-18A is in progress (Q11) |
 | ML-DECOMPOSE-GATEWAY-DESIGN | `e74fb88` | `9e4a710`, then `1f50910` | [correction](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-1.md) (the rebind placeholders would have left FR-08A red; a source-AST move check cannot see alias shadowing), then [approved](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-2.md) | batch C1b + operator fixup | [design](../design/DECOMPOSE-GATEWAY.md): Gateway facade + DomainCommit + AtomicBundle + Maintenance. The operator aligned its rebind steps with ML-DEAD-ROUTES and the sibling review |
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
+| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, correction pending | [correction](reviews/ML-PRECISION-TOOLING.review-1.md) | pending | OpenAI-only developer/reviewer on different models (Q15). Reviewer found four high-impact tool defects: piped caller and alias resolution can make a move wrong, split-set call target can fool the compiled checker, and destination write failure can leave source changed. Also format and stale Fable wording. Focused suite had been green; correction is in the lane |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -196,6 +207,8 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q12 | Tools for precise, cheaper agent work | **Decided 2026-09-24:** add `boundary` and `sourceror` (Hex, locked), use `mix xref` / `mix xref graph` and compiled `debug_info` checks, and an Elixir outline script; ticket ML-PRECISION-TOOLING opens batch C2. `AGENTS.md` now says how to search code |
 | Q13 | Is Foundry still scoped to "one operator, one machine, Pramāṇa", and must status go to Pramāṇa's `docs/PLAN.md`? | **Decided 2026-09-25: no to both.** Foundry is fully decoupled from Pramāṇa: the repair plan's scope clause and completion requirement are rewritten, and no document links to Pramāṇa pages. Trust in a new operator, host or repository still waits on FR-15aB. Follow-ups the same day: the post-repair tracks are re-filed here as [#15](https://github.com/lorecrafting/foundry/issues/15) and [#16](https://github.com/lorecrafting/foundry/issues/16), the Pramāṇa-era meta-harness note moved to the records tag, and the dead `COORDINATOR_TICK`/`HERDR_ENV` scrubbing left `ci.ex` and its tests. The docs branch was reviewed outside the lane ([review 1](reviews/DOCS-FRONT-DOOR.review-1.md), correction, folded in; [review 2](reviews/DOCS-FRONT-DOOR.review-2.md), approved), and so was the revision-4 R3 contract paragraph ([review](reviews/CONTRACT-R3.review.md), PASS WITH CHANGES, folded in) |
 | Q14 | Should R4 state the kernel's stricter reading, that a review verdict is recorded only after the reviewer stream is sealed? | **Open.** The [R3 review](reviews/CONTRACT-R3.review.md) F2 found the kernel enforces it (`review.ex` `require_reviewer_stream_sealed/1`) while R4's rows list the seal as an outcome of the verdict. Adding it is a one-line R4 edit and an operator decision |
+| Q15 | C2 review models, Ponytail, docs and test discipline | **Decided 2026-09-26 by the human:** use OpenAI models only while Claude Code is unavailable; choose model by task complexity and use a different model for independent review. Install Ponytail for Codex and require its developer self-review in standing briefs. Add a docs Ponytail (800-word `AGENTS.md` cap and milestone tidy pass) to ML-PRECISION-TOOLING. Adapt Lokacore's test guidance so every new test has a distinct plausible regression, independent expected answer and demonstrated red control where required; keep fixtures and test count lean. Put pinned `ast-grep` CI lints in a separate follow-up ticket. Open visible GitHub PRs for batch CI, then fast-forward locally rather than merge on GitHub. Same-vendor model review is weaker independence than cross-vendor review (risk A3) |
+| Q16 | Gateway split's open design choices | **Decided 2026-09-26 by the human:** use the [Gateway design](../design/DECOMPOSE-GATEWAY.md#8-operator-questions-recorded-not-decided) defaults: pin `Maintenance` in FR-08A, retain the `Gateway` delegate for the ProtectedPrimitives back-edge, and defer T3's semantic deletion of legacy protected inserts to its own reviewed ticket. Q15/Q12 already keep the shared move checker in `bin/` |
 
 ## Frictions
 
@@ -220,6 +233,8 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | F17 | refusals | Every refused lane command also prints an Elixir `RuntimeError` stack trace from `cli.ex:86` on stderr; stdout and the exit code are right | print the refusal and exit non-zero without raising |
 | F18 | `bin/check_docs.exs` | It resolves links against tracked files only, so a link to a newly copied, unstaged review file reads as broken (hit twice) | `git add` before `check_docs`, or check the working tree |
 | F19 | usage limits | A shared API session limit killed both running developers and a reviewer at once. The lane recorded nothing: the tickets sat in `active` and `reviewing`. Resuming the same agent instances after the reset lost no work and kept one principal per instance (compare F9) | the operator checks `lane status` and worktrees after any limit; run fewer agents at once when the budget is tight |
+| F20 | new move tooling | The first ML-PRECISION-TOOLING candidate's focused suite was green, but independent review reproduced four unsafe or falsely reassuring paths: piped callers, alias shadowing/chains, a wrong split-set call target accepted by the compiled checker, and source modification before a failed destination write. One capture-form defect had already been caught by the developer's red control. Cost: one correction round before either decomposition could use the tools | add each realistic failure as a controlled regression, fix or conservatively refuse it, and have a new reviewer probe the corrected candidate before integration |
+| F21 | model-specific brief | `docs/AGENT-BRIEF.md` still named Fable as the required independent reviewer after Q15 switched this campaign to OpenAI-only models; independent review found it in the first C2 candidate. Cost: a documentation correction and risk that a future operator would pause unnecessarily | make the standing rule fresh/different-model, record same-vendor independence limitation, and name the chosen principal only in each ticket's brief |
 
 ## Scorecard
 
