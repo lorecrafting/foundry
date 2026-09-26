@@ -34,3 +34,9 @@ that fails, with the file and line of the offence.
     Prose only.
 12. **`kernel/software/` is the replaceable reference controller, and deletable.** Prose
     only; rule 4 keeps the generic kernel from growing new dependencies on it.
+
+`boundary` also checks declared module groups during compilation with warnings as errors.
+The architecture test above remains the source specification for rules 1–4 and 6; the
+declarations give an earlier failure for forbidden cross-group calls. The xref ratchet in
+`bin/check_xref.exs` preserves the measured cycle and compile-edge ceilings and the
+approved split-module edges.

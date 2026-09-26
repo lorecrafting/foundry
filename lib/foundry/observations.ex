@@ -1,4 +1,6 @@
 defmodule Foundry.Observations do
+  use Boundary, deps: [Foundry.DurableStore], exports: :all
+
   @moduledoc """
   Minimal honest query surface over FR-08A protected facts.
 

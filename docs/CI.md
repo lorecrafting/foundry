@@ -19,6 +19,7 @@ rechecks the exact clean commit/tree afterward.
 2. inspect the complete selected Mix dependency graph and reject non-Hex, unlocked,
    lock-mismatched or nonisolated sources;
 3. force-compile with warnings as errors;
+   this includes declared `boundary` module groups;
 4. check every formatter-owned file except any explicitly pinned baseline debt (currently none);
 5. run the model-free suite while excluding explicitly inventoried external tests;
 6. inventory the resolved dependency tree; and
