@@ -44,6 +44,12 @@ on `integ/C2`; `lane integrated` reported no missing commits. The operator pinne
 `DomainCommit`, `AtomicBundle` and `Maintenance`, then ran one FR-08A rebind on the
 integrated tip. The frozen report says `ready=true` and the FR-08A focused test passed
 4/4; the pin list is 12. No batch gate or CI has run.
+ML-DECOMPOSE-PP is admitted on `aa19b69` with an issued Sol developer packet. Its
+uncommitted seven-module split compiles, but the shared compiled move checker falsely
+rejects five unchanged moved definitions because imported captures and an anonymous
+rescue variable carry relocation-sensitive AST context. The developer paused before
+submission. The disjoint ML-MOVE-CHECK-CONTEXT ticket is admitted on `246bdf9` with a
+fresh developer to correct the checker under review; the PP packet remains issued.
 
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
@@ -60,9 +66,9 @@ The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
 
-**Next:** admit ML-DECOMPOSE-PP under the
-[Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md) design. Rebind FR-08A
-on its integrated tip, run one local batch gate, open a visible PR for
+**Next:** review and integrate the narrow checker correction, then resume ML-DECOMPOSE-PP
+under the [Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md) design.
+Rebind FR-08A on its integrated tip, run one local batch gate, open a visible PR for
 Linux CI, then fast-forward `main` locally. The Quint citation update follows the moves.
 Then admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
 serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
@@ -179,6 +185,8 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
 | ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | integ/C2 (`229ffc4`), gate pending | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Full seven-commit range cherry-picked; `lane integrated` reported true; no C2 gate or PR yet |
 | ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
+| ML-MOVE-CHECK-CONTEXT | `246bdf9` | active developer packet | pending | pending | Disjoint precision-tool follow-up: compiled checker refuses unchanged imported captures and rescue context in the PP split; scoped to checker and its tests |
+| ML-DECOMPOSE-PP | `aa19b69` | active developer packet | pending | pending | Seven-module split compiles in a dedicated worktree but remains uncommitted and unsubmitted pending the checker correction; no rebind or gate |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 

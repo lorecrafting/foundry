@@ -164,7 +164,9 @@ must report those results before this milestone is called useful.
 as approved: decompose Protected Primitives under its reviewed design and Q17–Q18 choices.
 These are behavior-preserving
 maintenance of retained Core, not investment in a bundled controller or autonomous
-execution. Rebind FR-08A on the Protected split tip, then run one local gate for the batch.
+execution. The split is paused on a narrow compiled move-checker context correction
+(ML-MOVE-CHECK-CONTEXT); review and integrate that disjoint tool fix before resuming it.
+Rebind FR-08A on the Protected split tip, then run one local gate for the batch.
 The Quint citation rewrite follows the Protected split; pinned `ast-grep` lints remain a
 separate follow-up. No local C2 gate, CI or PR is claimed at this checkpoint.
 
