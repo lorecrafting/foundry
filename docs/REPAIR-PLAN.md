@@ -159,8 +159,8 @@ defines the preregistered matched tasks, hostile and legitimate controls, indepe
 adjudication, outcome denominators and rules for claiming prevention. ML-PG-EVALUATION
 must report those results before this milestone is called useful.
 
-**Immediate queue disposition.** Finish batch C2 as approved: integrate the exact
-reviewed ML-PRECISION-TOOLING range, then serially decompose Gateway and Protected
+**Immediate queue disposition.** The exact reviewed ML-PRECISION-TOOLING range is on
+`integ/C2`. Finish batch C2 as approved: serially decompose Gateway and Protected
 Primitives under their reviewed designs and Q16–Q18 choices. These are behavior-preserving
 maintenance of retained Core, not investment in a bundled controller or autonomous
 execution. Run the planned FR-08A rebind for each split and one local gate for the batch.
