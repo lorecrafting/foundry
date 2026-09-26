@@ -72,7 +72,7 @@ defmodule Foundry.DurableStore.DomainReadCheckTest do
   end
 
   # Two declared reads written leave no single target entity, so no stated
-  # expected_domain_revision can match (gateway.ex `expected_domain_revision/1`).
+  # expected_domain_revision can match (atomic_bundle.ex `expected_domain_revision/1`).
   test "a plan writing two declared reads has no expected_domain_revision", ctx do
     other = "DR7-other"
 
