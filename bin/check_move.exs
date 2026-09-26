@@ -42,16 +42,16 @@ defmodule Foundry.MoveCheck do
     for {owner, key, body, _, _, base_targets} <- base, base_targets != [] do
       matches = for {mod, ^key, ^body, _, _, targets} <- candidate, do: {mod, targets}
 
-      candidate_targets =
+      {candidate_owner, candidate_targets} =
         case {Enum.find(matches, fn {mod, _} -> mod == owner end), matches} do
-          {{_, targets}, _} -> targets
-          {nil, [{_, targets}]} -> targets
+          {{_, _} = retained, _} -> retained
+          {nil, [moved]} -> moved
           _ -> raise("capture target differs: #{inspect(key)}")
         end
 
       if length(base_targets) != length(candidate_targets) or
            Enum.any?(Enum.zip(base_targets, candidate_targets), fn {before, moved} ->
-             not same_capture?(before, moved, base, candidate)
+             not same_capture?(before, moved, base, candidate, owner != candidate_owner)
            end),
          do: raise("capture target differs: #{inspect(key)}")
     end
@@ -255,11 +255,11 @@ defmodule Foundry.MoveCheck do
 
   defp capture_targets({:&, _, [{:/, _, [{name, _, context}, arity]}]}, owner, _split)
        when is_atom(name) and (is_nil(context) or context == []) and is_integer(arity),
-       do: [{owner, {name, arity}}]
+       do: [{owner, {name, arity}, :local}]
 
   defp capture_targets({:&, _, [{:/, _, [{{:., _, [mod, name]}, _, []}, arity]}]}, _, split)
        when is_atom(mod) and is_atom(name) and is_integer(arity),
-       do: if(MapSet.member?(split, mod), do: [{mod, {name, arity}}], else: [])
+       do: if(MapSet.member?(split, mod), do: [{mod, {name, arity}, :remote}], else: [])
 
   defp capture_targets(tuple, owner, split) when is_tuple(tuple),
     do: tuple |> Tuple.to_list() |> Enum.flat_map(&capture_targets(&1, owner, split))
@@ -269,11 +269,18 @@ defmodule Foundry.MoveCheck do
 
   defp capture_targets(_, _, _), do: []
 
-  defp same_capture?({before_owner, key} = before, {after_owner, key} = moved, base, candidate) do
+  defp same_capture?(
+         {before_owner, key, before_kind} = before,
+         {after_owner, key, after_kind} = moved,
+         base,
+         candidate,
+         enclosing_moved?
+       ) do
     before_body = capture_body(before, base)
     after_body = capture_body(moved, candidate)
 
     before_body != nil and before_body == after_body and
+      (before_kind == after_kind or enclosing_moved?) and
       (before_owner == after_owner or
          (Enum.count(candidate, fn {_, found, body, _, _, _} ->
             found == key and body == before_body
@@ -283,9 +290,9 @@ defmodule Foundry.MoveCheck do
             end) == 1))
   end
 
-  defp same_capture?(_, _, _, _), do: false
+  defp same_capture?(_, _, _, _, _), do: false
 
-  defp capture_body({owner, key}, definitions) do
+  defp capture_body({owner, key, _kind}, definitions) do
     case Enum.find(definitions, fn {mod, found, _, _, _, _} -> {mod, found} == {owner, key} end) do
       {_, _, body, _, _, _} -> body
       nil -> nil

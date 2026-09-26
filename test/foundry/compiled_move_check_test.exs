@@ -286,6 +286,34 @@ defmodule Foundry.CompiledMoveCheckTest do
     assert output =~ "capture target differs"
   end
 
+  test "a retained owner's local capture cannot become remote" do
+    root = Path.join(System.tmp_dir!(), "capture_kind_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    source = fn first ->
+      "defmodule Flavor.Owner do\n" <>
+        "  def captures, do: {#{first}, &Flavor.Owner.helper/1}\n" <>
+        "  def helper(v), do: v + 1\nend\n"
+    end
+
+    compile_source(base, "value.ex", source.("&helper/1"))
+    compile_source(candidate, "value.ex", source.("&Flavor.Owner.helper/1"))
+
+    {output, status} =
+      System.cmd(
+        "elixir",
+        ["bin/check_move.exs", base, candidate, "Flavor.Owner", "Flavor.Owner"],
+        stderr_to_stdout: true
+      )
+
+    assert status != 0
+    assert output =~ "capture target differs"
+  end
+
   test "unresolved capture targets are refused" do
     root = Path.join(System.tmp_dir!(), "capture_missing_#{:erlang.unique_integer([:positive])}")
     base = Path.join(root, "base")
