@@ -18,7 +18,7 @@ Updated at every batch end, so any operator session (Claude, Codex or a human) c
 cold from the repository alone. Read this, then [the runbook](LANE-RUNBOOK.md), then
 [the agent brief](../AGENT-BRIEF.md).
 
-**State (2026-09-26, C2 tooling correction checkpoint).** `main` remains clean at
+**State (2026-09-26, portable-governance pivot).** `main` remains clean at
 `c55413fec19b113baa2f463e8dfaeb22674d8f91`; batches 1, A1, A2, B, C1a and C1b are integrated. The legacy daemon stack
 and the Pramāṇa-era names are gone (FR-23b done; the remaining `pramana` matches are the
 allowlist in [the sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)),
@@ -27,65 +27,38 @@ starts, Q9); stores 1 and 2 are archived under `~/.local/state/foundry-lane.stor
 Batch C1b (evidence tools in the gate, the dead verified-transaction route, and the two approved decomposition designs) is the last integrated batch. Developers and reviewers run their own `lane submit` and `lane review` (Q8). Older lane records still list ML-DEAD-VOCAB as `blocked` (superseded by ML-DEAD-VOCAB-2) and ML-DRILL-1 as `rejected` (drills), both by design.
 
 **Current C2 checkpoint.** ML-PRECISION-TOOLING was admitted on `c55413f` in store 3.
-Its latest clean developer worktree is `/private/tmp/ML-PRECISION-TOOLING-dev-3` at
-candidate `3d3ec7345148ea36f0d74ba3126ced495784cdfd`. Independent GPT-6 Astra
-reviews under three distinct principals recorded [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md),
-[correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), and
-[correction 3](reviews/ML-PRECISION-TOOLING.review-3.md). The lane is `queued`, with
-no outstanding packet. The third review confirmed the second review's four blockers
-closed but found default-generated arities bypassing move safety and a declared facade
-with a restricted head accepted by the checker. Its detached reviewer worktree is clean.
-The integration worktree `/private/tmp/foundry-integ-C2` is on `integ/C2`;
-it contains only operator decisions and review records, with no candidate cherry-picked.
-No C2 gate, CI, PR or FR-08A rebind has run. Next: issue the developer correction packet
-to a fresh GPT-6 Sol agent with a new principal (F9), fix the two new findings with lean red controls,
-submit, and obtain a fresh different-principal GPT-6 Astra review before integrating.
-Q16 approves the Gateway design defaults; Q17 approves grouped mechanical moves with
-one rebind for the Protected Primitives split. Its other open design questions still
-have Q18 decisions recorded below.
+Its clean developer worktree `/private/tmp/ML-PRECISION-TOOLING-dev-4` ends at
+`6330387904bca51574c3325e3f21b7eb3e5af359`. Four independent GPT-6 Astra reviews
+recorded [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md),
+[correction 2](reviews/ML-PRECISION-TOOLING.review-2.md),
+[correction 3](reviews/ML-PRECISION-TOOLING.review-3.md) and
+[approval 4](reviews/ML-PRECISION-TOOLING.review-4.md). The lane is `ready_to_integrate`;
+the approval receipt is recorded, but the candidate has not yet been cherry-picked.
+The integration worktree `/private/tmp/foundry-integ-C2` contains only operator decisions
+and review records. No C2 gate, CI, PR or FR-08A rebind has run. Q16–Q18 approve the
+two Core splits; Q19 changes the product target after this behavior-preserving C2 batch.
 
-**Next.**
+**New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
+as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
+Foundry authenticates and protects exact admission, candidate/check/review evidence,
+acceptance and actual integration through CLI/MCP. It does not claim model-spend control,
+agent-session recovery or autonomous execution in this milestone. The first external
+pilot compares Foundry-governed and ordinary native-client work on LokaCore, with
+operator effort and false refusals included. An independent Astra strategy review is
+requested before this reprioritization lands. The operator clarified that C2's god-module
+decomposition still proceeds first; it is maintenance of the retained Core, not a
+bundled-orchestrator expansion.
 
-1. **Batch C2, first: ML-PRECISION-TOOLING** (decided 2026-09-24, Q12; admitted and in
-   correction as recorded above): tools that make agent work precise and cheap, landing
-   before either split so both use them.
-   - `boundary` (Hex, locked): declare the module groups of [the boundary rules](../BOUNDARY-RULES.md)
-     (DurableStore Core, ManualLane, Workflow.Kernel, Repair, CLI) so an illegal dependency is
-     a compile error; keep `architecture_boundary_test` as the spec.
-   - `sourceror` (Hex, `only: [:dev, :test]`): a `mix foundry.move` task that moves named
-     functions to a new module and fixes aliases, so an agent names functions instead of
-     retyping thousands of lines.
-   - The shared move checker from both designs: compiled `debug_info` definitions via
-     `:beam_lib`, proving each moved function unchanged.
-   - `mix xref` tests: the cycle count (2 today) and compile-dependency edges (12 today) may
-     only fall; a split's allowed-edge list is compared with `mix xref graph` for its modules.
-     Measure these numbers at the ticket's base; don't trust the ones written here.
-   - `bin/outline.exs`: an Elixir outline (`ast-grep outline` does not parse Elixir):
-     `Code.string_to_quoted` → every `defmodule`/`def`/`defp`/`defmacro` with arity and
-     start–end lines, so an agent reads a few KB of map before opening a range of an
-     80 KB file. A test pins its output shape on a fixture.
-   - Optional, decide in the ticket: convention lints as `ast-grep` rules (`sgconfig.yml`,
-     `ast-grep test`), e.g. no hardcoded `/private/tmp` or `/bin/zsh` in tests (F3). Only if
-     CI installs a pinned `ast-grep`; otherwise keep them as ExUnit tests.
-   Each with a red control (an illegal call fails compilation; a changed moved body fails the
-   checker; a new cycle fails the ratchet). The gate's dependency policy accepts Hex packages
-   locked in `mix.lock` (`ci.ex` `validate_dependency_inventory/1`).
-   **Follow-up after this ticket:** add pinned `ast-grep` CI convention lints with rule tests
-   and red controls; Q15 keeps that work separate from the compiler and xref tooling.
-2. **Batch C2, then:** ML-DECOMPOSE-GATEWAY, then ML-DECOMPOSE-PP, each to its approved design
-   ([gateway](../design/DECOMPOSE-GATEWAY.md), [protected primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md)),
-   serial (both touch FR-08A pins; one rebind each, following the design's §3 procedure). The
-   designs' open operator questions are listed in each note; ask the human before deciding them.
-3. **Batch C3:** Quint `spec/ledger/ledger.qnt` citations become `Module.function/arity`
-   (they cite line numbers into `protected_primitives.ex` that the split moves).
-4. **Candidates found in C1b, not yet admitted:** retire the `ledger_generations`, `claims`,
-   `reservations` tables, `:legacy` authority mode and Observations' `:legacy` branch (needs a
-   WORKFLOW-CONTRACT:178 edit; see [the ML-DEAD-ROUTES review](reviews/ML-DEAD-ROUTES.review.md));
-   `Gateway.transact/4` has no committing caller in `lib/`; `RPC.run` still raises on an
-   invalid payload; 20 backticked citations of deleted fr-08 files.
-5. A fresh re-sweep of everything changed since the clean-room sweep (use `mix xref graph
-   --format stats` and a no-callers report as its starting data); its ranked list is the next
-   batch. Repeat until the repo is clean and maintainable.
+**Next, after the strategy review:** integrate the approved ML-PRECISION-TOOLING full
+candidate range, then admit ML-DECOMPOSE-GATEWAY and ML-DECOMPOSE-PP serially under the
+[Gateway](../design/DECOMPOSE-GATEWAY.md) and
+[Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md) designs. Rebind FR-08A
+once per split on the integrated tip, run one local batch gate, open a visible PR for
+Linux CI, then fast-forward `main` locally. The Quint citation update follows the moves.
+Then admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
+serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
+current lane CLI and store are their starting point. Pinned `ast-grep` lints remain a
+separate follow-up. A ready-to-integrate lane phase is not an integration claim.
 
 **Operator loop, per batch.**
 
@@ -195,7 +168,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DEAD-ROUTES | `e74fb88` | `1414280` | [approved](reviews/ML-DEAD-ROUTES.review.md) | batch C1b + FR-08A rebind | the test-only `transact_verified` route and `ProtectedVerifier` deleted (FR-08A now pins 9); `Observations` kept because FR-18A is in progress (Q11) |
 | ML-DECOMPOSE-GATEWAY-DESIGN | `e74fb88` | `9e4a710`, then `1f50910` | [correction](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-1.md) (the rebind placeholders would have left FR-08A red; a source-AST move check cannot see alias shadowing), then [approved](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-2.md) | batch C1b + operator fixup | [design](../design/DECOMPOSE-GATEWAY.md): Gateway facade + DomainCommit + AtomicBundle + Maintenance. The operator aligned its rebind steps with ML-DEAD-ROUTES and the sibling review |
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
-| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`; correction pending | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md) | pending | OpenAI-only developer/reviewer on different models (Q15). Third review confirmed the second review's four blockers closed, but found default-generated arities bypassing move safety and restricted facade heads accepted by the checker. Lane `queued`, no outstanding packet; no gate or PR yet |
+| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | pending | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Lane `ready_to_integrate`; no C2 gate or PR yet |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -231,6 +204,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q16 | Gateway split's open design choices | **Decided 2026-09-26 by the human:** use the [Gateway design](../design/DECOMPOSE-GATEWAY.md#8-operator-questions-recorded-not-decided) defaults: pin `Maintenance` in FR-08A, retain the `Gateway` delegate for the ProtectedPrimitives back-edge, and defer T3's semantic deletion of legacy protected inserts to its own reviewed ticket. Q15/Q12 already keep the shared move checker in `bin/` |
 | Q17 | Speed of the Protected Primitives split | **Decided 2026-09-26 by the human:** use grouped mechanical moves verified as they land, focused checks during the split, one independent review and one FR-08A rebind on the integrated tip. Keep semantic cleanup, including legacy deletion, in separate reviewed work. The 9 → 19 pin-list growth means one rebind with more pinned files, not a rebind after each move |
 | Q18 | Protected Primitives design's remaining open questions | **Decided 2026-09-26 by the human:** keep the facade through this ticket and decide delegate removal separately; amend FR-23 acceptance to allow one rebind on each integrated split tip; pin the seven named `Protected.*` modules; retain the shared move checker in `bin/`; keep `Operations` whole; use `Protected.*` files in a subdirectory. These are the proposed defaults in [the design §7](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md#7-risks-and-open-questions-recorded-not-decided), approved together before implementation |
+| Q19 | First product milestone and value test | **Decided 2026-09-26 by the human:** pivot after the C2 god-module decompositions to [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first). Codex, Claude Code and other clients orchestrate; Foundry provides authenticated durable provenance, exact evidence and acceptance through CLI/MCP. Defer Foundry-run launch, scheduling, billing, session recovery, Pi harness and bundled reference controller until measured need. Use real LokaCore work to compare against the ordinary native-client workflow, including operator effort and false blocks; retain controlled refusal drills. The human clarified that Gateway and Protected Primitives decomposition still proceeds in C2. Request an independent Astra review of the reprioritization before landing it |
 
 ## Frictions
 

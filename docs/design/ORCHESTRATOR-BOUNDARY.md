@@ -6,6 +6,12 @@
 does not change the active repair plan, accepted workflow contract, current launch policy,
 provider entitlement, production authorization or FR-08 implementation scope.
 
+**2026-09-26 priority update:** the [portable governance milestone](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
+builds a semantic client interface over the manual lane for Codex and Claude Code first.
+It does not implement the default controller adapter below, which remains deferred until
+there is evidence a bundled controller is useful. The original O1 timing below applies
+to that default adapter, not to a client calling the manual lane's governed operations.
+
 [Foundry strategy](../STRATEGY.md) · [Workflow contract](../WORKFLOW-CONTRACT.md) ·
 [Project workflow profiles](PROJECT-WORKFLOW-PROFILES.md) ·
 [Observability](../OBSERVABILITY.md) · [Ecosystem boundary](ECOSYSTEM-BOUNDARY.md) ·
@@ -938,6 +944,10 @@ Do not interrupt the active repair to implement this abstraction.
 ### O1 — local reference adapter
 
 **Timing, 2026-09-22 (operator-approved):** begin O1 only after FR-08B lands. The [O0 inventory](../orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) found the FR-08B kernel has no production caller yet and the live coordinator bypasses the protected store, so an adapter built now would wrap code FR-08B is about to rewire.
+
+The 2026-09-26 portable client seam is a different, earlier slice: it exposes the manual
+lane's existing protected semantics to external controllers. It does not wrap or activate
+the FR-08B reference workflow kernel, and it does not change this O1 dependency.
 
 **Approved 2026-09-23:** [keep this timing and build FR-08B's remaining protected items role-agnostic](../orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md).
 

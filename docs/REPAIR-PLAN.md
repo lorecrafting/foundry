@@ -109,29 +109,61 @@ dependency completion evidence, and current source—not the entire audit conver
 Read more when an interface crosses the assigned scope. Switching models alone is
 not a reason to discard useful context.
 
-### Two-level delivery strategy
+### Delivery sequence: portable governance first
 
-The repair has two explicit finish lines. They are milestones over this authoritative
-ticket graph, not a second backlog, and they do not change any dependency, finding owner,
-ticket acceptance paragraph or F01–F24 obligation.
+**Operator decision 2026-09-26 (dogfood log Q19).** The current product target is a
+**portable governed-acceptance milestone**: Codex, Claude Code or another controller plans,
+launches and coordinates its own agents; Foundry supplies a headless, authenticated,
+durable authority/evidence/acceptance service through one semantic CLI/MCP interface.
+The existing manual lane is the starting implementation and continues to dogfood Foundry.
+Its historical supervised-dogfood gate below remains a record, not the new product finish
+line. No bundled controller, Foundry-managed agent launch, session scheduler, model billing
+broker, provider harness, autonomous activation or Pi integration is needed for this first
+milestone. Foundry does not claim to enforce model spend or recover agent sessions in it.
 
-1. **Supervised dogfood alpha.** Foundry can accept real tickets, durably track and replay
-   them, produce bounded work packets, accept independently reviewed results, and recover
-   after restart. Execution remains supervised/manual until the autonomous provider and
-   isolation path has its own required evidence. This milestone permits using Foundry to
-   harden Foundry; it is not deployment, autonomous-execution approval, ticket completion
-   by implication, or FR-22 lifecycle acceptance.
-2. **Full repaired system.** Complete the remaining isolation, automatic execution,
-   conserved budgets, Git integration, immutable activation/rollback, maintenance,
-   constrained improvement and FR-22 whole-lifecycle acceptance. Only this second finish
-   line can close the repair backlog.
+The milestone does require protecting Foundry's own store, policy, Git evidence and
+acceptance from untrusted agent work; authenticating callers and independent reviewers;
+binding candidate, checks and verdict to an exact immutable revision; and reporting the
+actual integrated ref without inventing success. Foundry recovers its own committed facts
+and idempotent requests after restart. Client hooks may suggest when to call Foundry but
+are not authority or proof that every action was observed. A failed or unavailable client
+integration cannot silently fall back to asserted identity or self-reported checks.
 
-**Current operator-directed target, set 2026-09-20: supervised dogfood alpha**, the first
-finish line above. This is recorded here rather than only in a session's memory so that a
-restarted or cleared session finds it by reading this plan. It changes no dependency,
-acceptance paragraph or F01–F24 obligation; it states which finish line is currently being
-worked toward. Reaching it means Batch C and then Batch D below. The second finish line
-remains the only one that can close the backlog.
+The full autonomous repair remains a **later, separately chosen finish line**. Existing
+FR-08B–FR-22 full-scope obligations and F01–F24 findings stay open until their own
+acceptance; the portable milestone does not mark them complete. Work on FR-09–12, the
+full FR-15aB execution isolation, FR-15–17, FR-18B, FR-19B, FR-20 and FR-22's autonomous
+lifecycle is deferred for this product milestone. Revisit each against measured need
+before funding it. `FR-22` still owns closure of the full autonomous repair, if pursued.
+
+#### Portable milestone tickets, in dependency order
+
+These `ML-*` work packets are the active queue. They are bounded slices of the named FR
+owners, not a way to certify their full outcomes. Admit each in the manual lane only when
+its predecessor's interface is reviewed. Every implementation has its own exact-candidate
+review and normal integration checks.
+
+| ID | Owner and deliverable | Depends on | Acceptance for this milestone |
+|---|---|---|---|
+| ML-PG-CONTRACT | FR-06/08B: version the controller-neutral admission, status, candidate, check, review and integration facts over the existing manual lane. State the trust boundary and unsupported spending, execution and deployment claims | current manual lane | Two materially different clients can describe the same lifecycle without controller-specific protected fields; independent design review resolves identity, retry and evidence semantics before code |
+| ML-PG-CUSTODY | FR-15aB narrow slice: protect the authority store, policy and accepted Git evidence from agent-controlled processes; authenticate operator/developer/reviewer calls and bind each action to a distinct principal | ML-PG-CONTRACT | Actual isolated caller attempts to edit root files, impersonate a reviewer, replay a credential and submit under a sibling principal fail; valid scoped calls and restart still work. This is not provider/network/tool isolation for a Foundry-launched agent |
+| ML-PG-CANDIDATE | FR-13 slice: freeze a candidate from verified Git objects, check ancestry and admitted scope, run required checks under trusted policy and store receipts bound to exact tree, command, environment and result | ML-PG-CUSTODY | Stale, unrelated, modified, out-of-scope and fabricated-check candidates refuse; a legitimate candidate passes; candidate-controlled hooks/check definitions cannot certify themselves |
+| ML-PG-ACCEPTANCE | FR-08B/13/14 slice: bind a review from a distinct authenticated principal to the frozen candidate and record the actual manually integrated ref/tree | ML-PG-CANDIDATE | Wrong reviewer, changed candidate, stale review, duplicate submission and nonexistent/mismatched ref refuse or remain visibly pending; restart preserves the accepted evidence. No autonomous Git worker or activation is claimed |
+| ML-PG-CLIENTS | O1 client seam: expose those semantic operations through CLI and a small MCP surface; exercise Codex first and Claude Code when available. Hooks are optional context/reminders | ML-PG-ACCEPTANCE | Codex completes a real supervised ticket; a second independently implemented client passes the protocol conformance fixture. Client restart and repeated calls are idempotent; native agent completion alone cannot mint Foundry acceptance. Claim cross-product portability only after a second real client passes |
+| ML-PG-EVALUATION | FR-18A/22 evidence slice: use LokaCore as the first external-repository pilot, comparing ordinary Codex work with and without Foundry governance on prospectively matched tickets; add Claude Code when available. Retain hostile/failed-submission drills | ML-PG-CLIENTS and project-specific isolation/admission approval | Publish accepted outcomes after a declared observation window, actual refusals and baseline outcomes, legitimate-work false blocks, operator hours and maintenance cost under the protocol below. Do not call an unobserved hypothetical harm “prevented”; decide whether the measured value justifies retaining the layer |
+
+**Evaluation protocol.** [Validation](strategy/VALIDATION.md#portable-governance-milestone)
+defines the preregistered matched tasks, hostile and legitimate controls, independent
+adjudication, outcome denominators and rules for claiming prevention. ML-PG-EVALUATION
+must report those results before this milestone is called useful.
+
+**Immediate queue disposition.** Finish batch C2 as approved: integrate the exact
+reviewed ML-PRECISION-TOOLING range, then serially decompose Gateway and Protected
+Primitives under their reviewed designs and Q16–Q18 choices. These are behavior-preserving
+maintenance of retained Core, not investment in a bundled controller or autonomous
+execution. Run the planned FR-08A rebind for each split and one local gate for the batch.
+The Quint citation rewrite follows the Protected split; pinned `ast-grep` lints remain a
+separate follow-up. No local C2 gate, CI or PR is claimed at this checkpoint.
 
 <a id="dogfood-gate-amendment"></a>
 **Amended 2026-09-23 (operator, decisions M1–M5 of
@@ -163,8 +195,11 @@ Foundry is not in production, so there is no backward compatibility to keep:
 - **C4.** FR-23b renames follow the deletions. The Pramāṇa-era digest domain tags are
   renamed outright to `foundry-*` and existing stores discarded (the lane store is archived first).
 
-Use coherent batches to reach those milestones without creating one unreviewable
-FR-08–FR-22 change:
+The 2026-09-20 batch sequence below is retained as historical planning for the full
+autonomous repair. The [portable queue above](#portable-milestone-tickets-in-dependency-order)
+and the current [dogfood handoff](batch-d/DOGFOOD-LOG.md#handoff-where-the-campaign-stands)
+supersede it for the next admission; no status in the inventory is implied complete by
+this priority change. Its original intent was to avoid one unreviewable FR-08–FR-22 change:
 
 - **Batch A:** current FR-04 correction, H0 and FR-19A may proceed concurrently under
   disjoint ownership; freeze and review each candidate separately.
@@ -508,6 +543,8 @@ design gate only; every routed implementation obligation remains open.
 
 **Ready** means specified enough to begin investigation and implementation; it does
 not mean a repair has been made. **Blocked** means wait for listed dependencies.
+The statuses below describe full-scope FR outcomes; the portable milestone's bounded
+active slices and their revised order are in [the table above](#portable-milestone-tickets-in-dependency-order).
 
 | ID | Deliverable | Depends on | Status | Findings |
 |---|---|---|---|---|
@@ -540,10 +577,11 @@ not mean a repair has been made. **Blocked** means wait for listed dependencies.
 | FR-20 | Reconnect constrained improvement proposals | FR-15, FR-18B, FR-17 | Blocked | F19 |
 | FR-21 | Establish independent Foundry CI and build provenance | FR-01, FR-04, FR-05 | **Complete: reviewed and integration-attested** | F23, F24 |
 | FR-23a | Hygiene that no other ticket rewrites: docs, bin scripts, tests, formatter baseline, Git refs, gate | — (file rule: touches no file FR-08B/10/11/12/19B rewrites and no attestation-pinned file; see the [split proposal](fr-23/FR-23-SPLIT-PROPOSAL-2026-09-22.md)) | **In progress, split approved 2026-09-22.** Done: formatter baseline, doc and dead-surface inventories, bin script health, closure probe exit code, design status notes. The `SystemMetrics` defect was already fixed at `63ee6cb6`; the Improver proposal path it reopened is closed by `propose: false` until FR-20 (`91dc324c`) | F23, F24 |
-| FR-23b | Decompose god modules, retire legacy surfaces and rename the Pramāṇa-era namespace to `Foundry` | — ([clean-room amendment](#clean-room-amendment) C1: deletion replaces the FR-08B/FR-12/FR-19B dependency) | **In progress through the manual lane** ([dogfood log](batch-d/DOGFOOD-LOG.md)) | F23, F24 |
+| FR-23b | Decompose god modules, retire legacy surfaces and rename the Pramāṇa-era namespace to `Foundry` | — ([clean-room amendment](#clean-room-amendment) C1: deletion replaces the FR-08B/FR-12/FR-19B dependency) | **Partly integrated; Gateway and Protected splits are next in C2** ([dogfood log](batch-d/DOGFOOD-LOG.md)) | F23, F24 |
 | FR-22 | Prove full lifecycle and reconcile operating docs | FR-11, FR-12, FR-13, FR-14, FR-15aA, FR-15aB, FR-15, FR-16, FR-17, FR-18A, FR-18B, FR-19A, FR-19B, FR-20, FR-21, FR-23a, FR-23b | Blocked | F01–F24 |
 
-There are **24 ticket nodes: FR-01 through FR-23, plus child ticket FR-15a**. H0 and F
+There are **24 full-repair FR ticket nodes: FR-01 through FR-23, plus child ticket FR-15a**;
+the six `ML-PG-*` work packets above are bounded milestone slices. H0 and F
 are bounded evidence checkpoints, and the A/B labels are slices of their existing parent
 tickets. **FR-23 is a ticket; F23 and F24 are audit findings** routed to existing owners in
 the checksum below. The similar names are unrelated: findings use the `F` prefix and

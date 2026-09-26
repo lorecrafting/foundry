@@ -27,6 +27,16 @@ kernel: hold authority/evidence/acceptance invariants stable while comparing wor
 strategies, models, harnesses, context policies, tool configurations, review topologies
 and concurrency by accepted-outcome correctness, effort, latency and resource cost.
 
+**Current first product milestone (operator decision 2026-09-26):** make that protected
+boundary useful to Codex, Claude Code and other external controllers through authenticated
+CLI/MCP operations. Those clients own their agent launches, planning, scheduling, model
+billing and session recovery. Foundry owns only the admitted intent and its own durable
+facts, exact candidate/check/review evidence, acceptance and observed integration. It
+does not claim to enforce model spend, recover external sessions or guarantee their tool
+effects in this milestone. Prove value on LokaCore against the operator's ordinary native
+agent workflow before expanding the product. The active ticket order and acceptance are
+in the [repair plan](REPAIR-PLAN.md#delivery-sequence-portable-governance-first).
+
 Retain the standalone Elixir/OTP project. Since 2026-09-23 no execution path exists in
 the tree: the OMP-through-Herdr path was deleted with the legacy daemon
 ([plan amendment C1](REPAIR-PLAN.md#clean-room-amendment)), and the manual lane launches
@@ -90,7 +100,7 @@ workflow contract remains authoritative for current identities and transitions.
 
 ### Ship a reference controller without making it the kernel
 
-Foundry should still work out of the box. The candidate post-repair distribution (ROADMAP I-F5) is **Foundry Core +
+**Deferred until the portable governance milestone proves useful.** Foundry should still work out of the box if a bundled controller is later justified. The candidate distribution (ROADMAP I-F5) is **Foundry Core +
 an optional bundled Standard Controller**, with external controllers using the same Core
 protocol.
 

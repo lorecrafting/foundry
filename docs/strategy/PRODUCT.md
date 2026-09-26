@@ -7,14 +7,17 @@
 > Moved from Pramāṇa on 2026-09-24 (Pramāṇa commit `2ad8ed9`); Foundry maintains this copy on its own.
 
 This was written as one half of a joint Pramāṇa/Foundry strategy and is now Foundry's
-alone. The horizon (H0–H4) and gate (G0–G4) labels keep their pre-split meaning. G0 is
-the repair entry gate: [FR-22](../REPAIR-PLAN.md#fr-22--prove-full-lifecycle-and-reconcile-operating-docs) accepted.
+alone. The horizon (H0–H4) and gate (G0–G4) labels below retain their historical
+full-autonomy meaning. The operator's current first product finish line is the
+[portable governance milestone](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first):
+external agents orchestrate, Foundry authenticates and verifies exact evidence and
+acceptance. FR-22 remains the later full-autonomy repair gate if that expansion is chosen.
 
 ## Choices
 
 | Choice | Proposed direction | Consequence |
 |---|---|---|
-| Foundry investment | Complete repair acceptance, then measure delivery, run a substitution check and improve only the demonstrated gap | Compose mature infrastructure where it passes Foundry's contract; do not rebuild generic agent/workflow/sandbox layers for ownership's sake |
+| Foundry investment | Prove portable governed acceptance with existing agent clients, measure its value against their native workflow, then fund only demonstrated gaps | Compose mature agent/orchestration infrastructure; defer the full autonomous repair and bundled controller until the smaller milestone is useful |
 | Long-term Foundry option | Portable model-directed execution/governance kernel, proved first on a second repository and later on a materially different authorized workflow | Preserve independence now; keep roles/workflows configurable outside the protected authority core; delay multi-tenant platform work until demand is demonstrated |
 
 Foundry's proposed advantage is controlled delivery with understandable failure and
@@ -47,7 +50,7 @@ build and run without Foundry. A Foundry assignment may invoke authorized projec
 commands in an isolated environment; Foundry's authority store must never become a
 supervised project's database.
 
-## Repair acceptance is the entry gate, not another initiative
+## Full-autonomy repair acceptance is a later gate
 
 [REPAIR-PLAN](../REPAIR-PLAN.md) and
 [WORKFLOW-CONTRACT](../WORKFLOW-CONTRACT.md) govern. The former owns
@@ -65,9 +68,10 @@ not that acceptance. This strategy neither closes tickets nor suspends obligatio
 | FR-18/19/20/21 | Use honest projections, retention, constrained improvement and build provenance |
 | FR-22 | Require the scenario evidence and explicit unsupported cases before post-repair autonomous product work |
 
-A discovered contradiction returns to the owning contract through review. It does
-not authorize a strategy rewrite of the repair queue or an operator-only kernel
-that permanently removes the agreed autonomous repair capability.
+A discovered contradiction returns to the owning contract through review. The
+operator-approved portable milestone changes the active queue, not the evidence
+required to claim a full autonomous repair. Funding that later capability is a
+separate choice informed by the LokaCore comparison.
 
 ## One operating model, not several overlapping stacks
 
@@ -78,8 +82,8 @@ evidence, recovery**. These are a review vocabulary, not six new services.
 The workflow kernel decides domain transitions; the protected verifier owns safety
 and authority checks. Middleware can shape context or diagnostics inside those
 boundaries. A plugin, model response or general evaluation tool cannot be allowed
-to replace the checks that constrain it. The current source still uses OMP through
-Herdr, but the durable execution boundary should be harness-neutral. Pi remains the
+to replace the checks that constrain it. The legacy OMP/Herdr execution path was
+deleted in C1; any later durable execution boundary should be harness-neutral. Pi remains the
 preferred first replacement agent candidate; before writing a custom bridge, compare
 direct pinned Pi RPC with pinned Jido.Harness/ACP behind the same Foundry contract.
 Neither path is adopted until FR-09/15a conformance and any OMP-specific governing-contract

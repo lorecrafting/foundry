@@ -5,6 +5,67 @@
 [Product strategy](PRODUCT.md) · [Research register](RESEARCH.md)
 > Moved from Pramāṇa on 2026-09-24 (Pramāṇa commit `2ad8ed9`); Foundry maintains this copy on its own.
 
+## Portable governance milestone
+
+The first product milestone in the [repair plan](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
+lets Codex, Claude Code or another client orchestrate its own agents. Foundry claims
+durable authenticated admission, exact candidate/check/review evidence and honest
+acceptance/integration, not model-spend enforcement, agent-session recovery or automatic
+execution. Evaluate those claims against the operator's normal native-client workflow,
+including its existing permissions, review and CI; a deliberately weakened baseline is
+not evidence of product value.
+
+Before a pilot, register the task class, repository and allowed scope, client/model/profile,
+operator and review policy, required checks, observation window, expected safe outcome,
+baseline workflow and stopping rule. Use the same attempted candidate or command on both
+arms where possible. Match legitimate work as well as hostile/stale inputs; use an
+independent adjudicator who can inspect exact trees and receipts without knowing which
+arm produced them. Repeat nondeterministic agent tasks and report the number of runs.
+
+The controlled challenge set includes wrong caller or reviewer principal, stale or
+modified Git tree, unrelated ancestry, out-of-scope diff, forged or candidate-edited
+check, review of another candidate, repeated request, moved accepted ref, and restart
+between commit and acknowledgement. Each has a positive counterpart that should pass.
+Retain the attempted input, policy/check revision, actual result, refusal reason,
+candidate/ref IDs, adjudication and enough trace to reproduce the classification.
+
+Report counts and denominators for unsafe attempts accepted, unsafe attempts blocked,
+legitimate attempts accepted, legitimate attempts falsely blocked, and outcomes still
+unknown. Also report time to evidence-backed acceptance, operator interventions and
+hours, correction/rework, escaped defects and attributable cash, subscription,
+infrastructure and maintenance cost. Compare rates within matched task classes, with
+uncertainty and sample size; do not combine a typo fix with an architectural repair.
+Count an observed refusal as a **blocked attempt**. Claim **prevented harm** only when the
+matched native workflow actually accepts the same unsafe attempt and independent
+adjudication confirms the risk. If the baseline also rejects it, Foundry added no
+measured prevention for that case; if the baseline was not observed, the counterfactual
+is unknown. No denominator or too few comparable trials means **insufficient evidence**.
+
+### LokaCore live comparison
+
+After project-specific admission and isolation are approved, use LokaCore as the first
+external-repository pilot. Start with Codex; add Claude Code when it is available and
+record its results as a separate client stratum. Prospectively allocate comparable real
+tickets between the operator's ordinary native-client workflow and that same workflow with Foundry
+governing evidence and acceptance. Balance by task class and estimated difficulty;
+keep model, required checks, independent review standard and observation window as
+similar as practical. A brief shadow period may measure integration overhead and
+counterfactual refusal signals, but cannot demonstrate prevention because Foundry did
+not control acceptance in that arm. Do not run the same production change twice and
+pretend the second run is independent; replay exact inputs only for a specific disputed
+boundary decision in isolated copies.
+
+An independent assessor inspects actual merged trees and later corrections or failures,
+blinded to the arm where practical. The primary live outcome is accepted changes that
+remain acceptable through the declared window **per total operator hour**. Include
+setup, review, interventions, failed submissions, false blocks and Foundry maintenance in
+those hours. Report per-arm counts, task mix, time to acceptance, escaped defects and
+resource cost; explain allocation changes or missing follow-up. A refusal count alone is
+not a benefit. Before the pilot, state what extra operator time is acceptable for a
+demonstrated reduction in unsafe acceptance or rework. If Foundry shows no incremental
+benefit at that cost, remove or narrow the governed surface rather than preserving a
+layer merely because it produced a detailed log.
+
 ## Scorecard
 
 
