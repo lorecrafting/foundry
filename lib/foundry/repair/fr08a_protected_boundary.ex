@@ -13,8 +13,8 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
   alias Foundry.DurableStore.Gateway
   alias Foundry.Repair.FR08HandoffGate
 
-  @subject_revision "49596eee6127937094cad3e3d97d252f563b1a3c"
-  @subject_tree "db28deaf1f637450266f5cd4edb89f1036244b3e"
+  @subject_revision "ae359b74b4e690b2329f83f9c00e5d2159d526bc"
+  @subject_tree "734912a000f0971290be41c6c6f141af36e821f6"
   @api_identity [
     {Foundry.DurableStore.Authority, "lib/foundry/durable_store/authority.ex",
      "20e56e90974613f20f16d45342cbae4d215304f1a8f06cd2563d101ae2dc587b",
@@ -23,14 +23,17 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
      "53c21790997aa653e1ee6ec4b8d6a1fd4b74514219b09a67b0ed85aa99861e2d",
      "693b9323215444f71102e1f18d7d2589"},
     {Foundry.DurableStore.Gateway, "lib/foundry/durable_store/gateway.ex",
-     "a360c2052f7ece8f44a46bb4a119459e21e25dd67b031622f75f0725f053f1c5",
-     "2fe09847642d38aad227de5c9b52a916"},
+     "d57c730b810e36358096631b7a86bc093685255e692456480970b50bd44390cf",
+     "9fcc80699c9dff0d217a7ded998b8687"},
     {Foundry.DurableStore.DomainCommit, "lib/foundry/durable_store/domain_commit.ex",
-     "pin-sha256-domaincommit", "pin-md5-domaincommit"},
+     "8439f772ed56b94dd732a1368032030a31114ef33999d31f737c9271ee8ec427",
+     "f5f8bbc5c123ac62772261cfce8a8a80"},
     {Foundry.DurableStore.AtomicBundle, "lib/foundry/durable_store/atomic_bundle.ex",
-     "pin-sha256-atomicbundle", "pin-md5-atomicbundle"},
+     "5c36462c46b1e5be4b90a843747d05c6e67e6b2c4d7ebe5439752ea8595c626c",
+     "e451f16ac0a9c8694cf81763846a0be2"},
     {Foundry.DurableStore.Maintenance, "lib/foundry/durable_store/maintenance.ex",
-     "pin-sha256-maintenance", "pin-md5-maintenance"},
+     "e79bbaa4d3cd08bb75153620c6f4b473da15a29a594ce614d0303e52721ac369",
+     "db63c5643f65a1d4c02a53bc126b65bf"},
     {Foundry.DurableStore.ProtectedPrimitives,
      "lib/foundry/durable_store/protected_primitives.ex",
      "945f0234bb35a5ddd10f1f7ce568ce85d06cd5466722d5840b7d6985019e32f4",
