@@ -314,6 +314,41 @@ defmodule Foundry.CompiledMoveCheckTest do
     assert output =~ "capture target differs"
   end
 
+  test "moving a capture does not permit changing its retained target's capture kind" do
+    root = Path.join(System.tmp_dir!(), "capture_caller_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    compile_source(base, "value.ex", """
+    defmodule Retained.A do
+      def captures, do: {&helper/1, &Retained.A.helper/1}
+      def helper(v), do: v + 1
+    end
+    """)
+
+    compile_source(candidate, "value.ex", """
+    defmodule Retained.A do
+      def helper(v), do: v + 1
+    end
+    defmodule Retained.B do
+      def captures, do: {&Retained.A.helper/1, &Retained.A.helper/1}
+    end
+    """)
+
+    {output, status} =
+      System.cmd(
+        "elixir",
+        ["bin/check_move.exs", base, candidate, "Retained.A", "Retained.A,Retained.B"],
+        stderr_to_stdout: true
+      )
+
+    assert status != 0
+    assert output =~ "capture target differs"
+  end
+
   test "unresolved capture targets are refused" do
     root = Path.join(System.tmp_dir!(), "capture_missing_#{:erlang.unique_integer([:positive])}")
     base = Path.join(root, "base")

@@ -279,15 +279,18 @@ defmodule Foundry.MoveCheck do
     before_body = capture_body(before, base)
     after_body = capture_body(moved, candidate)
 
+    target_moved? =
+      before_owner != after_owner and
+        Enum.count(candidate, fn {_, found, body, _, _, _} ->
+          found == key and body == before_body
+        end) == 1 and
+        Enum.count(base, fn {_, found, body, _, _, _} ->
+          found == key and body == after_body
+        end) == 1
+
     before_body != nil and before_body == after_body and
-      (before_kind == after_kind or enclosing_moved?) and
-      (before_owner == after_owner or
-         (Enum.count(candidate, fn {_, found, body, _, _, _} ->
-            found == key and body == before_body
-          end) == 1 and
-            Enum.count(base, fn {_, found, body, _, _, _} ->
-              found == key and body == after_body
-            end) == 1))
+      (before_kind == after_kind or (enclosing_moved? and target_moved?)) and
+      (before_owner == after_owner or target_moved?)
   end
 
   defp same_capture?(_, _, _, _, _), do: false
