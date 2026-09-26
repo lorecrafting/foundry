@@ -9,7 +9,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundaryTest do
     assert report.identity.implementation_binding == "verified:source-sha256+beam-md5/v1"
     assert report.identity.subject_revision == "ae359b74b4e690b2329f83f9c00e5d2159d526bc"
     assert report.identity.subject_tree == "734912a000f0971290be41c6c6f141af36e821f6"
-    assert length(report.identity.exercised_api) == 12
+    assert length(report.identity.exercised_api) == 19
     assert FR08HandoffGate.ready?(report.gate)
     assert report.gate.passed_count == 6
     assert report.gate.failed_count == 0
