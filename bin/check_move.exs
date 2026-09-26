@@ -39,12 +39,21 @@ defmodule Foundry.MoveCheck do
     if MapSet.size(disputed) > 0,
       do: raise("ambiguous split call: #{inspect(MapSet.to_list(disputed))}")
 
-    for {_, key, body, _, _, base_targets} <- base,
-        {_, ^key, ^body, _, _, candidate_targets} <- candidate,
-        base_targets != [] or candidate_targets != [] do
-      base_bodies = Enum.map(base_targets, &capture_body(&1, base))
-      candidate_bodies = Enum.map(candidate_targets, &capture_body(&1, candidate))
-      if base_bodies != candidate_bodies, do: raise("capture target differs: #{inspect(key)}")
+    for {owner, key, body, _, _, base_targets} <- base, base_targets != [] do
+      matches = for {mod, ^key, ^body, _, _, targets} <- candidate, do: {mod, targets}
+
+      candidate_targets =
+        case {Enum.find(matches, fn {mod, _} -> mod == owner end), matches} do
+          {{_, targets}, _} -> targets
+          {nil, [{_, targets}]} -> targets
+          _ -> raise("capture target differs: #{inspect(key)}")
+        end
+
+      if length(base_targets) != length(candidate_targets) or
+           Enum.any?(Enum.zip(base_targets, candidate_targets), fn {before, moved} ->
+             not same_capture?(before, moved, base, candidate)
+           end),
+         do: raise("capture target differs: #{inspect(key)}")
     end
 
     Enum.each(declared, &check_addition!(&1, base, candidate, candidate_dir))
@@ -259,6 +268,22 @@ defmodule Foundry.MoveCheck do
     do: Enum.flat_map(list, &capture_targets(&1, owner, split))
 
   defp capture_targets(_, _, _), do: []
+
+  defp same_capture?({before_owner, key} = before, {after_owner, key} = moved, base, candidate) do
+    before_body = capture_body(before, base)
+    after_body = capture_body(moved, candidate)
+
+    before_body != nil and before_body == after_body and
+      (before_owner == after_owner or
+         (Enum.count(candidate, fn {_, found, body, _, _, _} ->
+            found == key and body == before_body
+          end) == 1 and
+            Enum.count(base, fn {_, found, body, _, _, _} ->
+              found == key and body == after_body
+            end) == 1))
+  end
+
+  defp same_capture?(_, _, _, _), do: false
 
   defp capture_body({owner, key}, definitions) do
     case Enum.find(definitions, fn {mod, found, _, _, _, _} -> {mod, found} == {owner, key} end) do

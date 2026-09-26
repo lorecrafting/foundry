@@ -252,6 +252,106 @@ defmodule Foundry.CompiledMoveCheckTest do
     assert output =~ "compiled definitions differ"
   end
 
+  test "same-body capture changed to a different owner is refused" do
+    root = Path.join(System.tmp_dir!(), "capture_owner_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    source = fn target ->
+      "defmodule Capture.Entry do\n  def captures, do: &Capture.#{target}.helper/1\nend\n" <>
+        "defmodule Capture.One do\n  def helper(v), do: v + 1\nend\n" <>
+        "defmodule Capture.Two do\n  def helper(v), do: v + 1\nend\n"
+    end
+
+    compile_source(base, "value.ex", source.("One"))
+    compile_source(candidate, "value.ex", source.("Two"))
+
+    {output, status} =
+      System.cmd(
+        "elixir",
+        [
+          "bin/check_move.exs",
+          base,
+          candidate,
+          "Capture.Entry,Capture.One,Capture.Two",
+          "Capture.Entry,Capture.One,Capture.Two"
+        ],
+        stderr_to_stdout: true
+      )
+
+    assert status != 0
+    assert output =~ "capture target differs"
+  end
+
+  test "unresolved capture targets are refused" do
+    root = Path.join(System.tmp_dir!(), "capture_missing_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    source = fn target ->
+      "defmodule Missing.Entry do\n  def capture, do: &Missing.#{target}.absent/1\nend\n" <>
+        "defmodule Missing.One do\nend\n"
+    end
+
+    compile_source(base, "value.ex", source.("One"))
+    compile_source(candidate, "value.ex", source.("One"))
+
+    {output, status} =
+      System.cmd(
+        "elixir",
+        [
+          "bin/check_move.exs",
+          base,
+          candidate,
+          "Missing.Entry,Missing.One",
+          "Missing.Entry,Missing.One"
+        ],
+        stderr_to_stdout: true
+      )
+
+    assert status != 0
+    assert output =~ "capture target differs"
+  end
+
+  test "unchanged duplicate-key captures stay with their owners" do
+    root =
+      Path.join(System.tmp_dir!(), "capture_duplicates_#{:erlang.unique_integer([:positive])}")
+
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    source =
+      "defmodule Duplicate.A do\n  def capture, do: &helper/1\n  def helper(v), do: {:a, v}\nend\n" <>
+        "defmodule Duplicate.B do\n  def capture, do: &helper/1\n  def helper(v), do: {:b, v}\nend\n"
+
+    compile_source(base, "value.ex", source)
+    compile_source(candidate, "value.ex", source)
+
+    {output, 0} =
+      System.cmd(
+        "elixir",
+        [
+          "bin/check_move.exs",
+          base,
+          candidate,
+          "Duplicate.A,Duplicate.B",
+          "Duplicate.A,Duplicate.B"
+        ],
+        stderr_to_stdout: true
+      )
+
+    assert output =~ "compiled definitions match"
+  end
+
   test "a declared facade must forward unchanged to its own moved body" do
     root = Path.join(System.tmp_dir!(), "facade_move_#{:erlang.unique_integer([:positive])}")
     base = Path.join(root, "base")
