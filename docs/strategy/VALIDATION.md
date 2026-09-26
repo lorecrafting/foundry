@@ -35,9 +35,11 @@ unknown. Also report time to evidence-backed acceptance, operator interventions 
 hours, correction/rework, escaped defects and attributable cash, subscription,
 infrastructure and maintenance cost. Compare rates within matched task classes, with
 uncertainty and sample size; do not combine a typo fix with an architectural repair.
-Count an observed refusal as a **blocked attempt**. Claim **prevented harm** only when the
-matched native workflow actually accepts the same unsafe attempt and independent
-adjudication confirms the risk. If the baseline also rejects it, Foundry added no
+Count an observed refusal as a **blocked attempt**. Claim **prevented unsafe acceptance**
+only when the matched native workflow actually accepts the same unsafe attempt and independent
+adjudication confirms the risk. This does not establish downstream harm. Claim prevented
+downstream harm only when a separately observed outcome within the declared follow-up
+supports it. If the baseline also rejects the attempt, Foundry added no
 measured prevention for that case; if the baseline was not observed, the counterfactual
 is unknown. No denominator or too few comparable trials means **insufficient evidence**.
 

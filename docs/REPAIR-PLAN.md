@@ -123,15 +123,17 @@ milestone. Foundry does not claim to enforce model spend or recover agent sessio
 
 The milestone does require protecting Foundry's own store, policy, Git evidence and
 acceptance from untrusted agent work; authenticating callers and independent reviewers;
-binding candidate, checks and verdict to an exact immutable revision; and reporting the
-actual integrated ref without inventing success. Foundry recovers its own committed facts
-and idempotent requests after restart. Client hooks may suggest when to call Foundry but
+binding candidate, checks and verdict to an exact immutable revision; and promoting the
+reviewed candidate to an authoritative accepted ref with a protected old-ref comparison.
+An external ref is an observation, not Foundry acceptance. Foundry recovers its own
+committed facts and idempotent requests after restart. Client hooks may suggest when to call Foundry but
 are not authority or proof that every action was observed. A failed or unavailable client
 integration cannot silently fall back to asserted identity or self-reported checks.
 
 The full autonomous repair remains a **later, separately chosen finish line**. Existing
-FR-08B–FR-22 full-scope obligations and F01–F24 findings stay open until their own
-acceptance; the portable milestone does not mark them complete. Work on FR-09–12, the
+Remaining unresolved FR-08B–FR-22 full-scope obligations and F01–F24 findings stay open
+until their own acceptance; completed statuses remain unchanged. The portable milestone
+does not mark the remaining obligations complete. Work on FR-09–12, the
 full FR-15aB execution isolation, FR-15–17, FR-18B, FR-19B, FR-20 and FR-22's autonomous
 lifecycle is deferred for this product milestone. Revisit each against measured need
 before funding it. `FR-22` still owns closure of the full autonomous repair, if pursued.
@@ -145,11 +147,11 @@ review and normal integration checks.
 
 | ID | Owner and deliverable | Depends on | Acceptance for this milestone |
 |---|---|---|---|
-| ML-PG-CONTRACT | FR-06/08B: version the controller-neutral admission, status, candidate, check, review and integration facts over the existing manual lane. State the trust boundary and unsupported spending, execution and deployment claims | current manual lane | Two materially different clients can describe the same lifecycle without controller-specific protected fields; independent design review resolves identity, retry and evidence semantics before code |
-| ML-PG-CUSTODY | FR-15aB narrow slice: protect the authority store, policy and accepted Git evidence from agent-controlled processes; authenticate operator/developer/reviewer calls and bind each action to a distinct principal | ML-PG-CONTRACT | Actual isolated caller attempts to edit root files, impersonate a reviewer, replay a credential and submit under a sibling principal fail; valid scoped calls and restart still work. This is not provider/network/tool isolation for a Foundry-launched agent |
+| ML-PG-CONTRACT | FR-06/08B: version the controller-neutral admission, status, candidate, check, review, acceptance and promotion facts over the existing manual lane. Define the authoritative accepted ref and its exclusive writer; distinguish protected promotion from observing an external ref. State the trust boundary and unsupported spending, execution and deployment claims | current manual lane | Two materially different clients can describe the same lifecycle without controller-specific protected fields; independent design review resolves identity, retry, exact-ref promotion and evidence semantics before code |
+| ML-PG-CUSTODY | FR-15aB narrow slice: protect the authority store, policy and accepted Git evidence from agent-controlled processes; authenticate operator/developer/reviewer calls and bind each action to a distinct principal. Keep candidate code and its check worker outside protected authority | ML-PG-CONTRACT | Actual isolated caller attempts to edit root files or the accepted ref, impersonate a reviewer, replay a credential and submit under a sibling principal fail; valid scoped calls and restart still work. Hostile project tests cannot edit protected state. This is not provider/network/tool isolation for a Foundry-launched agent |
 | ML-PG-CANDIDATE | FR-13 slice: freeze a candidate from verified Git objects, check ancestry and admitted scope, run required checks under trusted policy and store receipts bound to exact tree, command, environment and result | ML-PG-CUSTODY | Stale, unrelated, modified, out-of-scope and fabricated-check candidates refuse; a legitimate candidate passes; candidate-controlled hooks/check definitions cannot certify themselves |
-| ML-PG-ACCEPTANCE | FR-08B/13/14 slice: bind a review from a distinct authenticated principal to the frozen candidate and record the actual manually integrated ref/tree | ML-PG-CANDIDATE | Wrong reviewer, changed candidate, stale review, duplicate submission and nonexistent/mismatched ref refuse or remain visibly pending; restart preserves the accepted evidence. No autonomous Git worker or activation is claimed |
-| ML-PG-CLIENTS | O1 client seam: expose those semantic operations through CLI and a small MCP surface; exercise Codex first and Claude Code when available. Hooks are optional context/reminders | ML-PG-ACCEPTANCE | Codex completes a real supervised ticket; a second independently implemented client passes the protocol conformance fixture. Client restart and repeated calls are idempotent; native agent completion alone cannot mint Foundry acceptance. Claim cross-product portability only after a second real client passes |
+| ML-PG-ACCEPTANCE | FR-08B/13/14 slice: bind a review from a distinct authenticated principal to the frozen candidate, then let an operator trigger protected promotion of that exact candidate to the authoritative accepted ref | ML-PG-CANDIDATE | Wrong reviewer, changed candidate, stale review, duplicate submission, direct ref write and moved accepted base refuse or remain visibly pending; moved base needs fresh checks and review. Promotion uses an issued claim and fixed old-to-new Git ref CAS; a crash after ref update reconciles the durable effect and exact accepted tree. No autonomous agent launcher or activation is claimed |
+| ML-PG-CLIENTS | Manual-lane client seam: expose those semantic operations through CLI and a small MCP surface; exercise Codex first and Claude Code when available. Hooks are optional context/reminders | ML-PG-ACCEPTANCE | Codex completes a real supervised ticket; a second independently implemented client passes the protocol conformance fixture. Client restart and repeated calls are idempotent; native agent completion alone cannot mint Foundry acceptance. Claim cross-product portability only after a second real client passes |
 | ML-PG-EVALUATION | FR-18A/22 evidence slice: use LokaCore as the first external-repository pilot, comparing ordinary Codex work with and without Foundry governance on prospectively matched tickets; add Claude Code when available. Retain hostile/failed-submission drills | ML-PG-CLIENTS and project-specific isolation/admission approval | Publish accepted outcomes after a declared observation window, actual refusals and baseline outcomes, legitimate-work false blocks, operator hours and maintenance cost under the protocol below. Do not call an unobserved hypothetical harm “prevented”; decide whether the measured value justifies retaining the layer |
 
 **Evaluation protocol.** [Validation](strategy/VALIDATION.md#portable-governance-milestone)

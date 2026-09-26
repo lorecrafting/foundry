@@ -946,8 +946,9 @@ Do not interrupt the active repair to implement this abstraction.
 **Timing, 2026-09-22 (operator-approved):** begin O1 only after FR-08B lands. The [O0 inventory](../orchestrator/O0-AUTHORITY-INVENTORY-2026-09-22.md) found the FR-08B kernel has no production caller yet and the live coordinator bypasses the protected store, so an adapter built now would wrap code FR-08B is about to rewire.
 
 The 2026-09-26 portable client seam is a different, earlier slice: it exposes the manual
-lane's existing protected semantics to external controllers. It does not wrap or activate
-the FR-08B reference workflow kernel, and it does not change this O1 dependency.
+lane's existing protected semantics to external controllers. The lane already uses
+`WorkflowKernel.decide/3`; this seam may reuse that kernel. It adds no default-controller
+adapter and does not activate the unfinished autonomous lifecycle or change O1's dependency.
 
 **Approved 2026-09-23:** [keep this timing and build FR-08B's remaining protected items role-agnostic](../orchestrator/O1-SEQUENCING-PROPOSAL-2026-09-23.md).
 

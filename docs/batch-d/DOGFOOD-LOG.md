@@ -20,7 +20,8 @@ cold from the repository alone. Read this, then [the runbook](LANE-RUNBOOK.md), 
 
 **State (2026-09-26, portable-governance pivot).** `main` remains clean at
 `c55413fec19b113baa2f463e8dfaeb22674d8f91`; batches 1, A1, A2, B, C1a and C1b are integrated. The legacy daemon stack
-and the Pramāṇa-era names are gone (FR-23b done; the remaining `pramana` matches are the
+and the Pramāṇa-era names are gone (FR-23b namespace/legacy cleanup integrated;
+decompositions remain; the remaining `pramana` matches are the
 allowlist in [the sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)),
 and dated records live at tag `records/2026-09-24` (Q10). The lane runs on store 3 (50/50
 starts, Q9); stores 1 and 2 are archived under `~/.local/state/foundry-lane.store{1,2}-archived-2026-09-24`.
@@ -41,11 +42,14 @@ two Core splits; Q19 changes the product target after this behavior-preserving C
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
 Foundry authenticates and protects exact admission, candidate/check/review evidence,
-acceptance and actual integration through CLI/MCP. It does not claim model-spend control,
+and operator-triggered exact-candidate promotion to an authoritative accepted ref through
+CLI/MCP. It does not claim model-spend control,
 agent-session recovery or autonomous execution in this milestone. The first external
 pilot compares Foundry-governed and ordinary native-client work on LokaCore, with
-operator effort and false refusals included. An independent Astra strategy review is
-requested before this reprioritization lands. The operator clarified that C2's god-module
+operator effort and false refusals included. An independent Astra
+[strategy review](reviews/PORTABLE-STRATEGY.review-1.md) required correction of the
+protected promotion boundary and three wording errors; the revised plan awaits re-review.
+The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
 
