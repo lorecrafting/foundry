@@ -75,7 +75,7 @@ bin/foundry lane admit ML-42 --base-ref "$(git rev-parse HEAD)" --title "Short t
 
 ```sh
 bin/foundry lane packet ML-42 --role developer \
-  --principal agent:claude-opus-5-5/dev-ML-42 --out /private/tmp/ML-42.dev.json
+  --principal agent:codex-gpt-6-sol/dev-ML-42 --out /private/tmp/ML-42.dev.json
 ```
 
 Hand it to a developer agent in its own worktree (`isolation: "worktree"`), with the packet
@@ -96,7 +96,7 @@ git -C <worktree> rev-parse HEAD         # this is --candidate
 **Submit.** `--principal` must be the developer packet's principal.
 
 ```sh
-bin/foundry lane submit ML-42 --principal agent:claude-opus-5-5/dev-ML-42 \
+bin/foundry lane submit ML-42 --principal agent:codex-gpt-6-sol/dev-ML-42 \
   --candidate <sha> --checkout <worktree>
 ```
 
@@ -107,10 +107,10 @@ are still required. Otherwise the phase becomes `awaiting_review`.
 
 ```sh
 bin/foundry lane packet ML-42 --role reviewer \
-  --principal agent:claude-fable-5-1/review-ML-42 --out /private/tmp/ML-42.review.json
+  --principal agent:codex-gpt-6-astra/review-ML-42 --out /private/tmp/ML-42.review.json
 ```
 
-Hand it to a fresh Fable agent, never a fork of the developer or of you. Give it its own
+Hand it to a fresh agent on a different model, never a fork of the developer or of you. Give it its own
 detached worktree at the candidate, never the developer's: the developer's checkout is the
 one the lane recorded, and a reviewer's red control or `git checkout` there would alter it.
 
@@ -126,7 +126,7 @@ checks the diff against `scope` except the reviewer, so ask it to.
 **Review.**
 
 ```sh
-bin/foundry lane review ML-42 --principal agent:claude-fable-5-1/review-ML-42 \
+bin/foundry lane review ML-42 --principal agent:codex-gpt-6-astra/review-ML-42 \
   --verdict approved --candidate <sha> --notes /private/tmp/ML-42.review.md
 ```
 
@@ -137,7 +137,7 @@ bin/foundry lane review ML-42 --principal agent:claude-fable-5-1/review-ML-42 \
 packet's issuer.
 
 ```sh
-bin/foundry lane settle ML-42 --role developer --principal agent:claude-opus-5-5/dev-ML-42 \
+bin/foundry lane settle ML-42 --role developer --principal agent:codex-gpt-6-sol/dev-ML-42 \
   --outcome non_started --attest "what you checked" --issuer-gone --channel-quiet
 ```
 
@@ -168,8 +168,8 @@ bin/foundry lane integrated ML-42 [--ref main]   # is base..candidate in the ref
 
 ## 4. Principals
 
-Convention: developer `agent:claude-opus-5-5/dev-<ticket>`, reviewer
-`agent:claude-fable-5-1/review-<ticket>`; a human is `human:<name>`. `--principal` never
+Current campaign examples: developer `agent:codex-gpt-6-sol/dev-<ticket>`, reviewer
+`agent:codex-gpt-6-astra/review-<ticket>`; a human is `human:<name>`. `--principal` never
 defaults.
 
 They must differ. The seeded policy makes the reviewer independent of the developer role,
