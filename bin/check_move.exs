@@ -19,7 +19,7 @@ defmodule Foundry.MoveCheck do
     # Declared additions are compared separately. Facade delegates intentionally
     # duplicate a moved key, but must point to its equivalent new owner.
     compared =
-      base ++ Enum.reject(candidate, fn {mod, key, _, _, _} -> {mod, key} in declared end)
+      base ++ Enum.reject(candidate, fn {mod, key, _, _, _, _} -> {mod, key} in declared end)
 
     ambiguous =
       compared
@@ -39,31 +39,39 @@ defmodule Foundry.MoveCheck do
     if MapSet.size(disputed) > 0,
       do: raise("ambiguous split call: #{inspect(MapSet.to_list(disputed))}")
 
+    for {_, key, body, _, _, base_targets} <- base,
+        {_, ^key, ^body, _, _, candidate_targets} <- candidate,
+        base_targets != [] or candidate_targets != [] do
+      base_bodies = Enum.map(base_targets, &capture_body(&1, base))
+      candidate_bodies = Enum.map(candidate_targets, &capture_body(&1, candidate))
+      if base_bodies != candidate_bodies, do: raise("capture target differs: #{inspect(key)}")
+    end
+
     Enum.each(declared, &check_addition!(&1, base, candidate, candidate_dir))
 
     unexpected =
       candidate
-      |> Enum.reject(fn {mod, key, _, _, _} -> {mod, key} in declared end)
+      |> Enum.reject(fn {mod, key, _, _, _, _} -> {mod, key} in declared end)
       |> Enum.map(&elem(&1, 2))
       |> Enum.frequencies()
 
     expected = base |> Enum.map(&elem(&1, 2)) |> Enum.frequencies()
 
     Enum.each(candidate_modules, fn mod ->
-      count = Enum.count(candidate, fn {owner, _, _, _, _} -> owner == mod end)
+      count = Enum.count(candidate, fn {owner, _, _, _, _, _} -> owner == mod end)
       IO.puts("#{inspect(mod)}: #{count} definitions")
     end)
 
     promoted =
-      for {_, key, _, :def, _} <- candidate,
-          {_, ^key, _, :defp, _} <- base,
+      for {_, key, _, :def, _, _} <- candidate,
+          {_, ^key, _, :defp, _, _} <- base,
           do: key
 
     IO.puts("former defp promoted: #{inspect(Enum.uniq(promoted))}")
 
     if unexpected != expected or
          Enum.any?(declared, fn key ->
-           Enum.count(candidate, fn {mod, name, _, _, _} -> {mod, name} == key end) != 1
+           Enum.count(candidate, fn {mod, name, _, _, _, _} -> {mod, name} == key end) != 1
          end) do
       IO.puts(:stderr, "compiled definitions differ: #{inspect(diff(expected, unexpected))}")
       System.halt(1)
@@ -128,11 +136,11 @@ defmodule Foundry.MoveCheck do
   end
 
   defp check_addition!({base_owner, key} = added, base, candidate, candidate_dir) do
-    base_bodies = for {^base_owner, ^key, body, _, _} <- base, do: body
+    base_bodies = for {^base_owner, ^key, body, _, _, _} <- base, do: body
 
     if base_bodies != [] do
       owners =
-        for {owner, ^key, body, _, _} <- candidate,
+        for {owner, ^key, body, _, _, _} <- candidate,
             {owner, key} != added and body in base_bodies,
             do: owner
 
@@ -143,6 +151,7 @@ defmodule Foundry.MoveCheck do
 
   defp forwarding_target(dir, mod, {name, arity} = key) do
     beam = Path.join(dir, "#{mod}.beam")
+
     {:ok, {^mod, [debug_info: {:debug_info_v1, backend, data}]}} =
       :beam_lib.chunks(String.to_charlist(beam), [:debug_info])
 
@@ -151,11 +160,14 @@ defmodule Foundry.MoveCheck do
     case Enum.find(defs, fn {found, _, _, _} -> found == key end) do
       {^key, :def, _, [{_, args, [], {{:., _, [target, ^name]}, _, forwarded}}]}
       when is_list(args) and length(args) == arity and is_list(forwarded) ->
-        if Enum.all?(args, &match?({var, _, context} when is_atom(var) and var != :_ and is_atom(context), &1)) and
+        if Enum.all?(
+             args,
+             &match?({var, _, context} when is_atom(var) and var != :_ and is_atom(context), &1)
+           ) and
              length(Enum.uniq_by(args, &elem(&1, 0))) == arity and
              normalize(args, MapSet.new()) == normalize(forwarded, MapSet.new()),
-          do: target,
-          else: nil
+           do: target,
+           else: nil
 
       _ ->
         nil
@@ -174,13 +186,28 @@ defmodule Foundry.MoveCheck do
 
       Enum.map(defs, fn {key, kind, _, clauses} ->
         {mod, key, {key, if(kind == :defp, do: :def, else: kind), normalize(clauses, split)},
-         kind, call_sites(clauses, split)}
+         kind, call_sites(clauses, split), capture_targets(clauses, mod, split)}
       end)
     end)
   end
 
   defp normalize(term, split) do
     case term do
+      {:&, _meta, [{:/, _slash_meta, [{{:., _, [mod, name]}, _, []}, arity]}]}
+      when is_atom(mod) and is_atom(name) and is_integer(arity) ->
+        if MapSet.member?(split, mod),
+          do: {:&, [], [{:/, [], [{name, [], nil}, arity]}]},
+          else: {:&, [], [{:/, [], [{{:., [], [mod, name]}, [], []}, arity]}]}
+
+      {:&, _meta, [{:/, _slash_meta, [{name, _call_meta, context}, arity]}]}
+      when is_atom(name) and (is_nil(context) or context == []) and is_integer(arity) ->
+        {:&, [], [{:/, [], [{name, [], nil}, arity]}]}
+
+      {:in, _meta, [{:_, _underscore_meta, context}, exceptions]} when is_atom(context) ->
+        if MapSet.member?(split, context),
+          do: {:in, [], [{:_, [], nil}, normalize(exceptions, split)]},
+          else: {:in, [], [{:_, [], context}, normalize(exceptions, split)]}
+
       {{:., _, [mod, fun]}, _, args} when is_atom(mod) and is_list(args) ->
         args = normalize(args, split)
         if MapSet.member?(split, mod), do: {fun, [], args}, else: {{:., [], [mod, fun]}, [], args}
@@ -216,6 +243,29 @@ defmodule Foundry.MoveCheck do
 
   defp call_sites(list, split) when is_list(list), do: Enum.flat_map(list, &call_sites(&1, split))
   defp call_sites(_, _), do: []
+
+  defp capture_targets({:&, _, [{:/, _, [{name, _, context}, arity]}]}, owner, _split)
+       when is_atom(name) and (is_nil(context) or context == []) and is_integer(arity),
+       do: [{owner, {name, arity}}]
+
+  defp capture_targets({:&, _, [{:/, _, [{{:., _, [mod, name]}, _, []}, arity]}]}, _, split)
+       when is_atom(mod) and is_atom(name) and is_integer(arity),
+       do: if(MapSet.member?(split, mod), do: [{mod, {name, arity}}], else: [])
+
+  defp capture_targets(tuple, owner, split) when is_tuple(tuple),
+    do: tuple |> Tuple.to_list() |> Enum.flat_map(&capture_targets(&1, owner, split))
+
+  defp capture_targets(list, owner, split) when is_list(list),
+    do: Enum.flat_map(list, &capture_targets(&1, owner, split))
+
+  defp capture_targets(_, _, _), do: []
+
+  defp capture_body({owner, key}, definitions) do
+    case Enum.find(definitions, fn {mod, found, _, _, _, _} -> {mod, found} == {owner, key} end) do
+      {_, _, body, _, _, _} -> body
+      nil -> nil
+    end
+  end
 
   defp diff(expected, actual) do
     %{missing: changed(expected, actual), extra: changed(actual, expected)}

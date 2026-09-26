@@ -165,6 +165,93 @@ defmodule Foundry.CompiledMoveCheckTest do
     assert output =~ "compiled definitions match"
   end
 
+  test "a moved local capture may become an imported capture, but keeps its target" do
+    root = Path.join(System.tmp_dir!(), "capture_move_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    compile_source(base, "base.ex", """
+    defmodule Capture.Before do
+      def use(v), do: Enum.map(v, &helper/1)
+      def helper(v), do: v + 1
+    end
+    """)
+
+    compile_source(
+      base,
+      "wrong.ex",
+      "defmodule Capture.Wrong do\n  def helper(v), do: v - 1\nend\n"
+    )
+
+    compile_source(candidate, "candidate.ex", """
+    defmodule Capture.Owner do
+      def helper(v), do: v + 1
+    end
+    defmodule Capture.Wrong do
+      def helper(v), do: v - 1
+    end
+    defmodule Capture.After do
+      import Capture.Owner, only: [helper: 1]
+      def use(v), do: Enum.map(v, &helper/1)
+    end
+    """)
+
+    args = [
+      "bin/check_move.exs",
+      base,
+      candidate,
+      "Capture.Before,Capture.Wrong",
+      "Capture.After,Capture.Owner,Capture.Wrong"
+    ]
+
+    {output, 0} = System.cmd("elixir", args, stderr_to_stdout: true)
+    assert output =~ "compiled definitions match"
+
+    compile_source(candidate, "candidate.ex", """
+    defmodule Capture.Owner do
+      def helper(v), do: v + 1
+    end
+    defmodule Capture.Wrong do
+      def helper(v), do: v - 1
+    end
+    defmodule Capture.After do
+      import Capture.Wrong, only: [helper: 1]
+      def use(v), do: Enum.map(v, &helper/1)
+    end
+    """)
+
+    {output, status} = System.cmd("elixir", args, stderr_to_stdout: true)
+    assert status != 0
+    assert output =~ "capture target differs"
+  end
+
+  test "a moved rescue keeps its behavior despite anonymous variable context" do
+    root = Path.join(System.tmp_dir!(), "rescue_move_#{:erlang.unique_integer([:positive])}")
+    base = Path.join(root, "base")
+    candidate = Path.join(root, "candidate")
+    File.mkdir_p!(base)
+    File.mkdir_p!(candidate)
+    on_exit(fn -> File.rm_rf!(root) end)
+
+    source = fn mod, result ->
+      "defmodule #{mod} do\n  def value(v) do\n    _ = length(v)\n    true\n  rescue\n    ArgumentError -> #{result}\n  end\nend\n"
+    end
+
+    compile_source(base, "value.ex", source.("Rescue.Before", ":handled"))
+    compile_source(candidate, "value.ex", source.("Rescue.After", ":handled"))
+    args = ["bin/check_move.exs", base, candidate, "Rescue.Before", "Rescue.After"]
+    {output, 0} = System.cmd("elixir", args, stderr_to_stdout: true)
+    assert output =~ "compiled definitions match"
+
+    compile_source(candidate, "value.ex", source.("Rescue.After", ":changed"))
+    {output, status} = System.cmd("elixir", args, stderr_to_stdout: true)
+    assert status != 0
+    assert output =~ "compiled definitions differ"
+  end
+
   test "a declared facade must forward unchanged to its own moved body" do
     root = Path.join(System.tmp_dir!(), "facade_move_#{:erlang.unique_integer([:positive])}")
     base = Path.join(root, "base")
