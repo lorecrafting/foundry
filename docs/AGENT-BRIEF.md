@@ -65,7 +65,7 @@ Written 2026-09-23 from one day's integration of about twenty agent candidates.
 
 ## Reviews
 
-Independent review is a fresh agent on a different model (Fable), never a fork. A reviewer
+Independent review is a fresh agent with a distinct reviewer principal, never a fork. A reviewer
 brief names the delta, the approved design, and the author's own inductive steps to attack.
 It never asks for a gate rerun or hash recomputation ([repair plan](REPAIR-PLAN.md)). Protected
 Core designs get a review *before* implementation as well as after.
