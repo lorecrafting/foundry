@@ -160,10 +160,11 @@ adjudication, outcome denominators and rules for claiming prevention. ML-PG-EVAL
 must report those results before this milestone is called useful.
 
 **Immediate queue disposition.** The exact reviewed ML-PRECISION-TOOLING range is on
-`integ/C2`. Finish batch C2 as approved: serially decompose Gateway and Protected
-Primitives under their reviewed designs and Q16–Q18 choices. These are behavior-preserving
+`integ/C2`, and the Gateway split and its FR-08A rebind are integrated. Finish batch C2
+as approved: decompose Protected Primitives under its reviewed design and Q17–Q18 choices.
+These are behavior-preserving
 maintenance of retained Core, not investment in a bundled controller or autonomous
-execution. Run the planned FR-08A rebind for each split and one local gate for the batch.
+execution. Rebind FR-08A on the Protected split tip, then run one local gate for the batch.
 The Quint citation rewrite follows the Protected split; pinned `ast-grep` lints remain a
 separate follow-up. No local C2 gate, CI or PR is claimed at this checkpoint.
 

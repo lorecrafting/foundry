@@ -36,12 +36,14 @@ recorded [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md),
 [approval 4](reviews/ML-PRECISION-TOOLING.review-4.md). The lane is `ready_to_integrate`;
 the approval receipt is recorded. The full seven-commit candidate range is cherry-picked
 onto `/private/tmp/foundry-integ-C2`; `lane integrated ML-PRECISION-TOOLING --ref integ/C2`
-reported `integrated: true`, with no missing commits. No C2 gate, CI, PR or FR-08A rebind
-has run. Q16–Q18 approve the
-two Core splits; Q19 changes the product target after this behavior-preserving C2 batch.
+reported `integrated: true`, with no missing commits. Q16–Q18 approve the two Core
+splits; Q19 changes the product target after this behavior-preserving C2 batch.
 Gateway candidate `0a8db0b` passed its independent
 [Astra review](reviews/ML-DECOMPOSE-GATEWAY.review.md), and its full five-commit range is
-on `integ/C2`; `lane integrated` reported no missing commits. Its FR-08A rebind is next.
+on `integ/C2`; `lane integrated` reported no missing commits. The operator pinned
+`DomainCommit`, `AtomicBundle` and `Maintenance`, then ran one FR-08A rebind on the
+integrated tip. The frozen report says `ready=true` and the FR-08A focused test passed
+4/4; the pin list is 12. No batch gate or CI has run.
 
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
@@ -58,10 +60,9 @@ The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
 
-**Next:** rebind Gateway, then admit ML-DECOMPOSE-PP under the
-[Gateway](../design/DECOMPOSE-GATEWAY.md) and
-[Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md) designs. Rebind FR-08A
-once per split on the integrated tip, run one local batch gate, open a visible PR for
+**Next:** admit ML-DECOMPOSE-PP under the
+[Protected Primitives](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md) design. Rebind FR-08A
+on its integrated tip, run one local batch gate, open a visible PR for
 Linux CI, then fast-forward `main` locally. The Quint citation update follows the moves.
 Then admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
 serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
@@ -177,7 +178,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DECOMPOSE-GATEWAY-DESIGN | `e74fb88` | `9e4a710`, then `1f50910` | [correction](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-1.md) (the rebind placeholders would have left FR-08A red; a source-AST move check cannot see alias shadowing), then [approved](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-2.md) | batch C1b + operator fixup | [design](../design/DECOMPOSE-GATEWAY.md): Gateway facade + DomainCommit + AtomicBundle + Maintenance. The operator aligned its rebind steps with ML-DEAD-ROUTES and the sibling review |
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
 | ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | integ/C2 (`229ffc4`), gate pending | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Full seven-commit range cherry-picked; `lane integrated` reported true; no C2 gate or PR yet |
-| ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`), rebind and gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. Reviewer found an inherited contract-citation arity typo, corrected on integration branch |
+| ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
