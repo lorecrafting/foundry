@@ -14,6 +14,7 @@ defmodule Foundry.DurableStore.Gateway do
     Authority,
     Capacity,
     Database,
+    Maintenance,
     Encoding,
     Kernel,
     Owner,
@@ -127,14 +128,14 @@ defmodule Foundry.DurableStore.Gateway do
   end
 
   def handle_call(:operational_health, from, state) do
-    case read_operational_health(state) do
+    case Maintenance.read_operational_health(state) do
       {:ok, health} ->
         owner = self()
         token = make_ref()
 
         {pid, monitor} =
           spawn_monitor(fn ->
-            capacity_probe_controller(
+            Maintenance.capacity_probe_controller(
               owner,
               token,
               state.capacity_probe,
@@ -163,7 +164,7 @@ defmodule Foundry.DurableStore.Gateway do
   end
 
   def handle_call({:recent_events, limit}, _from, state) do
-    result = query_recent_events(state.conn, limit)
+    result = Maintenance.query_recent_events(state.conn, limit)
     {:reply, result, transition_after_result(state, result)}
   end
 
@@ -172,7 +173,7 @@ defmodule Foundry.DurableStore.Gateway do
   end
 
   def handle_call(:checkpoint, _from, state) do
-    result = checkpoint_database(state.conn, state.maintenance_fault)
+    result = Maintenance.checkpoint_database(state.conn, state.maintenance_fault)
     {:reply, result, transition_after_result(state, result)}
   end
 
@@ -326,7 +327,7 @@ defmodule Foundry.DurableStore.Gateway do
   end
 
   def handle_call({:backup, path}, _from, state) do
-    result = backup_database(state.conn, path, state.maintenance_fault)
+    result = Maintenance.backup_database(state.conn, path, state.maintenance_fault)
     {:reply, result, transition_after_result(state, result)}
   end
 
@@ -339,8 +340,13 @@ defmodule Foundry.DurableStore.Gateway do
       {request, requests} ->
         Process.demonitor(request.monitor, [:flush])
         Process.demonitor(request.caller_monitor, [:flush])
-        physical = normalize_capacity_result(result)
-        GenServer.reply(request.from, {:ok, add_physical_capacity(request.health, physical)})
+        physical = Maintenance.normalize_capacity_result(result)
+
+        GenServer.reply(
+          request.from,
+          {:ok, Maintenance.add_physical_capacity(request.health, physical)}
+        )
+
         {:noreply, %{state | operational_health_requests: requests}}
     end
   end
@@ -356,7 +362,8 @@ defmodule Foundry.DurableStore.Gateway do
 
         GenServer.reply(
           request.from,
-          {:ok, add_physical_capacity(request.health, {:unknown, :capacity_probe_timeout})}
+          {:ok,
+           Maintenance.add_physical_capacity(request.health, {:unknown, :capacity_probe_timeout})}
         )
 
         {:noreply, %{state | operational_health_requests: requests}}
@@ -372,7 +379,12 @@ defmodule Foundry.DurableStore.Gateway do
         Process.demonitor(request.caller_monitor, [:flush])
 
         physical = {:unknown, {:capacity_probe_worker_exit, reason}}
-        GenServer.reply(request.from, {:ok, add_physical_capacity(request.health, physical)})
+
+        GenServer.reply(
+          request.from,
+          {:ok, Maintenance.add_physical_capacity(request.health, physical)}
+        )
+
         {:noreply, update_in(state.operational_health_requests, &Map.delete(&1, token))}
 
       {token, request, :caller} ->
@@ -1944,343 +1956,6 @@ defmodule Foundry.DurableStore.Gateway do
   end
 
   defp maybe_limit_pages(_conn, _pages), do: {:error, :invalid_page_limit}
-
-  defp read_operational_health(state) do
-    with {:ok, [[page_count]]} <- Database.query(state.conn, "PRAGMA page_count"),
-         {:ok, [[page_size]]} <- Database.query(state.conn, "PRAGMA page_size"),
-         {:ok, [[max_page_count]]} <- Database.query(state.conn, "PRAGMA max_page_count"),
-         {:ok, [[last_sequence]]} <-
-           Database.query(state.conn, "SELECT coalesce(max(seq), 0) FROM events") do
-      {:ok,
-       %{
-         mode: :ready,
-         last_durable_sequence: last_sequence,
-         database_bytes: page_count * page_size,
-         wal_bytes: file_size(state.path <> "-wal"),
-         capacity: %{
-           sqlite_page_count: page_count,
-           sqlite_max_page_count: max_page_count,
-           sqlite_available_bytes: max(max_page_count - page_count, 0) * page_size
-         }
-       }}
-    else
-      {:error, reason} -> {:error, {:storage_unavailable, reason}}
-      other -> {:error, {:storage_unavailable, {:invalid_health_result, other}}}
-    end
-  end
-
-  defp add_physical_capacity(health, physical) do
-    capacity =
-      Map.merge(health.capacity, %{
-        physical_available_bytes: physical,
-        status: if(is_integer(physical), do: :known, else: :unknown)
-      })
-
-    %{health | capacity: capacity}
-  end
-
-  defp query_recent_events(_conn, limit) when limit < 1 or limit > 1_000,
-    do: {:error, {:invalid_limit, %{minimum: 1, maximum: 1_000}}}
-
-  defp query_recent_events(conn, limit) do
-    case Database.query(
-           conn,
-           "SELECT seq, event_id, command_id, event_type FROM events ORDER BY seq DESC LIMIT ?",
-           [limit]
-         ) do
-      {:ok, rows} ->
-        {:ok,
-         Enum.map(rows, fn [sequence, event_id, command_id, event_type] ->
-           %{
-             sequence: sequence,
-             event_id: event_id,
-             command_id: command_id,
-             event_type: event_type
-           }
-         end)}
-
-      {:error, reason} ->
-        {:error, {:storage_unavailable, reason}}
-    end
-  end
-
-  defp checkpoint_database(conn, fault) do
-    with {:ok, before_view} <- Authority.read(conn, :all),
-         :ok <- inject_maintenance(fault, :before_checkpoint),
-         {:ok, [[busy, log_frames, checkpointed_frames]]} <-
-           run_maintenance_operation(fault, :during_checkpoint, conn, fn ->
-             Database.query(conn, "PRAGMA wal_checkpoint(TRUNCATE)")
-           end),
-         true <- busy == 0,
-         :ok <- inject_maintenance(fault, :after_checkpoint),
-         {:ok, after_view} <- Authority.read(conn, :all),
-         true <- before_view.content == after_view.content,
-         true <- before_view.reconstructed == after_view.reconstructed,
-         {:ok, [[last_sequence]]} <-
-           Database.query(conn, "SELECT coalesce(max(seq), 0) FROM events") do
-      {:ok,
-       %{
-         busy: busy,
-         log_frames: log_frames,
-         checkpointed_frames: checkpointed_frames,
-         last_durable_sequence: last_sequence
-       }}
-    else
-      false -> {:error, {:authority_corrupt, "sqlite", "checkpoint", :content_mismatch}}
-      {:error, {:authority_corrupt, _table, _identity, _reason} = reason} -> {:error, reason}
-      {:error, reason} -> {:error, {:storage_unavailable, reason}}
-      other -> {:error, {:storage_unavailable, {:checkpoint_failed, other}}}
-    end
-  end
-
-  defp inject_maintenance({:halt, point}, point), do: System.halt(74)
-  defp inject_maintenance({:error, point}, point), do: {:error, {:injected_maintenance, point}}
-  defp inject_maintenance(_fault, _point), do: :ok
-
-  defp start_maintenance_fault({:during, point, fun}, point, conn) when is_function(fun, 1),
-    do: fun.(conn)
-
-  defp start_maintenance_fault(_fault, _point, _conn), do: :ok
-
-  defp run_maintenance_operation(fault, point, conn, operation) do
-    case start_maintenance_fault(fault, point, conn) do
-      {:scoped, finish} when is_function(finish, 1) ->
-        try do
-          result = operation.()
-
-          case finish.(result) do
-            :ok -> result
-            {:error, _reason} = error -> error
-            other -> {:error, {:maintenance_fault_cleanup_failed, other}}
-          end
-        catch
-          kind, reason ->
-            stacktrace = __STACKTRACE__
-            _ = finish.({:raised, kind, reason})
-            :erlang.raise(kind, reason, stacktrace)
-        end
-
-      :ok ->
-        operation.()
-
-      {:error, _reason} = error ->
-        error
-
-      other ->
-        {:error, {:invalid_maintenance_fault_result, other}}
-    end
-  end
-
-  defp capacity_probe_controller(owner, token, probe, path, timeout_ms) do
-    owner_monitor = Process.monitor(owner)
-    controller = self()
-
-    {probe_pid, probe_monitor} =
-      spawn_monitor(fn ->
-        result = invoke_capacity_probe(probe, path)
-        send(controller, {:capacity_probe_result, self(), result})
-      end)
-
-    timer = Process.send_after(controller, :capacity_probe_timeout, timeout_ms)
-
-    await_capacity_probe(
-      owner,
-      owner_monitor,
-      token,
-      probe_pid,
-      probe_monitor,
-      timer
-    )
-  end
-
-  defp await_capacity_probe(owner, owner_monitor, token, probe_pid, probe_monitor, timer) do
-    receive do
-      {:capacity_probe_result, ^probe_pid, result} ->
-        Process.cancel_timer(timer)
-        Process.demonitor(probe_monitor, [:flush])
-        Process.demonitor(owner_monitor, [:flush])
-        send(owner, {:operational_health_capacity, token, result})
-
-      :capacity_probe_timeout ->
-        stop_capacity_probe(probe_pid, probe_monitor)
-        Process.demonitor(owner_monitor, [:flush])
-        send(owner, {:operational_health_capacity_timeout, token})
-
-      {:cancel_capacity_probe, ^token} ->
-        Process.cancel_timer(timer)
-        stop_capacity_probe(probe_pid, probe_monitor)
-        Process.demonitor(owner_monitor, [:flush])
-
-      {:DOWN, ^owner_monitor, :process, ^owner, _reason} ->
-        Process.cancel_timer(timer)
-        stop_capacity_probe(probe_pid, probe_monitor)
-
-      {:DOWN, ^probe_monitor, :process, ^probe_pid, reason} ->
-        Process.cancel_timer(timer)
-        Process.demonitor(owner_monitor, [:flush])
-
-        send(
-          owner,
-          {:operational_health_capacity, token, {:error, {:capacity_probe_worker_exit, reason}}}
-        )
-    end
-  end
-
-  defp stop_capacity_probe(probe_pid, probe_monitor) do
-    Process.exit(probe_pid, :kill)
-
-    receive do
-      {:DOWN, ^probe_monitor, :process, ^probe_pid, _reason} -> :ok
-    end
-  end
-
-  defp invoke_capacity_probe(probe, path) do
-    probe.(path)
-  rescue
-    error -> {:error, {:capacity_probe_exception, error}}
-  catch
-    :exit, reason -> {:error, {:capacity_probe_exit, reason}}
-  end
-
-  defp normalize_capacity_result(result) do
-    case result do
-      {:ok, bytes} when is_integer(bytes) and bytes >= 0 -> bytes
-      {:error, reason} -> {:unknown, reason}
-      other -> {:unknown, {:invalid_capacity_result, other}}
-    end
-  end
-
-  defp file_size(path) do
-    case File.stat(path) do
-      {:ok, stat} -> stat.size
-      {:error, :enoent} -> 0
-      {:error, reason} -> {:unknown, reason}
-    end
-  end
-
-  defp backup_database(conn, path, fault) do
-    with {:ok, source_view} <- Authority.read(conn, :all),
-         {:ok, target} <- PathIdentity.new(path),
-         {:ok, database_rows} <- Database.query(conn, "PRAGMA database_list"),
-         source_path when is_binary(source_path) and source_path != "" <-
-           Enum.find_value(database_rows, fn
-             [_seq, "main", value] -> value
-             _row -> nil
-           end),
-         {:ok, source} <- PathIdentity.existing(source_path),
-         :ok <- PathIdentity.validate_new_database(target),
-         :ok <- PathIdentity.validate_publication(source, [target]),
-         false <- PathIdentity.collision?(source, target) do
-      perform_backup(conn, target, source_view, fault)
-    else
-      {:error, :target_exists} -> {:error, :backup_exists}
-      true -> {:error, :backup_path_collision}
-      {:error, reason} -> {:error, reason}
-    end
-  end
-
-  defp perform_backup(conn, target, source_view, fault) do
-    escaped = String.replace(target.path, "'", "''")
-
-    with :ok <-
-           run_maintenance_operation(fault, :during_backup, conn, fn ->
-             Database.execute(conn, "VACUUM INTO '#{escaped}'")
-           end),
-         :ok <- maybe_interrupt_backup(fault),
-         {:ok, snapshot} <- PathIdentity.existing(target.path),
-         {:ok, result} <- verify_backup(snapshot, source_view, fault) do
-      {:ok, result}
-    else
-      {:error, {:storage_unavailable, _reason} = reason} -> {:error, reason}
-      {:error, reason} -> {:error, {:storage_unavailable, {:backup_failed, reason}}}
-      other -> {:error, {:storage_unavailable, {:backup_failed, other}}}
-    end
-  end
-
-  defp maybe_interrupt_backup(fault), do: inject_maintenance(fault, :after_backup_snapshot)
-
-  defp verify_backup(snapshot, source_view, fault) do
-    path = snapshot.path
-
-    open_result =
-      with :ok <- PathIdentity.revalidate(snapshot),
-           {:ok, conn} <- Database.open(snapshot),
-           :ok <- PathIdentity.revalidate(snapshot) do
-        {:ok, conn}
-      end
-
-    case open_result do
-      {:ok, backup} ->
-        result =
-          with {:ok, backup_view} <- Authority.read(backup, :all),
-               true <- source_view.content == backup_view.content,
-               true <- source_view.reconstructed == backup_view.reconstructed,
-               :ok <- sync_snapshot(path, fault) do
-            {:ok,
-             %{
-               path: path,
-               content: backup_view.content,
-               reconstruction: publication_reconstruction(backup_view.reconstructed)
-             }}
-          else
-            false -> {:error, :backup_content_mismatch}
-            {:error, reason} -> {:error, reason}
-          end
-
-        _ = Database.close(backup)
-        result
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  defp sync_snapshot(path, fault) do
-    with :ok <- sync_file(path, fault),
-         :ok <- sync_directory(Path.dirname(path)) do
-      :ok
-    end
-  end
-
-  defp sync_file(path, fault) do
-    case :file.open(String.to_charlist(path), [:read, :binary, :raw]) do
-      {:ok, file} ->
-        try do
-          with :ok <- start_maintenance_fault(fault, :during_backup_sync, file) do
-            :file.sync(file)
-          end
-        after
-          _ = :file.close(file)
-        end
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  defp sync_directory(path) do
-    case :file.open(String.to_charlist(path), [:read, :raw, :directory]) do
-      {:ok, directory} ->
-        try do
-          :file.sync(directory)
-        after
-          _ = :file.close(directory)
-        end
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  defp publication_reconstruction(state) do
-    bytes = :erlang.term_to_binary(state, [:deterministic])
-
-    %{
-      projection_count: map_size(state),
-      sha256: Encoding.digest(bytes),
-      state: state
-    }
-  end
 
   defp recovery_state(path, reason) do
     %{
