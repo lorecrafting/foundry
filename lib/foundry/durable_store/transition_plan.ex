@@ -32,7 +32,7 @@ defmodule Foundry.DurableStore.TransitionPlan do
   @alternative ~w(discriminator proposal)
   @domain_read ~w(kind entity_id revision)
 
-  # Must stay a subset of ProtectedPrimitives' supported operations and must contain every
+  # Must stay a subset of Protected.Rows' supported operations and must contain every
   # type @producers names, or a declared slot becomes unreachable. consume_validation was
   # here and is not a protected operation at all; issue_claim produces launch_authority_v1
   # and was missing, which made all six admission slots unbindable once

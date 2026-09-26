@@ -3,8 +3,9 @@
 [Foundry](../../README.md) › [Docs](../../docs/README.md) › R5 budget ledger — Quint model
 
 `ledger.qnt` models the R5 budget ledger as the code implements it
-(`lib/foundry/durable_store/protected_primitives.ex` at Pramāṇa `df1ac5f8`; every
-action cites its line). The contract is the "Budget ledger — R5" section of
+(historical `lib/foundry/durable_store/protected_primitives.ex` at Pramāṇa
+`df1ac5f8`; model source line citations retain that revision). The contract is the
+"Budget ledger — R5" section of
 [the workflow contract](../../docs/WORKFLOW-CONTRACT.md). Where the code and the contract
 disagree, the model follows the code and marks the spot `DISAGREE`.
 
@@ -56,13 +57,16 @@ conservation invariants test each action's arithmetic.
 1. **A quarantined claim loses its hold when its generation closes.** Trace (seed 1, 25
    steps): e1 is claimed, issued and settled `unknown`. e2 is created on `obj/1` and claimed,
    but not issued. A `settle_claim` for e2 reuses e1's `receipt_id`. `observation_conflict?`
-   (PP:1595) runs before any check on the claim's status, so it quarantines the
+   (`Protected.Operations.observation_conflict?/4`) runs before any check on the
+   claim's status, so it quarantines the
    **claimed, unissued** claim while its reservation is still `reserved`. Then
-   `close_generation obj/1` runs: `revoke_unissued_generation` (PP:1689) releases every
+   `close_generation obj/1` runs: `revoke_unissued_generation` (`Protected.Operations.revoke_unissued_generation/2`)
+   releases every
    `reserved` reservation, whether or not its claim is quarantined, and
    `cancel_unissued_effect_owners` skips the `reconciliation_required` effect. The units go
    held → available → retired. The quarantine itself leaves a state that fails the restart
-   check: `reservation_statuses` (PP:7584) expects `issued_unknown` for a quarantined claim
+   check: `reservation_statuses` (`Protected.RestartCheck.reservation_statuses/3`) expects `issued_unknown` for a
+   quarantined claim
    with no receipts. Quarantining a `cancelled` claim the same way also fails the restart
    check.
 2. **Closing one ledger strands another ledger's hold.** Trace (seed 1): e2 is created with
@@ -70,15 +74,17 @@ conservation invariants test each action's arithmetic.
    r1 stays `reserved` and holds units on `root/0`. No operation can release it:
    `release_reservation` and `cancel_effect` both refuse a cancelled owner. It is released
    only when `root/0` closes. Until then the restart check fails (a cancelled owner allows
-   only released or retired reservations). `reservation_dimensions` (PP:3498) is the only
+   only released or retired reservations). `reservation_dimensions` (`Protected.Guards.reservation_dimensions/2`) is the only
    check on which ledgers an effect's reservations may use, and it checks the dimension, not
    the ledger. The same trace works with `obj` and `tkt`.
 3. **A proposed reservation owned by an existing effect fails the restart check.** Trace
    (seed `0x8e44`, 5 steps): r1 and r2 are reserved for e1, then `create_effect e1` lists
    only r1. r2 stays `proposed` under a `pending` effect, which the restart check rejects
-   (PP:7575). `reserve` (PP:998) never checks the state of its owner.
+   (`Protected.RestartCheck.reservation_statuses/3`). `reserve`
+   (`Protected.Operations.apply_operation/2`, `reserve` clause) never checks the
+   state of its owner.
 
-The restart check is `ProtectedPrimitives.validate`, which runs when the database opens
+The restart check is `Protected.RestartCheck.validate/1`, which runs when the database opens
 (`database.ex:467`), not after each command. Each state above commits, and then the store
 refuses to reopen. None of the three findings breaks numeric conservation.
 

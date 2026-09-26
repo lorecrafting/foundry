@@ -6,7 +6,7 @@
 [the FR-10 design](../../docs/fr-10/FR10-DESIGN-2026-09-23.md). It models the protocol **as
 designed** (D1–D5 plus the operator's answers Q2–Q4), not today's code. Each store action
 cites the protected operation it models in
-`lib/foundry/durable_store/protected_primitives.ex` (`PP:<line>`, lines at
+the historical `lib/foundry/durable_store/protected_primitives.ex` (`PP:<line>` at
 Pramāṇa `33395c92`). The scope follows design §7: one ticket and attempt, and one semantic operation
 with ordinal 0 (E0) and its retry, ordinal 1 (E1). There are two writer epochs, and each
 effect has one reservation of one unit on a two-unit ledger. Failures injected: a
@@ -122,7 +122,8 @@ settles `unknown` and keeps the hold (`channelEvidenceHoldsTest`).
 **B. A late `unknown` receipt re-quarantines a settled effect (today's code).**
 `settle_with_receipts` quarantines any non-exact receipt when a known outcome is already
 stored. An `unknown` receipt carries less information, not conflicting information
-(`PP:1911-1916`). The counterexample below came from an earlier run (`stepDesignHonest`, I6, 300k samples,
+(`Protected.Operations.settle_with_receipts/6`). The counterexample below came from an
+earlier run (`stepDesignHonest`, I6, 300k samples,
 seed 7); the 20k-sample run finds the same class of path:
 
 1. The epoch-0 worker dispatches and emits a timeout `unknown` receipt. The receipt stays
@@ -132,21 +133,23 @@ seed 7); the 20k-sample run finds the same class of path:
 4. The retry E1 is created.
 5. The stale `unknown` arrives. E0 goes `failed` → `reconciliation_required`.
 
-E1 can then never be claimed or issued (`predecessor_current?` at `PP:3463-3486`), and
+E1 can then never be claimed or issued (`Protected.Guards.predecessor_current?/2`), and
 the attempt can never close. Only operator recovery, which Q3 requires, gets it out. A
 routine timeout-then-outcome reordering needs a human. **Fix F2:** store a stale `unknown`
 and leave the status unchanged. F2 is not a fix for conflicting known outcomes.
 
 **C. Nothing defines what quarantining a predecessor means for its successor.** A genuinely
 conflicting observation (R5) can quarantine E0 after E1 exists (`stepFixedAdversary`, I6).
-The code allows this deliberately (the `close_attempt` comment, `PP:1553-1558`). The design
+The code allows this deliberately (the `close_attempt` comment in
+`Protected.Operations.apply_operation/2`). The design
 says nothing about the live retry: whether it is blocked, cancelled or allowed to proceed.
 I6 as written in §7 cannot hold. This is an open design question; the model does not
 answer it.
 
 **D. The design's I5 is too strong.** §7's I5 says a quarantined claim keeps its unit held.
 A claim that settled and was then quarantined had already moved its unit, and quarantine
-moves no units (`PP:2001-2016`). I5 is therefore narrowed to claims with no known outcome.
+moves no units (`Protected.Operations.quarantine_conflicting_receipt/5`). I5 is therefore
+narrowed to claims with no known outcome.
 
 **Design silences the model had to fill** (each is marked `ASSUMPTION` in the source):
 
@@ -156,12 +159,13 @@ moves no units (`PP:2001-2016`). I5 is therefore narrowed to claims with no know
   it never does.
 - D1 does not say what `cancel_effect` does to the execution. The model closes it.
 - §7's I6 omits `succeeded` as a legal predecessor, but `predecessor_guard` accepts it
-  (`PP:3454`). The model follows the code.
+  (`Protected.Guards.predecessor_guard/5`). The model follows the code.
 
 ## Red control
 
 The known-bad variant is `stepQ3Bug`: F1, F2 and conflicting observations, with the
-69614867 guard (`PP:1907-1908`) switched off. Random simulation did not reach its 11-step path, even at 200k samples. The
+69614867 guard (`Protected.Operations.reconciled_settlement/5`) switched off. Random
+simulation did not reach its 11-step path, even at 200k samples. The
 witness `q3RedControlTest` drives the path deterministically. To show the
 failure, its expectation was temporarily changed to `.expect(I9)` and the test was run.
 The change was then restored.

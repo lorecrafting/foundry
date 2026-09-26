@@ -237,7 +237,7 @@ defmodule Foundry.WorkPacket do
            # The attempt's developer issuers, which build/3's inputs cannot reach (the
            # kernel ticket carries no principal): `ManualLane.Backend` fills them from the
            # effect facts. Core enforces independence regardless
-           # (protected_primitives.ex:1344), so this is display data only.
+           # (Protected.Guards.principal_independence/6), so this is display data only.
            "excluded_principals" => []
          }}
     end

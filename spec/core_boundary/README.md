@@ -76,7 +76,7 @@ so it needs an operator decision. Nothing here changes code.
 | Invariant | Guarantee (C3 / spec) | Checks modelled |
 |---|---|---|
 | `casCurrent` | revisions/CAS: every committed event's expected ticket revision was current | `gateway.ex:1874-1893`, `:1895-1906` |
-| `createdAtCurrentRevisions` | revisions: an effect names the policy and control revisions current at creation | `protected_primitives.ex:1254-1255` |
+| `createdAtCurrentRevisions` | revisions: an effect names the policy and control revisions current at creation | `Protected.Operations.apply_operation/2` (`create_effect` clause) |
 | `issuedUnderActiveControl` | control status and predecessor currency at issue | `:1347-1356` (claim), `:1405-1413` (issue), `:3171`, `:3473-3494` |
 | `allocationConserved` | allocation at `reserve`: units are conserved, never overdrawn | `:1006`, releases at `:1762-1769`, non-start refund |
 | `lineageWellFormed` | predecessor currency at creation | `predecessor_guard`, `:3435-3470` |
@@ -136,7 +136,7 @@ Delete one tagged line in a copy and run the simulation:
   `limitBranchHolds` under `stepFixed`. **Violated.** The trace revises the policy to limit 1,
   creates, claims and issues effect 1, then a *bound* `unconditional_v1` plan settles it as a
   non-start with ordinal 1 ≥ 1 and writes `below`.
-- **RED-B**: delete `attemptOpen(s, a)` in `createEffect` (`protected_primitives.ex:1229`) and
+- **RED-B**: delete `attemptOpen(s, a)` in `createEffect` (`Protected.Guards.attempt_open/3`) and
   run `closureTerminal` under `step`. **Violated.** The trace runs `closeAttempt(1)` on an
   empty attempt, then `createEffect(2, attempt 1)`.
 
@@ -145,7 +145,8 @@ Both are restored in `core.qnt`.
 ## What the model leaves out
 
 - **One generation.** The discriminator's ordinal counts per infrastructure generation
-  (`protected_primitives.ex:208-214`), while the allowance counts every non-start in the
+  (`Protected.Operations.persist_nonstart_settlement/3`), while the allowance counts
+  every non-start in the
   attempt (`:3211-3224`). After a reset the discriminator can say `below` when `create_effect`
   refuses the retry. The result is a stranded retry, not a safety break.
 - **Branch content.** Core selects the alternative *named* by the limit. The contents of each
@@ -156,4 +157,4 @@ Both are restored in `core.qnt`.
   checks the ticket projection only.
 - **Not modelled:** reclaim, quarantine after close, `cancel_effect` on issued claims, leases,
   multiple roles and objective scope. `required_dimension/2` names roles in Core
-  (`protected_primitives.ex:3509-3511`). That is O0 §3.2 debt and out of scope here.
+  (`Protected.Guards.required_dimension/2`). That is O0 §3.2 debt and out of scope here.
