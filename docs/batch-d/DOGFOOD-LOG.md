@@ -37,7 +37,8 @@ the protected import lint rejecting approved `only:` imports. Its detached revie
 is clean. The integration worktree `/private/tmp/foundry-integ-C2` is on `integ/C2`;
 it contains only operator decisions and review records, with no candidate cherry-picked.
 No C2 gate, CI, PR or FR-08A rebind has run. Next: issue the developer correction packet
-to the same GPT-6 Sol agent/principal, fix the four findings with lean red controls,
+to a fresh GPT-6 Sol agent with a new principal (the earlier instance ends with this
+session; F9), fix the four findings with lean red controls,
 submit, and obtain a fresh different-principal GPT-6 Astra review before integrating.
 Q16 approves the Gateway design defaults; Q17 approves grouped mechanical moves with
 one rebind for the Protected Primitives split. Its other open design questions still
