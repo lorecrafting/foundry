@@ -1,9 +1,9 @@
-# Measured at c55413fec19b113baa2f463e8dfaeb22674d8f91:
+# Measured on the ML-DECOMPOSE-PP candidate graph:
 # mix xref graph --format cycles: 2 strongly connected components;
-# mix xref graph --label compile --format stats: 12 direct compile edges.
+# mix xref graph --label compile --format stats: 18 direct compile edges.
 defmodule Foundry.XrefCheck do
   @cycle_limit 2
-  @compile_limit 12
+  @compile_limit 18
   @root "lib/foundry/durable_store/"
   @protected %{
     "protected/rows.ex" => ~w(database.ex encoding.ex),

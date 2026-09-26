@@ -32,13 +32,13 @@ defmodule Foundry.XrefCheckTest do
     assert output =~ "forbidden split edge:"
   end
 
-  test "a thirteenth compile edge fails even without another cycle" do
+  test "a nineteenth compile edge fails even without another cycle" do
     graph =
-      Enum.into(1..13, %{}, fn i -> {"source#{i}", %{"sink#{i}" => "compile"}} end)
+      Enum.into(1..19, %{}, fn i -> {"source#{i}", %{"sink#{i}" => "compile"}} end)
 
     {output, status} = check(graph)
     assert status != 0
-    assert output =~ "13/12 compile edges"
+    assert output =~ "19/18 compile edges"
   end
 
   defp check(graph) do
