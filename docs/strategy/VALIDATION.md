@@ -50,15 +50,22 @@ LokaCore separate. Start with Codex; add Claude Code when available and report i
 separate client stratum. Match tickets by task class and estimated difficulty, then
 allocate them between the operator's ordinary native-client workflow and that workflow
 with Foundry governing evidence and acceptance. Pin the model, required checks,
-independent review standard and observation window as closely as practical. Run baseline
-work in isolated branches with the same ordinary PR/CI protections. Do not give either
+independent review standard and observation window as closely as practical. Record the
+exact running Foundry service revision for each governed trial and disclose upgrades
+between matched trials. Run baseline work in isolated branches with the same ordinary
+PR/CI protections and a declared evaluation ref where native acceptance can be observed.
+Do not give either
 agent access to the other arm's authority or accepted ref. Admit any baseline result to
 the live Foundry tree only through the project's normal reviewed integration policy;
 record that later step separately from the baseline outcome.
 
 An independent assessor inspects exact candidate trees, ordinary review/CI results and
-later corrections, blinded to the arm where practical. The primary comparison is changes
-adjudicated acceptable through the declared window **per total operator hour**. Include
+later corrections, blinded to the arm where practical. The primary comparison counts
+candidates **actually accepted under their assigned workflow's declared rules** and
+independently adjudicated acceptable through the declared window **per total operator
+hour**. Native acceptance on the evaluation ref is distinct from Foundry's protected
+accepted ref and from later live integration. Report acceptable but blocked candidates
+and never-eligible shadow candidates separately as quality and overhead evidence. Include
 setup, review, interventions, failed submissions, false blocks and Foundry maintenance.
 Report per-arm counts, task mix, time to adjudication, escaped defects and resource cost;
 explain allocation changes and missing follow-up. A refusal count alone is not a benefit.
@@ -73,8 +80,10 @@ governed surface.
 ## Scorecard
 
 
-Primary outcome: **accepted changes that remain acceptable through a declared
-observation window / total operator hours**, within comparable task classes.
+Primary outcome: **changes actually accepted under the assigned workflow and still
+acceptable through a declared observation window / total operator hours**, within
+comparable task classes. For the internal pilot, native acceptance uses its declared
+evaluation ref; it is not Foundry acceptance or a live integration claim.
 Operator hours include steering, review, intervention, rework and maintenance—not
 just time spent pressing Approve. Declare the observation window before scoring.
 Do not compare a typo fix and an architecture change as equivalent units.
