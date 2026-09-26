@@ -13,8 +13,8 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
   alias Foundry.DurableStore.Gateway
   alias Foundry.Repair.FR08HandoffGate
 
-  @subject_revision "ae359b74b4e690b2329f83f9c00e5d2159d526bc"
-  @subject_tree "734912a000f0971290be41c6c6f141af36e821f6"
+  @subject_revision "b5c2da1796e1cd614e22d42e211414d65c966001"
+  @subject_tree "5131fa15b1a1e61c91fe73431c64f22da51e9d4d"
   @api_identity [
     {Foundry.DurableStore.Authority, "lib/foundry/durable_store/authority.ex",
      "20e56e90974613f20f16d45342cbae4d215304f1a8f06cd2563d101ae2dc587b",
@@ -36,32 +36,32 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
      "db63c5643f65a1d4c02a53bc126b65bf"},
     {Foundry.DurableStore.ProtectedPrimitives,
      "lib/foundry/durable_store/protected_primitives.ex",
-     "945f0234bb35a5ddd10f1f7ce568ce85d06cd5466722d5840b7d6985019e32f4",
-     "4c19d74f30d5d0a235de52f52bdd279a"},
+     "e7c8f65335f2391f0236dcdc94113faf85d4b0e40bc150487d0a37f9c5de9898",
+     "cfac190b00efc843823a2e5a5f4aec00"},
     {Foundry.DurableStore.Protected.Rows, "lib/foundry/durable_store/protected/rows.ex",
-     "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
-     "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1"},
+     "e7b68c57b66f173005989ca33959ba7a830d15382e7d25be8ffa977e4fee0e26",
+     "df41208765fc7b3e30b26bf4b2f66895"},
     {Foundry.DurableStore.Protected.Guards, "lib/foundry/durable_store/protected/guards.ex",
-     "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2",
-     "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2"},
+     "ad9ce5a8dffa54b399d7f9769ddb918e87a5eab084897bf8e4d97e5037942ecb",
+     "e4ebee270dc999d11e4d653146786c37"},
     {Foundry.DurableStore.Protected.ReadSet, "lib/foundry/durable_store/protected/read_set.ex",
-     "a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3",
-     "b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3"},
+     "f058432bc60bfbb889348566ab777a8a7e1d0e26ab9bcbcc76dd63526221059c",
+     "0ba92b8e4ee85768f765114e047cba1e"},
     {Foundry.DurableStore.Protected.Reads, "lib/foundry/durable_store/protected/reads.ex",
-     "a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4",
-     "b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4"},
+     "b7f7f500c86c911df0c0ab26cefdeb1e2dd1d126c6c69b7cd148dbf473e3eacb",
+     "90d4275d819d6eaa4f3c84033735331c"},
     {Foundry.DurableStore.Protected.TransitionReplay,
      "lib/foundry/durable_store/protected/transition_replay.ex",
-     "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5",
-     "b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5"},
+     "5432cac5a180c9ebf6059933c80a405b0b1e1246027e1d57cdc533bb9b1cf9af",
+     "db0c12d351c6573dadd8ab4a76b5bc6d"},
     {Foundry.DurableStore.Protected.Operations,
      "lib/foundry/durable_store/protected/operations.ex",
-     "a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6",
-     "b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6"},
+     "1cafb250c6709b9c4490e0e060fa406bf284db593051449cc27a1c1821961f96",
+     "fc65844d175794a78df53d022ccdc22f"},
     {Foundry.DurableStore.Protected.RestartCheck,
      "lib/foundry/durable_store/protected/restart_check.ex",
-     "a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7",
-     "b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7"},
+     "e8e889ed11d629c2819283fc5087ba9c8c3aef741322417c1d00f2055ed2c07d",
+     "f6dd36369e5bfa1661c4e635ea152562"},
     {Foundry.DurableStore.Kernel, "lib/foundry/durable_store/kernel.ex",
      "d205857d23b4de281de50a9c045413ebeb601e1b279e50a179197617e01b5b26",
      "0bdbbd459b78cb97b9ae8281edacb2d3"},
@@ -77,7 +77,7 @@ defmodule Foundry.Repair.FR08AProtectedBoundary do
     # Pinned 2026-09-23 (strategy review): Core guarantees live here too — plan binding,
     # the non-start discriminator rule, settlement identity, and predicate derivation.
     {Foundry.DurableStore.TransitionPlan, "lib/foundry/durable_store/transition_plan.ex",
-     "cc0fbb3265e3dbb94a70383bdbbc76597f40f3225b220c1f5b15c45eecc300bf",
+     "4b726879713f02f823a9fece49ae40456499aef3cc97d5f41de7879153965172",
      "bf16bdc00b301265786c4eef1089111c"}
   ]
 
