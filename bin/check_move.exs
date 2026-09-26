@@ -1,5 +1,7 @@
 # Compare compiler-expanded definitions across a module split. Compile both revisions
 # independently, then pass their ebin directories and module sets to this script.
+# A declared addition that replaces a base function must be a single remote
+# delegate to a candidate owner whose compiled body matches the base body.
 defmodule Foundry.MoveCheck do
   def run([base_dir, candidate_dir, base_names, candidate_names | options]) do
     {additions, lint_option} = Enum.split_while(options, &(&1 != "--lint-protected"))
@@ -12,29 +14,57 @@ defmodule Foundry.MoveCheck do
     base = definitions(base_dir, base_modules, split)
     candidate = definitions(candidate_dir, candidate_modules, split)
     declared = Enum.map(additions, &addition/1)
+    if length(Enum.uniq(declared)) != length(declared), do: raise("duplicate addition")
+
+    # Declared additions are compared separately. Facade delegates intentionally
+    # duplicate a moved key, but must point to its equivalent new owner.
+    compared =
+      base ++ Enum.reject(candidate, fn {mod, key, _, _, _} -> {mod, key} in declared end)
+
+    ambiguous =
+      compared
+      |> Enum.group_by(&elem(&1, 1), &elem(&1, 2))
+      |> Enum.filter(fn {_, bodies} -> bodies |> Enum.uniq() |> length() > 1 end)
+      |> Enum.map(&elem(&1, 0))
+      |> MapSet.new()
+
+    called =
+      compared
+      |> Enum.flat_map(&elem(&1, 4))
+      |> Enum.map(&elem(&1, 1))
+      |> MapSet.new()
+
+    disputed = MapSet.intersection(ambiguous, called)
+
+    if MapSet.size(disputed) > 0,
+      do: raise("ambiguous split call: #{inspect(MapSet.to_list(disputed))}")
+
+    Enum.each(declared, &check_addition!(&1, base, candidate))
 
     unexpected =
       candidate
-      |> Enum.reject(fn {mod, key, _, _} -> {mod, key} in declared end)
+      |> Enum.reject(fn {mod, key, _, _, _} -> {mod, key} in declared end)
       |> Enum.map(&elem(&1, 2))
       |> Enum.frequencies()
 
     expected = base |> Enum.map(&elem(&1, 2)) |> Enum.frequencies()
 
     Enum.each(candidate_modules, fn mod ->
-      count = Enum.count(candidate, fn {owner, _, _, _} -> owner == mod end)
+      count = Enum.count(candidate, fn {owner, _, _, _, _} -> owner == mod end)
       IO.puts("#{inspect(mod)}: #{count} definitions")
     end)
 
     promoted =
-      for {_, key, _, :def} <- candidate,
-          {_, ^key, _, :defp} <- base,
+      for {_, key, _, :def, _} <- candidate,
+          {_, ^key, _, :defp, _} <- base,
           do: key
 
     IO.puts("former defp promoted: #{inspect(Enum.uniq(promoted))}")
 
-    if unexpected != expected or length(declared) != length(additions) or
-         Enum.any?(declared, fn key -> Enum.count(candidate, fn {mod, name, _, _} -> {mod, name} == key end) != 1 end) do
+    if unexpected != expected or
+         Enum.any?(declared, fn key ->
+           Enum.count(candidate, fn {mod, name, _, _, _} -> {mod, name} == key end) != 1
+         end) do
       IO.puts(:stderr, "compiled definitions differ: #{inspect(diff(expected, unexpected))}")
       System.halt(1)
     end
@@ -43,26 +73,38 @@ defmodule Foundry.MoveCheck do
   end
 
   def run(_),
-    do: raise("usage: elixir bin/check_move.exs BASE_EBIN CANDIDATE_EBIN BASE_MODULES CANDIDATE_MODULES [MODULE.function/arity ...] [--lint-protected FILE ...]")
+    do:
+      raise(
+        "usage: elixir bin/check_move.exs BASE_EBIN CANDIDATE_EBIN BASE_MODULES CANDIDATE_MODULES [MODULE.function/arity ...] [--lint-protected FILE ...]"
+      )
 
   defp lint_protected!(path) do
     ast = path |> File.read!() |> Code.string_to_quoted!(file: path)
+
     {_ast, violations} =
       Macro.prewalk(ast, [], fn
-        {:__MODULE__, _, _} = node, acc -> {node, ["__MODULE__" | acc]}
+        {:__MODULE__, _, _} = node, acc ->
+          {node, ["__MODULE__" | acc]}
+
         {kind, _, _} = node, acc when kind in [:alias, :import, :require] ->
           text = Macro.to_string(node)
           if allowed_directive?(kind, text), do: {node, acc}, else: {node, [text | acc]}
 
-        node, acc -> {node, acc}
+        node, acc ->
+          {node, acc}
       end)
 
-    if violations != [], do: raise("#{path}: forbidden split directive: #{Enum.join(Enum.reverse(violations), ", ")}")
+    if violations != [],
+      do:
+        raise("#{path}: forbidden split directive: #{Enum.join(Enum.reverse(violations), ", ")}")
   end
 
   defp allowed_directive?(:alias, text) do
     String.match?(text, ~r/^alias Foundry\.DurableStore\.(Database|Encoding|TransitionPlan)$/) or
-      String.match?(text, ~r/^alias Foundry\.DurableStore\.\{(Database|Encoding|TransitionPlan)(, (Database|Encoding|TransitionPlan))*\}$/)
+      String.match?(
+        text,
+        ~r/^alias Foundry\.DurableStore\.\{(Database|Encoding|TransitionPlan)(, (Database|Encoding|TransitionPlan))*\}$/
+      )
   end
 
   defp allowed_directive?(:import, text),
@@ -70,13 +112,41 @@ defmodule Foundry.MoveCheck do
 
   defp allowed_directive?(_, _), do: false
 
-  defp modules(csv), do: csv |> String.split(",", trim: true) |> Enum.map(&String.to_atom("Elixir." <> &1))
+  defp modules(csv),
+    do: csv |> String.split(",", trim: true) |> Enum.map(&String.to_atom("Elixir." <> &1))
 
   defp addition(value) do
     [module_and_name, arity] = String.split(value, "/")
     parts = String.split(module_and_name, ".")
+
     {String.to_atom("Elixir." <> (parts |> Enum.drop(-1) |> Enum.join("."))),
      {String.to_atom(List.last(parts)), String.to_integer(arity)}}
+  end
+
+  defp check_addition!({_, key} = added, base, candidate) do
+    base_bodies = for {_, ^key, body, _, _} <- base, do: body
+
+    if base_bodies != [] do
+      owners =
+        for {owner, ^key, body, _, _} <- candidate,
+            {owner, key} != added and body in base_bodies,
+            do: owner
+
+      remote =
+        case Enum.find(candidate, fn {owner, name, _, _, _} -> {owner, name} == added end) do
+          {_, _, _, _, calls} -> Enum.reject(calls, fn {owner, _} -> is_nil(owner) end)
+          nil -> []
+        end
+
+      case remote do
+        [{target, ^key}] ->
+          if target not in owners,
+            do: raise("declared delegate target differs: #{inspect(added)}")
+
+        _ ->
+          raise("declared delegate target differs: #{inspect(added)}")
+      end
+    end
   end
 
   defp definitions(dir, modules, split) do
@@ -88,8 +158,10 @@ defmodule Foundry.MoveCheck do
 
       {:ok, %{definitions: defs}} = backend.debug_info(:elixir_v1, mod, data, [])
       IO.puts("#{inspect(mod)}: #{length(defs)} source definitions")
+
       Enum.map(defs, fn {key, kind, _, clauses} ->
-        {mod, key, {key, if(kind == :defp, do: :def, else: kind), normalize(clauses, split)}, kind}
+        {mod, key, {key, if(kind == :defp, do: :def, else: kind), normalize(clauses, split)},
+         kind, call_sites(clauses, split)}
       end)
     end)
   end
@@ -106,10 +178,28 @@ defmodule Foundry.MoveCheck do
       tuple when is_tuple(tuple) ->
         tuple |> Tuple.to_list() |> Enum.map(&normalize(&1, split)) |> List.to_tuple()
 
-      list when is_list(list) -> Enum.map(list, &normalize(&1, split))
-      other -> other
+      list when is_list(list) ->
+        Enum.map(list, &normalize(&1, split))
+
+      other ->
+        other
     end
   end
+
+  defp call_sites({{:., _, [mod, fun]}, _, args}, split) when is_atom(mod) and is_list(args) do
+    nested = Enum.flat_map(args, &call_sites(&1, split))
+    if MapSet.member?(split, mod), do: [{mod, {fun, length(args)}} | nested], else: nested
+  end
+
+  defp call_sites({name, _, args}, split) when is_atom(name) and is_list(args) do
+    [{nil, {name, length(args)}} | Enum.flat_map(args, &call_sites(&1, split))]
+  end
+
+  defp call_sites(tuple, split) when is_tuple(tuple),
+    do: tuple |> Tuple.to_list() |> Enum.flat_map(&call_sites(&1, split))
+
+  defp call_sites(list, split) when is_list(list), do: Enum.flat_map(list, &call_sites(&1, split))
+  defp call_sites(_, _), do: []
 
   defp diff(expected, actual) do
     %{missing: changed(expected, actual), extra: changed(actual, expected)}
