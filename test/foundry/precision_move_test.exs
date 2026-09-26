@@ -94,6 +94,38 @@ defmodule Foundry.PrecisionMoveTest do
     refute File.exists?(missing)
   end
 
+  test "retained defaults count as local calls across the move boundary" do
+    {from, to} =
+      files(
+        "defmodule MoveFixture.Source do\n  def helper(a \\\\ :one, b \\\\ :two) when is_atom(a), do: {a, b}\n  def shout, do: helper()\nend\n",
+        "defmodule MoveFixture.Target do\nend\n"
+      )
+
+    before = {File.read!(from), File.read!(to)}
+
+    assert_raise Mix.Error, ~r/local calls cross/, fn ->
+      Mix.Tasks.Foundry.Move.run(["--from", from, "--to", to, "--functions", "shout/0"])
+    end
+
+    assert {File.read!(from), File.read!(to)} == before
+  end
+
+  test "destination defaults count as existing definitions" do
+    {from, to} =
+      files(
+        "defmodule MoveFixture.Source do\n  def shout(v), do: v\nend\n",
+        "defmodule MoveFixture.Target do\n  def shout({tag, value} \\\\ {:ok, :one}, b \\\\ :two) when is_atom(b), do: {tag, value, b}\nend\n"
+      )
+
+    before = {File.read!(from), File.read!(to)}
+
+    assert_raise Mix.Error, ~r/target definition conflicts/, fn ->
+      Mix.Tasks.Foundry.Move.run(["--from", from, "--to", to, "--functions", "shout/1"])
+    end
+
+    assert {File.read!(from), File.read!(to)} == before
+  end
+
   defp files(source, target) do
     dir = Path.join(System.tmp_dir!(), "move_#{:erlang.unique_integer([:positive])}")
     File.mkdir_p!(dir)

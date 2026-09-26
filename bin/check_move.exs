@@ -151,7 +151,9 @@ defmodule Foundry.MoveCheck do
     case Enum.find(defs, fn {found, _, _, _} -> found == key end) do
       {^key, :def, _, [{_, args, [], {{:., _, [target, ^name]}, _, forwarded}}]}
       when is_list(args) and length(args) == arity and is_list(forwarded) ->
-        if normalize(args, MapSet.new()) == normalize(forwarded, MapSet.new()),
+        if Enum.all?(args, &match?({var, _, context} when is_atom(var) and var != :_ and is_atom(context), &1)) and
+             length(Enum.uniq_by(args, &elem(&1, 0))) == arity and
+             normalize(args, MapSet.new()) == normalize(forwarded, MapSet.new()),
           do: target,
           else: nil
 

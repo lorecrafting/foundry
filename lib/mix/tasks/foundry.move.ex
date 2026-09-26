@@ -68,12 +68,12 @@ if Mix.env() in [:dev, :test] do
       retained = source_nodes -- selected
 
       source_defs =
-        source_nodes |> Enum.map(&definition/1) |> Enum.reject(&is_nil/1) |> MapSet.new()
+        source_nodes |> Enum.flat_map(&definition_arities/1) |> MapSet.new()
 
       moved_defs = MapSet.new(names)
 
       target_defs =
-        target_nodes |> Enum.map(&definition/1) |> Enum.reject(&is_nil/1) |> MapSet.new()
+        target_nodes |> Enum.flat_map(&definition_arities/1) |> MapSet.new()
 
       if not MapSet.disjoint?(moved_defs, target_defs),
         do: Mix.raise("target definition conflicts")
@@ -185,6 +185,17 @@ if Mix.env() in [:dev, :test] do
     end
 
     defp definition(_), do: nil
+
+    defp definition_arities({kind, _, [head | _]})
+         when kind in [:def, :defp, :defmacro, :defmacrop, :defdelegate] do
+      head = if match?({:when, _, _}, head), do: head |> elem(2) |> hd(), else: head
+      {name, _, args} = head
+      args = args || []
+      defaults = Enum.count(args, &match?({:\\, _, _}, &1))
+      for arity <- (length(args) - defaults)..length(args), do: {name, arity}
+    end
+
+    defp definition_arities(_), do: []
     defp movable?({kind, _, _}) when kind in [:def, :defp], do: true
     defp movable?(_), do: false
     defp decorator?({:@, _, [{name, _, _}]}), do: name in [:doc, :spec, :impl]

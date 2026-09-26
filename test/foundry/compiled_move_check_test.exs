@@ -193,6 +193,9 @@ defmodule Foundry.CompiledMoveCheckTest do
     for {facade, accepted?} <- [
           {"defdelegate value(a, b), to: Identity.Owner", true},
           {"defdelegate value(a, b), to: Identity.Other", false},
+          {"def value(0, b), do: Identity.Owner.value(0, b)", false},
+          {"def value({a}, b), do: Identity.Owner.value({a}, b)", false},
+          {"def value(a, b) when is_integer(a), do: Identity.Owner.value(a, b)", false},
           {"def value(a, b), do: Identity.Owner.value(b, a)", false},
           {"def value(a, b), do: -Identity.Owner.value(a, b)", false},
           {"def value(a, b) do\n    Identity.Owner.value(a, b)\n    :wrong\n  end", false}
