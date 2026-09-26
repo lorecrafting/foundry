@@ -2,9 +2,10 @@
 
 [Foundry](../../README.md) › [Docs](../README.md) › Decomposing protected_primitives.ex
 
-Status: **design only, for review before implementation** (ticket ML-DECOMPOSE-PP-DESIGN;
-Protected Core designs are reviewed first, per the [agent brief](../AGENT-BRIEF.md)).
-Nothing here is implemented. Checked against `main` `e74fb8803cb2`, where
+Status: **implemented on `integ/C2`, batch gate pending**. The approved design was
+implemented by ML-DECOMPOSE-PP; its exact candidate received an independent
+[code review](../batch-d/reviews/ML-DECOMPOSE-PP.review.md). The measurements below were
+checked against historical `main` `e74fb8803cb2`, where
 [`protected_primitives.ex`](../../lib/foundry/durable_store/protected_primitives.ex) is
 8,191 lines: one module, 335 function groups (name/arity), 12 of them public.
 Revision 2 addresses review 1 and aligns with the corrected gateway design
