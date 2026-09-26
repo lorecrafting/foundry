@@ -63,8 +63,13 @@ The second candidate `6429ff7` closed those findings but its recorded
 false pass: a retained function changed a local capture to a remote capture of the same
 owner. Third candidate `5ecd585` closed that case, but recorded
 [review 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md) found a related false pass when
-the enclosing function moves and its captured helper stays put. A fresh fourth correction
-principal has an issued developer packet; PP remains held.
+the enclosing function moves and its captured helper stays put. Fourth candidate
+`ada78ea` closed that case, but recorded
+[review 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md) found first-class capture identity
+can still collapse when both caller and helper move. Its
+[supplement](reviews/ML-MOVE-CHECK-CONTEXT.review-4-supplement.md) recommends a bounded
+direct `Enum.map/2` or `Enum.flat_map/2` callback allowance for the actual PP need. A
+fresh fifth Sol correction packet is issued; PP remains held.
 
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
@@ -200,7 +205,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
 | ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | integ/C2 (`229ffc4`), gate pending | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Full seven-commit range cherry-picked; `lane integrated` reported true; no C2 gate or PR yet |
 | ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
-| ML-MOVE-CHECK-CONTEXT | `246bdf9` | `9b3dcd4`, `6429ff7`, `5ecd585` | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md), [correction 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md) | pending | The third candidate closed the retained-caller case but accepted local↔remote capture changes when only the caller moved. Fourth Sol developer packet issued; PP remains held |
+| ML-MOVE-CHECK-CONTEXT | `246bdf9` | `9b3dcd4`, `6429ff7`, `5ecd585`, `ada78ea` | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md), [correction 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md), [correction 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md) | pending | Unique caller and target moves still change first-class capture identity. Fifth Sol packet issued for a bounded direct-Enum callback allowance; PP remains held |
 | ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), gate pending | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
 | ML-DECOMPOSE-PP | `aa19b69` | active developer packet | pending | pending | Seven-module split compiles in a dedicated worktree but remains uncommitted and unsubmitted pending the checker correction; no rebind or gate |
 
