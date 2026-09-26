@@ -58,6 +58,11 @@ The first move-context correction candidate `9b3dcd4` received a recorded
 [correction review](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md): equal-body wrong-owner
 captures were accepted, and unchanged duplicate-key captures were falsely refused.
 Its reviewer receipt completed; a fresh correction developer principal is next.
+The second candidate `6429ff7` closed those findings but its recorded
+[review 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md) found one more observable
+false pass: a retained function changed a local capture to a remote capture of the same
+owner. This differs from the necessary local-to-remote capture when its enclosing function
+actually moves. A fresh third correction principal is next; PP remains held.
 
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
@@ -193,7 +198,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
 | ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | integ/C2 (`229ffc4`), gate pending | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Full seven-commit range cherry-picked; `lane integrated` reported true; no C2 gate or PR yet |
 | ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
-| ML-MOVE-CHECK-CONTEXT | `246bdf9` | `9b3dcd4` | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md) | pending | Disjoint precision-tool follow-up: first candidate accepted the real PP split but missed equal-body wrong owners and falsely refused unchanged duplicate keys. Lane queued; fresh correction principal required |
+| ML-MOVE-CHECK-CONTEXT | `246bdf9` | `9b3dcd4`, `6429ff7` | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md) | pending | The second candidate closed wrong-owner and duplicate-key findings but accepted a retained-owner local→remote capture rewrite. Lane queued; fresh third correction principal required |
 | ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), gate pending | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
 | ML-DECOMPOSE-PP | `aa19b69` | active developer packet | pending | pending | Seven-module split compiles in a dedicated worktree but remains uncommitted and unsubmitted pending the checker correction; no rebind or gate |
 
