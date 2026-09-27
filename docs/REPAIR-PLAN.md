@@ -121,6 +121,17 @@ acceptance milestone below remain separately gated investment, not prerequisites
 for trying the local interface. Do not weaken their claims by treating manual
 records as protected evidence.
 
+**User UX direction 2026-09-27:** optimize for installing/connecting Foundry once,
+then doing ordinary work inside Pi, Codex or Claude Code without recurring setup
+commands or a human review/promotion click on every eligible ticket. Compare a
+guided local protected install with a separately operated service against setup
+friction, source privacy, operator effort and actual isolation before choosing the
+protected deployment topology. A client plugin alone does not protect authority;
+this direction does not choose cloud hosting, remove current operator admission
+requirements for new protected tickets, or authorize a change to the reviewed
+custody design. Bounded automatic new-work admission remains the later
+[progressive-admission follow-on](https://github.com/lorecrafting/foundry/issues/15).
+
 ### Delivery sequence: portable governance first
 
 **Earlier operator decision 2026-09-26 (dogfood log Q19), now a later protected
