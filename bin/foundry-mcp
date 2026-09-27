@@ -19,7 +19,7 @@ defmodule FoundryManualMCP do
   def main, do: loop()
 
   defp loop do
-    case IO.binread(:stdio, :line) do
+    case IO.read(:stdio, :line) do
       :eof ->
         :ok
 
@@ -29,7 +29,7 @@ defmodule FoundryManualMCP do
       line ->
         case reply(line) do
           nil -> :ok
-          message -> IO.binwrite(:stdio, [:json.encode(message), "\n"])
+          message -> IO.write(:stdio, [:json.encode(message), "\n"])
         end
 
         loop()

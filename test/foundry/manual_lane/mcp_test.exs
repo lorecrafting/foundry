@@ -99,6 +99,25 @@ defmodule Foundry.ManualLane.MCPTest do
     assert get_in(Enum.at(responses, 16), ["error", "code"]) == -32700
   end
 
+  test "raw UTF-8 initialize and string IDs roundtrip without ending the session" do
+    root = temp_root()
+    input = Path.join(root, "requests.jsonl")
+
+    File.write!(
+      input,
+      ~s({"jsonrpc":"2.0","id":"café","method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"雪","version":"1"}}}) <>
+        "\n" <>
+        ~s({"jsonrpc":"2.0","id":"雪-2","method":"ping"}) <>
+        "\n" <>
+        ~S({"jsonrpc":"2.0","id":"caf\u00e9","method":"ping"}) <> "\n"
+    )
+
+    responses = run(input, [])
+    assert Enum.map(responses, & &1["id"]) == ["café", "雪-2", "café"]
+    assert get_in(hd(responses), ["result", "protocolVersion"]) == "2025-11-25"
+    assert Enum.map(tl(responses), & &1["result"]) == [%{}, %{}]
+  end
+
   test "status returns a small CLI result and refuses output beyond 16 KiB" do
     root = temp_root()
     release = Path.join(root, "fake-release")
@@ -111,7 +130,9 @@ defmodule Foundry.ManualLane.MCPTest do
     for {body, oversized?} <- [
           {~s({"ok":true,"mode":"ready","tickets":{}}), false},
           {String.duplicate("x", 16_384), false},
-          {String.duplicate("x", 16_385), true}
+          {String.duplicate("x", 16_385), true},
+          {String.duplicate("é", 8_192), false},
+          {String.duplicate("é", 8_193), true}
         ] do
       File.write!(fixture, body)
 
