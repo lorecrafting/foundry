@@ -121,7 +121,7 @@ defmodule FoundryManualMCP do
       for {name, description, properties} <- @tools do
         %{
           "name" => name,
-          "description" => description <> " Unprotected same-UID lane; retries after a partial commit may require checking status/log and reusing the original arguments. CLI errors are not receipts. Inputs and responses are limited to 16 KiB.",
+          "description" => description <> " Unprotected same-UID lane; retries after a partial commit may require checking status/log and reusing the original arguments. CLI errors are not receipts. Inputs are limited to 16 KiB; CLI output text is capped at 16 KiB.",
           "inputSchema" => %{
             "type" => "object", "properties" => properties,
             "required" => Map.keys(properties) -- if(name == "manual_lane_submit", do: ["blocked"], else: []),

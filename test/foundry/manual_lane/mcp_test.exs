@@ -271,6 +271,7 @@ defmodule Foundry.ManualLane.MCPTest do
       assert tool["inputSchema"]["properties"]["ticket_id"]["maxLength"] == 128
       assert tool["description"] =~ "same-UID"
       assert tool["description"] =~ "partial commit"
+      assert tool["description"] =~ "CLI output text is capped at 16 KiB"
     end
   end
 
@@ -340,20 +341,10 @@ defmodule Foundry.ManualLane.MCPTest do
 
     input = Path.join(root, "invalid.jsonl")
 
-    File.write!(
-      input,
-      Enum.map_join(cases, "\n", &JSON.encode!/1) <>
-        "\n" <>
-        JSON.encode!(
-          call("manual_lane_status", %{
-            "ticket_id" => "ML-42",
-            "padding" => String.duplicate("x", 17_000)
-          })
-        ) <> "\n"
-    )
+    File.write!(input, Enum.map_join(cases, "\n", &JSON.encode!/1) <> "\n")
 
     responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
-    assert length(responses) == length(cases) + 1
+    assert length(responses) == length(cases)
     assert Enum.all?(responses, &(get_in(&1, ["error", "code"]) in [-32602, -32600]))
     refute File.exists?(log)
 
@@ -385,6 +376,22 @@ defmodule Foundry.ManualLane.MCPTest do
                "--json"
              ]
            ]
+  end
+
+  test "oversized valid status request refuses before CLI and drains for next request" do
+    root = temp_root()
+    {release, log} = fake_release(root)
+    input = Path.join(root, "requests.jsonl")
+    status = call("manual_lane_status", %{"ticket_id" => "ML-42"})
+    oversized = JSON.encode!(status) <> String.duplicate(" ", 16_385)
+    File.write!(input, oversized <> "\n" <> JSON.encode!(status) <> "\n")
+
+    [refusal, recovered] = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
+    assert refusal["error"]["code"] == -32600
+    assert refusal["id"] == nil
+    assert recovered["result"]["isError"] == false
+    assert get_in(recovered, ["result", "content", Access.at(0), "text"]) == ~s({"ok":true})
+    assert recorded_argv(log) == [~w(lane status ML-42 --json)]
   end
 
   defp call(name, args),
