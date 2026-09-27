@@ -92,8 +92,7 @@ first lines.
 | [Portable autonomous review amendment](design/PORTABLE-AUTONOMOUS-REVIEW.md) | independently approved design-only generic scoped attestation and preauthorized ordinary exact-ref promotion; implementation review and real-host gates outstanding |
 | [Portable packet provenance](design/PORTABLE-PACKET-PROVENANCE.md) | independently approved design-only finite role-neutral packet contract and pre-import producer seal; implementation/host gates outstanding |
 | [Portable custody packet binding](design/PORTABLE-CUSTODY-PACKET-BINDING.md) | independently approved design-only generic atomic original-result transaction using reviewed finite packet provenance; not implemented |
-| [Portable operator ingress](design/PORTABLE-CUSTODY-OPERATOR-INGRESS.md) | old candidate corrected (P1 live-FD claim); newly admitted acquisition-prevention topology awaits full-range independent review before Foundation Core work |
-| [Portable custody operator ingress](design/PORTABLE-CUSTODY-OPERATOR-INGRESS.md) | proposed distinct service-owned operator admission ingress prerequisite before foundation Core mutation; pending independent design review and host proof |
+| [Portable custody operator ingress](design/PORTABLE-CUSTODY-OPERATOR-INGRESS.md) | Q27 correction proposal: dedicated authenticated operator login/input and FD containment; both historical P1 candidates superseded prospectively; full-range independent review and host proof pending |
 | [Ecosystem boundary](design/ECOSYSTEM-BOUNDARY.md) | what Foundry owns and what it reuses |
 | [Workflow profiles](design/PROJECT-WORKFLOW-PROFILES.md), [Planning strategies](design/PLANNING-STRATEGIES.md) | project-declared workflows; model-proposed plans |
 | [Pi harness](design/PI-HARNESS.md), [Jido harness](design/JIDO-HARNESS.md) | FR-09 harness candidates |
