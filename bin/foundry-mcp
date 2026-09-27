@@ -134,11 +134,13 @@ defmodule FoundryManualMCP do
   end
 
   defp dispatch("tools/call", %{"name" => name, "arguments" => args} = params, id)
-       when name in @tool_names and is_map(args) and map_size(params) == 2 do
+       when name in @tool_names and is_map(args) do
     {_, _, properties} = Enum.find(@tools, &(elem(&1, 0) == name))
     optional = if name == "manual_lane_submit", do: ["blocked"], else: []
 
-    if valid_args?(args, properties, optional) do
+    if Map.keys(params) -- ["name", "arguments", "_meta"] == [] and
+         (not Map.has_key?(params, "_meta") or is_map(params["_meta"])) and
+         valid_args?(args, properties, optional) do
       result(id, invoke(name, args))
     else
       error(id, -32602, "Invalid tool arguments")
