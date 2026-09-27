@@ -86,6 +86,7 @@ first lines.
 | [Product strategy](strategy/PRODUCT.md) | mission, post-repair initiatives I-F1 to I-F5, open decisions |
 | [Validation](strategy/VALIDATION.md), [Research register](strategy/RESEARCH.md) | how success is measured; external sources checked |
 | [Orchestrator boundary](design/ORCHESTRATOR-BOUNDARY.md) | replaceable controllers over one authority plane |
+| [Portable governance contract](design/PORTABLE-GOVERNANCE-CONTRACT.md) | proposed first milestone semantic facts, trust boundary and protected accepted ref |
 | [Ecosystem boundary](design/ECOSYSTEM-BOUNDARY.md) | what Foundry owns and what it reuses |
 | [Workflow profiles](design/PROJECT-WORKFLOW-PROFILES.md), [Planning strategies](design/PLANNING-STRATEGIES.md) | project-declared workflows; model-proposed plans |
 | [Pi harness](design/PI-HARNESS.md), [Jido harness](design/JIDO-HARNESS.md) | FR-09 harness candidates |
