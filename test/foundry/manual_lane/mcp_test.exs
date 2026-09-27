@@ -275,6 +275,60 @@ defmodule Foundry.ManualLane.MCPTest do
     end
   end
 
+  test "tools/call accepts only object metadata without changing CLI arguments" do
+    root = temp_root()
+    {release, log} = fake_release(root)
+    input = Path.join(root, "requests.jsonl")
+    meta = %{"pi-mcp-adapter/toolCallId" => "call-42"}
+    sha = String.duplicate("a", 40)
+
+    status =
+      call("manual_lane_status", %{"ticket_id" => "ML-PG-MANUAL-MCP-PREVIEW"})
+      |> put_in(["params", "_meta"], meta)
+
+    admit =
+      call("manual_lane_admit", %{
+        "ticket_id" => "ML-42",
+        "base_ref" => sha,
+        "title" => "Short title",
+        "scope" => ["lib/a.ex"],
+        "acceptance" => ["criterion"]
+      })
+      |> put_in(["params", "_meta"], meta)
+
+    invalid = [
+      put_in(status, ["params", "unexpected"], true),
+      put_in(status, ["params", "_meta"], "call-42"),
+      put_in(admit, ["params", "_meta"], []),
+      put_in(admit, ["params", "arguments", "scope"], ["../escape"])
+    ]
+
+    File.write!(input, Enum.map_join([status, admit | invalid], "\n", &JSON.encode!/1) <> "\n")
+    responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
+
+    assert length(responses) == 6
+    assert Enum.all?(Enum.take(responses, 2), &(get_in(&1, ["result", "isError"]) == false))
+    assert Enum.all?(Enum.drop(responses, 2), &(get_in(&1, ["error", "code"]) == -32602))
+
+    assert recorded_argv(log) == [
+             ~w(lane status ML-PG-MANUAL-MCP-PREVIEW --json),
+             [
+               "lane",
+               "admit",
+               "ML-42",
+               "--base-ref",
+               sha,
+               "--title",
+               "Short title",
+               "--scope",
+               "lib/a.ex",
+               "--acceptance",
+               "criterion",
+               "--json"
+             ]
+           ]
+  end
+
   test "malformed tool arguments never invoke the CLI; refusal remains a tool error" do
     root = temp_root()
     {release, log} = fake_release(root)
