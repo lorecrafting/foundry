@@ -2,7 +2,7 @@
 
 [Foundry](../../README.md) › [Docs](../README.md) › Portable governance contract
 
-**Status:** proposed design for independent review, 2026-09-26. **Current status pointer:** the later [autonomous review amendment](PORTABLE-AUTONOMOUS-REVIEW.md) proposes agent reviewer authority and preauthorized ordinary promotion, subject to independent review and host gates; this historical body still describes the earlier operator-triggered choice. This changes neither the running manual lane nor the full [workflow contract](../WORKFLOW-CONTRACT.md). The [portable milestone queue](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order) owns implementation and acceptance. Version **1** below is the proposed semantic contract, shared by CLI and MCP; it is not a claim that either transport implements it.
+**Status:** proposed design for independent review, 2026-09-26. **Current status pointer:** the later [autonomous review amendment](PORTABLE-AUTONOMOUS-REVIEW.md) was independently approved as design-only for generic agent attestation and preauthorized ordinary promotion; implementation and host gates remain; this historical body still describes the earlier operator-triggered choice. This changes neither the running manual lane nor the full [workflow contract](../WORKFLOW-CONTRACT.md). The [portable milestone queue](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order) owns implementation and acceptance. Version **1** below is the proposed semantic contract, shared by CLI and MCP; it is not a claim that either transport implements it.
 
 ## Present boundary
 
