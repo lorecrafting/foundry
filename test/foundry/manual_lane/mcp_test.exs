@@ -86,6 +86,8 @@ defmodule Foundry.ManualLane.MCPTest do
     assert get_in(Enum.at(responses, 1), ["result", "tools"]) |> Enum.map(& &1["name"]) == [
              "manual_lane_status",
              "manual_lane_integrated",
+             "manual_lane_overview",
+             "manual_lane_log",
              "manual_lane_admit",
              "manual_lane_developer_packet",
              "manual_lane_reviewer_packet",
@@ -159,6 +161,50 @@ defmodule Foundry.ManualLane.MCPTest do
         assert result["content"] == [%{"type" => "text", "text" => body}]
       end
     end
+
+    File.write!(input, JSON.encode!(call("manual_lane_overview", %{})) <> "\n")
+    File.write!(fixture, String.duplicate("x", 16_385))
+
+    [overview] = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_FIXTURE", fixture}])
+    assert overview["result"]["isError"] == true
+
+    assert overview["result"]["content"] == [
+             %{"type" => "text", "text" => "Lane overview exceeds 16 KiB"}
+           ]
+  end
+
+  test "log returns CLI text and bounds oversized output and errors" do
+    root = temp_root()
+    release = Path.join(root, "fake-release")
+    fixture = Path.join(root, "log-output")
+    input = Path.join(root, "request.jsonl")
+
+    File.write!(
+      release,
+      "#!/bin/sh\ncat \"$FOUNDRY_MCP_FIXTURE\"\nexit \"${FOUNDRY_MCP_FAIL:-0}\"\n"
+    )
+
+    File.chmod!(release, 0o755)
+    File.write!(input, JSON.encode!(call("manual_lane_log", %{"ticket_id" => "ML-42"})) <> "\n")
+
+    for {body, exit_code, expected} <- [
+          {~s({"ok":true,"events":[]}), 0, {false, ~s({"ok":true,"events":[]})}},
+          {"refused", 1, {true, "refused"}},
+          {String.duplicate("x", 16_385), 0, {true, "Lane log exceeds 16 KiB"}}
+        ] do
+      File.write!(fixture, body)
+
+      [response] =
+        run(input, [
+          {"FOUNDRY_RELEASE", release},
+          {"FOUNDRY_MCP_FIXTURE", fixture},
+          {"FOUNDRY_MCP_FAIL", Integer.to_string(exit_code)}
+        ])
+
+      {is_error, text} = expected
+      assert response["result"]["isError"] == is_error
+      assert response["result"]["content"] == [%{"type" => "text", "text" => text}]
+    end
   end
 
   test "each allowed operation sends exact argv to the lane and exposes bounded schemas" do
@@ -171,6 +217,8 @@ defmodule Foundry.ManualLane.MCPTest do
     calls = [
       {"manual_lane_status", common, ~w(lane status ML-42 --json)},
       {"manual_lane_integrated", common, ~w(lane integrated ML-42 --json)},
+      {"manual_lane_overview", %{}, ~w(lane status --json)},
+      {"manual_lane_log", common, ~w(lane log ML-42 --json)},
       {"manual_lane_admit",
        Map.merge(common, %{
          "base_ref" => sha,
@@ -272,8 +320,15 @@ defmodule Foundry.ManualLane.MCPTest do
 
     for tool <- get_in(schema, ["result", "tools"]) do
       assert tool["inputSchema"]["additionalProperties"] == false
-      assert "ticket_id" in tool["inputSchema"]["required"]
-      assert tool["inputSchema"]["properties"]["ticket_id"]["maxLength"] == 128
+
+      if tool["name"] == "manual_lane_overview" do
+        assert tool["inputSchema"]["required"] == []
+        assert tool["inputSchema"]["properties"] == %{}
+      else
+        assert "ticket_id" in tool["inputSchema"]["required"]
+        assert tool["inputSchema"]["properties"]["ticket_id"]["maxLength"] == 128
+      end
+
       assert tool["description"] =~ "same-UID"
       assert tool["description"] =~ "partial commit"
       assert tool["description"] =~ "CLI output text is capped at 16 KiB"
@@ -284,6 +339,10 @@ defmodule Foundry.ManualLane.MCPTest do
 
     assert Map.keys(integrated["inputSchema"]["properties"]) == ["ticket_id"]
     assert integrated["inputSchema"]["required"] == ["ticket_id"]
+
+    log_tool = Enum.find(get_in(schema, ["result", "tools"]), &(&1["name"] == "manual_lane_log"))
+    assert log_tool["inputSchema"]["required"] == ["ticket_id"]
+    assert Map.keys(log_tool["inputSchema"]["properties"]) == ["ticket_id"]
   end
 
   test "tools/call accepts only object metadata without changing CLI arguments" do
@@ -295,6 +354,10 @@ defmodule Foundry.ManualLane.MCPTest do
 
     status =
       call("manual_lane_status", %{"ticket_id" => "ML-PG-MANUAL-MCP-PREVIEW"})
+      |> put_in(["params", "_meta"], meta)
+
+    log_call =
+      call("manual_lane_log", %{"ticket_id" => "ML-42"})
       |> put_in(["params", "_meta"], meta)
 
     admit =
@@ -314,15 +377,20 @@ defmodule Foundry.ManualLane.MCPTest do
       put_in(admit, ["params", "arguments", "scope"], ["../escape"])
     ]
 
-    File.write!(input, Enum.map_join([status, admit | invalid], "\n", &JSON.encode!/1) <> "\n")
+    File.write!(
+      input,
+      Enum.map_join([status, log_call, admit | invalid], "\n", &JSON.encode!/1) <> "\n"
+    )
+
     responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
 
-    assert length(responses) == 6
-    assert Enum.all?(Enum.take(responses, 2), &(get_in(&1, ["result", "isError"]) == false))
-    assert Enum.all?(Enum.drop(responses, 2), &(get_in(&1, ["error", "code"]) == -32602))
+    assert length(responses) == 7
+    assert Enum.all?(Enum.take(responses, 3), &(get_in(&1, ["result", "isError"]) == false))
+    assert Enum.all?(Enum.drop(responses, 3), &(get_in(&1, ["error", "code"]) == -32602))
 
     assert recorded_argv(log) == [
              ~w(lane status ML-PG-MANUAL-MCP-PREVIEW --json),
+             ~w(lane log ML-42 --json),
              [
                "lane",
                "admit",
@@ -358,6 +426,16 @@ defmodule Foundry.ManualLane.MCPTest do
       call("manual_lane_integrated", %{}),
       call("manual_lane_integrated", %{"ticket_id" => "ML-42", "ref" => "other"}),
       call("manual_lane_integrated", %{"ticket_id" => "../unsafe"}),
+      call("manual_lane_overview", %{"ticket_id" => "ML-42"}),
+      put_in(call("manual_lane_overview", %{}), ["params", "arguments"], []),
+      update_in(call("manual_lane_overview", %{}), ["params"], &Map.delete(&1, "arguments")),
+      call("manual_lane_log", %{"ticket_id" => "../unsafe"}),
+      call("manual_lane_log", %{"ticket_id" => "--help"}),
+      call("manual_lane_log", %{"ticket_id" => 42}),
+      call("manual_lane_log", %{"ticket_id" => "ML-" <> String.duplicate("A", 126)}),
+      call("manual_lane_log", %{"ticket_id" => "ML-42", "extra" => true}),
+      call("manual_lane_log", %{}),
+      put_in(call("manual_lane_log", %{"ticket_id" => "ML-42"}), ["params", "_meta"], []),
       call("manual_lane_admit", Map.put(good, "scope", ["../escape"])),
       call("manual_lane_admit", Map.put(good, "acceptance", [])),
       call("manual_lane_admit", Map.put(good, "title", "bad\nline")),
@@ -412,8 +490,10 @@ defmodule Foundry.ManualLane.MCPTest do
     File.write!(input, Enum.map_join(cases, "\n", &JSON.encode!/1) <> "\n")
 
     responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
-    assert length(responses) == length(cases)
-    assert Enum.all?(responses, &(get_in(&1, ["error", "code"]) in [-32602, -32600]))
+
+    assert Enum.map(responses, &get_in(&1, ["error", "code"])) ==
+             List.duplicate(-32602, length(cases) - 1) ++ [-32600]
+
     refute File.exists?(log)
 
     File.write!(input, JSON.encode!(call("manual_lane_admit", good)) <> "\n")
@@ -451,11 +531,15 @@ defmodule Foundry.ManualLane.MCPTest do
     {release, log} = fake_release(root)
     input = Path.join(root, "requests.jsonl")
 
-    for {tool, argv} <- [
-          {"manual_lane_status", ~w(lane status ML-42 --json)},
-          {"manual_lane_integrated", ~w(lane integrated ML-42 --json)}
-        ] do
-      request = call(tool, %{"ticket_id" => "ML-42"})
+    calls = [
+      {"manual_lane_status", %{"ticket_id" => "ML-42"}, ~w(lane status ML-42 --json)},
+      {"manual_lane_integrated", %{"ticket_id" => "ML-42"}, ~w(lane integrated ML-42 --json)},
+      {"manual_lane_overview", %{}, ~w(lane status --json)},
+      {"manual_lane_log", %{"ticket_id" => "ML-42"}, ~w(lane log ML-42 --json)}
+    ]
+
+    for {tool, args, argv} <- calls do
+      request = call(tool, args)
       oversized = JSON.encode!(request) <> String.duplicate(" ", 16_385)
       File.write!(input, oversized <> "\n" <> JSON.encode!(request) <> "\n")
 
@@ -467,7 +551,7 @@ defmodule Foundry.ManualLane.MCPTest do
       assert List.last(recorded_argv(log)) == argv
     end
 
-    assert length(recorded_argv(log)) == 2
+    assert recorded_argv(log) == Enum.map(calls, &elem(&1, 2))
   end
 
   defp call(name, args),

@@ -12,6 +12,8 @@ defmodule FoundryManualMCP do
   @tools [
     {"manual_lane_status", "Read one ticket; observation only.", %{"ticket_id" => @ticket}},
     {"manual_lane_integrated", "Observe Git integration against main; does not change lane phase.", %{"ticket_id" => @ticket}},
+    {"manual_lane_overview", "Read lane overview; observation only.", %{}},
+    {"manual_lane_log", "Read one ticket's lane log; observation only.", %{"ticket_id" => @ticket}},
     {"manual_lane_admit", "PM explicitly chooses ticket, base, scope and acceptance; this does not authenticate an operator.",
      %{"ticket_id" => @ticket, "base_ref" => @ref, "title" => @text,
        "scope" => %{"type" => "array", "items" => %{"type" => "string", "pattern" => "^(?!/|-)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9_./-]+$", "maxLength" => 256}, "minItems" => 1, "maxItems" => 20},
@@ -198,6 +200,11 @@ defmodule FoundryManualMCP do
   defp invoke("manual_lane_integrated", %{"ticket_id" => ticket}),
     do: cli(["integrated", ticket])
 
+  defp invoke("manual_lane_overview", _args), do: cli(["status"])
+
+  defp invoke("manual_lane_log", %{"ticket_id" => ticket}),
+    do: cli(["log", ticket])
+
   defp invoke("manual_lane_admit", args) do
     cli(["admit", args["ticket_id"], "--base-ref", args["base_ref"], "--title", args["title"],
          "--scope", Enum.join(args["scope"], ",")] ++
@@ -228,9 +235,16 @@ defmodule FoundryManualMCP do
 
     # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
     text =
-      if byte_size(out) > @limit,
-        do: if(hd(args) == "status", do: "Ticket status exceeds 16 KiB", else: "Lane output exceeds 16 KiB"),
-        else: String.trim(out)
+      if byte_size(out) > @limit do
+        case args do
+          ["status"] -> "Lane overview exceeds 16 KiB"
+          ["status" | _] -> "Ticket status exceeds 16 KiB"
+          ["log" | _] -> "Lane log exceeds 16 KiB"
+          _ -> "Lane output exceeds 16 KiB"
+        end
+      else
+        String.trim(out)
+      end
     %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(out) > @limit}
   rescue
     error ->
