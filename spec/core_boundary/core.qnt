@@ -7,8 +7,9 @@
 // branch label, any expected revision). Core's checks are the only guards. SQL is
 // abstracted away: one step is one committed Gateway transaction.
 //
-// Line citations are lib/foundry/durable_store/<file>:<line> at Pramāṇa df1ac5f8.
-// PP = protected_primitives.ex, TP = transition_plan.ex, GW = gateway.ex.
+// The model is dated at Pramāṇa df1ac5f8. Protected implementation correspondences use
+// stable current Module.function/arity or apply_operation/2 clause names; TP and GW retain
+// the model revision's transition_plan.ex and gateway.ex line citations.
 //
 // Two step relations:
 //   step       Core as built at df1ac5f8.
@@ -22,8 +23,8 @@ module core {
   pure val MAX_REV = 3
   // infrastructure_attempt_limits[role] per policy revision; the one revision change lowers it.
   pure def limitAt(rev: int): int = if (rev == 0) 2 else 1
-  pure val TERMINAL = Set("non_started", "succeeded", "failed", "cancelled") // PP:8
-  pure val CLOSED_RESV = Set("consumed", "released", "retired", "none")      // PP:9
+  pure val TERMINAL = Set("non_started", "succeeded", "failed", "cancelled") // Protected.Rows.closed_effect_statuses/0
+  pure val CLOSED_RESV = Set("consumed", "released", "retired", "none")      // Protected.Operations.apply_operation/2 "close_attempt" clause
 
   type Effect = {
     st: str,          // none pending claimed issued non_started succeeded unknown cancelled
@@ -34,7 +35,7 @@ module core {
     ctlRev: int,      // control_revision the effect names
     units: int,       // reserved start units
     resv: str,        // none proposed reserved issued_unknown consumed released
-    nsOrd: int,       // settlement ordinal if non_started (PP:214)
+    nsOrd: int,       // settlement ordinal if non_started (Protected.Operations.persist_nonstart_settlement/3)
     createdAt: int,
     // ghosts: truth recorded at commit, independent of the guard that admitted it
     polAtCreate: int,
@@ -62,7 +63,7 @@ module core {
     avail: int,
     polRev: int,
     ctlRev: int,
-    ctlActive: bool,        // root control status == "active" (PP:3171)
+    ctlActive: bool,        // root control status == "active" (Protected.Guards.control_active?/1)
     closedAt: int -> int,   // root_attempt_closures, 0 = open
     clock: int,
     ticketRev: int,         // durable revision of the ticket projection
@@ -94,7 +95,7 @@ module core {
 
   // ---------------------------------------------------------------- Core checks (pure)
 
-  pure def limitBranch(ordinal: int, limit: int): str =   // PP:332-352
+  pure def limitBranch(ordinal: int, limit: int): str =   // Protected.Guards.infrastructure_discriminator_at_revision/3
     if (ordinal < limit) "below" else "reached"
 
   pure def lineage(st: State, a: int): Set[int] =
@@ -103,11 +104,11 @@ module core {
   pure def nonstarts(st: State, a: int): int =
     lineage(st, a).filter(f => st.eff.get(f).st == "non_started").size()
 
-  // PP:3203-3228: count < limit at the CURRENT policy, or no prior non-start.
+  // Protected.Guards.nonstart_allowance/3: count < limit at the CURRENT policy, or no prior non-start.
   pure def allowanceOk(st: State, a: int): bool =
     nonstarts(st, a) == 0 or nonstarts(st, a) < limitAt(st.polRev)
 
-  // PP:3435-3470 predecessor_guard: first in lineage has ord 0 and no predecessor; otherwise
+  // Protected.Guards.predecessor_guard/5: first in lineage has ord 0 and no predecessor; otherwise
   // the predecessor is the latest in lineage and terminal, and ord is its ord + 1.
   pure def predGuard(st: State, a: int, pred: int, ord: int): bool =
     val lin = lineage(st, a)
@@ -116,20 +117,20 @@ module core {
       lin.forall(m => st.eff.get(m).ord <= st.eff.get(l).ord)
       and pred == l and ord == st.eff.get(l).ord + 1 and TERMINAL.contains(st.eff.get(l).st))
 
-  // PP:3473-3494 predecessor_current?
+  // Protected.Guards.predecessor_current?/2
   pure def predCurrent(st: State, e: int): bool =
     val x = st.eff.get(e)
     (x.ord == 0 and x.pred == 0) or (x.pred != 0 and x.pred != e
       and TERMINAL.contains(st.eff.get(x.pred).st)
       and st.eff.get(x.pred).att == x.att and st.eff.get(x.pred).ord + 1 == x.ord)
 
-  // claim_effect PP:1347-1356 and issue_claim PP:1405-1413 share these.
+  // Protected.Operations.apply_operation/2 "claim_effect" and "issue_claim" clauses share these.
   pure def launchChecks(st: State, e: int): bool =
     val x = st.eff.get(e)
     st.polRev == x.polRev and st.ctlRev == x.ctlRev and st.ctlActive
       and predCurrent(st, e) and x.resv == "reserved"
 
-  pure def attemptOpen(st: State, a: int): bool = st.closedAt.get(a) == 0  // PP:3326-3337
+  pure def attemptOpen(st: State, a: int): bool = st.closedAt.get(a) == 0  // Protected.Guards.attempt_open/3
 
   pure def tick(st: State): State = { ...st, clock: st.clock + 1 }
 
@@ -137,9 +138,9 @@ module core {
 
   // ------------------------------------------------ protected commands (any order, any args)
 
-  action reserve(e: int, units: int): bool = all {        // PP:998-1036
+  action reserve(e: int, units: int): bool = all {        // Protected.Operations.apply_operation/2 "reserve" clause
     s.eff.get(e).resv == "none", s.eff.get(e).st == "none",
-    units > 0, units <= s.avail,                          // PP:1006
+    units > 0, units <= s.avail,                          // "reserve" clause units guard
     s' = tick({ ...setEff(s, e, { ...s.eff.get(e), resv: "proposed", units: units }),
                 avail: s.avail - units })
   }
@@ -147,22 +148,23 @@ module core {
   action createEffect(e: int, a: int, pred: int, ord: int, pr: int, cr: int): bool = all {
     s.eff.get(e).st == "none",
     s.eff.get(e).resv == "proposed",                      // load_effect_reservations
-    attemptOpen(s, a),                                    // PP:1229  RED-B
-    predGuard(s, a, pred, ord),                           // PP:1232
-    pr == s.polRev, cr == s.ctlRev,                       // PP:1254-1255
-    s.ctlActive,                                          // PP:1256 -> PP:3171
-    allowanceOk(s, a),                                    // PP:1257
+    attemptOpen(s, a),                                    // Protected.Guards.attempt_open/3  RED-B
+    predGuard(s, a, pred, ord),                           // Protected.Guards.predecessor_guard/5
+    pr == s.polRev, cr == s.ctlRev,                       // "create_effect" clause revision guards
+    s.ctlActive,                                          // Protected.Guards.allowed_effect?/3 -> control_active?/1
+    allowanceOk(s, a),                                    // Protected.Guards.nonstart_allowance/3
     s' = tick(setEff(s, e, { ...s.eff.get(e),
       st: "pending", att: a, ord: ord, pred: pred, polRev: pr, ctlRev: cr,
       resv: "reserved", createdAt: s.clock, polAtCreate: s.polRev, ctlAtCreate: s.ctlRev }))
   }
 
-  action claimEffect(e: int): bool = all {                // PP:1338-1396
+  action claimEffect(e: int): bool = all {                // Protected.Operations.apply_operation/2 "claim_effect" clause
     s.eff.get(e).st == "pending", launchChecks(s, e),
     s' = tick(setEff(s, e, { ...s.eff.get(e), st: "claimed" }))
   }
 
-  // issue_claim PP:1398-1447. Also reached inside a launch bundle (launchBundle).
+  // Protected.Operations.apply_operation/2 "issue_claim" clause. Also reached inside a
+  // launch bundle (launchBundle).
   pure def issued(st: State, e: int): State =
     val x = st.eff.get(e)
     val ok = st.ctlActive and st.ctlRev == x.ctlRev and st.polRev == x.polRev
@@ -174,13 +176,14 @@ module core {
     s' = tick(issued(s, e))
   }
 
-  action cancelPending(e: int): bool = all {              // PP:1762-1769
+  action cancelPending(e: int): bool = all {              // Protected.Operations.cancel_effect/3 pending clause
     s.eff.get(e).st == "pending",
     s' = tick({ ...setEff(s, e, { ...s.eff.get(e), st: "cancelled", resv: "released" }),
                 avail: s.avail + s.eff.get(e).units })
   }
 
-  // settle_claim PP:1501-1539; the non-start ordinal counts this one (PP:208-214).
+  // Protected.Operations.apply_operation/2 "settle_claim" clause; the non-start ordinal is
+  // persisted by Protected.Operations.persist_nonstart_settlement/3.
   pure def settled(st: State, e: int, outcome: str): State =
     val x = st.eff.get(e)
     if (outcome == "non_started")
@@ -196,7 +199,7 @@ module core {
     s' = tick(settled(s, e, outcome))
   }
 
-  pure def closable(st: State, a: int): bool =            // PP:1563-1573
+  pure def closable(st: State, a: int): bool =            // Protected.Operations.apply_operation/2 "close_attempt" clause
     attemptOpen(st, a)
       and lineage(st, a).forall(f => TERMINAL.contains(st.eff.get(f).st)
                                      and CLOSED_RESV.contains(st.eff.get(f).resv))
@@ -206,12 +209,12 @@ module core {
     s' = tick({ ...s, closedAt: s.closedAt.set(a, s.clock) })
   }
 
-  action setControl(active: bool): bool = all {           // set_control, PP:745
+  action setControl(active: bool): bool = all {           // Protected.Operations.apply_operation/2 "set_control" clause
     s.ctlRev < MAX_REV,
     s' = tick({ ...s, ctlActive: active, ctlRev: s.ctlRev + 1 })
   }
 
-  action revisePolicy: bool = all {                       // set_policy, PP:741
+  action revisePolicy: bool = all {                       // Protected.Operations.apply_operation/2 "set_policy" clause
     s.polRev == 0,
     s' = tick({ ...s, polRev: 1 })
   }
@@ -256,7 +259,7 @@ module core {
     val x = post.eff.get(e)
     val fact = if (carrier == "plan" and bound) e else forged
     val branch = if (carrier == "plan" and disc == "limit")
-                   limitBranch(x.nsOrd, limitAt(x.polRev))         // PP:346, GW:1314-1326
+                   limitBranch(x.nsOrd, limitAt(x.polRev))         // Protected.Guards.infrastructure_discriminator_at_revision/3, GW:1314-1326
                  else wb
     s' = tick(emit(post, { ...EV, kind: "launch_settled", exec: exec, fact: fact,
                            branch: branch }, exp))

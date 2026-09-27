@@ -5,9 +5,8 @@
 [`effects.qnt`](effects.qnt) is commit 0 of
 [the FR-10 design](../../docs/fr-10/FR10-DESIGN-2026-09-23.md). It models the protocol **as
 designed** (D1–D5 plus the operator's answers Q2–Q4), not today's code. Each store action
-cites the protected operation it models in
-the historical `lib/foundry/durable_store/protected_primitives.ex` (`PP:<line>` at
-Pramāṇa `33395c92`). The scope follows design §7: one ticket and attempt, and one semantic operation
+cites the current corresponding `Foundry.DurableStore.Protected` function or operation
+clause by stable name. The scope follows design §7: one ticket and attempt, and one semantic operation
 with ordinal 0 (E0) and its retry, ordinal 1 (E1). There are two writer epochs, and each
 effect has one reservation of one unit on a two-unit ledger. Failures injected: a
 Gateway/Coordinator crash that starts a new epoch while the old worker may survive, a hard
@@ -164,7 +163,7 @@ narrowed to claims with no known outcome.
 ## Red control
 
 The known-bad variant is `stepQ3Bug`: F1, F2 and conflicting observations, with the
-69614867 guard (`Protected.Operations.reconciled_settlement/5`) switched off. Random
+69614867 guard in `Protected.Operations.settle_with_receipts/6` switched off. Random
 simulation did not reach its 11-step path, even at 200k samples. The
 witness `q3RedControlTest` drives the path deterministically. To show the
 failure, its expectation was temporarily changed to `.expect(I9)` and the test was run.

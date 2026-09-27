@@ -77,12 +77,12 @@ so it needs an operator decision. Nothing here changes code.
 |---|---|---|
 | `casCurrent` | revisions/CAS: every committed event's expected ticket revision was current | `gateway.ex:1874-1893`, `:1895-1906` |
 | `createdAtCurrentRevisions` | revisions: an effect names the policy and control revisions current at creation | `Protected.Operations.apply_operation/2` (`create_effect` clause) |
-| `issuedUnderActiveControl` | control status and predecessor currency at issue | `:1347-1356` (claim), `:1405-1413` (issue), `:3171`, `:3473-3494` |
-| `allocationConserved` | allocation at `reserve`: units are conserved, never overdrawn | `:1006`, releases at `:1762-1769`, non-start refund |
-| `lineageWellFormed` | predecessor currency at creation | `predecessor_guard`, `:3435-3470` |
-| `nonstartAllowance` | non-start allowance | `:1257`, `:3203-3228` |
-| `closureTerminal` | attempt closure is terminal | `close_attempt` `:1559-1589`, `attempt_open` `:1229`, `:3326-3337` |
-| `limitBranchHolds` | the limit branch equals the comparison at the effect's own policy revision | `:332-352`, `gateway.ex:1314-1326`, `transition_plan.ex:382-384` |
+| `issuedUnderActiveControl` | control status and predecessor currency at issue | `Protected.Operations.apply_operation/2` (`claim_effect` and `issue_claim` clauses), `Protected.Guards.control_active?/1`, `Protected.Guards.predecessor_current?/2` |
+| `allocationConserved` | allocation at `reserve`: units are conserved, never overdrawn | `Protected.Operations.apply_operation/2` (`reserve` clause), `Protected.Operations.cancel_effect/3`, non-start refund in `Protected.Operations.reservation_settlement/3` |
+| `lineageWellFormed` | predecessor currency at creation | `Protected.Guards.predecessor_guard/5` |
+| `nonstartAllowance` | non-start allowance | `Protected.Guards.nonstart_allowance/3` |
+| `closureTerminal` | attempt closure is terminal | `Protected.Operations.apply_operation/2` (`close_attempt` and `create_effect` clauses), `Protected.Guards.attempt_open/3` |
+| `limitBranchHolds` | the limit branch equals the comparison at the effect's own policy revision | `Protected.Guards.infrastructure_discriminator_at_revision/3`, `gateway.ex:1314-1326`, `transition_plan.ex:382-384` |
 | `settlementIdentity` | a settlement names the execution whose effect it settled | `transition_plan.ex:705-718`, `:184-198` |
 | `attemptSettledIsClosed` | `attempt_settled` names an attempt Core closed | `terminal_settlement_v1`, `transition_plan.ex:57` |
 | `launchPlannedIsIssued` | `launch_planned` names an effect Core issued | `launch_authority_v1`, `transition_plan.ex:55` |
@@ -146,8 +146,8 @@ Both are restored in `core.qnt`.
 
 - **One generation.** The discriminator's ordinal counts per infrastructure generation
   (`Protected.Operations.persist_nonstart_settlement/3`), while the allowance counts
-  every non-start in the
-  attempt (`:3211-3224`). After a reset the discriminator can say `below` when `create_effect`
+  every non-start in the attempt (`Protected.Guards.nonstart_allowance/3`). After a reset
+  the discriminator can say `below` when `create_effect`
   refuses the retry. The result is a stranded retry, not a safety break.
 - **Branch content.** Core selects the alternative *named* by the limit. The contents of each
   alternative are the controller's (`gateway.ex:1284-1293`), so `ticket_blocked` on `reached` is

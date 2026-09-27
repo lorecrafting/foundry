@@ -1,13 +1,13 @@
 // FR-10 commit 0: the effect / claim / receipt / reconciliation protocol AS DESIGNED in
 // docs/fr-10/FR10-DESIGN-2026-09-23.md (D1-D5, operator answers Q2-Q4), not today's
-// code. Every store action cites the protected operation it models in
-// lib/foundry/durable_store/protected_primitives.ex ("PP:<line>", lines at
-// Pramāṇa 33395c92). Design-only actions cite the design section.
+// code. Every store action cites the current stable Protected module function or clause
+// corresponding to the operation it models. Design-only actions cite the design section.
 //
 // Scope (design section 7): one ticket and attempt, one semantic operation with ordinals
 // 0 (effect 0) and 1 (its retry, effect 1), two writer epochs, one reservation of one unit
 // per effect on a two-unit ledger. One claim per effect: claim_effect needs a pending effect
-// (PP:1344) and cancelling a claim cancels its effect (PP:1771-1793), so an effect never
+// (Protected.Operations.apply_operation/2 "claim_effect" clause) and cancelling a claim
+// cancels its effect (Protected.Operations.cancel_effect/3 claimed clause), so an effect never
 // gets a second claim; the claim is folded into the effect record.
 //
 // Three variants share the actions and differ only in a flag record (see README.md):
@@ -21,7 +21,7 @@ module effects {
   pure val EPOCHS = Set(0, 1)
   pure val TOTAL = 2
   pure val RECQ = "reconciliation_required"
-  // @closed_effect_statuses, PP:8
+  // Protected.Rows.closed_effect_statuses/0
   pure val TERMINAL = Set("succeeded", "failed", "non_started", "cancelled")
   pure val KNOWN = Set("succeeded", "failed", "non_started")
 
@@ -83,13 +83,17 @@ module effects {
   type Out = { r: Eff, da: int, dh: int, dc: int }
   pure def same(r: Eff): Out = { r: r, da: 0, dh: 0, dc: 0 }
 
-  // quarantine_conflicting_receipt PP:2001-2016: status -> RECQ, leases retained, no units
+  // Protected.Operations.quarantine_conflicting_receipt/5: status -> RECQ, leases retained,
+  // no units
   // move, and the conflicting receipt is NOT stored.
   pure def quarantine(r: Eff): Out = same({ ...r, st: RECQ, quarantined: true })
 
-  // first_settlement PP:1970 / reconciled_settlement PP:1936: status := outcome, receipt
-  // stored; settle_reservations PP:3898-3920 (unknown moves nothing); reservation_settlement
-  // PP:3922-3936 (succeeded/failed consume, non_started releases); settle_leases PP:3938.
+  // Protected.Operations.first_settlement/5 and
+  // Protected.Operations.reconciled_settlement/5: status := outcome, receipt stored;
+  // Protected.Operations.settle_reservations/3 (unknown moves nothing) and
+  // Protected.Operations.reservation_settlement/3 (succeeded/failed consume,
+  // non_started releases), followed by
+  // Protected.Operations.settle_leases/3.
   // D1: succeeded -> running, non_started -> closed, unknown -> unknown.
   // ASSUMPTION (D1 is silent): failed -> running, and a closed execution never reopens.
   pure def apply(r: Eff, o: str): Out =
@@ -104,23 +108,24 @@ module effects {
     else
       { r: { ...base, res: "consumed", resSettles: r.resSettles + 1 }, da: 0, dh: -1, dc: 1 }
 
-  // settle_claim PP:1501-1539 -> settle_with_receipts PP:1885-1921.
+  // Protected.Operations.apply_operation/2 "settle_claim" clause delegates to
+  // Protected.Operations.settle_with_receipts/6.
   pure def settle(r: Eff, o: str, v: Variant): Out =
-    if (r.log.contains(o)) same(r)                        // exact duplicate, PP:1893-1902
-    else if (v.q3Guard and r.st == RECQ) quarantine(r)    // 69614867, PP:1907-1908
+    if (r.log.contains(o)) same(r)                        // exact duplicate, Operations.settle_with_receipts/6
+    else if (v.q3Guard and r.st == RECQ) quarantine(r)    // 69614867, Operations.settle_with_receipts/6 RECQ clause
     else if (r.log != Set())
       if (o != "unknown" and r.log.forall(x => x == "unknown"))
-        // reconciled_settlement PP:1911-1913; settle_reservations needs issued_unknown PP:3905
+        // Protected.Operations.reconciled_settlement/5; Operations.settle_reservations/3 needs issued_unknown
         (if (r.res == "issued_unknown") apply(r, o) else same(r))
       else if (v.absorbStaleUnknown and o == "unknown")
         same({ ...r, log: r.log.union(Set(o)) })          // F2 (proposal, not code)
-      else quarantine(r)                                   // PP:1914-1916
-    else if (Set("issued", "unknown").contains(r.st))      // first_settlement PP:1973
+      else quarantine(r)                                   // Operations.settle_with_receipts/6 conflict clause
+    else if (Set("issued", "unknown").contains(r.st))      // Operations.first_settlement/5 status guard
       apply(r, o)
     else same(r)                                           // rejected, no mutation
 
-  // predecessor_guard PP:3425-3458 (terminal set PP:3454) at create; predecessor_current?
-  // PP:3463-3486 at claim and issue.
+  // Protected.Guards.predecessor_guard/5 (including its terminal set) at create;
+  // Protected.Guards.predecessor_current?/2 at claim and issue.
   def predOk(e: int): bool = e == 0 or TERMINAL.contains(eff.get(0).st)
 
   // D3. As designed, non-start evidence is EITHER (a) the issuer's epoch is fenced and its
@@ -154,8 +159,9 @@ module effects {
 
   // ---------- store actions (protected operations) ----------
 
-  // create_effect PP:1211-1336: attempt open (attempt_open PP:3320), one semantic
-  // (generation, ordinal) (PP:3383-3419), predecessor terminal, reservation activated.
+  // Protected.Operations.apply_operation/2 "create_effect" clause: attempt open
+  // (Protected.Guards.attempt_open/3), one semantic (generation, ordinal)
+  // (Protected.Guards.semantic_effect_available/2), predecessor terminal, reservation activated.
   // D1: opens the execution as pending.
   action createEffect(e: int): bool = all {
     not(attemptClosed), eff.get(e).st == "none", avail >= 1, predOk(e),
@@ -163,31 +169,31 @@ module effects {
            avail - 1, held + 1, consumed, -1),
   }
 
-  // claim_effect PP:1338-1396: pending, predecessor current, reservations reserved; the
-  // claim is stamped with the current writer epoch (PP:1344, :1359-1363).
+  // Protected.Operations.apply_operation/2 "claim_effect" clause: pending, predecessor
+  // current, reservations reserved; the claim is stamped with the current writer epoch.
   action claimEffect(e: int): bool = all {
     eff.get(e).st == "pending", predOk(e), eff.get(e).res == "reserved",
     putEff(e, { ...eff.get(e), st: "claimed", claimEpoch: epoch }),
   }
 
-  // issue_claim PP:1398-1447: claimed, claim epoch == current epoch (PP:1402-1403),
-  // reservations -> issued_unknown (PP:1419). The current epoch's worker now holds it.
+  // Protected.Operations.apply_operation/2 "issue_claim" clause: claimed, claim epoch ==
+  // current epoch, reservations -> issued_unknown. The current epoch's worker now holds it.
   action issueClaim(e: int): bool = all {
     eff.get(e).st == "claimed", eff.get(e).claimEpoch == epoch, predOk(e),
     putEff(e, { ...eff.get(e), st: "issued", res: "issued_unknown", issuedBy: epoch }),
   }
 
-  // reclaim_claim PP:1449-1499: claimed, from a prior epoch, proof issuer_quiescent
-  // (PP:1455); D3 turns the token into evidence that the old issuer is gone.
+  // Protected.Operations.apply_operation/2 "reclaim_claim" clause: claimed, from a prior
+  // epoch, proof issuer_quiescent; D3 turns the token into evidence that the old issuer is gone.
   action reclaimClaim(e: int): bool = all {
     eff.get(e).st == "claimed", eff.get(e).claimEpoch < epoch,
     not(alive.get(eff.get(e).claimEpoch)),
     putEff(e, { ...eff.get(e), claimEpoch: epoch }),
   }
 
-  // cancel_effect PP:1762-1769 (pending, unissued) and PP:1771-1793 (claimed,
-  // issuer_quiescent), releasing via release_many PP:1863-1883. ASSUMPTION (D1 silent): the
-  // execution of a never-issued effect closes. issued + control_ack (PP:1746-1760) only
+  // Protected.Operations.cancel_effect/3 pending + unissued and claimed + issuer_quiescent
+  // clauses release through Protected.Operations.release_many/2. ASSUMPTION (D1 silent):
+  // the execution of a never-issued effect closes. The issued + control_ack clause only
   // reports the outstanding claim and changes nothing, so it is not an action.
   action cancelEffect(e: int): bool = all {
     Set("pending", "claimed").contains(eff.get(e).st),
@@ -196,8 +202,9 @@ module effects {
            avail + 1, held - 1, consumed, -1),
   }
 
-  // An ordinary receipt reaches settle_claim. Provenance (settlement_provenance
-  // PP:1923-1934) holds for the original issuer's actor whatever its epoch, so an
+  // An ordinary receipt reaches the Protected.Operations.apply_operation/2 "settle_claim"
+  // clause. Protected.Operations.settlement_provenance/3 holds for the original issuer's
+  // actor whatever its epoch, so an
   // old-epoch worker's receipt is accepted.
   action deliverReceipt(e: int, o: str, v: Variant): bool = all {
     inflight.contains((e, o)),
@@ -205,8 +212,9 @@ module effects {
   }
 
   // A second observation under an existing receipt id with a different digest
-  // (observation_conflict? PP:1517, :1593-1601) or a request id bound to another claim
-  // (PP:1520) quarantines whatever the claim's status. Adversarial input.
+  // (Protected.Operations.observation_conflict?/4) or a request id bound to another claim
+  // (the "settle_claim" clause's request-receipt guard) quarantines whatever the claim's
+  // status. Adversarial input.
   action conflictingReceipt(e: int, v: Variant): bool = all {
     v.adversary, eff.get(e).issuedBy >= 0,
     putOut(e, quarantine(eff.get(e)), e),
@@ -250,8 +258,9 @@ module effects {
     putEff(e, { ...eff.get(e), exec: "closed" }),
   }
 
-  // close_attempt PP:1559-1588: every effect terminal (PP:1571), every activated
-  // reservation consumed/released/retired (PP:1573); D1 adds every execution closed.
+  // Protected.Operations.apply_operation/2 "close_attempt" clause: every effect terminal
+  // (Protected.Rows.closed_effect_statuses/0), every activated reservation
+  // consumed/released/retired (the clause's closed-reservation set); D1 adds every execution closed.
   // Closing an attempt with no effect is legal but dead-ends every simulation trace, so the
   // model requires E0 to exist.
   action closeAttempt: bool = all {

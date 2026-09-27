@@ -1,16 +1,17 @@
 // Quint model of Foundry's R5 budget ledger, as the CODE implements it.
 //
-// Source: lib/foundry/durable_store/protected_primitives.ex at Pramāṇa df1ac5f8
-// (cited below as PP:<line>). Contract: docs/WORKFLOW-CONTRACT.md "Budget ledger — R5".
+// Source: lib/foundry/durable_store/protected_primitives.ex at Pramāṇa df1ac5f8.
+// Current implementation correspondences cite stable Protected module functions below.
+// Contract: docs/WORKFLOW-CONTRACT.md "Budget ledger — R5".
 // Where the two disagree the code is modelled and the disagreement is marked DISAGREE.
 //
 // Bounds: fixed tree root -> obj -> tkt, generations 0..1, one dimension, units 1..2,
 // two reservations, two effects (one claim per effect; claim status == effect status, which
-// validate_effect_relations PP:6105 enforces). Every operation is one transaction: a guard
+// Protected.RestartCheck.validate_effect_relations/1 enforces). Every operation is one transaction: a guard
 // that fails in the code is a disabled action here.
 //
-// Omitted deliberately: the per-ledger write guard conserved? (PP:3019, used by
-// update_ledger). Leaving it out makes PerNodeConservation check each action's arithmetic
+// Omitted deliberately: the per-ledger write guard Protected.Rows.conserved?/1 (used by
+// Protected.Rows.update_ledger/3). Leaving it out makes PerNodeConservation check each action's arithmetic
 // instead of holding by construction. Leases, policy/control revisions, writer epochs, read
 // sets and reclaim_claim move no units and are not modelled.
 module ledger {
@@ -59,28 +60,30 @@ module ledger {
   def E(e: str): Eff = eff.get(e)
   def keyOf(r: str): LKey = (R(r).node, R(r).gen)
 
-  // current_generation PP:2908: max generation for the id.
+  // Protected.Rows.current_generation/2: max generation for the id.
   def curGen(n: str): int = if (L((n, 1)).exists) 1 else 0
   def children(k: LKey): Set[LKey] =
     KEYS.filter(c => L(c).exists and L(c).parent == k._1 and L(c).pgen == k._2)
-  // subtree_ledgers PP:1611 (recursive CTE). Depth is at most 3 here.
+  // Protected.Rows.subtree_ledgers/3 (recursive CTE). Depth is at most 3 here.
   def subtree(k: LKey): Set[LKey] =
     Set(k).union(children(k)).union(children(k).fold(Set(), (s, c) => s.union(children(c))))
-  // reservations_for_effect PP:3740 (by owner) and reservations_for_claim PP:3751 (by claim_id).
+  // Protected.Rows.reservations_for_effect/2 (by owner) and
+  // Protected.Rows.reservations_for_claim/2 (by claim_id).
   def resOf(e: str): Set[str] = RESV.filter(r => R(r).status != "absent" and R(r).owner == e)
   def boundOf(e: str): Set[str] = resOf(e).filter(r => R(r).bound)
-  // reservations_open? PP:3133
+  // Protected.Guards.reservations_open?/2
   def resOpenCurrent(rs: Set[str]): bool =
     rs.forall(r => L(keyOf(r)).open and curGen(R(r).node) == R(r).gen)
 
-  // release_hold PP:3152: held -> available if open, held -> retired if closed.
+  // Protected.Operations.release_hold/2: held -> available if open, held -> retired if closed.
   pure def releaseHold(l: Ledger, u: int): Ledger =
     if (l.open) { ...l, held: l.held - u, avail: l.avail + u }
     else { ...l, held: l.held - u, ret: l.ret + u }
 
-  // close_subtree PP:1657. Pass 1: for each open ledger, revoke_unissued_generation PP:1689
-  // releases its "reserved" reservations (ledger still open, so held -> available, status
-  // "released") and cancel_unissued_effect_owners PP:1703 cancels their pending/claimed
+  // Protected.Operations.close_subtree/2. Pass 1: for each open ledger,
+  // Protected.Operations.revoke_unissued_generation/2 releases its "reserved" reservations
+  // (ledger still open, so held -> available, status "released") and
+  // Protected.Operations.cancel_unissued_effect_owners/2 cancels their pending/claimed
   // owner effects (and claims). issued_unknown holds are untouched. Pass 2: every open
   // ledger closes and moves available -> retired.
   def closeSubtree(k: LKey): (LKey -> Ledger, str -> Res, str -> Eff) = {
@@ -108,7 +111,7 @@ module ledger {
     lastAction' = act("init", "", -1, 0, ""),
   }
 
-  // grant_ledger PP:866: a root ledger at an absent (id, generation).
+  // Protected.Operations.apply_operation/2 "grant_ledger" clause: a root ledger at an absent (id, generation).
   action grantRoot(g: int, u: int): bool = all {
     not(L(("root", g)).exists),
     ledgers' = ledgers.set(("root", g), { ...NOLEDGER, exists: true, open: true, auth: u, avail: u }),
@@ -117,7 +120,8 @@ module ledger {
     lastAction' = act("grant_ledger", "root", g, u, ""),
   }
 
-  // delegate_allocation PP:897: parent open, 0 < units <= parent.available, child absent.
+  // Protected.Operations.apply_operation/2 "delegate_allocation" clause: parent open,
+  // 0 < units <= parent.available, child absent.
   // Model restriction: the child id is the fixed tree child; the code accepts any other id
   // and any child generation.
   action delegate(p: str, pg: int, cg: int, u: int): bool = all {
@@ -134,7 +138,8 @@ module ledger {
     res' = res, eff' = eff, granted' = granted, attemptClosed' = attemptClosed,
   }
 
-  // return_allocation PP:952: child and parent open, units <= child.available, child
+  // Protected.Operations.apply_operation/2 "return_allocation" clause: child and parent
+  // open, units <= child.available, child
   // held == 0 and delegated == 0 (stricter than the contract, which forbids only returning
   // held/consumed units).
   action returnAlloc(c: str, cg: int, u: int): bool = all {
@@ -152,7 +157,8 @@ module ledger {
     res' = res, eff' = eff, granted' = granted, attemptClosed' = attemptClosed,
   }
 
-  // reserve PP:998: ledger open, units <= available, id fresh. Status "proposed"; NO units
+  // Protected.Operations.apply_operation/2 "reserve" clause: ledger open, units <=
+  // available, id fresh. Status "proposed"; NO units
   // move. DISAGREE: the contract's absent -> reserved moves available -> held; the code defers
   // that to create_effect's activation. The owner effect need not exist, and may already
   // exist (owner_id is not checked against effect state).
@@ -163,8 +169,9 @@ module ledger {
     lastAction' = act("reserve", r, g, u, n),
   }
 
-  // release_reservation PP:1039 with proof "unissued": status proposed/reserved/issued_unknown;
-  // release_guard PP:3125 admits it only with no claim or a still-"claimed" claim. A
+  // Protected.Operations.apply_operation/2 "release_reservation" clause with proof
+  // "unissued": status proposed/reserved/issued_unknown; Protected.Guards.release_guard/2
+  // admits it only with no claim or a still-"claimed" claim. A
   // proposed reservation moves no units. Target released/retired by ledger status.
   action releaseReservation(r: str): bool = all {
     Set("proposed", "reserved", "issued_unknown").contains(R(r).status),
@@ -176,12 +183,14 @@ module ledger {
     lastAction' = act("release_reservation", r, -1, 0, ""),
   }
 
-  // create_effect PP:1211: attempt open (attempt_open), effect id fresh, every listed
-  // reservation proposed/unbound/owned by this effect (load_effect_reservations PP:3234),
-  // then activate_reservations PP:3265: each ledger open and units <= available, moving
+  // Protected.Operations.apply_operation/2 "create_effect" clause: attempt open
+  // (Protected.Guards.attempt_open/3), effect id fresh, every listed reservation
+  // proposed/unbound/owned by this effect (Protected.Guards.load_effect_reservations/2),
+  // then Protected.Operations.activate_reservations/2: each ledger open and units <= available, moving
   // available -> held. Activation is sequential, so two reservations on one ledger must fit
   // together. Listing a subset of the owner's reservations is allowed; reservations on
-  // different ledgers are allowed (reservation_dimensions PP:3498 checks only the dimension).
+  // different ledgers are allowed (historically Protected.Guards.reservation_dimensions/2
+  // checked only the dimension).
   action createEffect(e: str, ids: Set[str]): bool = all {
     not(attemptClosed), E(e).status == "absent", ids.size() > 0,
     ids.forall(r => R(r).status == "proposed" and R(r).owner == e and not(R(r).bound)),
@@ -196,8 +205,9 @@ module ledger {
     lastAction' = act("create_effect", e, -1, 0, ""),
   }
 
-  // claim_effect PP:1338: effect pending; ALL reservations owned by the effect are
-  // "reserved" and unbound; each ledger open and current (PP:3133); binds them to the claim.
+  // Protected.Operations.apply_operation/2 "claim_effect" clause: effect pending; ALL
+  // reservations owned by the effect are "reserved" and unbound; each ledger open and
+  // current (Protected.Guards.reservations_open?/2); binds them to the claim.
   action claimEffect(e: str): bool = all {
     E(e).status == "pending", resOf(e).size() > 0,
     resOf(e).forall(r => R(r).status == "reserved" and not(R(r).bound)),
@@ -208,7 +218,8 @@ module ledger {
     lastAction' = act("claim_effect", e, -1, 0, ""),
   }
 
-  // issue_claim PP:1398: claim claimed, bound reservations all "reserved", open and current;
+  // Protected.Operations.apply_operation/2 "issue_claim" clause: claim claimed, bound
+  // reservations all "reserved", open and current;
   // reservations -> issued_unknown, hold unchanged.
   action issueClaim(e: str): bool = all {
     E(e).status == "claimed", boundOf(e).size() > 0,
@@ -219,10 +230,11 @@ module ledger {
     lastAction' = act("issue_claim", e, -1, 0, ""),
   }
 
-  // cancel_effect PP:1541 -> PP:1762 (pending, "unissued": release_many PP:1864 over ALL
-  // owned reservations) and PP:1771 (claimed, "issuer_quiescent": over the claim's).
-  // release_many fails the transaction unless every one is "reserved". PP:1746 (issued,
-  // "control_ack") moves nothing and is omitted.
+  // Protected.Operations.apply_operation/2 "cancel_effect" clause dispatches to
+  // Protected.Operations.cancel_effect/3: pending + "unissued" releases ALL owned
+  // reservations, while claimed + "issuer_quiescent" releases the claim's reservations,
+  // through Protected.Operations.release_many/2. release_many fails the transaction unless
+  // every one is "reserved". The issued + "control_ack" clause moves nothing and is omitted.
   action cancelEffect(e: str): bool = all {
     Set("pending", "claimed").contains(E(e).status),
     val rs = if (E(e).status == "pending") resOf(e) else boundOf(e)
@@ -238,10 +250,11 @@ module ledger {
     lastAction' = act("cancel_effect", e, -1, 0, ""),
   }
 
-  // settle_reservations PP:3910 / reservation_settlement PP:3932,3943: every claim
-  // reservation must be issued_unknown or the transaction fails. succeeded/failed:
-  // held -> consumed. non_started: release_hold (retired if the generation is closed).
-  // "unknown" moves nothing (PP:3908).
+  // Protected.Operations.settle_reservations/3 and
+  // Protected.Operations.reservation_settlement/3: every claim reservation must be
+  // issued_unknown or the transaction fails. succeeded/failed: held -> consumed.
+  // non_started: Protected.Operations.release_hold/2 (retired if the generation is closed).
+  // The "unknown" clause of Protected.Operations.settle_reservations/3 moves nothing.
   def settleOk(e: str): bool = boundOf(e).forall(r => R(r).status == "issued_unknown")
   def settleLedgers(e: str, o: str): LKey -> Ledger =
     if (o == "unknown") ledgers
@@ -254,7 +267,8 @@ module ledger {
       { ...R(r), status: if (o != "non_started") "consumed" else if (L(keyOf(r)).open) "released" else "retired" }
       else R(r))
 
-  // quarantine_conflicting_receipt PP:2001: claim/effect -> reconciliation_required; no
+  // Protected.Operations.quarantine_conflicting_receipt/5: claim/effect ->
+  // reconciliation_required; no
   // receipt stored, no units moved.
   action quarantine(e: str, why: str): bool = all {
     eff' = eff.set(e, { ...E(e), status: "reconciliation_required",
@@ -272,11 +286,12 @@ module ledger {
     lastAction' = act("settle_claim", e, -1, 0, how),
   }
 
-  // settle_claim PP:1501 with a well-formed proof for the outcome (settlement_proof PP:3903).
-  // `dup` = the receipt is an exact duplicate of a stored one. Branch order follows
-  // settle_with_receipts PP:1885: exact duplicate; quarantined claim re-quarantines (the fix
-  // at 69614867); unknown-only history + known outcome reconciles (reconciled_settlement
-  // PP:1936); other history quarantines; no history -> first_settlement PP:1970 (claim must
+  // Protected.Operations.apply_operation/2 "settle_claim" clause with a well-formed proof
+  // for the outcome (Protected.Rows.settlement_proof/2). `dup` = the receipt is an exact
+  // duplicate of a stored one. Branch order follows Protected.Operations.settle_with_receipts/6:
+  // exact duplicate; quarantined claim re-quarantines (the fix at 69614867); unknown-only
+  // history + known outcome reconciles (Protected.Operations.reconciled_settlement/5);
+  // other history quarantines; no history -> Protected.Operations.first_settlement/5 (claim must
   // be issued or unknown).
   action settle(e: str, o: str, dup: bool): bool = all {
     E(e).hasClaim,
@@ -293,8 +308,9 @@ module ledger {
     }
   }
 
-  // settle_claim PP:1501 whose receipt_id already belongs to another claim's receipt:
-  // observation_conflict? PP:1595 is tested BEFORE any claim-status check, so a claim in
+  // Protected.Operations.apply_operation/2 "settle_claim" clause whose receipt_id already
+  // belongs to another claim's receipt: Protected.Operations.observation_conflict?/4 was
+  // historically tested BEFORE any claim-status check, so a claim in
   // any status (including "claimed", never issued) is quarantined.
   action settleForeignReceipt(e: str): bool = all {
     E(e).hasClaim,
@@ -302,7 +318,8 @@ module ledger {
     quarantine(e, "receipt_id of another claim"),
   }
 
-  // close_generation PP:1080: the named ledger is open; close_subtree over its subtree.
+  // Protected.Operations.apply_operation/2 "close_generation" clause: the named ledger is
+  // open; Protected.Operations.close_subtree/2 over its subtree.
   action closeGeneration(n: str, g: int): bool = all {
     L((n, g)).exists, L((n, g)).open,
     val t = closeSubtree((n, g))
@@ -311,7 +328,8 @@ module ledger {
     lastAction' = act("close_generation", n, g, 0, ""),
   }
 
-  // reset_generation, root PP:1097: old open and current, units <= old.available, new
+  // Protected.Operations.apply_operation/2 root "reset_generation" clause: old open and
+  // current, units <= old.available, new
   // generation = old + 1 absent; close_subtree then a fresh root generation with `units`.
   // DISAGREE: the contract's transfer "decreases old authorized/retired"; the code leaves the
   // old generation's retired intact and grants the new generation fresh authority bounded by
@@ -329,7 +347,8 @@ module ledger {
     lastAction' = act("reset_generation", "root", 1, u, ""),
   }
 
-  // reset_generation, child PP:1150: old open and current, parent open, units <=
+  // Protected.Operations.apply_operation/2 child "reset_generation" clause: old open and
+  // current, parent open, units <=
   // parent.available (checked before the close); close_subtree(old); parent available ->
   // delegated; fresh child generation under the SAME parent generation.
   action resetChild(n: str, u: int): bool = all {
@@ -351,8 +370,9 @@ module ledger {
     granted' = granted, attemptClosed' = attemptClosed,
   }
 
-  // close_attempt PP:1559: every effect closed (@closed_effect_statuses PP:8) and every
-  // activated reservation consumed/released/retired (PP:9). Moves no units.
+  // Protected.Operations.apply_operation/2 "close_attempt" clause: every effect closed
+  // (Protected.Rows.closed_effect_statuses/0) and every activated reservation
+  // consumed/released/retired (the clause's closed-reservation set). Moves no units.
   action closeAttempt: bool = all {
     not(attemptClosed),
     EFFS.forall(e => E(e).status == "absent" or Set("succeeded", "failed", "non_started", "cancelled").contains(E(e).status)),
@@ -424,11 +444,12 @@ module ledger {
   val TreeConservation = GENS.forall(g => not(L(("root", g)).exists) or
     L(("root", g)).auth == sumOver(subtree(("root", g)), k => L(k).avail + L(k).held + L(k).cons + L(k).ret))
 
-  // Code's restart check validate_ledger_tree PP:6072.
+  // Code's restart check Protected.RestartCheck.validate_ledger_tree/1.
   val DelegatedMatchesChildren = KEYS.forall(k => not(L(k).exists) or
     L(k).deleg == sumOver(children(k), c => L(c).auth))
 
-  // Code's restart check validate_reservations PP:6090: held and consumed equal the sums of
+  // Code's restart check Protected.RestartCheck.validate_reservations/1: held and consumed
+  // equal the sums of
   // the live (reserved/issued_unknown) and consumed reservations on that ledger. Each
   // reservation names exactly one ledger, so every held unit is backed exactly once.
   val HeldBacked = KEYS.forall(k => not(L(k).exists) or all {
@@ -454,8 +475,10 @@ module ledger {
     (R(r).status != "reserved" or Set("pending", "claimed").contains(E(R(r).owner).status)) and
     (R(r).status != "issued_unknown" or Set("issued", "unknown", "reconciliation_required").contains(E(R(r).owner).status)))
 
-  // The code's own restart check validate_reservation_transition_status PP:7519 /
-  // validate_reservation_owner_status PP:7528 / reservation_statuses PP:7575-7610. A
+  // The code's own restart check
+  // Protected.RestartCheck.validate_reservation_transition_status/2,
+  // Protected.RestartCheck.validate_reservation_owner_status/2 and
+  // Protected.RestartCheck.reservation_statuses/3. A
   // committed state failing it makes the store refuse to open (database.ex:467 validate).
   def allowedStatuses(e: str): Set[str] = {
     val s = E(e).status

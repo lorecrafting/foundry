@@ -2,9 +2,9 @@
 
 [Foundry](../../README.md) › [Docs](../../docs/README.md) › R5 budget ledger — Quint model
 
-`ledger.qnt` models the R5 budget ledger as the code implements it
-(historical `lib/foundry/durable_store/protected_primitives.ex` at Pramāṇa
-`df1ac5f8`; model source line citations retain that revision). The contract is the
+`ledger.qnt` models the R5 budget ledger as the code implemented it in historical
+`lib/foundry/durable_store/protected_primitives.ex` at Pramāṇa `df1ac5f8`; comments cite
+current corresponding `Foundry.DurableStore.Protected` functions by stable name. The contract is the
 "Budget ledger — R5" section of
 [the workflow contract](../../docs/WORKFLOW-CONTRACT.md). Where the code and the contract
 disagree, the model follows the code and marks the spot `DISAGREE`.
