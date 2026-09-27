@@ -2,9 +2,9 @@
 
 [Foundry](../../README.md) › [Docs](../README.md) › [Strategy](../STRATEGY.md) › Arm B workflow checklist
 
-**Status:** unscored pilot preparation; not three-way results.
+**Status:** checklist creation is unscored; assigned arm-B trials are scored, not three-way results.
 
-Supplement the operator's existing workflow prompt and repository `AGENTS.md`; do not repeat coding conventions. For prospective arm B of the [first pilot](VALIDATION.md#first-pilot-local-workflow-assistant-versus-prompting), paste this checklist into Pi, Codex or Claude Code and fill every bracketed field before work starts:
+Supplement the operator's existing workflow prompt and repository `AGENTS.md`; do not repeat coding conventions. For prospective arm B of the [first pilot](VALIDATION.md#first-pilot-local-workflow-assistant-versus-prompting), paste this checklist into Pi, Codex or Claude Code and fill every bracketed field before work starts. Preparation only: do not call lane packet, submit or review to create this checklist.
 
 ```text
 Work under the existing workflow prompt and repository instructions. This checklist adds pilot evidence requirements; it does not replace them.
@@ -24,5 +24,5 @@ PR destination: [repository and target branch]
 5. Submit the full reviewed range through a PR. Verify CI for that range and record its result. Complete normal Git integration (for example, merged PR and resulting integration SHA); a lane phase or receipt is not Git integration or proof of acceptance. Do not claim integration until verified.
 6. Record total operator time, including setup, prompting, checks, review, corrections and PR work; rework rounds/time; and defects found, escaped or still open. Preserve unknowns as unknown.
 
-This is ordinary, unprotected workflow evidence: do not claim protected identity, acceptance or receipt. Do not call lane packet, submit or review for this preparation. Report observations only; do not present this artifact as scored pilot data or three-way results.
+This is ordinary, unprotected workflow evidence: do not claim protected identity, acceptance or receipt. Report observations only.
 ```
