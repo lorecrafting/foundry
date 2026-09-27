@@ -40,7 +40,8 @@ defmodule FoundryManualMCP do
     case decode(line) do
       {:ok, %{"jsonrpc" => "2.0", "method" => method, "id" => id} = request}
       when is_binary(method) and (is_integer(id) or is_binary(id)) ->
-        dispatch(method, Map.get(request, "params", %{}), id)
+        params = Map.get(request, "params", %{})
+        if is_map(params), do: dispatch(method, params, id), else: error(id, -32602, "Invalid params")
 
       {:ok, %{"jsonrpc" => "2.0", "method" => method} = request}
       when is_binary(method) and not is_map_key(request, "id") ->
@@ -60,7 +61,17 @@ defmodule FoundryManualMCP do
     _ -> :error
   end
 
-  defp dispatch("initialize", _params, id) do
+  defp dispatch(
+         "initialize",
+         %{
+           "protocolVersion" => protocol,
+           "capabilities" => capabilities,
+           "clientInfo" => %{"name" => name, "version" => version}
+         },
+         id
+       )
+       when is_binary(protocol) and is_map(capabilities) and is_binary(name) and
+              is_binary(version) do
     result(id, %{
       "protocolVersion" => @version,
       "capabilities" => %{"tools" => %{}},
@@ -68,6 +79,7 @@ defmodule FoundryManualMCP do
     })
   end
 
+  defp dispatch("initialize", _, id), do: error(id, -32602, "Invalid initialize params")
   defp dispatch("ping", _params, id), do: result(id, %{})
   defp dispatch("tools/list", _params, id), do: result(id, %{"tools" => [@tool]})
 
