@@ -84,7 +84,12 @@ defmodule Foundry.ManualLane.MCPTest do
     assert get_in(Enum.at(responses, 0), ["result", "protocolVersion"]) == "2025-11-25"
 
     assert get_in(Enum.at(responses, 1), ["result", "tools"]) |> Enum.map(& &1["name"]) == [
-             "manual_lane_status"
+             "manual_lane_status",
+             "manual_lane_admit",
+             "manual_lane_developer_packet",
+             "manual_lane_reviewer_packet",
+             "manual_lane_submit",
+             "manual_lane_review"
            ]
 
     assert get_in(Enum.at(responses, 2), ["error", "code"]) == -32601
@@ -150,6 +155,267 @@ defmodule Foundry.ManualLane.MCPTest do
         assert result["content"] == [%{"type" => "text", "text" => body}]
       end
     end
+  end
+
+  test "each allowed operation sends exact argv to the lane and exposes bounded schemas" do
+    root = temp_root()
+    {release, log} = fake_release(root)
+    sha = String.duplicate("a", 40)
+    common = %{"ticket_id" => "ML-42"}
+    principal = %{"principal" => "agent:sol/dev-42"}
+
+    calls = [
+      {"manual_lane_status", common, ~w(lane status ML-42 --json)},
+      {"manual_lane_admit",
+       Map.merge(common, %{
+         "base_ref" => sha,
+         "title" => "Short title",
+         "scope" => ["lib/a.ex", "test/a_test.exs"],
+         "acceptance" => ["first", "second"]
+       }),
+       [
+         "lane",
+         "admit",
+         "ML-42",
+         "--base-ref",
+         sha,
+         "--title",
+         "Short title",
+         "--scope",
+         "lib/a.ex,test/a_test.exs",
+         "--acceptance",
+         "first",
+         "--acceptance",
+         "second",
+         "--json"
+       ]},
+      {"manual_lane_developer_packet",
+       Map.merge(common, Map.merge(principal, %{"out" => "/tmp/dev.json"})),
+       ~w(lane packet ML-42 --role developer --principal agent:sol/dev-42 --out /tmp/dev.json --json)},
+      {"manual_lane_reviewer_packet",
+       Map.merge(common, %{"principal" => "agent:astra/review-42", "out" => "/tmp/review.json"}),
+       ~w(lane packet ML-42 --role reviewer --principal agent:astra/review-42 --out /tmp/review.json --json)},
+      {"manual_lane_submit",
+       Map.merge(
+         common,
+         Map.merge(principal, %{
+           "candidate" => sha,
+           "checkout" => "/tmp/work",
+           "blocked" => "needs correction"
+         })
+       ),
+       [
+         "lane",
+         "submit",
+         "ML-42",
+         "--principal",
+         "agent:sol/dev-42",
+         "--candidate",
+         sha,
+         "--checkout",
+         "/tmp/work",
+         "--blocked",
+         "needs correction",
+         "--json"
+       ]},
+      {"manual_lane_review",
+       Map.merge(common, %{
+         "principal" => "agent:astra/review-42",
+         "candidate" => sha,
+         "verdict" => "correction",
+         "notes" => "/tmp/notes.md"
+       }),
+       [
+         "lane",
+         "review",
+         "ML-42",
+         "--principal",
+         "agent:astra/review-42",
+         "--verdict",
+         "correction",
+         "--candidate",
+         sha,
+         "--notes",
+         "/tmp/notes.md",
+         "--json"
+       ]}
+    ]
+
+    input = Path.join(root, "calls.jsonl")
+
+    File.write!(
+      input,
+      Enum.map_join(calls, "\n", fn {name, args, _} -> JSON.encode!(call(name, args)) end) <> "\n"
+    )
+
+    responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
+    assert Enum.all?(responses, &(get_in(&1, ["result", "isError"]) == false))
+
+    assert Enum.map(responses, &get_in(&1, ["result", "content", Access.at(0), "text"])) ==
+             List.duplicate(~s({"ok":true}), length(calls))
+
+    assert recorded_argv(log) == Enum.map(calls, &elem(&1, 2))
+
+    schema_input = Path.join(root, "schema.jsonl")
+
+    File.write!(
+      schema_input,
+      JSON.encode!(%{"jsonrpc" => "2.0", "id" => 1, "method" => "tools/list"}) <> "\n"
+    )
+
+    [schema] = run(schema_input, [])
+
+    for tool <- get_in(schema, ["result", "tools"]) do
+      assert tool["inputSchema"]["additionalProperties"] == false
+      assert "ticket_id" in tool["inputSchema"]["required"]
+      assert tool["inputSchema"]["properties"]["ticket_id"]["maxLength"] == 128
+      assert tool["description"] =~ "same-UID"
+      assert tool["description"] =~ "partial commit"
+    end
+  end
+
+  test "malformed tool arguments never invoke the CLI; refusal remains a tool error" do
+    root = temp_root()
+    {release, log} = fake_release(root)
+    sha = String.duplicate("b", 40)
+
+    good = %{
+      "ticket_id" => "ML-42",
+      "base_ref" => sha,
+      "title" => "T",
+      "scope" => ["lib/a.ex"],
+      "acceptance" => ["criterion"]
+    }
+
+    cases = [
+      call("manual_lane_status", %{"ticket_id" => "ML-42", "extra" => true}),
+      call("manual_lane_admit", Map.put(good, "scope", ["../escape"])),
+      call("manual_lane_admit", Map.put(good, "acceptance", [])),
+      call("manual_lane_admit", Map.put(good, "title", "bad\nline")),
+      call("manual_lane_admit", Map.put(good, "title", "--unexpected")),
+      call("manual_lane_admit", Map.delete(good, "acceptance")),
+      call("manual_lane_admit", Map.put(good, "base_ref", "--help")),
+      call("manual_lane_developer_packet", %{
+        "ticket_id" => "ML-42",
+        "principal" => "x",
+        "out" => "relative"
+      }),
+      call("manual_lane_reviewer_packet", %{
+        "ticket_id" => "ML-42",
+        "principal" => "bad principal",
+        "out" => "/tmp/p"
+      }),
+      call("manual_lane_submit", %{
+        "ticket_id" => "ML-42",
+        "principal" => "x",
+        "candidate" => "not-a-sha",
+        "checkout" => "/tmp/p"
+      }),
+      call("manual_lane_review", %{
+        "ticket_id" => "ML-42",
+        "principal" => "x",
+        "candidate" => sha,
+        "verdict" => "accept",
+        "notes" => "/tmp/n"
+      }),
+      call("manual_lane_review", %{
+        "ticket_id" => "ML-42",
+        "principal" => "x",
+        "candidate" => sha,
+        "verdict" => "approved",
+        "notes" => "/tmp/n",
+        "override" => true
+      }),
+      put_in(
+        call("manual_lane_status", %{"ticket_id" => "ML-42"}),
+        ["params", "unexpected"],
+        true
+      ),
+      Map.put(
+        call("manual_lane_status", %{"ticket_id" => "ML-42"}),
+        "id",
+        String.duplicate("x", 129)
+      )
+    ]
+
+    input = Path.join(root, "invalid.jsonl")
+
+    File.write!(
+      input,
+      Enum.map_join(cases, "\n", &JSON.encode!/1) <>
+        "\n" <>
+        JSON.encode!(
+          call("manual_lane_status", %{
+            "ticket_id" => "ML-42",
+            "padding" => String.duplicate("x", 17_000)
+          })
+        ) <> "\n"
+    )
+
+    responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
+    assert length(responses) == length(cases) + 1
+    assert Enum.all?(responses, &(get_in(&1, ["error", "code"]) in [-32602, -32600]))
+    refute File.exists?(log)
+
+    File.write!(input, JSON.encode!(call("manual_lane_admit", good)) <> "\n")
+
+    [refusal] =
+      run(input, [
+        {"FOUNDRY_RELEASE", release},
+        {"FOUNDRY_MCP_LOG", log},
+        {"FOUNDRY_MCP_FAIL", "1"}
+      ])
+
+    assert refusal["result"]["isError"] == true
+    assert get_in(refusal, ["result", "content", Access.at(0), "text"]) == "refused"
+
+    assert recorded_argv(log) == [
+             [
+               "lane",
+               "admit",
+               "ML-42",
+               "--base-ref",
+               sha,
+               "--title",
+               "T",
+               "--scope",
+               "lib/a.ex",
+               "--acceptance",
+               "criterion",
+               "--json"
+             ]
+           ]
+  end
+
+  defp call(name, args),
+    do: %{
+      "jsonrpc" => "2.0",
+      "id" => 1,
+      "method" => "tools/call",
+      "params" => %{"name" => name, "arguments" => args}
+    }
+
+  defp fake_release(root) do
+    release = Path.join(root, "fake-release")
+    log = Path.join(root, "rpc.log")
+
+    File.write!(
+      release,
+      "#!/bin/sh\nprintf '%s\\n' \"$2\" >> \"$FOUNDRY_MCP_LOG\"\nif [ \"${FOUNDRY_MCP_FAIL:-}\" = 1 ]; then echo refused; exit 1; fi\necho '{\"ok\":true}'\n"
+    )
+
+    File.chmod!(release, 0o755)
+    {release, log}
+  end
+
+  defp recorded_argv(log) do
+    log
+    |> File.read!()
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn rpc ->
+      [_, payload] = Regex.run(~r/Foundry\.CLI\.RPC\.run\("([A-Za-z0-9_-]+)"\)/, rpc)
+      payload |> Base.url_decode64!(padding: false) |> JSON.decode!() |> Map.fetch!("argv")
+    end)
   end
 
   defp temp_root do

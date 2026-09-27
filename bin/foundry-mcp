@@ -1,38 +1,67 @@
 #!/usr/bin/env elixir
-# Local, unprotected manual-lane preview. This process grants no Foundry authority.
+# Local, unprotected manual-lane adapter. This process grants no Foundry authority.
 defmodule FoundryManualMCP do
   @version "2025-11-25"
-  @tool %{
-    "name" => "manual_lane_status",
-    "description" =>
-      "Read one ticket from Foundry's unprotected same-UID manual lane. Observation only; not protected acceptance or operator identity.",
-    "inputSchema" => %{
-      "type" => "object",
-      "properties" => %{
-        "ticket_id" => %{"type" => "string", "pattern" => "^ML-[A-Za-z0-9-]+$", "maxLength" => 128}
-      },
-      "required" => ["ticket_id"],
-      "additionalProperties" => false
-    }
-  }
+  @limit 16_384
+  @ticket %{"type" => "string", "pattern" => "^ML-[A-Za-z0-9-]+$", "maxLength" => 128}
+  @ref %{"type" => "string", "pattern" => "^[A-Za-z0-9][A-Za-z0-9._/-]*$", "maxLength" => 128}
+  @principal %{"type" => "string", "pattern" => "^[A-Za-z0-9][A-Za-z0-9:_./-]*$", "maxLength" => 128}
+  @path %{"type" => "string", "pattern" => "^/[A-Za-z0-9_./-]+$", "maxLength" => 512}
+  @sha %{"type" => "string", "pattern" => "^[0-9a-fA-F]{40}$"}
+  @text %{"type" => "string", "pattern" => "^(?!--)[^\\x00-\\x1F\\x7F]+$", "minLength" => 1, "maxLength" => 512}
+  @tools [
+    {"manual_lane_status", "Read one ticket; observation only.", %{"ticket_id" => @ticket}},
+    {"manual_lane_admit", "PM explicitly chooses ticket, base, scope and acceptance; this does not authenticate an operator.",
+     %{"ticket_id" => @ticket, "base_ref" => @ref, "title" => @text,
+       "scope" => %{"type" => "array", "items" => %{"type" => "string", "pattern" => "^(?!/|-)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9_./-]+$", "maxLength" => 256}, "minItems" => 1, "maxItems" => 20},
+       "acceptance" => %{"type" => "array", "items" => @text, "minItems" => 1, "maxItems" => 20}}},
+    {"manual_lane_developer_packet", "PM explicitly chooses developer principal and packet output path; this does not launch an agent.",
+     %{"ticket_id" => @ticket, "principal" => @principal, "out" => @path}},
+    {"manual_lane_reviewer_packet", "PM explicitly chooses independent reviewer principal and packet output path; recorded names do not prove independence.",
+     %{"ticket_id" => @ticket, "principal" => @principal, "out" => @path}},
+    {"manual_lane_submit", "Developer explicitly supplies candidate and clean checkout; optional blocked reason. A lane submission is not verified Git publication.",
+     %{"ticket_id" => @ticket, "principal" => @principal, "candidate" => @sha, "checkout" => @path,
+       "blocked" => @text}},
+    {"manual_lane_review", "Reviewer explicitly chooses verdict, exact candidate and notes file; a verdict is not protected acceptance or Git publication.",
+     %{"ticket_id" => @ticket, "principal" => @principal, "verdict" => %{"type" => "string", "enum" => ["approved", "correction", "rejected"]},
+       "candidate" => @sha, "notes" => @path}}
+  ]
+  @tool_names Enum.map(@tools, &elem(&1, 0))
 
   def main, do: loop()
 
   defp loop do
-    case IO.read(:stdio, :line) do
-      :eof ->
-        :ok
-
-      {:error, reason} ->
-        IO.puts(:stderr, "MCP input failed: #{inspect(reason)}")
-
-      line ->
-        case reply(line) do
+    case line([], 0) do
+      :eof -> :ok
+      :oversized ->
+        IO.write(:stdio, [:json.encode(error(nil, -32600, "Request exceeds 16 KiB")), "\n"])
+        loop()
+      bytes ->
+        case reply(IO.iodata_to_binary(Enum.reverse(bytes))) do
           nil -> :ok
           message -> IO.write(:stdio, [:json.encode(message), "\n"])
         end
-
         loop()
+    end
+  end
+
+  # Read one bounded JSONL request; drain an oversized line without retaining it.
+  defp line(bytes, count) do
+    case IO.getn(:stdio, "", 1) do
+      :eof when count == 0 -> :eof
+      :eof -> bytes
+      "\n" -> bytes
+      char when is_binary(char) and count + byte_size(char) <= @limit ->
+        line([char | bytes], count + byte_size(char))
+      _ -> drain()
+    end
+  end
+
+  defp drain do
+    case IO.getn(:stdio, "", 1) do
+      "\n" -> :oversized
+      :eof -> :oversized
+      _ -> drain()
     end
   end
 
@@ -41,19 +70,24 @@ defmodule FoundryManualMCP do
       {:ok, %{"jsonrpc" => "2.0", "method" => method, "id" => id} = request}
       when is_binary(method) and (is_integer(id) or is_binary(id)) ->
         params = Map.get(request, "params", %{})
-        if is_map(params), do: dispatch(method, params, id), else: error(id, -32602, "Invalid params")
+
+        cond do
+          not valid_id?(id) -> error(nil, -32600, "Invalid Request")
+          not is_map(params) -> error(id, -32602, "Invalid params")
+          true -> dispatch(method, params, id)
+        end
 
       {:ok, %{"jsonrpc" => "2.0", "method" => method} = request}
       when is_binary(method) and not is_map_key(request, "id") ->
         nil
 
-      {:ok, _} ->
-        error(nil, -32600, "Invalid Request")
-
-      :error ->
-        error(nil, -32700, "Parse error")
+      {:ok, _} -> error(nil, -32600, "Invalid Request")
+      :error -> error(nil, -32700, "Parse error")
     end
   end
+
+  defp valid_id?(id) when is_binary(id), do: byte_size(id) <= 128
+  defp valid_id?(id), do: id in -9_007_199_254_740_991..9_007_199_254_740_991
 
   defp decode(line) do
     {:ok, :json.decode(line)}
@@ -81,46 +115,125 @@ defmodule FoundryManualMCP do
 
   defp dispatch("initialize", _, id), do: error(id, -32602, "Invalid initialize params")
   defp dispatch("ping", _params, id), do: result(id, %{})
-  defp dispatch("tools/list", _params, id), do: result(id, %{"tools" => [@tool]})
 
-  defp dispatch("tools/call", %{"name" => "manual_lane_status", "arguments" => args}, id)
-       when is_map(args) do
-    case args do
-      %{"ticket_id" => ticket} = all when map_size(all) == 1 and is_binary(ticket) ->
-        if byte_size(ticket) <= 128 and String.match?(ticket, ~r/\AML-[A-Za-z0-9-]+\z/) do
-          result(id, status(ticket))
-        else
-          error(id, -32602, "Invalid ticket_id")
-        end
+  defp dispatch("tools/list", _params, id) do
+    tools =
+      for {name, description, properties} <- @tools do
+        %{
+          "name" => name,
+          "description" => description <> " Unprotected same-UID lane; retries after a partial commit may require checking status/log and reusing the original arguments. CLI errors are not receipts. Inputs and responses are limited to 16 KiB.",
+          "inputSchema" => %{
+            "type" => "object", "properties" => properties,
+            "required" => Map.keys(properties) -- if(name == "manual_lane_submit", do: ["blocked"], else: []),
+            "additionalProperties" => false
+          }
+        }
+      end
 
-      _ ->
-        error(id, -32602, "Expected one ticket_id")
+    result(id, %{"tools" => tools})
+  end
+
+  defp dispatch("tools/call", %{"name" => name, "arguments" => args} = params, id)
+       when name in @tool_names and is_map(args) and map_size(params) == 2 do
+    {_, _, properties} = Enum.find(@tools, &(elem(&1, 0) == name))
+    optional = if name == "manual_lane_submit", do: ["blocked"], else: []
+
+    if valid_args?(args, properties, optional) do
+      result(id, invoke(name, args))
+    else
+      error(id, -32602, "Invalid tool arguments")
     end
   end
 
   defp dispatch("tools/call", _, id), do: error(id, -32602, "Unknown tool or arguments")
   defp dispatch(_, _, id), do: error(id, -32601, "Method not found")
 
-  defp status(ticket) do
+  defp valid_args?(args, properties, optional) do
+    keys = Map.keys(args)
+    Enum.all?(keys, &Map.has_key?(properties, &1)) and
+      Enum.all?(Map.keys(properties) -- optional, &Map.has_key?(args, &1)) and
+      Enum.all?(args, fn {key, value} -> valid?(key, value) end)
+  end
+
+  defp valid?("scope", paths),
+    do: is_list(paths) and length(paths) in 1..20 and Enum.all?(paths, &safe_scope?/1)
+
+  defp valid?("acceptance", criteria),
+    do: is_list(criteria) and length(criteria) in 1..20 and Enum.all?(criteria, &text?/1)
+
+  defp valid?("ticket_id", value),
+    do: bounded?(value, 128) and String.match?(value, ~r/\AML-[A-Za-z0-9-]+\z/)
+
+  defp valid?("base_ref", value),
+    do: bounded?(value, 128) and String.match?(value, ~r/\A[A-Za-z0-9][A-Za-z0-9._\/-]*\z/)
+
+  defp valid?("principal", value),
+    do: bounded?(value, 128) and String.match?(value, ~r{\A[A-Za-z0-9][A-Za-z0-9:_./-]*\z})
+
+  defp valid?(key, value) when key in ["out", "checkout", "notes"],
+    do: bounded?(value, 512) and String.match?(value, ~r{\A/[A-Za-z0-9_./-]+\z})
+
+  defp valid?("candidate", value),
+    do: is_binary(value) and String.match?(value, ~r/\A[0-9a-fA-F]{40}\z/)
+
+  defp valid?("verdict", value), do: value in ~w(approved correction rejected)
+  defp valid?(key, value) when key in ["title", "blocked"], do: text?(value)
+
+  defp safe_scope?(value),
+    do: bounded?(value, 256) and String.match?(value, ~r{\A[A-Za-z0-9_./-]+\z}) and
+      not String.starts_with?(value, ["/", "-"]) and ".." not in Path.split(value)
+
+  defp text?(value),
+    do: bounded?(value, 512) and not String.starts_with?(value, "--") and
+      not String.match?(value, ~r/[[:cntrl:]]/u)
+
+  defp bounded?(value, max), do: is_binary(value) and byte_size(value) in 1..max
+
+  defp invoke("manual_lane_status", %{"ticket_id" => ticket}),
+    do: cli(["status", ticket])
+
+  defp invoke("manual_lane_admit", args) do
+    cli(["admit", args["ticket_id"], "--base-ref", args["base_ref"], "--title", args["title"],
+         "--scope", Enum.join(args["scope"], ",")] ++
+          Enum.flat_map(args["acceptance"], &["--acceptance", &1]))
+  end
+
+  defp invoke(name, args) when name in ["manual_lane_developer_packet", "manual_lane_reviewer_packet"] do
+    role = if name == "manual_lane_developer_packet", do: "developer", else: "reviewer"
+    cli(["packet", args["ticket_id"], "--role", role, "--principal", args["principal"], "--out", args["out"]])
+  end
+
+  defp invoke("manual_lane_submit", args) do
+    cli(["submit", args["ticket_id"], "--principal", args["principal"],
+         "--candidate", args["candidate"], "--checkout", args["checkout"]] ++
+          if(Map.has_key?(args, "blocked"), do: ["--blocked", args["blocked"]], else: []))
+  end
+
+  defp invoke("manual_lane_review", args) do
+    cli(["review", args["ticket_id"], "--principal", args["principal"],
+         "--verdict", args["verdict"], "--candidate", args["candidate"], "--notes", args["notes"]])
+  end
+
+  defp cli(args) do
     {out, code} =
-      System.cmd(Path.expand("foundry", __DIR__), ["lane", "status", ticket, "--json"],
+      System.cmd(Path.expand("foundry", __DIR__), ["lane" | args] ++ ["--json"],
         stderr_to_stdout: true
       )
 
-    # ponytail: cap one observation; paginate if a single ticket grows beyond 16 KiB.
-    text = if byte_size(out) > 16_384, do: "Ticket status exceeds 16 KiB", else: String.trim(out)
-
-    %{
-      "content" => [%{"type" => "text", "text" => text}],
-      "isError" => code != 0 or byte_size(out) > 16_384
-    }
+    # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
+    text =
+      if byte_size(out) > @limit,
+        do: if(hd(args) == "status", do: "Ticket status exceeds 16 KiB", else: "Lane output exceeds 16 KiB"),
+        else: String.trim(out)
+    %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(out) > @limit}
   rescue
     error ->
-      %{"content" => [%{"type" => "text", "text" => Exception.message(error)}], "isError" => true}
+      message = Exception.message(error)
+      text = if byte_size(message) > @limit, do: "Lane command error exceeds 16 KiB", else: message
+      %{"content" => [%{"type" => "text", "text" => text}], "isError" => true}
   end
 
   defp result(id, body), do: %{"jsonrpc" => "2.0", "id" => id, "result" => body}
-
   defp error(nil, code, message), do: error(:null, code, message)
 
   defp error(id, code, message),
