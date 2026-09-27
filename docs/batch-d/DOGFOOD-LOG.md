@@ -64,9 +64,25 @@ formatting, dependency inventory and escript build. Provenance:
 `/private/tmp/foundry-C3-gate-2026-09-26/provenance.json`. This demonstrates
 Pi can participate in the existing manual lane; it is not yet the governed
 plugin integration promised by ML-PG-CLIENTS.
+The fresh C3 batch re-sweep found no actionable issue in the integrated spec,
+review or log. Linux PR #21 passed 809 model-free tests; the local macOS gate
+passed 812. `main` and `origin/main` reached `063a4a6` through that PR.
 
-**Next:** admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
-serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
+**C4 contract design.** ML-PG-CONTRACT defined the proposed version-1
+[portable governance contract](../design/PORTABLE-GOVERNANCE-CONTRACT.md).
+An independent Astra [first review](reviews/ML-PG-CONTRACT.review-1.md)
+caught two high-risk gaps: unaccepted changes could enter through an admitted
+base, and promotion could race policy/spec changes or another promotion. A new
+Sol principal corrected both; a fresh Astra [re-review](reviews/ML-PG-CONTRACT.review-2.md)
+approved the exact two-commit candidate and recorded its verdict. The full
+range is on `integ/C4` (`f3cbf99`), with `lane integrated` true. One local gate
+passed on that clean commit with pinned Elixir 1.20.3, OTP 29.0.5 and ERTS
+17.0.5: 812 model-free tests and all other stages. Provenance:
+`/private/tmp/foundry-C4-gate-2026-09-26/provenance.json`. This is reviewed
+design, not a working custody or acceptance service.
+
+**Next:** run the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
+serially: ML-PG-CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
 current lane CLI and store are their starting point. Pinned `ast-grep` lints remain a
 separate follow-up. A ready-to-integrate lane phase is not an integration claim.
 
@@ -184,6 +200,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), landed on main | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
 | ML-DECOMPOSE-PP | `aa19b69` | `364008a` (two commits) | [approved](reviews/ML-DECOMPOSE-PP.review.md) | integ/C2 (`ee3075e`) + FR-08A rebind (`154dac8`), landed on main | Seven-module split, rule 13 fence and live citations passed 403 reviewer focused tests, compiled 337→347 move check, 18/18 xref, and scratch red controls. Full range integrated; `lane integrated` true. Final 19-pin report `ready=true`, focused test 4/4 |
 | ML-QUINT-CITATIONS | `8f3710b` | `0cc860d` | [approved](reviews/ML-QUINT-CITATIONS.review.md) | integ/C3 (`88642b8`) | Pi/OpenAI Sol developer, independent Astra review and lane receipts. Six scoped Quint spec/README files; all 46 distinct module/function/arity citations resolved, non-comment Quint content unchanged, 3/3 typechecks and 6/6 witnesses passed. Full range integrated; `lane integrated` true. C3 local gate: 812 tests passed |
+| ML-PG-CONTRACT | `063a4a6` | `5eadca5`, then `55d1ddf` (two commits) | [correction 1](reviews/ML-PG-CONTRACT.review-1.md) (accepted-base equality; promotion exclusion), then [approved 2](reviews/ML-PG-CONTRACT.review-2.md) | integ/C4 (`f3cbf99`) | Version-1 portable contract design; no runtime change. Full range integrated; `lane integrated` true. C4 local gate: 812 tests passed |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -222,6 +239,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q19 | First product milestone and value test | **Decided 2026-09-26 by the human:** pivot after the C2 god-module decompositions to [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first). Codex, Claude Code and other clients orchestrate; Foundry provides authenticated durable provenance, exact evidence and acceptance through CLI/MCP. Defer Foundry-run launch, scheduling, billing, session recovery, Pi harness and bundled reference controller until measured need. Use real LokaCore work to compare against the ordinary native-client workflow, including operator effort and false blocks; retain controlled refusal drills. The human clarified that Gateway and Protected Primitives decomposition still proceeds in C2. Request an independent Astra review of the reprioritization before landing it |
 | Q20 | Evaluation repository | **Decided 2026-09-26 by the human:** evaluate Foundry's usefulness while building Foundry, using prospectively matched internal tickets and the ordinary native-client workflow as the comparison. Keep LokaCore separate for now. Revise ML-PG-EVALUATION and its validation protocol; Q19's LokaCore pilot target is superseded, while the portable-governance milestone and C2 decompositions remain. Independent [review 1](reviews/FOUNDRY-EVALUATION.review-1.md) required an observed-acceptance numerator; [review 2](reviews/FOUNDRY-EVALUATION.review-2.md) approved the correction |
 | Q21 | Pi, Codex and Claude Code integration timing | **Decided 2026-09-26 by the human:** record a Foundry plugin/client deliverable for all three hosts. [ML-PG-CLIENTS](https://github.com/lorecrafting/foundry/issues/19) follows protected acceptance and precedes evaluation; Pi may join the current manual lane earlier as an ordinary agent without a governed-integration claim. Share the Foundry protocol and skill; keep host packaging thin and prove real client conformance before claiming portability. No host hook or plugin grants Foundry authority |
+| Q22 | Where to hold the authoritative accepted Git ref for the first milestone | **Operator default 2026-09-26 under the human's continue-without-input instruction:** choose a dedicated local bare repository owned by the protected service under an actual OS access boundary, as [reviewed](reviews/ML-PG-CONTRACT.review-2.md). It is the smallest first proof of exclusive writing. CUSTODY must verify that agents/check workers cannot write it and record the operator-selected initial commit at provisioning. No repository was provisioned by the design ticket. A remote Git host may be supported later only if its exclusive credentials and expected-old atomic update are proved |
 
 ## Frictions
 
@@ -282,6 +300,7 @@ F14–F16 in store 2's first two.
 | ML-DECOMPOSE-GATEWAY-DESIGN | 2 | 2 H (rebind leaves FR-08A red; move check blind to aliases), 4 L | 0 | 0 / 0 |
 | ML-DECOMPOSE-PP-DESIGN | 3 | 3 H (unfenced write primitives; alias collisions; rule 13 vs pins), 2 M | 0 | 0 / 0 |
 | ML-QUINT-CITATIONS | 1 | 0 | 0 | 0 / 0 |
+| ML-PG-CONTRACT | 2 | 2 H (accepted-base equality; promotion exclusion) | 0 | 0 / 0 |
 
 **Reading, 2026-09-24 (11 tickets, before ML-RENAME-BIN-ENV).** Independent review pays: 7 defects caught, one of them
 high, against 2 escapes. The lane itself has caught no real error yet and has blocked one
