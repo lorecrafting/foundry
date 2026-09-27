@@ -85,6 +85,7 @@ defmodule Foundry.ManualLane.MCPTest do
 
     assert get_in(Enum.at(responses, 1), ["result", "tools"]) |> Enum.map(& &1["name"]) == [
              "manual_lane_status",
+             "manual_lane_overview",
              "manual_lane_admit",
              "manual_lane_developer_packet",
              "manual_lane_reviewer_packet",
@@ -155,6 +156,16 @@ defmodule Foundry.ManualLane.MCPTest do
         assert result["content"] == [%{"type" => "text", "text" => body}]
       end
     end
+
+    File.write!(input, JSON.encode!(call("manual_lane_overview", %{})) <> "\n")
+    File.write!(fixture, String.duplicate("x", 16_385))
+
+    [overview] = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_FIXTURE", fixture}])
+    assert overview["result"]["isError"] == true
+
+    assert overview["result"]["content"] == [
+             %{"type" => "text", "text" => "Lane overview exceeds 16 KiB"}
+           ]
   end
 
   test "each allowed operation sends exact argv to the lane and exposes bounded schemas" do
@@ -166,6 +177,7 @@ defmodule Foundry.ManualLane.MCPTest do
 
     calls = [
       {"manual_lane_status", common, ~w(lane status ML-42 --json)},
+      {"manual_lane_overview", %{}, ~w(lane status --json)},
       {"manual_lane_admit",
        Map.merge(common, %{
          "base_ref" => sha,
@@ -267,8 +279,15 @@ defmodule Foundry.ManualLane.MCPTest do
 
     for tool <- get_in(schema, ["result", "tools"]) do
       assert tool["inputSchema"]["additionalProperties"] == false
-      assert "ticket_id" in tool["inputSchema"]["required"]
-      assert tool["inputSchema"]["properties"]["ticket_id"]["maxLength"] == 128
+
+      if tool["name"] == "manual_lane_overview" do
+        assert tool["inputSchema"]["required"] == []
+        assert tool["inputSchema"]["properties"] == %{}
+      else
+        assert "ticket_id" in tool["inputSchema"]["required"]
+        assert tool["inputSchema"]["properties"]["ticket_id"]["maxLength"] == 128
+      end
+
       assert tool["description"] =~ "same-UID"
       assert tool["description"] =~ "partial commit"
       assert tool["description"] =~ "CLI output text is capped at 16 KiB"
@@ -344,6 +363,9 @@ defmodule Foundry.ManualLane.MCPTest do
 
     cases = [
       call("manual_lane_status", %{"ticket_id" => "ML-42", "extra" => true}),
+      call("manual_lane_overview", %{"ticket_id" => "ML-42"}),
+      put_in(call("manual_lane_overview", %{}), ["params", "arguments"], []),
+      update_in(call("manual_lane_overview", %{}), ["params"], &Map.delete(&1, "arguments")),
       call("manual_lane_admit", Map.put(good, "scope", ["../escape"])),
       call("manual_lane_admit", Map.put(good, "acceptance", [])),
       call("manual_lane_admit", Map.put(good, "title", "bad\nline")),
@@ -432,20 +454,35 @@ defmodule Foundry.ManualLane.MCPTest do
            ]
   end
 
-  test "oversized valid status request refuses before CLI and drains for next request" do
+  test "oversized status and overview requests refuse before CLI and drain for the next request" do
     root = temp_root()
     {release, log} = fake_release(root)
     input = Path.join(root, "requests.jsonl")
     status = call("manual_lane_status", %{"ticket_id" => "ML-42"})
-    oversized = JSON.encode!(status) <> String.duplicate(" ", 16_385)
-    File.write!(input, oversized <> "\n" <> JSON.encode!(status) <> "\n")
+    overview = call("manual_lane_overview", %{})
 
-    [refusal, recovered] = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
-    assert refusal["error"]["code"] == -32600
-    assert refusal["id"] == nil
-    assert recovered["result"]["isError"] == false
-    assert get_in(recovered, ["result", "content", Access.at(0), "text"]) == ~s({"ok":true})
-    assert recorded_argv(log) == [~w(lane status ML-42 --json)]
+    File.write!(
+      input,
+      Enum.map_join([status, overview], "", fn request ->
+        encoded = JSON.encode!(request)
+        encoded <> String.duplicate(" ", 16_385) <> "\n" <> encoded <> "\n"
+      end)
+    )
+
+    [status_refusal, status_recovered, overview_refusal, overview_recovered] =
+      run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
+
+    for refusal <- [status_refusal, overview_refusal] do
+      assert refusal["error"]["code"] == -32600
+      assert refusal["id"] == nil
+    end
+
+    for recovered <- [status_recovered, overview_recovered] do
+      assert recovered["result"]["isError"] == false
+      assert get_in(recovered, ["result", "content", Access.at(0), "text"]) == ~s({"ok":true})
+    end
+
+    assert recorded_argv(log) == [~w(lane status ML-42 --json), ~w(lane status --json)]
   end
 
   defp call(name, args),
