@@ -2,7 +2,7 @@
 
 [Foundry](../../README.md) › [Docs](../README.md) › Portable custody reconciliation
 
-**Status:** proposed design-only prerequisite for [ML-PG-CUSTODY](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order); requires independent review and explicit operator policy decisions before any protected Core change. Not an installed service, a receipt, or acceptance of the parent ticket. Source inspected at main `7a41ada9e6a589af17845b0c41b146c92e44424c`; the unmerged custody candidate is **`bb8617e02cfcd13e2e6bfe5f935d952132e0207c`** (independent correction reviews: `/private/tmp/ML-PG-CUSTODY.review-{4,5}.md`).
+**Status:** independently reviewed design-only prerequisite for [ML-PG-CUSTODY](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order) at candidate `a6907df758585db4bcb6034e7e396840f2789b80` ([review 2](../batch-d/reviews/ML-PG-CUSTODY-RECONCILIATION-DESIGN.review-2.md)); explicit operator policy decisions and a reviewed handoff remain before terminal protected Core reconciliation. Not an installed service or acceptance of the parent ticket. Source inspected at main `7a41ada9e6a589af17845b0c41b146c92e44424c`; the unmerged custody candidate is **`bb8617e02cfcd13e2e6bfe5f935d952132e0207c`** (independent correction reviews: `/private/tmp/ML-PG-CUSTODY.review-{4,5}.md`).
 
 ## Boundary and failure
 

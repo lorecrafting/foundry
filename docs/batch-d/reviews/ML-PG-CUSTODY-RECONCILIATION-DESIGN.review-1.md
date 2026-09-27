@@ -1,0 +1,63 @@
+# ML-PG-CUSTODY-RECONCILIATION-DESIGN — independent review 1
+
+- Verdict: **correction**.
+- Admitted base: `7a41ada9e6a589af17845b0c41b146c92e44424c`.
+- Exact candidate: `df14eefd3f2131cccf8778ae1a73c8559892da98`.
+- Principal: `agent:pi-openai-codex-gpt-6-astra/review-ML-PG-CUSTODY-RECONCILIATION-DESIGN-1`.
+- Packet: `/private/tmp/ML-PG-CUSTODY-RECONCILIATION-DESIGN.review-1.json`.
+- Independent fresh review, no delegation. Environment reports `openai-codex`, `gpt-6-astra`, reasoning `high`.
+
+Verified clean detached HEAD at the exact candidate. Reviewed the entire one-commit base-to-candidate range: three admitted documentation paths, 34 insertions/1 deletion. Inspected unmerged custody read-only in the separate clean detached `/private/tmp/ML-PG-CUSTODY-review-5`, verified at `bb8617e02cfcd13e2e6bfe5f935d952132e0207c`. No recorded source was edited.
+
+## Ranked finding
+
+### 1. P1 — The expressly admitted second acceptance criterion is deferred, not designed
+
+**Locations:** `docs/design/PORTABLE-CUSTODY-RECONCILIATION.md:23,30`; corresponding deferral in `docs/README.md:91` and `docs/REPAIR-PLAN.md:156`.
+
+The packet requires: **“Specify recoverable original packet-result-after-consumption cut without retargeting or replay, define exact facts and refusal/restart/red controls.”** The candidate instead says a “separate reviewed design” must identify the durable original result, and its acceptance paragraph leaves the consumed-claim cut pending until that future review. This is an honest safety disposition, but it does **not** meet this packet. Editing the parent backlog to describe the deferral does not amend the admitted acceptance criterion.
+
+The source diagnosis is substantially correct. At the unmerged SHA, `Custody.ordinary_execute/8` journals an intent separately from its action/result (`custody.ex:404-476`); the packet branch pins a predicted execution but leaves the intent pending after consumption (`:713-761`). `Backend.packet/3` reads current ticket/policy facts; `WorkPacket.build/3` requires an active matching attempt and an issued claim (`lib/foundry/work_packet.ex:25-39,143-162`). Issuer success and a matching effect ID do not preserve the complete original packet. Merely retrying that builder cannot implement historical response recovery.
+
+I reran the prior reviewer-owned consumed-packet counterexample against actual scratch Core and the exact unmerged source. Following claim consumption and clean reopen, the exact pending packet request returns `custody_unavailable`, result lookup returns `request_pending`, and only the original execution exists. This verifies safe non-retargeting, **not** recoverability. The fixture constructs the committed pending-intent cut through legitimate Core writes; it is not a killed socket/service experiment.
+
+**Minimum design-only correction:** replace the deferral with one concrete original-result protocol in this ticket. The smallest clear option is a durable canonical packet/result snapshot bound to the authenticated actor/project, complete canonical request digest (including expected revisions), original ticket/attempt/execution/effect/claim, claim epoch, and pinned spec/policy/candidate/check/independence facts. Specify the commitment order, not just those field names:
+
+1. Commit the immutable packet result with claim issuance, or specify an equivalently enforced barrier plus durable reconstruction inputs that makes consumption/exposure before result durability impossible. A separate unguarded snapshot write after `Backend.launch` merely recreates the reported cut. No alternate packet/read/submit route may bypass the barrier.
+2. After consumption, a later attempt, or restart, current authenticated outcome-read authorization plus exact actor/project/request matching returns that original snapshot without requiring an issued claim or the old active attempt. It must never call `launch` to recover an already issued result. Changed content, sibling actor, revoked actor and corrupt/mismatched snapshot refuse; a fresh ID cannot duplicate the operation.
+3. Enumerate before-issue, issued/result-durable but reply-lost, consumed-before-retry, moved-attempt, and repeated-reopen cuts. The decisive positive asserts exact original canonical result equality, unchanged effect/claim/reservation/ordinal counts, and no mutation of a successor. Name red controls for moving/removing the snapshot barrier, substituting the current packet, bypassing identity/digest binding, and losing the snapshot across reopen. An absent historical snapshot remains explicitly unresolved unless equivalent original facts are proved; do not fabricate one.
+
+An equivalent fully specified protocol is acceptable. “Keep pending,” a future design ticket, or a generic terminal refusal is not the requested recoverable-original-result design. No implementation, Core edit, gate or rebind is requested by this correction.
+
+## Other design dimensions attacked
+
+The operator proposal has useful conservative invariants. I found no additional demonstrated unsafe permission in its text; it remains conditional, not authorization to implement unresolved choices.
+
+- **Issuer versus operator:** lines 13-21 correctly require a separate authenticated operator decision while retaining original issuer receipts. Main `Operations.settlement_provenance/3` (`operations.ex:1350-1359`) checks actor, request, channel and quiescence epoch; `ProtectedPrimitives.apply_new/4` injects the real actor. Backend's `current_effect/4` and `settle_root/6` independently bind issuer/receipt. The rerun settlement probe confirms Custody operator refusal, Backend refusal and actual Core `receipt_provenance_mismatch`, including ready reopen with unknown work retained. Reusing the issuer's identity or loosening its ordinary receipt check is not a solution.
+- **Idempotency and CAS:** the proposed same-decision retry, changed-content/actor refusal, original claim identity and CAS are the right requirements. Apply the approved custody contract's ordering: current enrollment and outcome-read permission first; matching completed result next; only new execution uses mutation preconditions. Include the current operator authorization revision and original claim/effect, reservation/ledger generation, leases, infrastructure lineage and exact domain owner in the new decision's read dependencies. A new request ID is not permission to settle/refund twice. Unknown-to-known resolution needs a separately attributable decision, not modification of an earlier record.
+- **Role-specific closure and restart:** `Plan.nonstart/3` (`kernel/plan.ex:163-191`) already stages a bound settlement and infrastructure-limit alternatives; developer and reviewer deciders route to different events. Developer non-start retains the same active attempt and returns to queued/developing-resume; reviewer non-start retains the candidate and returns to awaiting-review, never developer correction. Current allocation/control and finite allowance still govern a successor. Delivery success alone closes neither role. The rerun eight-case matrix confirms delivered/recorded-but-unclosed reviews remain pending across revocation/reopen, while approved/correction/rejected closures have distinct phases; a closed quarantined developer effect remains outstanding.
+- **Important cross-boundary implementation gate:** line 21 explicitly leaves the reviewed handoff rule outstanding. Current `TransitionPlan` binds a non-start to the exact effect's ticket/attempt/execution (`transition_plan.ex:733-747`), and restart validation recognizes `settle_claim` plus a receipt-backed infrastructure settlement (`protected/restart_check.ex:638-741`). A new operator-authored decision does not automatically fit that carrier. Before Core work is authorized, specify its typed authoritative output/binding and replay validation without disguising it as an issuer receipt. The atomic bundle must include disposition, original ledger/lease settlement, ordinal and the correct role event. For already-recorded correction/rejection, “moved parent” must not confuse legitimate loss of the active-attempt pointer with a different target: only the original historical execution's pending cleanup may resume. These are concrete constraints on the explicitly outstanding rule, not an invitation to move the workflow reducer into Core.
+- **Non-delivery and quiescence:** the candidate correctly rejects expiry, revocation, local issuer exit and free-text operator assertion as sufficient proof. R1 permits a previously issued operation to finish after revocation; local death cannot prove a remote channel never delivered. Its line-32 evidence-source and supported-outcome questions genuinely remain operator decisions. Until a reviewed source proves both channel quiescence and exact non-delivery, the terminal branch must stay unavailable and holds/exclusions remain. A digest authenticates content, not the truth of its assertion. The manual lane's attested booleans cannot establish installed-host proof.
+- **Scope and parent obligations:** all changes are documentation-only and within packet scope. The text preserves actual distinct-UID host acceptance, trusted-human-only verdict submission and macOS/Linux restart duties under ML-PG-CUSTODY. Those are not demanded as completed work from this design ticket. Neither this review nor any eventual design approval establishes installed custody acceptance, candidate import, trusted checks or accepted-ref promotion.
+
+## Separate Ponytail Review — complexity only
+
+Lean already. No dependency, abstraction, second store or recovery framework to remove. The missing snapshot/ordering contract is an explicit requirement, not speculative machinery. Prefer the existing Core transaction/request-result mechanisms rather than a parallel journal. **Net: 0 lines proposed for deletion.** This complexity assessment is not an approval verdict.
+
+## Checks and limitations
+
+Artifacts use prefix `/private/tmp/ML-PG-CUSTODY-RECONCILIATION-DESIGN-review-1-`.
+
+- Read AGENTS, index/top-level README, agent brief, current repair-plan governing/milestone sections, workflow R1/R3/R4a and related enforcement rows, complete custody/portable contract designs, both contract reviews, all three custody-design reviews, and `/private/tmp/ML-PG-CUSTODY.review-{4,5}.md`.
+- Read full candidate diff and traced actual Core settlement/read-set/restart/binding code, Backend callers, WorkPacket, and unmerged Custody intent/target/result/status/recovery paths.
+- `elixir bin/check_docs.exs`: **0 broken links**, AGENTS **469/800 words**, exit 0 (`docs.log`).
+- `git diff --check 7a41ada9e6a589af17845b0c41b146c92e44424c..df14eefd3f2131cccf8778ae1a73c8559892da98`: exit 0. Exactly the packet's three scoped files changed.
+- Unmerged focused probes: inspected existing external `/private/tmp/ML-PG-CUSTODY-review-5-regression_test.exs`, selected lines `237:253`: **2 passed, 7 excluded**, seed **18713** (`custody-probes.log`). These deliberately assert the existing pending/refusal behaviors.
+- Inspected and reran `/private/tmp/ML-PG-CUSTODY-review-5-status_test.exs`: **8 passed**, seed **18713** (`status-probes.log`). Total **10 focused reviewer scenarios**, not a whole-custody retest. Existing generated-case comparison/unused-helper warnings were nonfatal. Relational oracle reported zero accepted-transition witnesses; no invariant proof is inferred.
+- Probe commands used `TMPDIR=/private/tmp MIX_ENV=test MIX_DEPS_PATH=/Users/raymondluong/dev/foundry/deps` and an external `MIX_BUILD_PATH`. An initial invocation mistakenly used the design checkout, where Custody is absent: **2 setup failures** (`probes.log`), not candidate defects or red controls. Corrected cwd to the separately verified unmerged checkout and reran successfully with a separate external build directory.
+- No source mutation/red-guard sweep: the candidate implements no new guards. The executable pending/refusal counterexample and static commitment-order attacks assess its contract coverage. Clean reopen probes do not establish crash-at-every-instruction or real socket timing.
+- No full gate, FR-08A rebind, sudo, provisioning, CI, protected-service install, distinct-UID attack, real hostile client-tool acceptance, trusted-human protected verdict, PR, integration or push. Both inspected worktrees remain clean.
+
+## Recording
+
+I will personally submit **correction** for the exact SHA and packet principal through the separate manual lane, save `/private/tmp/ML-PG-CUSTODY-RECONCILIATION-DESIGN-review-1-receipt.json`, and confirm status/log. The receipt and committed lane events, not this file alone, establish the recorded verdict. Protected custody remains unaccepted.
