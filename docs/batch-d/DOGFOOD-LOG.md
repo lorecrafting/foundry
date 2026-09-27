@@ -54,8 +54,18 @@ The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
 
-**Next:** the Quint citation update follows the C2 moves.
-Then admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
+**C3 citation follow-up.** Pi with the OpenAI Codex subscription completed
+ML-QUINT-CITATIONS as an ordinary manual-lane developer, and an independent
+OpenAI Astra reviewer approved and recorded the exact candidate. The full
+one-commit range is on `integ/C3` (`88642b8`), with `lane integrated` true.
+One local gate passed on that clean commit with pinned Elixir 1.20.3, OTP
+29.0.5 and ERTS 17.0.5: 812 model-free tests, warnings-as-errors compile,
+formatting, dependency inventory and escript build. Provenance:
+`/private/tmp/foundry-C3-gate-2026-09-26/provenance.json`. This demonstrates
+Pi can participate in the existing manual lane; it is not yet the governed
+plugin integration promised by ML-PG-CLIENTS.
+
+**Next:** admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
 serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
 current lane CLI and store are their starting point. Pinned `ast-grep` lints remain a
 separate follow-up. A ready-to-integrate lane phase is not an integration claim.
@@ -173,6 +183,7 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-MOVE-CHECK-CONTEXT | `246bdf9` | `70dd91c` (five commits) | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md), [correction 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md), [correction 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md), [approved 5](reviews/ML-MOVE-CHECK-CONTEXT.review-5.md) | integ/C2 (`886c743`), landed on main | Direct Enum mapper normalization only; 13 focused tests and 38 independent compiled comparisons passed, real PP check passed, bounded invocation claim recorded. Full range integrated; `lane integrated` true |
 | ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), landed on main | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
 | ML-DECOMPOSE-PP | `aa19b69` | `364008a` (two commits) | [approved](reviews/ML-DECOMPOSE-PP.review.md) | integ/C2 (`ee3075e`) + FR-08A rebind (`154dac8`), landed on main | Seven-module split, rule 13 fence and live citations passed 403 reviewer focused tests, compiled 337→347 move check, 18/18 xref, and scratch red controls. Full range integrated; `lane integrated` true. Final 19-pin report `ready=true`, focused test 4/4 |
+| ML-QUINT-CITATIONS | `8f3710b` | `0cc860d` | [approved](reviews/ML-QUINT-CITATIONS.review.md) | integ/C3 (`88642b8`) | Pi/OpenAI Sol developer, independent Astra review and lane receipts. Six scoped Quint spec/README files; all 46 distinct module/function/arity citations resolved, non-comment Quint content unchanged, 3/3 typechecks and 6/6 witnesses passed. Full range integrated; `lane integrated` true. C3 local gate: 812 tests passed |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
@@ -270,6 +281,7 @@ F14–F16 in store 2's first two.
 | ML-DEAD-ROUTES | 1 | 0 (1 follow-up) | 0 | 0 / 0 |
 | ML-DECOMPOSE-GATEWAY-DESIGN | 2 | 2 H (rebind leaves FR-08A red; move check blind to aliases), 4 L | 0 | 0 / 0 |
 | ML-DECOMPOSE-PP-DESIGN | 3 | 3 H (unfenced write primitives; alias collisions; rule 13 vs pins), 2 M | 0 | 0 / 0 |
+| ML-QUINT-CITATIONS | 1 | 0 | 0 | 0 / 0 |
 
 **Reading, 2026-09-24 (11 tickets, before ML-RENAME-BIN-ENV).** Independent review pays: 7 defects caught, one of them
 high, against 2 escapes. The lane itself has caught no real error yet and has blocked one
