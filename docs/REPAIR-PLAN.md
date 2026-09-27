@@ -132,6 +132,17 @@ requirements for new protected tickets, or authorize a change to the reviewed
 custody design. Bounded automatic new-work admission remains the later
 [progressive-admission follow-on](https://github.com/lorecrafting/foundry/issues/15).
 
+**User local-install direction 2026-09-27:** prefer PostgreSQL-style service
+ownership: a host administrator installs a fixed Foundry service under its own
+non-admin OS account with private state. The host administrator remains trusted;
+this does not defend against root or an administrator deliberately changing the
+installation. If Foundry instead runs under the developer's ordinary login,
+that convenience mode may be useful but is **not protected from agents sharing
+that login** and must never be labeled protected acceptance. This product choice
+does not remove Q27's separate authenticated operator admission, installed-host
+proof, or the option to revisit a managed service if local onboarding proves too
+costly. Neither install mode is implemented by the current MCP preview.
+
 ### Delivery sequence: portable governance first
 
 **Earlier operator decision 2026-09-26 (dogfood log Q19), now a later protected
