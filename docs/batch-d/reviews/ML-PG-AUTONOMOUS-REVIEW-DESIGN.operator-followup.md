@@ -1,0 +1,11 @@
+# Operator follow-up: role-agnostic protected authority
+
+2026-09-27 — NOT a new lane verdict or reviewer-authored correction.
+
+The ML-PG-AUTONOMOUS-REVIEW-DESIGN review of exact candidate `cfb2de877992985331e512f90954afbe0bc3c6fe` recorded **approved** under its original issued criteria (lane event 367). The archived original notes remain intact with SHA-256 `cfc56a87e4191df1af5fcafd49662b994ce5dc8b4289fdf74e3443b0e1d94228`. This approval does not authorize code, installed custody, or a later changed design criterion.
+
+After that receipt, the operator expressly required that workflow role labels, including `reviewer`, stay out of Foundry's protected Core/service. The reviewer subsequently reported a P1 concern to its supervisor: proposed `docs/design/PORTABLE-AUTONOMOUS-REVIEW.md` lines 13–21 describe a root-installed reviewer broker, permanent UID role enrollment, service-derived reviewer assignment and root reviewer acceptance predicates without defining which semantic role/eligibility/verdict mapping belongs to the replaceable software workflow versus protected generic authority. Existing `Protected.Guards.principal_independence` accepts policy data rather than needing additional hardcoded role sites. The later concern cannot change the already committed approval or its notes digest.
+
+Disposition: keep `cfb2de8` unintegrated. New ticket `ML-PG-AUTONOMOUS-REVIEW-ROLE-AGNOSTIC` was admitted on `927bfd9` to review the *complete* design range under explicit generic attestation/decision and rule-3 criteria; it will receive a new independent reviewer principal and exact-candidate lane verdict. Do not treat the old design approval as satisfying this new gate. Packet-result implementation separately remains suspended at architecture rule 3 with uncommitted prototype.
+
+Incident: an attempted resume of the old reviewer retained an immutable output binding to its original notes path and overwrote the external display copy with 119 bytes after it ended. No lane receipt changed. I preserved those bytes at `/private/tmp/ML-PG-AUTONOMOUS-REVIEW-DESIGN-review-1-overwritten-output.txt`, restored the external display copy byte-for-byte from the lane's archived notes, and verified the archived digest above. Do not resume that reviewer again against the original output binding.

@@ -89,6 +89,7 @@ first lines.
 | [Portable governance contract](design/PORTABLE-GOVERNANCE-CONTRACT.md) | proposed first milestone semantic facts, trust boundary and protected accepted ref |
 | [Portable custody](design/PORTABLE-CUSTODY.md) | proposed first-host service account, caller authentication and isolation acceptance |
 | [Portable custody reconciliation](design/PORTABLE-CUSTODY-RECONCILIATION.md) | proposed bounded revoked-issuer operator evidence and atomic original-packet result protocol; not implemented |
+| [Portable autonomous review amendment](design/PORTABLE-AUTONOMOUS-REVIEW.md) | independently approved design-only generic scoped attestation and preauthorized ordinary exact-ref promotion; implementation review and real-host gates outstanding |
 | [Portable packet provenance](design/PORTABLE-PACKET-PROVENANCE.md) | proposed finite role-neutral packet contract and authenticated pre-import producer seal; design only |
 | [Ecosystem boundary](design/ECOSYSTEM-BOUNDARY.md) | what Foundry owns and what it reuses |
 | [Workflow profiles](design/PROJECT-WORKFLOW-PROFILES.md), [Planning strategies](design/PLANNING-STRATEGIES.md) | project-declared workflows; model-proposed plans |
