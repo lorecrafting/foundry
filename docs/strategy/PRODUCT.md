@@ -8,16 +8,18 @@
 
 This was written as one half of a joint Pramāṇa/Foundry strategy and is now Foundry's
 alone. The horizon (H0–H4) and gate (G0–G4) labels below retain their historical
-full-autonomy meaning. The operator's current first product finish line is the
-[portable governance milestone](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first):
-external agents orchestrate, Foundry authenticates and verifies exact evidence and
-acceptance. FR-22 remains the later full-autonomy repair gate if that expansion is chosen.
+full-autonomy meaning. The current first product finish line is the
+[local workflow assistant](../REPAIR-PLAN.md#delivery-sequence-workflow-first-local-dogfood):
+measure whether it improves on the operator's present workflow prompt and a
+minimal shared skill. The formerly first
+[protected portable governance milestone](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
+is deferred; FR-22 remains the later full-autonomy repair gate if chosen.
 
 ## Choices
 
 | Choice | Proposed direction | Consequence |
 |---|---|---|
-| Foundry investment | Prove portable governed acceptance with existing agent clients, measure its value against their native workflow, then fund only demonstrated gaps | Compose mature agent/orchestration infrastructure; defer the full autonomous repair and bundled controller until the smaller milestone is useful |
+| Foundry investment | Prove a useful same-login local workflow with native clients against the current prompt and a minimal skill, then fund only demonstrated gaps | Reuse the manual lane, Git, PR review and CI; defer host custody, protected acceptance, full autonomous repair and bundled controller until the added value warrants them |
 | Long-term Foundry option | Portable model-directed execution/governance kernel, proved first on a second repository and later on a materially different authorized workflow | Preserve independence now; keep roles/workflows configurable outside the protected authority core; delay multi-tenant platform work until demand is demonstrated |
 
 Foundry's proposed advantage is controlled delivery with understandable failure and
@@ -30,11 +32,13 @@ own the boundary and investment logic.
 
 ## Mission and boundary
 
-Foundry is a trusted execution and governance kernel for model-directed work. Given a
-bounded objective, capable models may propose how to decompose and perform the work;
-Foundry supplies observable progress, controlled authority/expenditure, attributable
-evidence, acceptance and recoverable failure. Software engineering on Foundry itself is the
-first workload and first customer, not the permanent role/workflow model.
+Foundry's longer-term thesis is a trusted execution and governance kernel for
+model-directed work. Given a bounded objective, capable models may propose how to
+decompose and perform the work; the protected design aims for observable progress,
+controlled authority/expenditure, attributable evidence, acceptance and recoverable
+failure. The first same-login workflow product proves none of those security
+claims. Software engineering on Foundry itself is the first workload and first
+customer, not the permanent role/workflow model.
 
 The longer-term product option is the same dependable kernel across repositories and
 across materially different workflows within one project, without Buddhist-domain or
@@ -69,9 +73,10 @@ not that acceptance. This strategy neither closes tickets nor suspends obligatio
 | FR-22 | Require the scenario evidence and explicit unsupported cases before post-repair autonomous product work |
 
 A discovered contradiction returns to the owning contract through review. The
-operator-approved portable milestone changes the active queue, not the evidence
-required to claim a full autonomous repair. Funding that later capability is a
-separate choice informed by the Foundry-internal comparison.
+operator-approved local workflow milestone changes the active queue, not the
+evidence required to claim protected acceptance or a full autonomous repair.
+Funding that later capability is a separate choice informed by the
+Foundry-internal comparison.
 
 ## One operating model, not several overlapping stacks
 

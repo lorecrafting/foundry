@@ -27,16 +27,19 @@ kernel: hold authority/evidence/acceptance invariants stable while comparing wor
 strategies, models, harnesses, context policies, tool configurations, review topologies
 and concurrency by accepted-outcome correctness, effort, latency and resource cost.
 
-**Current first product milestone (operator decision 2026-09-26):** make that protected
-boundary useful to Codex, Claude Code and other external controllers through authenticated
-CLI/MCP operations. Those clients own their agent launches, planning, scheduling, model
-billing and session recovery. Foundry owns only the admitted intent and its own durable
-facts, exact candidate/check/review evidence, acceptance and observed integration. It
-does not claim to enforce model spend, recover external sessions or guarantee their tool
-effects in this milestone. Prove value while building Foundry against the operator's
-ordinary native-agent workflow before expanding the product. Keep LokaCore separate for
-now. The active ticket order and acceptance are
-in the [repair plan](REPAIR-PLAN.md#delivery-sequence-portable-governance-first).
+**Current first product milestone (operator decision 2026-09-27):** test whether a
+same-login local workflow assistant is more useful than the operator's existing
+workflow prompt or a minimal shared checklist/skill. Start with the manual lane,
+connect Pi and Codex (Claude Code when available), and guide scoped work through
+checks, model review, correction and branch/PR publication. Models and native
+clients still own execution and billing. Foundry may record claims and check Git
+facts but cannot authenticate separate principals, isolate agents, protect its
+same-UID store or assert protected acceptance. Default to normal human-reviewed
+PRs and CI. Measure acceptable merged outcomes per total operator hour, missed
+steps and rework while building Foundry; only then seek separately authorized
+Pramāṇa dogfood. The current [repair plan](REPAIR-PLAN.md#delivery-sequence-workflow-first-local-dogfood)
+owns this queue. The 2026-09-26 protected CLI/MCP milestone is now a later option,
+not the first product finish line.
 
 Retain the standalone Elixir/OTP project. Since 2026-09-23 no execution path exists in
 the tree: the OMP-through-Herdr path was deleted with the legacy daemon
@@ -101,7 +104,7 @@ workflow contract remains authoritative for current identities and transitions.
 
 ### Ship a reference controller without making it the kernel
 
-**Deferred until the portable governance milestone proves useful.** Foundry should still work out of the box if a bundled controller is later justified. The candidate distribution (ROADMAP I-F5) is **Foundry Core +
+**Deferred until the local workflow milestone proves useful.** Foundry should still work out of the box if a bundled controller is later justified. The candidate distribution (ROADMAP I-F5) is **Foundry Core +
 an optional bundled Standard Controller**, with external controllers using the same Core
 protocol.
 
