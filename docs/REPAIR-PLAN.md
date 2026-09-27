@@ -165,9 +165,8 @@ its predecessor's interface is reviewed and its own protected policy/spec/contra
 implementation scope are operator-admitted. Independently review protected designs before
 Core/host implementation, then review each implementation's exact candidate and run its
 focused refusal, useful-positive, restart and scratch red controls before integration.
-The independent packet-provenance review correction at
-`/private/tmp/ML-PG-PACKET-PROVENANCE-DESIGN-review-1-run-output.md` is external evidence
-for a P1 cycle and a second P1 ambiguous consuming-entry selection,
+The independent [packet-provenance correction review](batch-d/reviews/ML-PG-PACKET-PROVENANCE-DESIGN.review-1.md) records
+a P1 cycle and a second P1 ambiguous consuming-entry selection,
 **not approval** of that unfinished design; the operator's proposed order is likewise
 input, not an implemented contract. Before foundation code, separately resolve and
 independently review protected admission/producer-seal semantics: pin the authoritative
