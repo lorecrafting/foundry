@@ -5,9 +5,41 @@
 [Product strategy](PRODUCT.md) · [Research register](RESEARCH.md)
 > Moved from Pramāṇa on 2026-09-24 (Pramāṇa commit `2ad8ed9`); Foundry maintains this copy on its own.
 
+## First pilot: local workflow assistant versus prompting
+
+The [current first milestone](../REPAIR-PLAN.md#delivery-sequence-workflow-first-local-dogfood)
+asks whether Foundry saves work or improves outcomes **without** protected identities.
+Compare prospectively selected, similar Foundry maintenance tickets in three arms:
+(A) the operator's actual existing workflow prompt and native client, (B) that
+prompt plus a minimal shared checklist/skill, and (C) the same native client with
+Foundry's local workflow assistance. Use the same model class, ticket scope,
+branch/PR/CI rules, independent model review standard and follow-up window in
+each arm; rotate task order and record differences. Do not cripple the baseline.
+Foundry's current read-only MCP preview is not arm C's full proposed workflow.
+
+Declare the task mix, sample size, observation window, stopping rule and the
+smallest improvement worth maintaining Foundry **before** assigning tasks.
+Primary outcome: changes merged under the common PR rules and independently
+adjudicated acceptable through the window **per total operator hour**, including
+setup, interventions, review, correction and upkeep. Report denominators, escaped
+defects, missed checks/review/PR steps, incorrect candidate links, rework, false
+blocks, model cost and time-to-PR. A reviewer should inspect exact trees, CI and
+PR evidence without knowing the arm where practical. Repeat variable tasks;
+small or unbalanced samples are exploratory, not proof of a win. Do not treat a
+model's own report or a same-UID receipt as independent security evidence.
+
+The marginal question is C versus B: if a small skill or ordinary scripts do the
+job at lower cost, delete or shrink the local service. Keep Foundry if it shows
+useful incremental continuity across sessions/clients, fewer workflow misses or
+more acceptable results per operator hour without disproportionate overhead.
+Only after the Foundry-internal pilot seek separate authorization for Pramāṇa as
+a second repository; its outcomes and policy remain separate. Host isolation
+and protected acceptance need a different threat-model evaluation if funded.
+
 ## Portable governance milestone
 
-The first product milestone in the [repair plan](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
+**Deferred protected evaluation, not the first local product pilot.** If this
+milestone is later chosen, the [protected plan](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 lets Codex, Claude Code or another client orchestrate its own agents. Foundry claims
 durable authenticated admission, exact candidate/check/review evidence and honest
 acceptance/integration, not model-spend enforcement, agent-session recovery or automatic

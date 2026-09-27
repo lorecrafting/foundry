@@ -1,9 +1,10 @@
 # Foundry
 
-**Foundry is a governance kernel for AI agents that write code.** It keeps a durable,
-tamper-evident record of what an agent was asked to do and what it was allowed to spend.
-It also records what the agent actually delivered, and whether an independent reviewer
-accepted it. Agents do the work. Foundry decides what counts.
+**Foundry is a governance kernel for AI agents that write code.** Its current manual
+lane records tickets, submissions and reviews without launching agents. Same-login
+records are useful for following a workflow, but are not tamper-resistant against
+agents with that login or proof of an independent reviewer. Agents do the work;
+Foundry's protected acceptance boundary is a later, separately gated option.
 
 > **Status (2026-09-25): early and not in production.** Foundry runs today as the
 > [manual lane](docs/batch-d/LANE-RUNBOOK.md). It records work but launches nothing:
@@ -28,7 +29,8 @@ agent.
 
 ## The value proposition
 
-Foundry lets capable models direct useful work while it keeps these guarantees:
+Foundry's manual lane helps capable models follow work with these recorded rules.
+They are not host-security guarantees while every participant shares one login:
 
 | Guarantee | What it means in practice |
 |---|---|
@@ -82,27 +84,19 @@ refusals, recovery) and defines the vocabulary.
 
 ## Where it is headed
 
-The [repair plan](docs/REPAIR-PLAN.md) is the sole backlog. It restores capabilities in
-order, each behind evidence:
+The [repair plan](docs/REPAIR-PLAN.md) is the sole backlog. The first product goal
+is a useful **local workflow assistant** for Pi, Codex and, when available, Claude
+Code: work in a branch, run checks, get model review and publish a PR through the
+normal repository rules. The installed MCP preview currently offers only read-only
+manual-lane status; the wider experience is not built yet. Compare it on real
+Foundry tickets against the operator's existing workflow prompt and a minimal
+shared checklist before deciding it is worth maintaining. Try Pramāṇa as a
+separately authorized second project only after this internal dogfood.
 
-1. **Now: the manual lane, and cleaning up the codebase.** Batch C2 adds precision tooling
-   for agents and splits two oversized Core modules. The live queue is the
-   [dogfood log handoff](docs/batch-d/DOGFOOD-LOG.md#handoff-where-the-campaign-stands).
-2. **Next: governed execution.** Foundry launches agents itself, inside a proven isolation
-   boundary, through one small harness contract (FR-09, FR-10, FR-15a). Pinned Pi RPC is the
-   preferred first harness to evaluate
-   ([Pi harness](docs/design/PI-HARNESS.md)).
-3. **Then: the full lifecycle.** Corrections, timeouts, scheduling, verified check receipts,
-   Git integration and activation of accepted builds (FR-11 to FR-17), proved end to end
-   by FR-22.
-4. **Longer term: a portable kernel.** One stable authority plane with replaceable
-   controllers, harnesses and execution backends. It becomes a place to compare workflow
-   strategies and models by accepted outcomes, not token counts
-   ([product strategy](docs/strategy/PRODUCT.md)).
-
-Automatic launch stays closed until its owning tickets pass. The only surviving launch
-policy, `LaunchEligibility`, has no callers. It allows subscription-only routes and refuses
-any malformed policy.
+Protected identities, service ownership, automatic acceptance and autonomous
+launch remain [separate, gated options](docs/REPAIR-PLAN.md#delivery-sequence-portable-governance-first),
+not claims of the local product. `LaunchEligibility` has no callers; Foundry does
+not launch agents today.
 
 ## Quick start
 

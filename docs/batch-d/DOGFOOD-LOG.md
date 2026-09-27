@@ -18,6 +18,13 @@ Updated at every batch end, so any operator session (Claude, Codex or a human) c
 cold from the repository alone. Read this, then [the runbook](LANE-RUNBOOK.md), then
 [the agent brief](../AGENT-BRIEF.md).
 
+**Current direction (2026-09-27, Q30).** Dogfood the accountless local workflow
+assistant against the existing prompt and a minimal skill before investing in host
+custody. The MCP preview is read-only status, not the full workflow. The
+[repair plan](../REPAIR-PLAN.md#delivery-sequence-workflow-first-local-dogfood)
+owns the new unprotected queue; protected designs stay deferred. See Q30 and the
+[validation plan](../strategy/VALIDATION.md#first-pilot-local-workflow-assistant-versus-prompting).
+
 **State (2026-09-26, C2 landed).** `main` and `origin/main` reached clean
 `8f3710b3a537d9a3ab6399c972076a558206e751` through [PR #18](https://github.com/lorecrafting/foundry/pull/18).
 The five C2 tickets—precision tooling, Gateway, move-check context, xref ratchet and
@@ -36,7 +43,7 @@ CI only by adding `docs/design/OMA-SUBSTITUTION-EVALUATION.md`; the integration 
 merged that document, `check_docs` found zero broken links, and Linux CI passed again on
 the final PR tip `8f3710b`. No second local gate was run.
 
-**New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
+**Earlier target (Q19, superseded by Q30).** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
 Foundry authenticates and protects exact admission, candidate/check/review evidence,
 and operator-triggered exact-candidate promotion to an authoritative accepted ref through
@@ -285,6 +292,7 @@ through Linux CI on a PR and one local gate before `main` fast-forwarded.
 | Q27 | Who authorizes input and launch of the fixed operator admission client | **Full-range `50aa40b..9fc1780` [independent approval—design only](reviews/ML-PG-CUSTODY-OPERATOR-INPUT-DESIGN.review-1.md), event 451:** both historical ingress attempts received P1 correction; a root launcher with a non-login operator UID does not authenticate schema-valid bytes fed by a developer. Propose administrator-installed OpenSSH forced-command dedicated operator login/session on macOS/Linux, root-owned key/config/client and foreground PTY bounded canonical input with full body/project/revision display and operator confirmation. Service still authenticates accepted peer UID and current protected entitlement; root/admin bootstrap separately authorizes initial enrollment. SSH authenticates session/key, **not** the physical typist; shared key, hostile PTY injection, same-UID tools or untrusted input path keep admission disabled. This is exceptional operator policy/spec maintenance, not a human verdict/promotion click per Q24 ticket or an authorization for autonomous ordinary new-ticket admission. Q26 deliberate live-FD transfer remains delegated authority, never falsely refused. One P3 global-only sshd directive note remains for deployment. Distinct installed-host positives, unauthorized invocation/substitution, FD, lost-reply/restart and scratch red gates remain unrun |
 | Q28 | Must every batch get an extra end-of-batch re-sweep? | **Human decision 2026-09-27, after C11:** remove the automatic re-sweep for docs-only batches whose approved designs are unchanged at integration. Among C3–C11's nine docs/design re-sweeps, four found no actionable finding and five found a stale live status or handoff, with no substantive correctness/security finding (per-sweep time/cost was not recorded); [C11](reviews/C11-BATCH-RESWEEP.md) found one new P3 stale landing note (corrected above), plus a carried deployment note. Keep a fresh re-sweep for code, installed host-authority changes, post-review changes to reviewed semantics, or meaningful unreviewed merge changes. Record exact reviewed/integrated identity and skip rationale. Exact-candidate ticket reviews, batch-freeze contract-row coverage, CI/gates and real host proofs remain required. This operator-authorized policy/status/archive follow-up does not alter the approved C11 design or installed host authority and needs no second C11 re-sweep. |
 | Q29 | Can a usable local MCP seam precede protected acceptance? | **User direction 2026-09-27:** build a small local stdio MCP preview over the existing same-UID manual lane before provisioning the optional hardened host boundary. Admit `ML-PG-MANUAL-MCP-PREVIEW` as an independent read-only status slice on base `57b0cc8`; do not relabel its manual receipts as authenticated operator input, protected acceptance or a portable product milestone. The protected CUSTODY-FOUNDATION → ACCEPTANCE → CLIENTS dependencies and host gates are unchanged if those stronger guarantees are pursued. An actual Pi/Codex/Claude Code client integration is not proved by the initial transport fixture. |
+| Q30 | What is Foundry's first useful product without protected host identities? | **Human direction 2026-09-27, superseding Q19's first finish line and deferring Q24/Q25/Q27 implementation, not their reviewed historical designs or host-proof requirements:** build an accountless local workflow assistant on the manual lane, native clients, branches, checks, model reviews and PRs; first compare matched Foundry tickets using (A) the current workflow prompt, (B) prompt plus minimal shared skill, (C) local Foundry. Require acceptable merged outcomes per total operator hour and report missed steps, rework and overhead; if C adds no meaningful value over B, shrink or stop. Seek separate authorization before a Pramāṇa pilot; keep Pramāṇa code/policy independent. No automatic protected acceptance, authenticated independence, service-account install or FR-22 completion is claimed. Prior install preference is deferred. The [repair plan](../REPAIR-PLAN.md#delivery-sequence-workflow-first-local-dogfood) owns new ticket order; the [validation plan](../strategy/VALIDATION.md#first-pilot-local-workflow-assistant-versus-prompting) owns the comparison. |
 
 ## Frictions
 

@@ -109,39 +109,46 @@ dependency completion evidence, and current source—not the entire audit conver
 Read more when an interface crosses the assigned scope. Switching models alone is
 not a reason to discard useful context.
 
-### Delivery sequence: local MCP first, protected governance separately gated
+### Delivery sequence: workflow-first local dogfood
 
-**User direction 2026-09-27 (dogfood log Q29).** The first usable target is a
-local stdio MCP interface over the existing manual lane. It is same-UID and
-unprotected: its receipts do not authenticate agent/operator identity or confer
-Foundry acceptance. Expand beyond the read-only preview under separate bounded
-reviews; a real second client and cross-product tasks are needed before claiming
-Pi/Codex/Claude Code portability. Hardened host custody and the protected
-acceptance milestone below remain separately gated investment, not prerequisites
-for trying the local interface. Do not weaken their claims by treating manual
-records as protected evidence.
+**Operator decision 2026-09-27 (dogfood log Q30; supersedes Q19/Q29's first
+product finish line, not their historical evidence).** First make Foundry a
+useful local workflow assistant for ordinary Pi, Codex and, when available,
+Claude Code work. Connect once; guide scoped tickets, branches, checks, model
+review, correction and PR publication without repeated ceremony. Use Foundry
+on its own development first, then try a separately authorized Pramāṇa project
+without importing Pramāṇa code or policy into Foundry. This is a workflow
+experience, **not** the full protected Foundry specification or FR-22 closure.
+The current MCP preview supplies read-only `manual_lane_status` only; the rest
+of this local experience is proposed work, not installed functionality.
 
-**User UX direction 2026-09-27:** optimize for installing/connecting Foundry once,
-then doing ordinary work inside Pi, Codex or Claude Code without recurring setup
-commands or a human review/promotion click on every eligible ticket. Compare a
-guided local protected install with a separately operated service against setup
-friction, source privacy, operator effort and actual isolation before choosing the
-protected deployment topology. A client plugin alone does not protect authority;
-this direction does not choose cloud hosting, remove current operator admission
-requirements for new protected tickets, or authorize a change to the reviewed
-custody design. Bounded automatic new-work admission remains the later
-[progressive-admission follow-on](https://github.com/lorecrafting/foundry/issues/15).
+Work under the current login and reuse the existing manual lane/normal Git and
+CI. Recorded principal names and model reviews help follow the process but do
+not authenticate independence or prevent prompt injection or same-UID tampering.
+A local model may suggest a review; it cannot mint protected acceptance. Check
+results and Git refs must be reported honestly; human-reviewed PRs are the
+default publication path. An explicitly authorized ordinary auto-merge policy
+may be tested later, but must not claim isolation or bypass repository rules.
+No `foundry-svc` account, protected bare ref, reviewer credential or fake
+same-UID role separation is required for this milestone. Prior manual records
+cannot later be upgraded into protected evidence by changing the deployment.
 
-**User local-install direction 2026-09-27:** prefer PostgreSQL-style service
-ownership: a host administrator installs a fixed Foundry service under its own
-non-admin OS account with private state. The host administrator remains trusted;
-this does not defend against root or an administrator deliberately changing the
-installation. If Foundry instead runs under the developer's ordinary login,
-that convenience mode may be useful but is **not protected from agents sharing
-that login** and must never be labeled protected acceptance. This product choice
-does not remove Q27's separate authenticated operator admission, installed-host
-proof, or the option to revisit a managed service if local onboarding proves too
-costly. Neither install mode is implemented by the current MCP preview.
+| Next slice (unprotected) | Deliverable and smallest useful check |
+|---|---|
+| ML-WF-LOCAL | Expand the local CLI/MCP seam over **existing** manual-lane operations for status, admission, packet, submission and review; keep operator decisions explicit, bounded input/output and idempotent retries where supported. Exercise one actual corrected ticket; distinguish lane phase from verified Git publication (F6). Do not create a second authority store or call a manual receipt protected acceptance. |
+| ML-WF-CLIENTS | Package a shared workflow description with thin Pi/Codex adapters and Claude Code when available: connect once, surface next eligible action, and work in a branch with focused checks, model review and a PR. Prove a real scoped ticket in two distinct clients before claiming cross-client usability; do not promise native extension features not implemented. |
+| ML-WF-DOGFOOD | Prospectively compare matched Foundry tickets under (A) the operator's current workflow prompt, (B) the same prompt plus a minimal shared checklist/skill, and (C) the local assistant, with the same models, independent review and PR/CI rules. Count acceptable merged outcomes through a declared observation window per total operator hour, rework, missed steps, false blocks and setup/maintenance. Only then seek separate approval to use Pramāṇa as a second workload. If C cannot improve on B enough to pay for its overhead, simplify or stop building the local service; stronger host guarantees require a separate value case. |
+
+Each slice is separately scoped, reviewed on an exact branch candidate and
+published through a PR with CI. These are backlog slices, **not** admitted
+manual-lane tickets or permission to broaden spending, automatic launch or
+existing protected policy. The protected queue below is paused; its previously
+approved designs and exact evidence remain historical options. If stronger
+security becomes necessary, decide anew, provision real separate principals,
+review the design against the chosen host and prove its hostile/positive/restart
+gates before enabling protected acceptance. The earlier 2026-09-27 preference
+for a PostgreSQL-style `foundry-svc` install is deferred, not installed or
+silently approved for a single-login protected deployment.
 
 ### Delivery sequence: portable governance first
 
@@ -194,10 +201,10 @@ before funding it. `FR-22` still owns closure of the full autonomous repair, if 
 
 #### Portable milestone tickets, in dependency order
 
-These `ML-*` work packets are the active queue. They are bounded slices of the named FR
-owners, not a way to certify their full outcomes. The independent **local manual-lane MCP
-preview** below is an unprotected usability slice, not a portable governed-acceptance
-milestone or a substitute for ML-PG-CLIENTS. Admit each protected ticket in the manual
+The protected `ML-PG-*` work packets below are deferred, not the current
+workflow-first backlog. They are bounded FR slices, not a way to certify their
+full outcomes. The already shipped **local manual-lane MCP preview** row is
+unprotected and is not a substitute for protected ML-PG-CLIENTS. Admit each protected ticket in the manual
 lane only when its predecessor's interface is reviewed and its own protected
 policy/spec/contract and implementation scope are operator-admitted.
 Independently review protected designs before Core/host implementation, then review
