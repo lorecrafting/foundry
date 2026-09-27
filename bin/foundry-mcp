@@ -1,0 +1,118 @@
+#!/usr/bin/env elixir
+# Local, unprotected manual-lane preview. This process grants no Foundry authority.
+defmodule FoundryManualMCP do
+  @version "2025-11-25"
+  @tool %{
+    "name" => "manual_lane_status",
+    "description" =>
+      "Read one ticket from Foundry's unprotected same-UID manual lane. Observation only; not protected acceptance or operator identity.",
+    "inputSchema" => %{
+      "type" => "object",
+      "properties" => %{
+        "ticket_id" => %{"type" => "string", "pattern" => "^ML-[A-Za-z0-9-]+$", "maxLength" => 128}
+      },
+      "required" => ["ticket_id"],
+      "additionalProperties" => false
+    }
+  }
+
+  def main, do: loop()
+
+  defp loop do
+    case IO.binread(:stdio, :line) do
+      :eof ->
+        :ok
+
+      {:error, reason} ->
+        IO.puts(:stderr, "MCP input failed: #{inspect(reason)}")
+
+      line ->
+        case reply(line) do
+          nil -> :ok
+          message -> IO.binwrite(:stdio, [:json.encode(message), "\n"])
+        end
+
+        loop()
+    end
+  end
+
+  defp reply(line) do
+    case decode(line) do
+      {:ok, %{"jsonrpc" => "2.0", "method" => method, "id" => id} = request}
+      when is_binary(method) and (is_integer(id) or is_binary(id)) ->
+        dispatch(method, Map.get(request, "params", %{}), id)
+
+      {:ok, %{"jsonrpc" => "2.0", "method" => method} = request}
+      when is_binary(method) and not is_map_key(request, "id") ->
+        nil
+
+      {:ok, _} ->
+        error(nil, -32600, "Invalid Request")
+
+      :error ->
+        error(nil, -32700, "Parse error")
+    end
+  end
+
+  defp decode(line) do
+    {:ok, :json.decode(line)}
+  rescue
+    _ -> :error
+  end
+
+  defp dispatch("initialize", _params, id) do
+    result(id, %{
+      "protocolVersion" => @version,
+      "capabilities" => %{"tools" => %{}},
+      "serverInfo" => %{"name" => "foundry-manual-preview", "version" => "0.1.0"}
+    })
+  end
+
+  defp dispatch("ping", _params, id), do: result(id, %{})
+  defp dispatch("tools/list", _params, id), do: result(id, %{"tools" => [@tool]})
+
+  defp dispatch("tools/call", %{"name" => "manual_lane_status", "arguments" => args}, id)
+       when is_map(args) do
+    case args do
+      %{"ticket_id" => ticket} = all when map_size(all) == 1 and is_binary(ticket) ->
+        if byte_size(ticket) <= 128 and String.match?(ticket, ~r/\AML-[A-Za-z0-9-]+\z/) do
+          result(id, status(ticket))
+        else
+          error(id, -32602, "Invalid ticket_id")
+        end
+
+      _ ->
+        error(id, -32602, "Expected one ticket_id")
+    end
+  end
+
+  defp dispatch("tools/call", _, id), do: error(id, -32602, "Unknown tool or arguments")
+  defp dispatch(_, _, id), do: error(id, -32601, "Method not found")
+
+  defp status(ticket) do
+    {out, code} =
+      System.cmd(Path.expand("foundry", __DIR__), ["lane", "status", ticket, "--json"],
+        stderr_to_stdout: true
+      )
+
+    # ponytail: cap one observation; paginate if a single ticket grows beyond 16 KiB.
+    text = if byte_size(out) > 16_384, do: "Ticket status exceeds 16 KiB", else: String.trim(out)
+
+    %{
+      "content" => [%{"type" => "text", "text" => text}],
+      "isError" => code != 0 or byte_size(out) > 16_384
+    }
+  rescue
+    error ->
+      %{"content" => [%{"type" => "text", "text" => Exception.message(error)}], "isError" => true}
+  end
+
+  defp result(id, body), do: %{"jsonrpc" => "2.0", "id" => id, "result" => body}
+
+  defp error(nil, code, message), do: error(:null, code, message)
+
+  defp error(id, code, message),
+    do: %{"jsonrpc" => "2.0", "id" => id, "error" => %{"code" => code, "message" => message}}
+end
+
+FoundryManualMCP.main()

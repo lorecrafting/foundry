@@ -109,19 +109,32 @@ dependency completion evidence, and current source—not the entire audit conver
 Read more when an interface crosses the assigned scope. Switching models alone is
 not a reason to discard useful context.
 
+### Delivery sequence: local MCP first, protected governance separately gated
+
+**User direction 2026-09-27 (dogfood log Q29).** The first usable target is a
+local stdio MCP interface over the existing manual lane. It is same-UID and
+unprotected: its receipts do not authenticate agent/operator identity or confer
+Foundry acceptance. Expand beyond the read-only preview under separate bounded
+reviews; a real second client and cross-product tasks are needed before claiming
+Pi/Codex/Claude Code portability. Hardened host custody and the protected
+acceptance milestone below remain separately gated investment, not prerequisites
+for trying the local interface. Do not weaken their claims by treating manual
+records as protected evidence.
+
 ### Delivery sequence: portable governance first
 
-**Operator decision 2026-09-26 (dogfood log Q19).** The current product target is a
-**portable governed-acceptance milestone**: Codex, Claude Code or another controller plans,
-launches and coordinates its own agents; Foundry supplies a headless, authenticated,
-durable authority/evidence/acceptance service through one semantic CLI/MCP interface.
+**Earlier operator decision 2026-09-26 (dogfood log Q19), now a later protected
+milestone.** The portable governed-acceptance target is: Codex, Claude Code or
+another controller plans, launches and coordinates its own agents; Foundry
+supplies a headless, authenticated, durable authority/evidence/acceptance
+service through one semantic CLI/MCP interface.
 The existing manual lane is the starting implementation and continues to dogfood Foundry.
 Its historical supervised-dogfood gate below remains a record, not the new product finish
 line. No bundled controller, Foundry-managed agent launch, session scheduler, model billing
-broker, provider harness, autonomous activation or Pi integration is needed for this first
-milestone. Foundry does not claim to enforce model spend or recover agent sessions in it.
+broker, provider harness, autonomous activation or Pi integration is needed for that
+protected milestone. Foundry does not claim to enforce model spend or recover agent sessions in it.
 
-The milestone does require protecting Foundry's own store, policy, Git evidence and
+That protected milestone does require protecting Foundry's own store, policy, Git evidence and
 acceptance from untrusted agent work; authenticating callers and independent reviewers;
 binding candidate, checks and verdict to an exact immutable revision; and promoting the
 reviewed candidate to an authoritative accepted ref with a protected old-ref comparison.
@@ -160,10 +173,13 @@ before funding it. `FR-22` still owns closure of the full autonomous repair, if 
 #### Portable milestone tickets, in dependency order
 
 These `ML-*` work packets are the active queue. They are bounded slices of the named FR
-owners, not a way to certify their full outcomes. Admit each in the manual lane only when
-its predecessor's interface is reviewed and its own protected policy/spec/contract and
-implementation scope are operator-admitted. Independently review protected designs before
-Core/host implementation, then review each implementation's exact candidate and run its
+owners, not a way to certify their full outcomes. The independent **local manual-lane MCP
+preview** below is an unprotected usability slice, not a portable governed-acceptance
+milestone or a substitute for ML-PG-CLIENTS. Admit each protected ticket in the manual
+lane only when its predecessor's interface is reviewed and its own protected
+policy/spec/contract and implementation scope are operator-admitted.
+Independently review protected designs before Core/host implementation, then review
+each implementation's exact candidate and run its
 focused refusal, useful-positive, restart and scratch red controls before integration.
 The independent [packet-provenance correction review](batch-d/reviews/ML-PG-PACKET-PROVENANCE-DESIGN.review-1.md) found a P1 cycle and ambiguous consuming-entry selection; the full corrected `927bfd9..a86ebce` design received [independent approval—design only](batch-d/reviews/ML-PG-PACKET-PROVENANCE-DESIGN.review-2.md) against the separately reviewed Q25 sequence. It pins a role-neutral, operator-admitted consuming entry before producer issue and an exhaustive authenticated seal through import/issue/reopen. This is **not** implemented protected admission, a verified candidate or an attestor decision. The complementary [original-packet transaction/binding design](design/PORTABLE-CUSTODY-PACKET-BINDING.md) received [independent approval—design only](batch-d/reviews/ML-PG-CUSTODY-PACKET-ARCH-DESIGN.review-1.md) at exact candidate `7cda7fe`; both designs must be implemented and independently reviewed before the suspended architecture-red Core prototype could satisfy its packet acceptance. No sealed producer bytes certify Git/checks. Every implementation has its own
 exact-candidate review and normal integration checks. The split does not provide
@@ -177,6 +193,7 @@ provider/network isolation for Foundry-launched agents.
 | ML-PG-PACKET-PROVENANCE-DESIGN | Reviewed design-only prerequisite: finite operator-admitted role-neutral packet contract, protected ticket/attempt consumer selection and complete authenticated producer seal tied to later verified import; [design](design/PORTABLE-PACKET-PROVENANCE.md) | ML-PG-AUTONOMOUS-REVIEW-ROLE-AGNOSTIC and reviewed Q25 sequence | Full corrected `927bfd9..a86ebce` [review](batch-d/reviews/ML-PG-PACKET-PROVENANCE-DESIGN.review-2.md) approved design only; no new Core role literal, caller-selected producer set, unproved non-start successor, invented check set or early reviewer issue. Protected implementation, full packet-binding design review and actual host acceptance remain separate |
 | ML-PG-CUSTODY-PACKET-ARCH-DESIGN | Reviewed design-only prerequisite: complete role-neutral atomic original-packet transaction/result carrier, authenticated request and enrollment read-set, staged effect/claim/domain/packet binding and historical restart verification; [design](design/PORTABLE-CUSTODY-PACKET-BINDING.md) | ML-PG-PACKET-PROVENANCE-DESIGN and reviewed Q25 sequence | [Independent design review](batch-d/reviews/ML-PG-CUSTODY-PACKET-ARCH-DESIGN.review-1.md) approved exact `927bfd9..7cda7fe` only. No v1 empty-check lie under nonempty policy, no unproved non-start, no new Core role literals; code/host conformance and separate nonempty-check schema remain pending |
 | ML-PG-CUSTODY-OPERATOR-INPUT-DESIGN (Q27; supersedes two corrected ingress attempts) | [Operator ingress design](design/PORTABLE-CUSTODY-OPERATOR-INGRESS.md): distinct service/store/socket, disabled manual Gateway, dedicated trusted operator OS login with root-owned forced client, authenticated/confirmed canonical input and Q26 live-FD acquisition prevention | Reviewed custody, packet-provenance and packet-binding designs, Q24/Q25 and Q26; immutable `553c62b` FD-refusal and `06cef19` input-deputy candidates both received P1 correction, not approval | Independent [full `50aa40b..9fc1780` review](batch-d/reviews/ML-PG-CUSTODY-OPERATOR-INPUT-DESIGN.review-1.md) approved Q27 login/input/body binding and Q26 topology **design only** (event 451; one P3 global-only sshd directive note). Real macOS/Linux separate-UID unauthorized launch and schema-valid substitution, useful operator positive, FD acquisition, revocation, exact retry/reopen and distinct red controls remain future host gates. No code or host enablement from this review |
+| ML-PG-MANUAL-MCP-PREVIEW (unprotected local preview) | Expose one bounded read-only manual-lane ticket status operation over local stdio MCP, reusing `bin/foundry lane status`; no new authority, identity, agent launch or store | Existing manual lane only; independent of the protected queue | A model-free protocol test checks initialize, tool discovery, malformed input/refusal and CLI errors; a live manual ticket status succeeds. Same-UID agents can bypass manual receipts; protected ML-PG-CLIENTS and portability claims remain gated by ML-PG-ACCEPTANCE |
 | ML-PG-CUSTODY-FOUNDATION (new admission; FR-15aB and original-result slice) | Protect service-owned store/policy/local bare ref and socket; provision real distinct operator/developer/service identities, authenticated enrollment/revocation and original atomic developer packet/producer seal at submission. Pin admitted spec, policy, base and protected producer/consumer selection and exhaustive effect lineage; submission bytes remain unverified. Keep candidate execution outside authority | Reviewed ML-PG-CONTRACT, ML-PG-CUSTODY-DESIGN, ML-PG-AUTONOMOUS-REVIEW-ROLE-AGNOSTIC and [custody reconciliation design](design/PORTABLE-CUSTODY-RECONCILIATION.md); separately reviewed packet-provenance admission/seal **and original-packet transaction/binding designs**, plus independently reviewed full-range ML-PG-CUSTODY-OPERATOR-INPUT-DESIGN (Q27) after both ingress P1 corrections, before Core work | Actual macOS/Linux distinct-UID developer and hostile test attempts to edit root files, policy or bare ref, borrow operator/sibling identity, use privileged paths/RPC, replay or use revoked/reassigned UID refuse. Real authorized operator admission and developer issue/submit/seal succeed; atomic original packet bytes survive lost reply, consumed claim and repeated ready reopen without duplicate issue or mutable rebuild. Missing/corrupt old snapshots and unknown revoked issuers hold with exclusions, not invented results or terminal non-start. No reviewer packet, verdict/attestation, protected acceptance or promotion is issued or claimed at this stage |
 | ML-PG-CANDIDATE | FR-13 slice: import the sealed submission into immutable protected Git custody, independently verify complete admitted-base ancestry, scope and exact commit/tree, run mandatory trusted-policy checks and bind complete receipts one-to-one to the authenticated producer seal | ML-PG-CUSTODY-FOUNDATION | A legitimate developer submission produces a verified import and trusted passing checks **without a reviewer packet or broker**; the seal authenticates submitted bytes/lineage but never certifies Git or checks. Stale, unrelated, modified, out-of-scope, duplicate-bound or fabricated-check candidates and candidate-controlled hooks/check definitions refuse. Lost import/check reply and repeated reopen recover the same immutable binding or hold unknown, never infer success or reimport a different candidate |
 | ML-PG-REVIEW-BROKER | FR-15aB generic attestor-authority slice: install operator-owned pinned no-shell/no-extension no-execution broker and distinct attestation-only identity; candidate-executing/search/test worker has no decision authority. Issue reviewer packet and scoped capability only against the verified immutable import, complete producer seal and trusted checks; software workflow owns role/token meanings | ML-PG-CANDIDATE and reviewed generic attestation amendment | Real macOS/Linux hostile candidate and reviewer-visible tools cannot execute under the attestor UID, write protected state or submit a scoped decision; shared UID or unproved tool inventory disables route. Legitimate **agent** reviewer inspects immutable facts through the broker and records one exact, bound policy-listed positive decision under issued capability (not acceptance); changed token/role mapping follows separately admitted policy without new Core role literals. Revocation, sibling/producer identity, lost reply and repeated restart refuse or recover only the original attestation; scratch red controls detect each decisive guard's removal |
@@ -184,6 +201,14 @@ provider/network isolation for Foundry-launched agents.
 | ML-PG-ACCEPTANCE (re-scope/re-admit) | FR-08B/13/14 slice: bind the isolated agent's authenticated exact qualifying decision to immutable candidate/check/spec/policy/assignment facts, distinguish it from protected acceptance, then preauthorize ordinary exact-candidate promotion under operator-installed policy without a human click on every ticket | ML-PG-CUSTODY-CLOSURE, ML-PG-REVIEW-BROKER and ML-PG-CANDIDATE | Wrong principal/lineage or unsupported token/predicate, changed candidate/check/spec/policy/assignment, revoked identity, protected root/policy changes, duplicate submission, direct ref write and moved base refuse or hold. Protected acceptance alone issues a single authorized promotion claim for eligible ordinary work; fixed old-to-new CAS and crash reconciliation preserve exact tree and exclusion. Unknown stays held. Actual macOS/Linux hostile real-tool, useful-positive, restart and red controls pass before host enablement; root/policy upgrades remain operator-maintained. No autonomous agent launcher or activation is claimed |
 | [ML-PG-CLIENTS](https://github.com/lorecrafting/foundry/issues/19) | Manual-lane client seam: expose those semantic operations through CLI and a small MCP surface; package a shared skill for Pi, Codex and Claude Code with only the host-specific adapters each needs. Hooks are optional context/reminders | ML-PG-ACCEPTANCE | Codex completes a real supervised ticket; Pi and Claude Code exercise the same protocol fixture and a real scoped task when available. A second independently implemented real client must pass before a cross-product portability claim. Client restart and repeated calls are idempotent; native agent completion alone cannot mint Foundry acceptance |
 | ML-PG-EVALUATION | FR-18A/22 evidence slice: evaluate Foundry while building Foundry, comparing native-client work with and without Foundry governance on prospectively matched internal tickets; add Claude Code when available. Retain hostile/failed-submission drills. Keep LokaCore outside this milestone | ML-PG-CLIENTS | Publish outcomes actually accepted under each arm's declared rules and independently adjudicated through a declared observation window, actual refusals and baseline outcomes, legitimate-work false blocks, operator hours including review-broker maintenance, exceptional human review and recovery, and maintenance cost under the protocol below. Do not call an unobserved hypothetical harm “prevented”; decide whether the measured value justifies retaining the layer |
+
+The preview starts with `elixir /absolute/path/to/foundry/bin/foundry-mcp` as a local
+stdio MCP command while the manual-lane daemon is running. Its only tool,
+`manual_lane_status`, requires a ticket ID and returns at most 16 KiB. It does not
+admit tickets, record verdicts, authorize acceptance or authenticate callers; it
+is not a service for other users or a protected endpoint. Pi, Codex and Claude
+Code client configuration and a second real client remain future work, not a
+claim of portability from this one process.
 
 Pi can join the current manual lane as an ordinary agent before ML-PG-CLIENTS; that does
 not certify a Foundry integration. The governed client ticket starts after protected
