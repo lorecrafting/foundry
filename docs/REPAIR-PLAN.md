@@ -210,6 +210,16 @@ is not a service for other users or a protected endpoint. Pi, Codex and Claude
 Code client configuration and a second real client remain future work, not a
 claim of portability from this one process.
 
+**Preview dogfood follow-up (unprotected, not part of the shipped ticket):**
+`manual_lane_status` reports the lane's `ready_to_integrate` phase even after
+its commits are published. This is the existing [F6 integration-state gap](batch-d/DOGFOOD-LOG.md#frictions):
+`lane integrated` checks Git ancestry but does not change the lane phase.
+If a real-client trial needs publication visibility, scope a separate read-only
+status improvement that distinguishes lane phase from verified Git integration;
+never infer protected acceptance from either. Record future preview observations
+here only when they warrant a bounded follow-up; log the observed friction in
+the [dogfood log](batch-d/DOGFOOD-LOG.md#frictions).
+
 Pi can join the current manual lane as an ordinary agent before ML-PG-CLIENTS; that does
 not certify a Foundry integration. The governed client ticket starts after protected
 acceptance and precedes evaluation. Its portable unit is the versioned Foundry contract
