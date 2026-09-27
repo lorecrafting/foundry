@@ -167,14 +167,13 @@ defines the preregistered matched tasks, hostile and legitimate controls, indepe
 adjudication, outcome denominators and rules for claiming prevention. ML-PG-EVALUATION
 must report those results before this milestone is called useful.
 
-**Immediate queue disposition.** The reviewed precision tooling, Gateway split, bounded
-move-checker correction, xref ratchet and Protected Primitives split are on `integ/C2`.
-Both splits have their own FR-08A rebind; the final report has 19 pins and `ready=true`.
-These are behavior-preserving maintenance of retained Core, not investment in a bundled
-controller or autonomous execution. Run one local C2 gate, open a visible PR for Linux
-CI, then fast-forward `main` locally after CI passes. The Quint citation rewrite follows
-the Protected split; pinned `ast-grep` lints remain a separate follow-up. No local C2
-gate, CI or PR is claimed at this checkpoint.
+**Immediate queue disposition.** Precision tooling, Gateway, bounded move-checker
+correction, the xref ratchet and Protected Primitives landed on `main` at `8f3710b` via
+[C2 PR #18](https://github.com/lorecrafting/foundry/pull/18), after one local gate and
+Linux CI passed. Both Core splits have their own FR-08A rebind; the final report has 19
+pins and `ready=true`. These are behavior-preserving maintenance of retained Core, not
+investment in a bundled controller or autonomous execution. The Quint citation rewrite
+follows the Protected split; pinned `ast-grep` lints remain a separate follow-up.
 
 <a id="dogfood-gate-amendment"></a>
 **Amended 2026-09-23 (operator, decisions M1–M5 of

@@ -18,62 +18,23 @@ Updated at every batch end, so any operator session (Claude, Codex or a human) c
 cold from the repository alone. Read this, then [the runbook](LANE-RUNBOOK.md), then
 [the agent brief](../AGENT-BRIEF.md).
 
-**State (2026-09-26, portable-governance pivot).** `main` remains clean at
-`c55413fec19b113baa2f463e8dfaeb22674d8f91`; batches 1, A1, A2, B, C1a and C1b are integrated. The legacy daemon stack
-and the Pramāṇa-era names are gone (FR-23b namespace/legacy cleanup integrated;
-decompositions remain; the remaining `pramana` matches are the
-allowlist in [the sweep §5.1](../fr-23/CLEAN-ROOM-SWEEP-2026-09-23.md#51-what-still-says-pramana-after-fr-23b-allowlist)),
-and dated records live at tag `records/2026-09-24` (Q10). The lane runs on store 3 (50/50
-starts, Q9); stores 1 and 2 are archived under `~/.local/state/foundry-lane.store{1,2}-archived-2026-09-24`.
-Batch C1b (evidence tools in the gate, the dead verified-transaction route, and the two approved decomposition designs) is the last integrated batch. Developers and reviewers run their own `lane submit` and `lane review` (Q8). Older lane records still list ML-DEAD-VOCAB as `blocked` (superseded by ML-DEAD-VOCAB-2) and ML-DRILL-1 as `rejected` (drills), both by design.
+**State (2026-09-26, C2 landed).** `main` and `origin/main` reached clean
+`8f3710b3a537d9a3ab6399c972076a558206e751` through [PR #18](https://github.com/lorecrafting/foundry/pull/18).
+The five C2 tickets—precision tooling, Gateway, move-check context, xref ratchet and
+Protected Primitives—have independent recorded reviews and `lane integrated` receipts;
+their exact candidate and integration commits are in the ticket table below. Both Core
+splits were rebound once on their integrated tips. The final FR-08A report has 19 pins,
+`ready=true` and a 4/4 focused test. The move checker allows only the documented direct
+`Enum.map/2` and `Enum.flat_map/2` mapper case; arbitrary closure identity remains outside
+its claim. The lane remains on store 3, with stores 1 and 2 archived.
 
-**Current C2 checkpoint.** ML-PRECISION-TOOLING was admitted on `c55413f` in store 3.
-Its clean developer worktree `/private/tmp/ML-PRECISION-TOOLING-dev-4` ends at
-`6330387904bca51574c3325e3f21b7eb3e5af359`. Four independent GPT-6 Astra reviews
-recorded [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md),
-[correction 2](reviews/ML-PRECISION-TOOLING.review-2.md),
-[correction 3](reviews/ML-PRECISION-TOOLING.review-3.md) and
-[approval 4](reviews/ML-PRECISION-TOOLING.review-4.md). The lane is `ready_to_integrate`;
-the approval receipt is recorded. The full seven-commit candidate range is cherry-picked
-onto `/private/tmp/foundry-integ-C2`; `lane integrated ML-PRECISION-TOOLING --ref integ/C2`
-reported `integrated: true`, with no missing commits. Q16–Q18 approve the two Core
-splits; Q19 changes the product target after this behavior-preserving C2 batch.
-Gateway candidate `0a8db0b` passed its independent
-[Astra review](reviews/ML-DECOMPOSE-GATEWAY.review.md), and its full five-commit range is
-on `integ/C2`; `lane integrated` reported no missing commits. The operator pinned
-`DomainCommit`, `AtomicBundle` and `Maintenance`, then ran one FR-08A rebind on the
-integrated tip. The frozen report says `ready=true` and the FR-08A focused test passed
-4/4; the pin list was 12 at that checkpoint. No batch gate or CI has run.
-ML-DECOMPOSE-PP candidate `364008a` completed the seven-module split in two commits.
-Its independent [Astra review](reviews/ML-DECOMPOSE-PP.review.md) approved the exact
-range, and both commits are on `integ/C2`; `lane integrated` reports true. The reviewer
-passed 403 focused tests, 337→347 compiled definitions, the closed xref table and
-rule-13 red controls. The operator pinned all seven new modules in `b5c2da1` and ran
-one FR-08A rebind in `154dac8`. The report has 19 pins and `ready=true`; its focused
-test passed 4/4. No local C2 gate or PR has run.
-The separate xref ratchet ticket `ML-XREF-PP-RATCHET` has an independently
-[approved review](reviews/ML-XREF-PP-RATCHET.review.md) and is integrated on `integ/C2`:
-the six new compile edges are in the approved dependency table, the ceiling is 18,
-and cycles and forbidden-edge checks remain enforced.
-The first move-context correction candidate `9b3dcd4` received a recorded
-[correction review](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md): equal-body wrong-owner
-captures were accepted, and unchanged duplicate-key captures were falsely refused.
-Its reviewer receipt completed; a fresh correction developer principal is next.
-The second candidate `6429ff7` closed those findings but its recorded
-[review 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md) found one more observable
-false pass: a retained function changed a local capture to a remote capture of the same
-owner. Third candidate `5ecd585` closed that case, but recorded
-[review 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md) found a related false pass when
-the enclosing function moves and its captured helper stays put. Fourth candidate
-`ada78ea` closed that case, but recorded
-[review 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md) found first-class capture identity
-can still collapse when both caller and helper move. Its
-[supplement](reviews/ML-MOVE-CHECK-CONTEXT.review-4-supplement.md) recommends a bounded
-direct `Enum.map/2` or `Enum.flat_map/2` callback allowance for the actual PP need. Fifth
-candidate `70dd91c` received [independent approval](reviews/ML-MOVE-CHECK-CONTEXT.review-5.md)
-under that bounded invocation claim. All five candidate commits are on `integ/C2`, and
-`lane integrated` reports true. Closure introspection through a custom Enumerable is
-outside the checker's claim and is demonstrated in the approval note.
+One local C2 gate passed on clean `43c5383` with pinned Elixir 1.20.3, OTP 29.0.5 and
+ERTS 17.0.5: 812 model-free tests, warnings-as-errors compilation, formatting,
+dependency inventory and escript build. Its provenance is
+`/private/tmp/foundry-C2-gate-pinned-2026-09-26/provenance.json`. `main` advanced during
+CI only by adding `docs/design/OMA-SUBSTITUTION-EVALUATION.md`; the integration branch
+merged that document, `check_docs` found zero broken links, and Linux CI passed again on
+the final PR tip `8f3710b`. No second local gate was run.
 
 **New target.** The operator chose [portable governed acceptance](../REPAIR-PLAN.md#delivery-sequence-portable-governance-first)
 as the first product milestone. Codex, Claude Code and other clients orchestrate agents;
@@ -93,8 +54,7 @@ The operator clarified that C2's god-module
 decomposition still proceeds first; it is maintenance of the retained Core, not a
 bundled-orchestrator expansion.
 
-**Next:** run one local C2 batch gate, open a visible PR for Linux CI, then fast-forward
-`main` locally. The Quint citation update follows the moves.
+**Next:** the Quint citation update follows the C2 moves.
 Then admit the [portable milestone tickets](../REPAIR-PLAN.md#portable-milestone-tickets-in-dependency-order)
 serially: ML-PG-CONTRACT, CUSTODY, CANDIDATE, ACCEPTANCE, CLIENTS and EVALUATION. The
 current lane CLI and store are their starting point. Pinned `ast-grep` lints remain a
@@ -208,11 +168,11 @@ develops, another reviews) is the strongest independence the lane can record (A3
 | ML-DEAD-ROUTES | `e74fb88` | `1414280` | [approved](reviews/ML-DEAD-ROUTES.review.md) | batch C1b + FR-08A rebind | the test-only `transact_verified` route and `ProtectedVerifier` deleted (FR-08A now pins 9); `Observations` kept because FR-18A is in progress (Q11) |
 | ML-DECOMPOSE-GATEWAY-DESIGN | `e74fb88` | `9e4a710`, then `1f50910` | [correction](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-1.md) (the rebind placeholders would have left FR-08A red; a source-AST move check cannot see alias shadowing), then [approved](reviews/ML-DECOMPOSE-GATEWAY-DESIGN.review-2.md) | batch C1b + operator fixup | [design](../design/DECOMPOSE-GATEWAY.md): Gateway facade + DomainCommit + AtomicBundle + Maintenance. The operator aligned its rebind steps with ML-DEAD-ROUTES and the sibling review |
 | ML-DECOMPOSE-PP-DESIGN | `e74fb88` | `281e75c`, `f5dbf47`, then `8b389c1` | [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-1.md) (write fence as an open question; alias collisions; cut clauses), [correction](reviews/ML-DECOMPOSE-PP-DESIGN.review-2.md) (rule 13 would flag the FR-08A pin list), then [approved](reviews/ML-DECOMPOSE-PP-DESIGN.review-3.md) | batch C1b | [design](../design/DECOMPOSE-PROTECTED-PRIMITIVES.md): facade + seven `Protected.*` modules, rule 13 write fence, explicit allowed-edge table, pins 9 → 19 |
-| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | integ/C2 (`229ffc4`), gate pending | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Full seven-commit range cherry-picked; `lane integrated` reported true; no C2 gate or PR yet |
-| ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), gate pending | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
-| ML-MOVE-CHECK-CONTEXT | `246bdf9` | `70dd91c` (five commits) | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md), [correction 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md), [correction 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md), [approved 5](reviews/ML-MOVE-CHECK-CONTEXT.review-5.md) | integ/C2 (`886c743`), gate pending | Direct Enum mapper normalization only; 13 focused tests and 38 independent compiled comparisons passed, real PP check passed, bounded invocation claim recorded. Full range integrated; `lane integrated` true |
-| ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), gate pending | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
-| ML-DECOMPOSE-PP | `aa19b69` | `364008a` (two commits) | [approved](reviews/ML-DECOMPOSE-PP.review.md) | integ/C2 (`ee3075e`) + FR-08A rebind (`154dac8`), gate pending | Seven-module split, rule 13 fence and live citations passed 403 reviewer focused tests, compiled 337→347 move check, 18/18 xref, and scratch red controls. Full range integrated; `lane integrated` true. Final 19-pin report `ready=true`, focused test 4/4 |
+| ML-PRECISION-TOOLING | `c55413f` | `2cf11a0`, `3511fee`, `3d3ec73`, `6330387` | [correction 1](reviews/ML-PRECISION-TOOLING.review-1.md), [correction 2](reviews/ML-PRECISION-TOOLING.review-2.md), [correction 3](reviews/ML-PRECISION-TOOLING.review-3.md), [approved 4](reviews/ML-PRECISION-TOOLING.review-4.md) | integ/C2 (`229ffc4`), landed on main | OpenAI-only developer/reviewer on different models (Q15). Fourth review closed default-generated arities and restricted facade heads with 29 focused tests and red controls. Full seven-commit range cherry-picked; `lane integrated` reported true; C2 gate and PR #18 passed |
+| ML-DECOMPOSE-GATEWAY | `3e27ec0` | `0a8db0b` (five commits) | [approved](reviews/ML-DECOMPOSE-GATEWAY.review.md) | integ/C2 (`aec9734`) + FR-08A rebind (`6955f13`), landed on main | M1–M3 compiled move checks and 103 reviewer focused tests passed; T1 helper changes received a separate probe. `lane integrated` reported true. The contract-citation arity typo was corrected on integration branch; the 12-pin FR-08A report says `ready=true`, 4/4 focused tests passed |
+| ML-MOVE-CHECK-CONTEXT | `246bdf9` | `70dd91c` (five commits) | [correction 1](reviews/ML-MOVE-CHECK-CONTEXT.review-1.md), [correction 2](reviews/ML-MOVE-CHECK-CONTEXT.review-2.md), [correction 3](reviews/ML-MOVE-CHECK-CONTEXT.review-3.md), [correction 4](reviews/ML-MOVE-CHECK-CONTEXT.review-4.md), [approved 5](reviews/ML-MOVE-CHECK-CONTEXT.review-5.md) | integ/C2 (`886c743`), landed on main | Direct Enum mapper normalization only; 13 focused tests and 38 independent compiled comparisons passed, real PP check passed, bounded invocation claim recorded. Full range integrated; `lane integrated` true |
+| ML-XREF-PP-RATCHET | `a9c59dc` | `b6b8afd` | [approved](reviews/ML-XREF-PP-RATCHET.review.md) | integ/C2 (`ade9a14`), landed on main | Exact approved six-edge delta raises compile ceiling 12→18; 2/2 cycle and forbidden-edge guards retained. `lane integrated` reported true |
+| ML-DECOMPOSE-PP | `aa19b69` | `364008a` (two commits) | [approved](reviews/ML-DECOMPOSE-PP.review.md) | integ/C2 (`ee3075e`) + FR-08A rebind (`154dac8`), landed on main | Seven-module split, rule 13 fence and live citations passed 403 reviewer focused tests, compiled 337→347 move check, 18/18 xref, and scratch red controls. Full range integrated; `lane integrated` true. Final 19-pin report `ready=true`, focused test 4/4 |
 
 Batch A2 (four tickets, three integrated) was integrated with one conflict resolved by hand (the audit moved while a link in it changed) and one FR-08A rebind commit by the operator.
 
