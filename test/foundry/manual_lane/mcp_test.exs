@@ -207,6 +207,48 @@ defmodule Foundry.ManualLane.MCPTest do
     end
   end
 
+  test "CLI stderr warnings do not corrupt success and stderr-only refusals remain bounded" do
+    root = temp_root()
+    release = Path.join(root, "fake-release")
+    input = Path.join(root, "request.jsonl")
+
+    File.write!(
+      input,
+      JSON.encode!(call("manual_lane_status", %{"ticket_id" => "ML-42"})) <> "\n"
+    )
+
+    umask_file = Path.join(root, "umask")
+
+    File.write!(
+      release,
+      "#!/bin/sh\numask > \"$FOUNDRY_MCP_UMASK_FILE\"\nprintf '{\"ok\":true}'\necho warning >&2\n"
+    )
+
+    File.chmod!(release, 0o755)
+
+    [success] = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_UMASK_FILE", umask_file}])
+    {expected_umask, 0} = System.cmd("/bin/sh", ["-c", "umask"])
+    assert File.read!(umask_file) == expected_umask
+
+    assert success["result"] == %{
+             "content" => [%{"type" => "text", "text" => ~s({"ok":true})}],
+             "isError" => false
+           }
+
+    File.write!(release, "#!/bin/sh\necho refused-by-lane >&2\nexit 1\n")
+    [refusal] = run(input, [{"FOUNDRY_RELEASE", release}])
+    assert refusal["result"]["isError"] == true
+    assert refusal["result"]["content"] == [%{"type" => "text", "text" => "refused-by-lane"}]
+
+    File.write!(release, "#!/bin/sh\nhead -c 16385 /dev/zero | tr '\\000' x >&2\nexit 1\n")
+    [oversized] = run(input, [{"FOUNDRY_RELEASE", release}])
+    assert oversized["result"]["isError"] == true
+
+    assert oversized["result"]["content"] == [
+             %{"type" => "text", "text" => "Ticket status exceeds 16 KiB"}
+           ]
+  end
+
   test "each allowed operation sends exact argv to the lane and exposes bounded schemas" do
     root = temp_root()
     {release, log} = fake_release(root)

@@ -228,24 +228,40 @@ defmodule FoundryManualMCP do
   end
 
   defp cli(args) do
-    {out, code} =
-      System.cmd(Path.expand("foundry", __DIR__), ["lane" | args] ++ ["--json"],
-        stderr_to_stdout: true
-      )
+    {directory, 0} =
+      System.cmd("mktemp", ["-d", Path.join(System.tmp_dir!(), "foundry-mcp-stderr-XXXXXXXX")])
 
-    # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
-    text =
-      if byte_size(out) > @limit do
-        case args do
-          ["status"] -> "Lane overview exceeds 16 KiB"
-          ["status" | _] -> "Ticket status exceeds 16 KiB"
-          ["log" | _] -> "Lane log exceeds 16 KiB"
-          _ -> "Lane output exceeds 16 KiB"
+    directory = String.trim(directory)
+
+    try do
+      stderr = Path.join(directory, "stderr")
+      # Create diagnostics privately without changing the lane command's inherited umask.
+      {out, code} =
+        System.cmd("/bin/sh", ["-c", "stderr=$1; shift; (umask 077; : >\"$stderr\") || exit; \"$@\" 2>\"$stderr\"", "sh",
+          stderr, Path.expand("foundry", __DIR__), "lane" | args] ++ ["--json"])
+
+      size = File.stat!(stderr).size
+      # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
+      oversized? = byte_size(out) > @limit or (code != 0 and out == "" and size > @limit)
+
+      text =
+        if oversized? do
+          case args do
+            ["status"] -> "Lane overview exceeds 16 KiB"
+            ["status" | _] -> "Ticket status exceeds 16 KiB"
+            ["log" | _] -> "Lane log exceeds 16 KiB"
+            _ -> "Lane output exceeds 16 KiB"
+          end
+        else
+          diagnostic = if code != 0 and out == "", do: File.read!(stderr), else: ""
+          message = if out == "", do: diagnostic, else: out
+          if code != 0 and String.trim(message) == "", do: "Lane command exited with status #{code}", else: String.trim(message)
         end
-      else
-        String.trim(out)
-      end
-    %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(out) > @limit}
+
+      %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or oversized?}
+    after
+      File.rm_rf!(directory)
+    end
   rescue
     error ->
       message = Exception.message(error)
