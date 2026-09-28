@@ -228,8 +228,11 @@ defmodule FoundryManualMCP do
   end
 
   defp cli(args) do
-    stderr_path =
-      Path.join(System.tmp_dir!(), "foundry-mcp-stderr-#{Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)}")
+    {stderr_dir, 0} =
+      System.cmd("mktemp", ["-d", Path.join(System.tmp_dir!(), "foundry-mcp-stderr-XXXXXXXX")])
+
+    stderr_dir = String.trim(stderr_dir)
+    stderr_path = Path.join(stderr_dir, "diagnostics")
 
     {out, code, stderr} =
       try do
@@ -239,7 +242,10 @@ defmodule FoundryManualMCP do
 
         {out, code, File.read!(stderr_path)}
       after
-        File.rm(stderr_path)
+        case File.rm_rf(stderr_dir) do
+          {:ok, _} -> :ok
+          {:error, _, _} -> IO.puts(:stderr, "Failed to remove MCP stderr diagnostics")
+        end
       end
 
     # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.

@@ -243,6 +243,56 @@ defmodule Foundry.ManualLane.MCPTest do
     end
   end
 
+  test "stderr storage is private while the lane command runs and removed afterward" do
+    root = temp_root()
+    tmp = Path.join(root, "stderr-tmp")
+    release = Path.join(root, "fake-release")
+    input = Path.join(root, "request.jsonl")
+    ready = Path.join(root, "ready")
+    go = Path.join(root, "go")
+    File.mkdir!(tmp)
+
+    File.write!(
+      release,
+      "#!/bin/sh\nprintf 'private diagnostic' >&2\ntouch \"$FOUNDRY_MCP_READY\"\n" <>
+        "count=0\nwhile [ ! -f \"$FOUNDRY_MCP_GO\" ] && [ \"$count\" -lt 500 ]; do sleep 0.01; count=$((count + 1)); done\n" <>
+        "printf '{\"ok\":true}'\n"
+    )
+
+    File.chmod!(release, 0o755)
+
+    File.write!(
+      input,
+      JSON.encode!(call("manual_lane_status", %{"ticket_id" => "ML-42"})) <> "\n"
+    )
+
+    task =
+      Task.async(fn ->
+        run(input, [
+          {"TMPDIR", tmp},
+          {"FOUNDRY_RELEASE", release},
+          {"FOUNDRY_MCP_READY", ready},
+          {"FOUNDRY_MCP_GO", go}
+        ])
+      end)
+
+    try do
+      for _ <- 1..500, not File.exists?(ready), do: Process.sleep(10)
+      assert File.exists?(ready), "lane command never reached stderr pause"
+      [stderr_dir] = File.ls!(tmp)
+      path = Path.join(tmp, stderr_dir)
+      assert Bitwise.band(File.stat!(path).mode, 0o777) == 0o700
+      assert File.read!(Path.join(path, "diagnostics")) == "private diagnostic"
+    after
+      File.write!(go, "")
+    end
+
+    [response] = Task.await(task, 15_000)
+    assert response["result"]["content"] == [%{"type" => "text", "text" => ~s({"ok":true})}]
+    assert response["result"]["isError"] == false
+    assert File.ls!(tmp) == []
+  end
+
   test "each allowed operation sends exact argv to the lane and exposes bounded schemas" do
     root = temp_root()
     {release, log} = fake_release(root)
