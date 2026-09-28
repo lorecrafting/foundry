@@ -228,24 +228,36 @@ defmodule FoundryManualMCP do
   end
 
   defp cli(args) do
-    {out, code} =
-      System.cmd(Path.expand("foundry", __DIR__), ["lane" | args] ++ ["--json"],
-        stderr_to_stdout: true
-      )
+    stderr_file =
+      Path.join(System.tmp_dir!(), "foundry-mcp-stderr-#{Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)}")
 
-    # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
-    text =
-      if byte_size(out) > @limit do
-        case args do
-          ["status"] -> "Lane overview exceeds 16 KiB"
-          ["status" | _] -> "Ticket status exceeds 16 KiB"
-          ["log" | _] -> "Lane log exceeds 16 KiB"
-          _ -> "Lane output exceeds 16 KiB"
+    stderr_file |> File.open!([:write, :exclusive]) |> File.close()
+
+    try do
+      argv = [Path.expand("foundry", __DIR__), "lane" | args ++ ["--json"]]
+
+      {stdout, code} =
+        System.cmd("/bin/sh", ["-c", ~s(stderr_file="$1"; shift; exec "$@" 2>"$stderr_file"), "sh", stderr_file | argv])
+
+      stderr = File.read!(stderr_file)
+      out = if code == 0, do: stdout, else: stdout <> stderr
+
+      # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
+      text =
+        if byte_size(out) > @limit do
+          case args do
+            ["status"] -> "Lane overview exceeds 16 KiB"
+            ["status" | _] -> "Ticket status exceeds 16 KiB"
+            ["log" | _] -> "Lane log exceeds 16 KiB"
+            _ -> "Lane output exceeds 16 KiB"
+          end
+        else
+          String.trim(out)
         end
-      else
-        String.trim(out)
-      end
-    %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(out) > @limit}
+      %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(out) > @limit}
+    after
+      File.rm(stderr_file)
+    end
   rescue
     error ->
       message = Exception.message(error)

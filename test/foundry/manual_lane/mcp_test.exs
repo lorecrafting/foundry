@@ -173,6 +173,43 @@ defmodule Foundry.ManualLane.MCPTest do
            ]
   end
 
+  test "CLI stdout stays clean on warnings; stderr-only refusals and oversized errors remain useful" do
+    root = temp_root()
+    release = Path.join(root, "fake-release")
+    input = Path.join(root, "request.jsonl")
+
+    File.write!(
+      release,
+      "#!/bin/sh\nprintf '%s' \"$FOUNDRY_MCP_STDOUT\"\nprintf '%s' \"$FOUNDRY_MCP_STDERR\" >&2\nexit \"$FOUNDRY_MCP_FAIL\"\n"
+    )
+
+    File.chmod!(release, 0o755)
+
+    File.write!(
+      input,
+      JSON.encode!(call("manual_lane_status", %{"ticket_id" => "ML-42"})) <> "\n"
+    )
+
+    for {stdout, stderr, code, expected} <- [
+          {~s({"ok":true}), "warning: delayed lane status", "0", {false, ~s({"ok":true})}},
+          {~s({"ok":true}), String.duplicate("w", 16_385), "0", {false, ~s({"ok":true})}},
+          {"", "refused: daemon unavailable", "1", {true, "refused: daemon unavailable"}},
+          {"", String.duplicate("x", 16_385), "1", {true, "Ticket status exceeds 16 KiB"}}
+        ] do
+      [response] =
+        run(input, [
+          {"FOUNDRY_RELEASE", release},
+          {"FOUNDRY_MCP_STDOUT", stdout},
+          {"FOUNDRY_MCP_STDERR", stderr},
+          {"FOUNDRY_MCP_FAIL", code}
+        ])
+
+      {is_error, text} = expected
+      assert response["result"]["isError"] == is_error
+      assert response["result"]["content"] == [%{"type" => "text", "text" => text}]
+    end
+  end
+
   test "log returns CLI text and bounds oversized output and errors" do
     root = temp_root()
     release = Path.join(root, "fake-release")
