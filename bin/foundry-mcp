@@ -228,14 +228,24 @@ defmodule FoundryManualMCP do
   end
 
   defp cli(args) do
-    {out, code} =
-      System.cmd(Path.expand("foundry", __DIR__), ["lane" | args] ++ ["--json"],
-        stderr_to_stdout: true
-      )
+    stderr_path =
+      Path.join(System.tmp_dir!(), "foundry-mcp-stderr-#{Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)}")
+
+    {out, code, stderr} =
+      try do
+        {out, code} =
+          System.cmd("/bin/sh", ["-c", ~S(stderr="$1"; shift; "$@" 2> "$stderr"), "sh", stderr_path,
+                               Path.expand("foundry", __DIR__), "lane" | args ++ ["--json"]])
+
+        {out, code, File.read!(stderr_path)}
+      after
+        File.rm(stderr_path)
+      end
 
     # ponytail: System.cmd buffers CLI stdout; replace with a streaming runner if daemon output grows unbounded.
+    output = if code != 0 and String.trim(out) == "", do: stderr, else: out
     text =
-      if byte_size(out) > @limit do
+      if byte_size(output) > @limit do
         case args do
           ["status"] -> "Lane overview exceeds 16 KiB"
           ["status" | _] -> "Ticket status exceeds 16 KiB"
@@ -243,9 +253,12 @@ defmodule FoundryManualMCP do
           _ -> "Lane output exceeds 16 KiB"
         end
       else
-        String.trim(out)
+        case String.trim(output) do
+          "" when code != 0 -> "Lane command exited #{code} without output"
+          value -> value
+        end
       end
-    %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(out) > @limit}
+    %{"content" => [%{"type" => "text", "text" => text}], "isError" => code != 0 or byte_size(output) > @limit}
   rescue
     error ->
       message = Exception.message(error)

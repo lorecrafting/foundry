@@ -207,6 +207,42 @@ defmodule Foundry.ManualLane.MCPTest do
     end
   end
 
+  test "CLI stderr does not corrupt successful JSON and supplies bounded failure diagnostics" do
+    root = temp_root()
+    release = Path.join(root, "fake-release")
+    input = Path.join(root, "request.jsonl")
+
+    File.write!(
+      release,
+      "#!/bin/sh\nprintf '%s' \"$FOUNDRY_MCP_STDOUT\"\nprintf '%s' \"$FOUNDRY_MCP_STDERR\" >&2\nexit \"$FOUNDRY_MCP_EXIT\"\n"
+    )
+
+    File.chmod!(release, 0o755)
+
+    File.write!(
+      input,
+      JSON.encode!(call("manual_lane_status", %{"ticket_id" => "ML-42"})) <> "\n"
+    )
+
+    for {stdout, stderr, exit_code, is_error, text} <- [
+          {~s({"ok":true}), "warning: diagnostic", "0", false, ~s({"ok":true})},
+          {"", "error: lane unavailable", "1", true, "error: lane unavailable"},
+          {"", "", "2", true, "Lane command exited 2 without output"},
+          {"", String.duplicate("x", 16_385), "1", true, "Ticket status exceeds 16 KiB"}
+        ] do
+      [response] =
+        run(input, [
+          {"FOUNDRY_RELEASE", release},
+          {"FOUNDRY_MCP_STDOUT", stdout},
+          {"FOUNDRY_MCP_STDERR", stderr},
+          {"FOUNDRY_MCP_EXIT", exit_code}
+        ])
+
+      assert response["result"]["isError"] == is_error
+      assert response["result"]["content"] == [%{"type" => "text", "text" => text}]
+    end
+  end
+
   test "each allowed operation sends exact argv to the lane and exposes bounded schemas" do
     root = temp_root()
     {release, log} = fake_release(root)
