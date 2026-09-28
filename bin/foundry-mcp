@@ -11,6 +11,7 @@ defmodule FoundryManualMCP do
   @text %{"type" => "string", "pattern" => "^(?!--)[^\\x00-\\x1F\\x7F]+$", "minLength" => 1, "maxLength" => 512}
   @tools [
     {"manual_lane_status", "Read one ticket; observation only.", %{"ticket_id" => @ticket}},
+    {"manual_lane_integrated", "Observe Git integration against main; does not change lane phase.", %{"ticket_id" => @ticket}},
     {"manual_lane_overview", "Read lane overview; observation only.", %{}},
     {"manual_lane_log", "Read one ticket's lane log; observation only.", %{"ticket_id" => @ticket}},
     {"manual_lane_admit", "PM explicitly chooses ticket, base, scope and acceptance; this does not authenticate an operator.",
@@ -195,6 +196,9 @@ defmodule FoundryManualMCP do
 
   defp invoke("manual_lane_status", %{"ticket_id" => ticket}),
     do: cli(["status", ticket])
+
+  defp invoke("manual_lane_integrated", %{"ticket_id" => ticket}),
+    do: cli(["integrated", ticket])
 
   defp invoke("manual_lane_overview", _args), do: cli(["status"])
 

@@ -85,6 +85,7 @@ defmodule Foundry.ManualLane.MCPTest do
 
     assert get_in(Enum.at(responses, 1), ["result", "tools"]) |> Enum.map(& &1["name"]) == [
              "manual_lane_status",
+             "manual_lane_integrated",
              "manual_lane_overview",
              "manual_lane_log",
              "manual_lane_admit",
@@ -125,22 +126,27 @@ defmodule Foundry.ManualLane.MCPTest do
     assert Enum.map(tl(responses), & &1["result"]) == [%{}, %{}]
   end
 
-  test "status returns a small CLI result and refuses output beyond 16 KiB" do
+  test "read-only tools return small CLI results and refuse output beyond 16 KiB" do
     root = temp_root()
     release = Path.join(root, "fake-release")
     fixture = Path.join(root, "status-output")
     input = Path.join(root, "request.jsonl")
     File.write!(release, "#!/bin/sh\ncat \"$FOUNDRY_MCP_FIXTURE\"\n")
     File.chmod!(release, 0o755)
-    File.write!(input, JSON.encode!(@status) <> "\n")
 
-    for {body, oversized?} <- [
-          {~s({"ok":true,"mode":"ready","tickets":{}}), false},
-          {String.duplicate("x", 16_384), false},
-          {String.duplicate("x", 16_385), true},
-          {String.duplicate("é", 8_192), false},
-          {String.duplicate("é", 8_193), true}
+    for {tool, body, oversized?, error_text} <- [
+          {"manual_lane_status", ~s({"ok":true,"mode":"ready","tickets":{}}), false, nil},
+          {"manual_lane_status", String.duplicate("x", 16_384), false, nil},
+          {"manual_lane_status", String.duplicate("x", 16_385), true,
+           "Ticket status exceeds 16 KiB"},
+          {"manual_lane_status", String.duplicate("é", 8_192), false, nil},
+          {"manual_lane_status", String.duplicate("é", 8_193), true,
+           "Ticket status exceeds 16 KiB"},
+          {"manual_lane_integrated", ~s({"ok":true,"ref":"main","integrated":true}), false, nil},
+          {"manual_lane_integrated", String.duplicate("x", 16_385), true,
+           "Lane output exceeds 16 KiB"}
         ] do
+      File.write!(input, JSON.encode!(call(tool, %{"ticket_id" => "ML-42"})) <> "\n")
       File.write!(fixture, body)
 
       [response] =
@@ -150,9 +156,7 @@ defmodule Foundry.ManualLane.MCPTest do
       assert result["isError"] == oversized?
 
       if oversized? do
-        assert result["content"] == [
-                 %{"type" => "text", "text" => "Ticket status exceeds 16 KiB"}
-               ]
+        assert result["content"] == [%{"type" => "text", "text" => error_text}]
       else
         assert result["content"] == [%{"type" => "text", "text" => body}]
       end
@@ -212,6 +216,7 @@ defmodule Foundry.ManualLane.MCPTest do
 
     calls = [
       {"manual_lane_status", common, ~w(lane status ML-42 --json)},
+      {"manual_lane_integrated", common, ~w(lane integrated ML-42 --json)},
       {"manual_lane_overview", %{}, ~w(lane status --json)},
       {"manual_lane_log", common, ~w(lane log ML-42 --json)},
       {"manual_lane_admit",
@@ -329,6 +334,12 @@ defmodule Foundry.ManualLane.MCPTest do
       assert tool["description"] =~ "CLI output text is capped at 16 KiB"
     end
 
+    integrated =
+      Enum.find(get_in(schema, ["result", "tools"]), &(&1["name"] == "manual_lane_integrated"))
+
+    assert Map.keys(integrated["inputSchema"]["properties"]) == ["ticket_id"]
+    assert integrated["inputSchema"]["required"] == ["ticket_id"]
+
     log_tool = Enum.find(get_in(schema, ["result", "tools"]), &(&1["name"] == "manual_lane_log"))
     assert log_tool["inputSchema"]["required"] == ["ticket_id"]
     assert Map.keys(log_tool["inputSchema"]["properties"]) == ["ticket_id"]
@@ -412,6 +423,9 @@ defmodule Foundry.ManualLane.MCPTest do
 
     cases = [
       call("manual_lane_status", %{"ticket_id" => "ML-42", "extra" => true}),
+      call("manual_lane_integrated", %{}),
+      call("manual_lane_integrated", %{"ticket_id" => "ML-42", "ref" => "other"}),
+      call("manual_lane_integrated", %{"ticket_id" => "../unsafe"}),
       call("manual_lane_overview", %{"ticket_id" => "ML-42"}),
       put_in(call("manual_lane_overview", %{}), ["params", "arguments"], []),
       update_in(call("manual_lane_overview", %{}), ["params"], &Map.delete(&1, "arguments")),
@@ -476,8 +490,10 @@ defmodule Foundry.ManualLane.MCPTest do
     File.write!(input, Enum.map_join(cases, "\n", &JSON.encode!/1) <> "\n")
 
     responses = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
-    assert length(responses) == length(cases)
-    assert Enum.all?(responses, &(get_in(&1, ["error", "code"]) in [-32602, -32600]))
+
+    assert Enum.map(responses, &get_in(&1, ["error", "code"])) ==
+             List.duplicate(-32602, length(cases) - 1) ++ [-32600]
+
     refute File.exists?(log)
 
     File.write!(input, JSON.encode!(call("manual_lane_admit", good)) <> "\n")
@@ -510,35 +526,32 @@ defmodule Foundry.ManualLane.MCPTest do
            ]
   end
 
-  test "oversized status and overview requests refuse before CLI and drain for the next request" do
+  test "oversized valid read-only requests refuse before CLI and drain for next request" do
     root = temp_root()
     {release, log} = fake_release(root)
     input = Path.join(root, "requests.jsonl")
-    status = call("manual_lane_status", %{"ticket_id" => "ML-42"})
-    overview = call("manual_lane_overview", %{})
 
-    File.write!(
-      input,
-      Enum.map_join([status, overview], "", fn request ->
-        encoded = JSON.encode!(request)
-        encoded <> String.duplicate(" ", 16_385) <> "\n" <> encoded <> "\n"
-      end)
-    )
+    calls = [
+      {"manual_lane_status", %{"ticket_id" => "ML-42"}, ~w(lane status ML-42 --json)},
+      {"manual_lane_integrated", %{"ticket_id" => "ML-42"}, ~w(lane integrated ML-42 --json)},
+      {"manual_lane_overview", %{}, ~w(lane status --json)},
+      {"manual_lane_log", %{"ticket_id" => "ML-42"}, ~w(lane log ML-42 --json)}
+    ]
 
-    [status_refusal, status_recovered, overview_refusal, overview_recovered] =
-      run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
+    for {tool, args, argv} <- calls do
+      request = call(tool, args)
+      oversized = JSON.encode!(request) <> String.duplicate(" ", 16_385)
+      File.write!(input, oversized <> "\n" <> JSON.encode!(request) <> "\n")
 
-    for refusal <- [status_refusal, overview_refusal] do
+      [refusal, recovered] = run(input, [{"FOUNDRY_RELEASE", release}, {"FOUNDRY_MCP_LOG", log}])
       assert refusal["error"]["code"] == -32600
       assert refusal["id"] == nil
-    end
-
-    for recovered <- [status_recovered, overview_recovered] do
       assert recovered["result"]["isError"] == false
       assert get_in(recovered, ["result", "content", Access.at(0), "text"]) == ~s({"ok":true})
+      assert List.last(recorded_argv(log)) == argv
     end
 
-    assert recorded_argv(log) == [~w(lane status ML-42 --json), ~w(lane status --json)]
+    assert recorded_argv(log) == Enum.map(calls, &elem(&1, 2))
   end
 
   defp call(name, args),
