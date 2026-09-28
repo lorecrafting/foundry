@@ -228,10 +228,10 @@ defmodule FoundryManualMCP do
   end
 
   defp cli(args) do
-    stderr_file =
-      Path.join(System.tmp_dir!(), "foundry-mcp-stderr-#{Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false)}")
+    {stderr_path, 0} =
+      System.cmd("mktemp", [Path.join(System.tmp_dir!(), "foundry-mcp-stderr-XXXXXXXX")])
 
-    stderr_file |> File.open!([:write, :exclusive]) |> File.close()
+    stderr_file = String.trim_trailing(stderr_path, "\n")
 
     try do
       argv = [Path.expand("foundry", __DIR__), "lane" | args ++ ["--json"]]

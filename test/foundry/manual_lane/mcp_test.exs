@@ -210,6 +210,66 @@ defmodule Foundry.ManualLane.MCPTest do
     end
   end
 
+  test "temporary stderr is owner-private while the lane is running" do
+    root = temp_root()
+    release = Path.join(root, "fake-release")
+    input = Path.join(root, "request.jsonl")
+    ready = Path.join(root, "ready")
+    resume = Path.join(root, "resume")
+
+    File.write!(
+      release,
+      "#!/bin/sh\necho ready > \"$FOUNDRY_MCP_READY\"\nwhile [ ! -f \"$FOUNDRY_MCP_RESUME\" ]; do sleep 0.05; done\necho refused >&2\nexit 1\n"
+    )
+
+    File.chmod!(release, 0o755)
+
+    File.write!(
+      input,
+      JSON.encode!(call("manual_lane_status", %{"ticket_id" => "ML-42"})) <> "\n"
+    )
+
+    task =
+      Task.async(fn ->
+        {out, 0} =
+          System.cmd(
+            "/bin/sh",
+            ["-c", "umask 022; exec elixir \"$1\" < \"$2\"", "sh", @script, input],
+            env: [
+              {"TMPDIR", root},
+              {"FOUNDRY_RELEASE", release},
+              {"FOUNDRY_MCP_READY", ready},
+              {"FOUNDRY_MCP_RESUME", resume}
+            ]
+          )
+
+        out |> String.split("\n", trim: true) |> Enum.map(&JSON.decode!/1)
+      end)
+
+    try do
+      assert Enum.any?(1..100, fn _ ->
+               if File.exists?(ready),
+                 do: true,
+                 else:
+                   (
+                     Process.sleep(20)
+                     false
+                   )
+             end)
+
+      [stderr_file] = Path.wildcard(Path.join(root, "foundry-mcp-stderr-*"))
+      assert File.regular?(stderr_file)
+      assert Bitwise.band(File.stat!(stderr_file).mode, 0o777) == 0o600
+    after
+      File.write!(resume, "")
+    end
+
+    [response] = Task.await(task, 10_000)
+    assert response["result"]["isError"] == true
+    assert response["result"]["content"] == [%{"type" => "text", "text" => "refused"}]
+    assert Path.wildcard(Path.join(root, "foundry-mcp-stderr-*")) == []
+  end
+
   test "log returns CLI text and bounds oversized output and errors" do
     root = temp_root()
     release = Path.join(root, "fake-release")
